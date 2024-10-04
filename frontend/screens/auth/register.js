@@ -6,29 +6,21 @@ import axios from 'axios'; // Importamos Axios
 export default function Registro({ navigation }) {
   const [correo, setCorreo] = useState('');
   const [contrasena, setContrasena] = useState('');
-  const [confirmarContrasena, setConfirmarContrasena] = useState('');
 
-  const handleRegistro = async () => {
-    // Verificar si las contraseñas coinciden
-    if (contrasena !== confirmarContrasena) {
-      console.log('Las contraseñas no coinciden.');
-      return;
-    }
-
+  const handleRegister = async () => {
     try {
-      // Realizar la petición POST al backend para el registro
-      const response = await axios.post('http://localhost:3000/auth/registro', {
+      await axios.post('http://localhost:3000/auth/register', {
         correo,
         contrasena,
       });
-
-      // Si el registro es exitoso, mostrar mensaje y redirigir al login
-      console.log('Registro exitoso');
-      navigation.navigate('Login'); // Redirigir a la pantalla de login
+      console.log("Usuario registrado con exito.")
+      navigation.navigate('Login');
     } catch (error) {
-      console.log('No se pudo completar el registro');
+      console.error(error);
+      console.log("Error al registrar usuario.", error)
     }
   };
+
 
   return (
     <LinearGradient
@@ -66,16 +58,7 @@ export default function Registro({ navigation }) {
           secureTextEntry={true}
         />
 
-        <TextInput
-          style={styles.input}
-          placeholder="Confirmar Contraseña"
-          placeholderTextColor="#aaa"
-          value={confirmarContrasena}
-          onChangeText={setConfirmarContrasena}
-          secureTextEntry={true}
-        />
-
-        <TouchableOpacity style={styles.button} onPress={handleRegistro}>
+        <TouchableOpacity style={styles.button} onPress={handleRegister}>
           <Text style={styles.buttonText}>Registrarse</Text>
         </TouchableOpacity>
 

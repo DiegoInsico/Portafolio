@@ -10,12 +10,17 @@ const Login = ({ navigation }) => {
 
   const handleLogin = async () => {
     try {
-      const response = await login(correo, contrasena);
-      // Aquí puedes guardar el token recibido si es necesario
-      Alert.alert('Login Exitoso', 'Bienvenido a la app');
-      navigation.navigate('Login');
+      const response = await axios.post('http://tu_backend_url/auth/login', {
+        email,
+        password,
+      });
+      const token = response.data.access_token;
+      await AsyncStorage.setItem('token', token);
+      console.log("Login Exitoso.")
+      // Navega a la pantalla principal o la que desees
     } catch (error) {
-      Alert.alert('Error', 'Credenciales incorrectas');
+      console.error(error);
+      console.log("Error al iniciar sesion.")
     }
   };
 
@@ -36,7 +41,6 @@ const Login = ({ navigation }) => {
 
       <View style={styles.container}>
         <Text style={styles.title}>Inicia Sesión</Text>
-        <Text style={styles.subtitle}>Inicia Sesión</Text>
 
         <TextInput
           style={styles.input}

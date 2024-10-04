@@ -1,32 +1,37 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
-// Importa aquí tus dependencias, como el servicio de usuarios, JWT, etc.
+import { Injectable } from '@nestjs/common';
+import { UserService } from '../user/user.service';
+import { JwtService } from '@nestjs/jwt';
+import * as bcrypt from 'bcryptjs';
 
 @Injectable()
 export class AuthService {
-  async login(loginDto) {
-    const { correo, contrasena } = loginDto;
-    // Aquí debes verificar las credenciales del usuario.
-    // Si son correctas, devuelve un token o la información necesaria.
-    // Si no, lanza una excepción.
-    // Ejemplo:
-    const user = await this.validateUser(correo, contrasena);
-    if (!user) {
-      throw new UnauthorizedException('Credenciales incorrectas');
+  constructor(
+    public userService: UserService,
+    public jwtService: JwtService,
+  ) {}
+
+  async validateUser(email: string, pass: string): Promise<any> {
+    const user = await this.userService.findOneByEmail(email);
+    if (user && (await bcrypt.compare(pass, user.contrasena))) {
+      const { contrasena, ...result } = user;
+      return result;
     }
-    // Genera y devuelve un token JWT u otra información
-    return { token: 'jwt-token-generado' };
+    return null;
   }
 
-  async register(registerDto) {
-    const { correo, contrasena } = registerDto;
-    // Lógica para registrar al usuario
-    // Por ejemplo, crear el usuario en la base de datos
-    return { message: 'Usuario registrado exitosamente' };
+  async login(user: any) {
+    const payload = { email: user.email, sub: user.id };
+    return {
+      access_token: this.jwtService.sign(payload),
+    };
   }
 
-  async validateUser(correo, contrasena) {
-    // Lógica para validar al usuario
-    // Por ejemplo, buscar al usuario en la base de datos y verificar la contraseña
-    return { id: 1, correo };
+  async register(userData: any) {
+    const hashedPassword = await bcrypt.hash(userData.contrasena, 10);
+    const user = await this.userService.create({
+      ...userData,
+      contrasena: hashedPassword,
+    });
+    return user;
   }
 }
