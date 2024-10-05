@@ -1,7 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { UserService } from '../user/user.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
+import { ChangePasswordDto } from './dto/cpassword.dto';
 
 @Injectable()
 export class AuthService {
@@ -10,9 +11,9 @@ export class AuthService {
     public jwtService: JwtService,
   ) {}
 
-  async validateUser(email: string, pass: string): Promise<any> {
-    const user = await this.userService.findOneByEmail(email);
-    if (user && (await bcrypt.compare(pass, user.contrasena))) {
+  async validateUser(correo: string, contrasena: string): Promise<any> {
+    const user = await this.userService.findOneByEmail(correo);
+    if (user && (await bcrypt.compare(contrasena, user.contrasena))) {
       const { contrasena, ...result } = user;
       return result;
     }
@@ -20,7 +21,7 @@ export class AuthService {
   }
 
   async login(user: any) {
-    const payload = { email: user.email, sub: user.id };
+    const payload = { correo: user.correo, sub: user.id };
     return {
       access_token: this.jwtService.sign(payload),
     };
@@ -33,5 +34,24 @@ export class AuthService {
       contrasena: hashedPassword,
     });
     return user;
+  }
+
+  async changePassword(userId: number, changePasswordDto: ChangePasswordDto) {
+    const { contrasenaActual, nuevaContrasena } = changePasswordDto;
+    const user = await this.userService.findOneById(userId);
+    if (!user) {
+      throw new HttpException('Usuario no encontrado', HttpStatus.NOT_FOUND);
+    }
+
+    const passwordMatch = await bcrypt.compare(contrasenaActual, user.contrasena);
+    if (!passwordMatch) {
+      throw new HttpException('La contraseña actual es incorrecta', HttpStatus.BAD_REQUEST);
+    }
+
+    const hashedNewPassword = await bcrypt.hash(nuevaContrasena, 10);
+    user.contrasena = hashedNewPassword;
+    await this.userService.update(user);
+
+    return { message: 'Contraseña actualizada correctamente' };
   }
 }

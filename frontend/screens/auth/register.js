@@ -1,23 +1,28 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Image } from 'react-native';
-import axios from 'axios'; // Importamos Axios
+import axiosInstance from '../../utils/axiosInstance';
 
 export default function Registro({ navigation }) {
   const [correo, setCorreo] = useState('');
   const [contrasena, setContrasena] = useState('');
 
   const handleRegister = async () => {
+    console.log('Datos a enviar:', { correo, contrasena });
     try {
-      await axios.post('http://localhost:3000/auth/register', {
+      const response = await axiosInstance.post('/auth/register', {
         correo,
         contrasena,
       });
+      console.log('Respuesta del servidor:', response.data);
       console.log("Usuario registrado con exito.")
       navigation.navigate('Login');
     } catch (error) {
       console.error(error);
-      console.log("Error al registrar usuario.", error)
+      console.log("Error al registrar usuario.", error);
+      if (error.response) {
+        console.error('Error en la respuesta:', error.response.data); // Log de la respuesta de error del servidor
+      }
     }
   };
 
@@ -59,7 +64,7 @@ export default function Registro({ navigation }) {
         />
 
         <TouchableOpacity style={styles.button} onPress={handleRegister}>
-          <Text style={styles.buttonText}>Registrarse</Text>
+          <Text style={styles.buttonText}>Registrar</Text>
         </TouchableOpacity>
 
         <TouchableOpacity onPress={() => navigation.navigate('Login')}>
