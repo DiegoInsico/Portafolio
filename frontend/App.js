@@ -4,9 +4,8 @@ import { createStackNavigator } from "@react-navigation/stack";
 
 import LoginScreen from "./screens/auth/login";
 import RegisterScreen from "./screens/auth/register";
-import HomeScreen from "./screens/home/HomeScreen";
+import Home from "./screens/home/home";
 import ChangePasswordScreen from "./screens/auth/resetPass";
-import TestGridPage from "./screens/home/homePrueba";
 // Importa otras pantallas que necesites
 
 const Stack = createStackNavigator();
@@ -14,7 +13,7 @@ const Stack = createStackNavigator();
 export default function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="TestGridPage">
+      <Stack.Navigator initialRouteName="Home">
         <Stack.Screen
           name="Login"
           component={LoginScreen}
@@ -27,7 +26,7 @@ export default function App() {
         />
         <Stack.Screen
           name="Home"
-          component={HomeScreen}
+          component={Home}
           options={{ title: "Inicio" }}
         />
         <Stack.Screen

@@ -13,7 +13,7 @@ export default function Navbar() {
       {/* Icono de perfil centrado */}
       <View style={styles.profileContainer}>
         <Image
-          source={require('./../../assets/images/usuario.jpg')} // Imagen de perfil
+          source={require('../assets/test/persona.png')} // Imagen de perfil
           style={styles.profileIcon}
         />
       </View>
