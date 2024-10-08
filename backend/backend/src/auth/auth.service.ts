@@ -3,6 +3,7 @@ import { UserService } from '../user/user.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
 import { ChangePasswordDto } from './dto/cpassword.dto';
+import { User } from 'src/user/entities/user.entity';
 
 @Injectable()
 export class AuthService {
@@ -37,21 +38,26 @@ export class AuthService {
   }
 
   async changePassword(userId: number, changePasswordDto: ChangePasswordDto) {
-    const { contrasenaActual, nuevaContrasena } = changePasswordDto;
+    const { contrasena, confirmarContrasena } = changePasswordDto;
     const user = await this.userService.findOneById(userId);
     if (!user) {
       throw new HttpException('Usuario no encontrado', HttpStatus.NOT_FOUND);
     }
 
-    const passwordMatch = await bcrypt.compare(contrasenaActual, user.contrasena);
+    const passwordMatch = await bcrypt.compare(contrasena, user.contrasena);
     if (!passwordMatch) {
       throw new HttpException('La contraseña actual es incorrecta', HttpStatus.BAD_REQUEST);
     }
 
-    const hashedNewPassword = await bcrypt.hash(nuevaContrasena, 10);
+    const hashedNewPassword = await bcrypt.hash(confirmarContrasena, 10);
     user.contrasena = hashedNewPassword;
     await this.userService.update(user);
 
     return { message: 'Contraseña actualizada correctamente' };
+  }
+
+  async generateJwtToken(user: User, expiresIn: string = '1h'): Promise<string> {
+    const payload = { sub: user.id, correo: user.correo };
+    return this.jwtService.sign(payload, { expiresIn });
   }
 }

@@ -1,16 +1,23 @@
-import { Controller, Post, Body, HttpException, HttpStatus, UseGuards, Put, Request } from '@nestjs/common';
+import { Controller, Post, Body, HttpException, HttpStatus, UseGuards, Put, Request, BadRequestException } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthGuard } from '@nestjs/passport';
 import { ChangePasswordDto } from './dto/cpassword.dto';
+import { RegisterDto } from './dto/register.dto';
+import { LoginDto } from './dto/login.dto';
+import { EmailService } from 'src/email/email.service';
+import { JwtService } from '@nestjs/jwt';
 
 @Controller('auth')
 export class AuthController {
 
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService,
+              private emailService: EmailService,
+              private readonly jwtService: JwtService,
+  ) {}
 
   @Post('login')
-  async login(@Body() body) {
-    const user = await this.authService.validateUser(body.correo, body.contrasena);
+  async login(@Body() loginDto: LoginDto) {
+    const user = await this.authService.validateUser(loginDto.correo, loginDto.contrasena);
     if (user) {
       return this.authService.login(user);
     }
@@ -18,12 +25,20 @@ export class AuthController {
   }
 
   @Post('register')
-  async register(@Body() body) {
-    const existingUser = await this.authService.userService.findOneByEmail(body.correo);
+  async register(@Body() registerDto: RegisterDto) {
+
+    const { usuario, correo, contrasena, confirmarContrasena } = registerDto;
+
+    if (contrasena !== confirmarContrasena) {
+      throw new BadRequestException('Las contraseñas no coinciden');
+    }
+
+    const existingUser = await this.authService.userService.findOneByEmail(registerDto.correo);
     if (existingUser) {
       throw new HttpException('El usuario ya existe', HttpStatus.BAD_REQUEST);
     }
-    const user = await this.authService.register(body);
+
+    const user = await this.authService.register(registerDto);
     return user;
   }
 

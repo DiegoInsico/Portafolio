@@ -13,7 +13,11 @@ const Stack = createStackNavigator();
 export default function App() {
   return (
     <NavigationContainer>
+<<<<<<< Updated upstream
       <Stack.Navigator initialRouteName="Home">
+=======
+      <Stack.Navigator initialRouteName="Iniciar Sesión">
+>>>>>>> Stashed changes
         <Stack.Screen
           name="Login"
           component={LoginScreen}
