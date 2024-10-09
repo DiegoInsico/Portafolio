@@ -1,29 +1,19 @@
 // src/email/email.service.ts
 
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import * as nodemailer from 'nodemailer';
+import * as SendGrid from '@sendgrid/mail';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class EmailService {
-  private transporter: nodemailer.Transporter;
-
   constructor(private configService: ConfigService) {
-    this.transporter = nodemailer.createTransport({
-      host: this.configService.get<string>('EMAIL_HOST'),
-      port: this.configService.get<number>('EMAIL_PORT'),
-      secure: this.configService.get<boolean>('EMAIL_SECURE'), // true para 465, false para otros puertos
-      auth: {
-        user: this.configService.get<string>('EMAIL_USER'),
-        pass: this.configService.get<string>('EMAIL_PASS'),
-      },
-    });
+    SendGrid.setApiKey(this.configService.get<string>('SENDGRID_API_KEY'));
   }
 
-  async sendPasswordResetEmail(to: string, resetLink: string) {
-    const mailOptions: nodemailer.SendMailOptions = {
-      from: this.configService.get<string>('EMAIL_FROM'), // Remitente
+  async sendPasswordResetEmail(to: string, resetLink: string): Promise<void> {
+    const msg: SendGrid.MailDataRequired = {
       to,
+      from: this.configService.get<string>('EMAIL_FROM'), // Asegúrate de que este correo esté verificado en SendGrid
       subject: 'Restablecimiento de Contraseña',
       text: `Hola,
 
@@ -46,7 +36,8 @@ Equipo de Soporte`,
     };
 
     try {
-      await this.transporter.sendMail(mailOptions);
+      await SendGrid.send(msg);
+      console.log(`Correo de restablecimiento enviado a ${to}`);
     } catch (error) {
       console.error('Error al enviar correo:', error);
       throw new InternalServerErrorException('Error al enviar correo de reseteo.');

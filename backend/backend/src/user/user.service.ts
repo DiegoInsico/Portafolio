@@ -55,4 +55,9 @@ export class UserService {
     user.contrasena = await bcrypt.hash(nuevaContrasena, salt);
     await this.update(user);
   }
+
+  async generateJwtToken(user: User, expiresIn: string = '1h'): Promise<string> {
+    const payload = { sub: user.id, correo: user.correo };
+    return this.jwtService.sign(payload, { expiresIn });
+  }
 }

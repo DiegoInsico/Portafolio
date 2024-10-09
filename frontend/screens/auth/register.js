@@ -49,16 +49,17 @@ export default function Registro({ navigation }) {
         usuario: values.usuario,
         correo: values.correo,
         contrasena: values.contrasena,
+        confirmarContrasena: values.confirmarContrasena,
       });
+
       console.log('Respuesta del servidor:', response.data);
-      Alert.alert('Éxito', 'Usuario registrado con éxito.');
       navigation.navigate('Login');
     } catch (error) {
       console.error(error);
-      if (axiosInstance.isAxiosError(error) && error.response) {
+      if (axios.isAxiosError(error) && error.response) {
         const serverMessage =
           error.response.data.message || 'Error al registrar usuario.';
-        Alert.alert('Error', serverMessage);
+        console.log("Error" , serverMessage)
       } else {
         Alert.alert('Error', 'Ocurrió un error inesperado.');
       }

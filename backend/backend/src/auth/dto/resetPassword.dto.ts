@@ -1,6 +1,9 @@
 import { IsString, MinLength, Matches } from 'class-validator';
 
-export class ChangePasswordDto {
+// Propósito: Permitir a un usuario no autenticado (generalmente porque ha olvidado su contraseña) restablecer su contraseña utilizando un token de reseteo que se envía por correo electrónico.
+// Contexto de Uso: Cuando un usuario no puede acceder a su cuenta porque ha olvidado su contraseña y necesita restablecerla.
+
+export class ResetPasswordDto {
   @IsString()
   token: string;
 

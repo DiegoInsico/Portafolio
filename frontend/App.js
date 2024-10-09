@@ -5,7 +5,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import LoginScreen from "./screens/auth/login";
 import RegisterScreen from "./screens/auth/register";
 import Home from "./screens/home/home";
-import ChangePasswordScreen from "./screens/auth/resetPass";
+import RequestPasswordReset from "./screens/auth/resetPass";
 // Importa otras pantallas que necesites
 
 const Stack = createStackNavigator();
@@ -13,11 +13,8 @@ const Stack = createStackNavigator();
 export default function App() {
   return (
     <NavigationContainer>
-<<<<<<< Updated upstream
-      <Stack.Navigator initialRouteName="Home">
-=======
       <Stack.Navigator initialRouteName="Iniciar Sesión">
->>>>>>> Stashed changes
+
         <Stack.Screen
           name="Login"
           component={LoginScreen}
@@ -34,8 +31,8 @@ export default function App() {
           options={{ title: "Inicio" }}
         />
         <Stack.Screen
-          name="ChangePassword"
-          component={ChangePasswordScreen}
+          name="RequestPasswordReset"
+          component={RequestPasswordReset}
           options={{ title: "Cambiar Contraseña" }}
         />
 

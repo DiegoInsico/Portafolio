@@ -9,7 +9,8 @@ import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [ConfigModule.forRoot({ // Asegúrate de que se llame en el módulo raíz
-    isGlobal: true, // Esto permite que ConfigModule sea accesible en toda la aplicación
+    isGlobal: true,
+    envFilePath: '.env' // Esto permite que ConfigModule sea accesible en toda la aplicación
   }),
     TypeOrmModule.forRoot({
       type: 'postgres',
