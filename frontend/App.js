@@ -13,7 +13,7 @@ const Stack = createStackNavigator();
 export default function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Iniciar Sesión">
+      <Stack.Navigator initialRouteName="Home">
 
         <Stack.Screen
           name="Login"

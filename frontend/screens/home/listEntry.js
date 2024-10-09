@@ -11,9 +11,9 @@ const getRandomHeightRatio = (min, max) => {
 // Función para calcular el ratio basado en la longitud del texto
 const getTextHeightRatio = (text) => {
     const length = text.length;
-    if (length <= 50) return 0.7; // Texto corto, ratio bajo
-    if (length <= 100) return 1; // Texto mediano, ratio estándar
-    if (length <= 200) return 1.5; // Texto más largo, ratio más alto
+    if (length <= 40) return 0.6; // Texto corto, ratio bajo
+    if (length <= 70) return 0.8; // Texto mediano, ratio estándar
+    if (length <= 150) return 1.5; // Texto más largo, ratio más alto
     return 2; // Texto muy largo, ratio mayor
 };
 
