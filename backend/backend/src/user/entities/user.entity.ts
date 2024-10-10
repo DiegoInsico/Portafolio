@@ -1,6 +1,6 @@
 import { Entity, Column, PrimaryGeneratedColumn, Unique } from 'typeorm';
 
-@Entity()
+@Entity('users')
 @Unique(['correo']) // Asegura que el correo electrónico sea único
 export class User {
   @PrimaryGeneratedColumn()

@@ -18,7 +18,7 @@ export class EntriesService {
     try {
       return await this.entriesRepository.save(entry);
     } catch (error) {
-      console.log('Erro creando la entrada:', error);
+      console.log('Error creando la entrada:', error);
       throw new InternalServerErrorException('No se pudo crear la entrada')
     }
   }
