@@ -247,6 +247,7 @@ const ModalEntry = ({ visible, onClose, respuesta, setRespuesta }) => {
                                         selectedOptions.includes('Mensaje') && styles.selectedOptions,
                                     ]}
                                     onPress={() => handleSelectOption('Mensaje')}
+                                    name='categoria'
                                 >
                                     <Text style={styles.optionText}>Mensaje</Text>
                                 </Pressable>
@@ -301,7 +302,8 @@ const ModalEntry = ({ visible, onClose, respuesta, setRespuesta }) => {
                                     <FontAwesome name="trash" size={24} color="red" />
                                 </Pressable>
                                 {/* Mostrar la imagen seleccionada */}
-                                <Image source={{ uri: media }} style={styles.image} resizeMode="contain" />
+                                <Image source={{ uri: media }} style={styles.image} resizeMode="contain" 
+                                name='media'/>
                             </View>
                         )}
 
@@ -319,6 +321,7 @@ const ModalEntry = ({ visible, onClose, respuesta, setRespuesta }) => {
                                 style={[styles.textInput, { height: Math.max(20, inputHeight) }]}
                                 placeholder="Cuadro de texto"
                                 multiline
+                                name='descripcion'
                                 value={respuesta}
                                 onChangeText={setRespuesta}
                                 onContentSizeChange={(e) => setInputHeight(e.nativeEvent.contentSize.height)}
@@ -338,6 +341,7 @@ const ModalEntry = ({ visible, onClose, respuesta, setRespuesta }) => {
                                                 style={styles.beneficiaryInput}
                                                 value={beneficiario}
                                                 maxLength={50}
+                                                name='beneficiario'
                                                 onChangeText={(text) => handleBeneficiarioChange(text, index)}
                                                 placeholder="Beneficiario"
                                             />
@@ -362,6 +366,7 @@ const ModalEntry = ({ visible, onClose, respuesta, setRespuesta }) => {
                                     <Pressable
                                         onPress={showDatePicker}
                                         style={{ flexDirection: 'row', alignItems: 'center' }}
+                                        name='fecha_entrega'
                                     >
                                         <MaterialIcons name="date-range" size={24} color="black" />
                                         <Text style={styles.dateText}>{formatDate(date)}</Text>
