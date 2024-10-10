@@ -1,14 +1,6 @@
 import * as React from "react";
 import { NavigationContainer } from "@react-navigation/native";
-import { createStackNavigator } from "@react-navigation/stack";
-
-import LoginScreen from "./screens/auth/login";
-import RegisterScreen from "./screens/auth/register";
-import Home from "./screens/home/home";
-import RequestPasswordReset from "./screens/auth/resetPass";
-// Importa otras pantallas que necesites
-
-const Stack = createStackNavigator();
+import MainStackNavigator from "./navigation/MainStackNavigator";
 
 export default function App() {
   return (
@@ -37,6 +29,7 @@ export default function App() {
         />
 
       </Stack.Navigator>
+      <MainStackNavigator />
     </NavigationContainer>
   );
 }
