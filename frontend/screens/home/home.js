@@ -3,8 +3,8 @@ import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import PropTypes from 'prop-types';
 import EntryListScreen from './listEntry'; // Asegúrate de que la ruta sea correcta
-import ModalEntry from '../entrys/modalEntry';
 import Navbar from '../../components/Header'
+import ModalEntry from '../entrys/modalEntry';
 import Background from '../../components/background';
 
 const entries = [
@@ -161,10 +161,8 @@ const entries = [
     // ... el resto de las entradas ...
 ];
 
-const Home = ({ navigation }) => {
-    const [respuesta, setRespuesta] = useState('');
+export default function Home({ navigation }) {
     const [modalVisible, setModalVisible] = useState(false);
-
     const handlePress = () => {
         setModalVisible(true); // Abrir el modal
     };
@@ -172,7 +170,6 @@ const Home = ({ navigation }) => {
     const handleCloseModal = () => {
         setModalVisible(false); // Cerrar el modal
     };
-
     return (
         <Background>
             <Navbar />
@@ -180,18 +177,14 @@ const Home = ({ navigation }) => {
                 <View style={styles.questionContainer}>
                     <Text style={styles.questionText}>¿Cuál fue tu viaje más importante?</Text>
                 </View>
-
-                <View style={styles.inputContainer}>
+                <View>
                     <Pressable style={styles.addButton} onPress={handlePress}>
-                        <FontAwesome name="plus" size={24} color="white" />
+                        <FontAwesome name="plus" size={40} color="white" />
                     </Pressable>
                 </View>
-
                 <ModalEntry
                     visible={modalVisible}
                     onClose={handleCloseModal}
-                    respuesta={respuesta}
-                    setRespuesta={setRespuesta}
                 />
 
                 <View style={styles.entryListContainer}>
@@ -207,7 +200,6 @@ Home.propTypes = {
     navigation: PropTypes.object.isRequired,
 };
 
-export default Home;
 
 const styles = StyleSheet.create({
     dailyContainer: {
@@ -228,27 +220,6 @@ const styles = StyleSheet.create({
         color: 'black',
         fontWeight: 'bold',
         textAlign: 'center',
-    },
-    inputContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        width: '80%',
-        justifyContent: 'center',
-        marginBottom: 20,
-    },
-    addButton: {
-        width: 45,
-        height: 45,
-        borderRadius: 22.5,
-        backgroundColor: '#C19A6B',
-        justifyContent: 'center',
-        alignItems: 'center',
-        elevation: 5,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.8,
-        shadowRadius: 2,
-        marginLeft: 10,
     },
     entryListContainer: {
         flexGrow: 1,

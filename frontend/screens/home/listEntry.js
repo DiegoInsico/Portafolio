@@ -29,7 +29,7 @@ export default function EntryListScreen({ entries }) {
             text: entry.content.text ?? '', // Mostrar texto si está disponible
             date: entry.date, // Añadimos la fecha
             heightRatio: entry.content.image || entry.content.video
-                ? getRandomHeightRatio(1.3, 2.3) // Si hay media, un ratio fijo
+                ? getRandomHeightRatio(1.3, 2) // Si hay media, un ratio fijo
                 : getTextHeightRatio(entry.content.text || ''), // Si es solo texto, calcular el ratio basado en el texto
         }));
     };
