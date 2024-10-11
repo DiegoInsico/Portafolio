@@ -1,10 +1,10 @@
 import { IsNotEmpty, IsString, IsIn, IsOptional } from 'class-validator';
 
 export class CreateEntryDto {
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
-  @IsIn(['Consejo', 'Reflexión', 'Deseo'])
-  category: string;
+  @IsIn(['Consejo', 'Reflexión', 'Deseo', 'Mensaje'])
+  category?: string;
 
   @IsNotEmpty()
   @IsString()

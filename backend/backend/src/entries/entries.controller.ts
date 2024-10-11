@@ -8,12 +8,12 @@ import { extname } from 'path';
 
 @Controller('entries')
 export class EntriesController {
-  constructor(private readonly entriesService: EntriesService) {}
+  constructor(private readonly entriesService: EntriesService) { }
 
-  @Post()
+  @Post('/submit')
   @UseInterceptors(FileInterceptor('media', {
     storage: diskStorage({
-      destination: './uploads', // Carpeta donde se almacenarán los archivos
+      destination: './uploads',
       filename: (req, file, callback) => {
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
         const ext = extname(file.originalname);
@@ -22,10 +22,14 @@ export class EntriesController {
     }),
     limits: { fileSize: 10 * 1024 * 1024 }, // Limitar el tamaño del archivo a 10MB
     fileFilter: (req, file, callback) => {
-      if (file.mimetype.startsWith('audio/') || file.mimetype.startsWith('video/')) {
+      if (
+        file.mimetype.startsWith('audio/') ||
+        file.mimetype.startsWith('video/') ||
+        file.mimetype.startsWith('image/') // Añadir soporte para imágenes
+      ) {
         callback(null, true);
       } else {
-        callback(new Error('Solo se permiten archivos de audio o video'), false);
+        callback(new Error('Solo se permiten archivos de audio, video o imagen'), false);
       }
     },
   }))
@@ -33,6 +37,9 @@ export class EntriesController {
     @Body() createEntryDto: CreateEntryDto,
     @UploadedFile() file: Express.Multer.File,
   ) {
+    console.log('createEntryDto:', createEntryDto);
+    console.log('Uploaded file:', file);
+
     let media_url: string = null;
     if (file) {
       media_url = `/uploads/${file.filename}`;

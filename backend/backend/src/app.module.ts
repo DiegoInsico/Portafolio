@@ -19,7 +19,7 @@ import { Entry } from './entries/entities/entry.entity';
       host: 'localhost',
       port: 5432,
       username: 'postgres',
-      password: '123456',
+      password: '1234',
       database: 'postgres',
       entities: [__dirname + '/**/*.entity{.ts,.js}', Entry],
       synchronize: true,
