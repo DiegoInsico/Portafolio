@@ -72,17 +72,31 @@ export default function Login({ navigation }) {
 
   return (
     <LinearGradient
-      // Colores del degradado de izquierda a derecha
-      colors={["#b6c0e8", "#ffcccb"]}
-      style={styles.background}
+      colors={[
+        "#D4AF37", // Dorado suave
+        "#E6C47F", // Melocotón suave/dorado claro
+        "#C2A66B", // Dorado oscuro más neutro
+        "#4B4E6D", // Azul grisáceo oscuro para las sombras
+        "#2C3E50", // Negro grisáceo oscuro en la parte inferior
+      ]}
       start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 0 }}
+      end={{ x: 0, y: 1 }}
+      style={styles.background}
     >
       <Image
-        source={require("../../assets/flores.png")} // Reemplaza con la ruta de tu imagen
+        source={require("../../assets/background/imagen-fondo.png")} // Reemplaza con la ruta de tu imagen
         style={styles.image}
         resizeMode="cover"
       />
+
+      <View style={styles.container}>
+        <Image
+          source={require("../../assets/background/florLogo.png")} // Reemplaza con la ruta de tu imagen
+          style={styles.logo}
+          resizeMode="cover"
+        />
+        <Text style={styles.titleSoul}>Soul</Text>
+      </View>
 
       <View style={styles.container}>
         <Text style={styles.title}>Inicia Sesión</Text>
@@ -184,14 +198,10 @@ export default function Login({ navigation }) {
               <TouchableOpacity
                 onPress={() => navigation.navigate("RequestPasswordReset")}
               >
-                <Text style={styles.linkText}>
-                  Has olvidado tu contraseña?
-                </Text>
+                <Text style={styles.linkText}>Has olvidado tu contraseña?</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity
-                onPress={() => navigation.navigate("Register")}
-              >
+              <TouchableOpacity onPress={() => navigation.navigate("Register")}>
                 <Text style={styles.linkText}>
                   ¿No tienes una cuenta? Regístrate
                 </Text>
@@ -211,24 +221,42 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   container: {
-    flex: 1,
-    width: "85%",
+    width: "90%",
     justifyContent: "center",
     alignItems: "center",
-    paddingHorizontal: 20,
+    paddingHorizontal: 5,
+  },
+  logo: {
+    width: 150, // Ajusta el ancho de la imagen
+    height: 150, // Ajusta la altura de la imagen
+    position: "flex",
+    marginTop: 50,
+    shadowColor: "#000000", // Color de la sombra
+    shadowOffset: { width: 5, height: 5 }, // Desplazamiento de la sombra (horizonte/vertical)
+    shadowOpacity: 0.4, // Opacidad de la sombra
+    shadowRadius: 0, // Radio de difuminado de la sombra (IOS)
+    elevation: 0, // Elevación para sombra en Android
   },
   image: {
-    width: "100%",
-    height: 600,
-    position: "absolute",
-    top: 0,
-    opacity: 0.5,
+    width: "70%", // Ajusta el ancho de la imagen
+    height: 200, // Ajusta la altura de la imagen
+    position: "absolute", // Usa "absolute" para posicionar la imagen
+    right: 0, // Pega la imagen a la derecha
+    bottom: 0, // Pega la imagen al fondo
+    opacity: 0.8, // Ajusta la opacidad de la imagen
+  },
+  titleSoul: {
+    fontSize: 28,
+    fontWeight: "bold",
+    color: "#000000",
+    alignSelf: "center",
+    fontFamily: "Montserrat",
   },
   title: {
     fontSize: 28,
     fontWeight: "bold",
     color: "#000000",
-    marginBottom: 20,
+    marginBottom: 50,
     alignSelf: "center",
   },
   form: {
@@ -243,6 +271,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     marginBottom: 10,
     backgroundColor: "#f9f9f9",
+    shadowColor: "#000000", // Color de la sombra
+    shadowOffset: { width: 5, height: 5 }, // Desplazamiento de la sombra (horizonte/vertical)
+    shadowOpacity: 0.4, // Opacidad de la sombra
+    shadowRadius: 10, // Radio de difuminado de la sombra (IOS)
+    elevation: 10, // Elevación para sombra en Android
   },
   iconStyle: {
     marginRight: 5,
@@ -262,14 +295,26 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   button: {
-    backgroundColor: "#ff9999",
+    color: "#fff",
+    backgroundColor: "#D4AF37",
     paddingVertical: 15,
     borderRadius: 8,
     alignItems: "center",
-    marginTop: 10,
+    marginTop: 20,
+    shadowColor: "#000000", // Color de la sombra
+    shadowOffset: { width: 5, height: 5 }, // Desplazamiento de la sombra (horizonte/vertical)
+    shadowOpacity: 0.4, // Opacidad de la sombra
+    shadowRadius: 10, // Radio de difuminado de la sombra (IOS)
+    elevation: 10, // Elevación para sombra en Android
   },
   buttonDisabled: {
-    backgroundColor: "#ccc",
+    color: "#fff",
+    backgroundColor: "#4B4E6D",
+    shadowColor: "#000000", // Color de la sombra
+    shadowOffset: { width: 5, height: 5 }, // Desplazamiento de la sombra (horizonte/vertical)
+    shadowOpacity: 0.4, // Opacidad de la sombra
+    shadowRadius: 10, // Radio de difuminado de la sombra (IOS)
+    elevation: 10, // Elevación para sombra en Android
   },
   buttonText: {
     color: "#000000",
@@ -277,8 +322,8 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   linkText: {
-    color: "#000000",
-    marginTop: 10,
+    color: "#fff",
+    marginTop: 20,
     textAlign: "center",
     fontSize: 14,
     fontWeight: "bold",
