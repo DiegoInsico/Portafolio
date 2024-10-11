@@ -6,6 +6,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const axiosInstance = axios.create({
   baseURL: 'http://localhost:3000', // Reemplaza con tu dirección IP y puerto
   timeout: 10000, // Opcional: tiempo máximo en milisegundos para que una solicitud falle si no hay respuesta
+  headers: {
+    // 'Content-Type': 'multipart/form-data', // Opcional: Deja que Axios lo maneje automáticamente
+  },
 });
 
 // Agregar un interceptor para incluir el token JWT en cada solicitud

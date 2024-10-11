@@ -1,43 +1,66 @@
-import React from 'react';
-import { View, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import React, { useState, useRef } from 'react';
+import { View, StyleSheet, TouchableOpacity, Pressable, SafeAreaView, StatusBar } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
+import ModalEntry from '../screens/entrys/modalEntry';
 
 export default function Navbar() {
-  return (
-    <View style={styles.navbar}>
-      {/* Menú hamburguesa alineado a la derecha */}
-      <TouchableOpacity style={styles.menuButton}>
-        <FontAwesome name="bars" size={28} color="black" />
-      </TouchableOpacity>
+  const [modalVisible, setModalVisible] = useState(false);
+  const handlePress = () => {
+    setModalVisible(true); // Abrir el modal
+  };
 
-      {/* Icono de perfil centrado */}
-      <View style={styles.profileContainer}>
-        <Image
-          source={require('../assets/test/persona.png')} // Imagen de perfil
-          style={styles.profileIcon}
+  const handleCloseModal = () => {
+    setModalVisible(false); // Cerrar el modal
+  };
+  return (
+    <SafeAreaView style={styles.safeArea}>
+      <StatusBar backgroundColor="black" barStyle="light-content" />
+      <View style={styles.navbar}>
+        {/* Menú hamburguesa alineado a la derecha */}
+        <Pressable style={styles.addButton} onPress={handlePress}>
+          <FontAwesome name="plus" size={40} color="white" />
+        </Pressable>
+
+        {/* Icono de perfil centrado */}
+        <View style={styles.inputContainer}>
+          <Pressable style={styles.addButton} onPress={handlePress}>
+            <FontAwesome name="plus" size={40} color="white" />
+          </Pressable>
+        </View>
+        <ModalEntry
+          visible={modalVisible}
+          onClose={handleCloseModal}
         />
+
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 0, // Solo afecta el navbar, no toda la pantalla
+    backgroundColor: '#ee684b', // Color de fondo del área segura
+    paddingTop: StatusBar.currentHeight || 0, // Asegura espacio para la barra de estado
+  },
   navbar: {
-    height: 50, // Ajuste para la altura del navbar
+    height: 0, // Ajuste para la altura del navbar
     backgroundColor: '#ee684b', // Color del navbar
     justifyContent: 'center',
     alignItems: 'center',
     position: 'relative', // Posición relativa para el perfil
   },
-  profileContainer: {
+  inputContainer: {
     position: 'absolute',
-    top: 0, // Este valor mueve el perfil hacia abajo para que sobresalga del navbar
+    top: -50, // Este valor mueve el perfil hacia abajo para que sobresalga del navbar
     left: '50%',
     transform: [{ translateX: -40 }], // Centrar el perfil horizontalmente
-    width: 83,
-    height: 83,
+    width: 80,
+    height: 80,
+    border: 10,
+    borderColor: '#ee684b',
     borderRadius: 40, // Hace que el contenedor sea circular
-    backgroundColor: '#ee684b', // Fondo blanco detrás de la imagen
+    backgroundColor: '#C19A6B', // Fondo blanco detrás de la imagen
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 1, // Asegura que el perfil esté por encima del navbar
@@ -50,6 +73,6 @@ const styles = StyleSheet.create({
   menuButton: {
     position: 'absolute',
     right: 20, // Alinea el botón de menú a la derecha
-    top: 10, // Ajusta la posición vertical del botón de menú
+    top: -38, // Ajusta la posición vertical del botón de menú
   },
 });

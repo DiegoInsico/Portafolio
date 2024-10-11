@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import {
-    Modal, View, Text, TextInput, Pressable, StyleSheet, ScrollView, Alert, Image,
+    Modal, View, Text, TextInput, Pressable, StyleSheet, ScrollView, Alert, Image, ImageBackground
 } from 'react-native';
 import { FontAwesome, MaterialIcons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
+import axiosInstance from '../../utils/axiosInstance';
+import { Platform } from 'react-native';
 
 /**
  * ModalEntry Component
@@ -13,16 +15,18 @@ import DateTimePickerModal from 'react-native-modal-datetime-picker';
  * Incluye campos para texto, selección de opciones, carga de imágenes y videos, selección de fecha y
  * manejo de beneficiarios.
  */
-const ModalEntry = ({ visible, onClose, respuesta, setRespuesta }) => {
+const ModalEntry = ({ visible, onClose }) => {
 
     //Almacenar la URI de la imagen y video seleccionada
     const [media, setMedia] = useState(null);
+    const [respuesta, setRespuesta] = useState('');
 
     //Categorias
     //Visibilidad de las opciones de categoría
     const [isCategoriesVisible, setIsCategoriesVisible] = useState(false);
+    const tiposDeEntrada = ['Mensaje', 'Consejo', 'Recuerdo', 'Reflexión'];
     //Almacenar las opciones seleccionadas
-    const [selectedOptions, setSelectedOptions] = useState([]);
+    const [selectedOption, setSelectedOption] = useState('');
 
     //Fecha asignada
     //Almacenar la fecha seleccionada
@@ -48,21 +52,10 @@ const ModalEntry = ({ visible, onClose, respuesta, setRespuesta }) => {
     };
     //Función para manejar la selección de opciones de categoría
     const handleSelectOption = (option) => {
-        if (selectedOptions.includes(option)) {
-            setSelectedOptions(selectedOptions.filter((item) => item !== option));
-        } else {
-            if (selectedOptions.length < 3) {
-                setSelectedOptions([...selectedOptions, option]);
-            } else {
-                const updatedOptions = [...selectedOptions.slice(1), option];
-                setSelectedOptions(updatedOptions);
-            }
-        }
+        setSelectedOption(option); // Establecer el valor de la opción seleccionada
     };
     //Determinar si se deben mostrar los campos de beneficiarios y fecha
-    const showBeneficiariosFecha = selectedOptions.some(option =>
-        ['Mensaje', 'Consejo', 'Recuerdo'].includes(option)
-    );
+    const showBeneficiariosFecha = ['Mensaje', 'Consejo', 'Recuerdo', 'Reflexion'].includes(selectedOption);
 
     //Funciones de Media
     //Función para seleccionar una imagen o video de la galería
@@ -77,18 +70,22 @@ const ModalEntry = ({ visible, onClose, respuesta, setRespuesta }) => {
                 mediaTypes: ImagePicker.MediaTypeOptions.All,
                 allowsEditing: true,
                 quality: 1,
+                base64: false, // Asegura que no se retorne base64
             });
-            if (!result.canceled) {
+            console.log('Resultado de ImagePicker:', result);
+            if (!result.canceled && result.assets && result.assets.length > 0 && result.assets[0].uri) {
                 setMedia(result.assets[0].uri);
                 Alert.alert('Archivo seleccionado', '¡El archivo ha sido seleccionado con éxito!');
             } else {
-                console.log('Selección cancelada');
+                console.log('Selección cancelada o URI no válida');
             }
         } catch (error) {
             console.log('Error al seleccionar archivo:', error);
             Alert.alert('Error', 'Ocurrió un error al seleccionar el archivo.');
         }
     };
+
+
     //Función para remover la imagen seleccionada
     const removeMedia = () => {
         setMedia(null);
@@ -121,6 +118,11 @@ const ModalEntry = ({ visible, onClose, respuesta, setRespuesta }) => {
             setBeneficiarios([...beneficiarios, '']); // Añade un nuevo campo vacío
         }
     };
+    const handleRemoveBeneficiary = (index) => {
+        const updatedBeneficiarios = [...beneficiarios];
+        updatedBeneficiarios.splice(index, 1); // Elimina el beneficiario en el índice dado
+        setBeneficiarios(updatedBeneficiarios); // Actualiza el estado con la lista modificada
+    };
     //Función para manejar el cambio en el campo de beneficiario
     const handleBeneficiarioChange = (text, index) => {
         const newBeneficiarios = [...beneficiarios];
@@ -135,65 +137,71 @@ const ModalEntry = ({ visible, onClose, respuesta, setRespuesta }) => {
         setMedia(null);
         setDate(new Date());
         setIsCategoriesVisible(false);
-        setSelectedOptions([]);
+        setSelectedOption('');
         setBeneficiarios(['']);
         setInputHeight(20);
     };
+    const getMimeType = (filename) => {
+        const extension = filename.split('.').pop().toLowerCase();
+        switch (extension) {
+            case 'jpg':
+            case 'jpeg':
+                return 'image/jpeg';
+            case 'png':
+                return 'image/png';
+            case 'gif':
+                return 'image/gif';
+            case 'mp4':
+                return 'video/mp4';
+            case 'mov':
+                return 'video/quicktime';
+            // Añade más tipos según tus necesidades
+            default:
+                return 'application/octet-stream';
+        }
+    };
     //Función para manejar el envío del formulario
     const handleSubmit = async () => {
-        // =======================
-        // ===== VALIDACIONES =====
-        // =======================
-        // Validaciones de beneficiarios si se muestran
-        if (showBeneficiariosFecha) {
-            for (let i = 0; i < beneficiarios.length; i++) {
-                if (!beneficiarios[i].trim()) {
-                    Alert.alert('Error', `Por favor, completa el beneficiario #${i + 1}.`);
-                    return;
-                }
-            }
-        }
+        // Validaciones previas...
 
-        // =======================
-        // ===== PREPARAR DATOS ===
-        // =======================
         const formData = new FormData();
-        formData.append('respuesta', respuesta);
+        formData.append('category', selectedOption);
+        formData.append('message', respuesta);
         formData.append('date', date.toISOString());
-        formData.append('selectedOptions', JSON.stringify(selectedOptions));
-        formData.append('beneficiarios', JSON.stringify(beneficiarios));
-        // Validaciones y preparación de la imagen
+
+        // Adjuntar la imagen/video si está presente
         if (media) {
             const filename = media.split('/').pop();
-            const match = /\.(\w+)$/.exec(filename);
-            const type = match ? `image/${match[1]}` : `image`;
+            const mimeType = getMimeType(filename);
+
+            // Asegurarse de que `media` es una cadena válida antes de llamar a `.replace`
+            const uri = Platform.OS === 'android' ? media : media.replace('file://', '');
 
             formData.append('media', {
-                uri: media,
+                uri,
                 name: filename,
-                type,
+                type: mimeType,
             });
         }
 
-        // =======================
-        // ===== ENVIAR DATOS =====
-        // =======================
+        // **No** agregar 'media_url' al FormData
+        // Elimina cualquier línea que haga `formData.append('media_url', ...)`
+
+
+        // Enviar los datos al backend
         try {
-            const response = await fetch('https://tu-servidor.com/api/submit-form', {
-                method: 'POST',
+            const response = await axiosInstance.post("/entries/submit", formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
-                body: formData,
             });
 
-            if (response.ok) {
-                const result = await response.json();
-                // Resetear el formulario y cerrar el modal
+            if (response.status === 201 || response.status === 200) {
                 resetForm();
                 onClose();
+                Alert.alert('Éxito', 'La entrada se ha enviado correctamente.');
             } else {
-                const error = await response.text();
+                const error = response.data?.message || 'Error desconocido.';
                 Alert.alert('Error', `Error al enviar el formulario: ${error}`);
             }
         } catch (error) {
@@ -201,6 +209,8 @@ const ModalEntry = ({ visible, onClose, respuesta, setRespuesta }) => {
             Alert.alert('Error', 'Ocurrió un error al enviar el formulario. Por favor, intenta nuevamente.');
         }
     };
+
+
 
     // ===========================
     // ======== RENDERIZADO ======
@@ -213,6 +223,10 @@ const ModalEntry = ({ visible, onClose, respuesta, setRespuesta }) => {
             onRequestClose={onClose}
         >
             <View style={styles.modalBackground}>
+                <ImageBackground
+                    source={require('../../assets/test/fondo.jpeg')} // Ruta a tu imagen
+                    style={styles.backgroundImage}
+                />
                 <View style={styles.modalContainer}>
 
                     <ScrollView contentContainerStyle={styles.scrollContentContainer}>
@@ -221,6 +235,10 @@ const ModalEntry = ({ visible, onClose, respuesta, setRespuesta }) => {
                            =========================================== */}
                         <View style={styles.entryTypeContainer}>
                             {/* Botón para mostrar/ocultar opciones de categoría */}
+                            <Pressable style={styles.closeButton} onPress={onClose}>
+                                {/* Icono de flecha hacia atrás */}
+                                <FontAwesome name="arrow-left" size={24} color="white" />
+                            </Pressable>
                             <Pressable style={styles.toggleButton} onPress={toggleOptions}>
                                 <Text style={styles.toggleButtonText}>Tipo de entrada</Text>
                                 <FontAwesome
@@ -231,7 +249,7 @@ const ModalEntry = ({ visible, onClose, respuesta, setRespuesta }) => {
                             </Pressable>
                             {/* Botón para cargar media */}
                             <Pressable onPress={pickMedia}>
-                                <FontAwesome name="upload" size={24} color="black" />
+                                <FontAwesome name="upload" size={24} color="white" style={styles.uploadButton} />
                             </Pressable>
                         </View>
 
@@ -240,55 +258,27 @@ const ModalEntry = ({ visible, onClose, respuesta, setRespuesta }) => {
                            =========================================== */}
                         {isCategoriesVisible && (
                             <View style={styles.optionsContainer}>
-                                {/* Opción: Mensaje */}
-                                <Pressable
-                                    style={[
-                                        styles.optionButton,
-                                        selectedOptions.includes('Mensaje') && styles.selectedOptions,
-                                    ]}
-                                    onPress={() => handleSelectOption('Mensaje')}
-                                    name='categoria'
-                                >
-                                    <Text style={styles.optionText}>Mensaje</Text>
-                                </Pressable>
+                                {tiposDeEntrada.map((tipo, index) => (
+                                    <Pressable
+                                        key={index}
+                                        style={[
+                                            styles.optionButton,
+                                            selectedOption === tipo && styles.selectedOption, // Aplicar estilo si está seleccionado
+                                        ]}
+                                        name='category'
+                                        onPress={() => handleSelectOption(tipo)}
+                                    >
+                                        <Text style={styles.optionText}>{tipo}</Text>
 
-                                {/* Opción: Consejo */}
-                                <Pressable
-                                    style={[
-                                        styles.optionButton,
-                                        selectedOptions.includes('Consejo') && styles.selectedOptions,
-                                    ]}
-                                    onPress={() => handleSelectOption('Consejo')}
-                                >
-                                    <Text style={styles.optionText}>Consejo</Text>
-                                </Pressable>
-
-                                {/* Opción: Recuerdo */}
-                                <Pressable
-                                    style={[
-                                        styles.optionButton,
-                                        selectedOptions.includes('Recuerdo') && styles.selectedOptions,
-                                    ]}
-                                    onPress={() => handleSelectOption('Recuerdo')}
-                                >
-                                    <Text style={styles.optionText}>Recuerdo</Text>
-                                </Pressable>
-
-                                {/* Opción: Reflexión */}
-                                <Pressable
-                                    style={[
-                                        styles.optionButton,
-                                        selectedOptions.includes('Reflexión') && styles.selectedOptions,
-                                    ]}
-                                    onPress={() => handleSelectOption('Reflexión')}
-                                >
-                                    <Text style={styles.optionText}>Reflexión</Text>
-                                </Pressable>
-
-                                {/* Botón para agregar más opciones (si es necesario) */}
-                                <Pressable style={styles.addButton}>
-                                    <FontAwesome name="plus" size={24} color="black" />
-                                </Pressable>
+                                        {/* Mostrar la hoja si está seleccionado */}
+                                        {selectedOption === tipo && (
+                                            <Image
+                                                source={require('../../assets/test/hoja.png')} // Ruta a la hoja de otoño
+                                                style={styles.leafIcon}
+                                            />
+                                        )}
+                                    </Pressable>
+                                ))}
                             </View>
                         )}
 
@@ -299,11 +289,11 @@ const ModalEntry = ({ visible, onClose, respuesta, setRespuesta }) => {
                             <View style={styles.imageContainer}>
                                 {/* Botón para eliminar la imagen */}
                                 <Pressable style={styles.deleteIcon} onPress={removeMedia}>
-                                    <FontAwesome name="trash" size={24} color="red" />
+                                    <FontAwesome name="trash" size={30} color="red" />
                                 </Pressable>
                                 {/* Mostrar la imagen seleccionada */}
-                                <Image source={{ uri: media }} style={styles.image} resizeMode="contain" 
-                                name='media'/>
+                                <Image source={{ uri: media }} style={styles.image} resizeMode="contain"
+                                    name='media' />
                             </View>
                         )}
 
@@ -321,7 +311,7 @@ const ModalEntry = ({ visible, onClose, respuesta, setRespuesta }) => {
                                 style={[styles.textInput, { height: Math.max(20, inputHeight) }]}
                                 placeholder="Cuadro de texto"
                                 multiline
-                                name='descripcion'
+                                name='message'
                                 value={respuesta}
                                 onChangeText={setRespuesta}
                                 onContentSizeChange={(e) => setInputHeight(e.nativeEvent.contentSize.height)}
@@ -341,17 +331,48 @@ const ModalEntry = ({ visible, onClose, respuesta, setRespuesta }) => {
                                                 style={styles.beneficiaryInput}
                                                 value={beneficiario}
                                                 maxLength={50}
-                                                name='beneficiario'
+                                                name="beneficiario"
                                                 onChangeText={(text) => handleBeneficiarioChange(text, index)}
                                                 placeholder="Beneficiario"
                                             />
-                                            {/* Botón para agregar un nuevo beneficiario */}
-                                            {beneficiarios.length < 5 && index === beneficiarios.length - 1 && (
+
+                                            {/* Si solo hay 1 beneficiario, mostramos el botón agregar */}
+                                            {beneficiarios.length === 1 && (
                                                 <Pressable
                                                     style={styles.addBeneficiaryButton}
                                                     onPress={addBeneficiario}
                                                 >
                                                     <FontAwesome name="plus" size={16} color="black" />
+                                                </Pressable>
+                                            )}
+
+                                            {/* Si hay más de 1 beneficiario, muestra el botón de eliminar excepto en el último */}
+                                            {beneficiarios.length > 1 && index < beneficiarios.length - 1 && (
+                                                <Pressable
+                                                    style={styles.removeBeneficiaryButton}
+                                                    onPress={() => handleRemoveBeneficiary(index)}
+                                                >
+                                                    <FontAwesome name="times" size={16} color="white" />
+                                                </Pressable>
+                                            )}
+
+                                            {/* El último beneficiario tiene el botón agregar si hay menos de 5 beneficiarios */}
+                                            {beneficiarios.length > 1 && index === beneficiarios.length - 1 && beneficiarios.length < 5 && (
+                                                <Pressable
+                                                    style={styles.addBeneficiaryButton}
+                                                    onPress={addBeneficiario}
+                                                >
+                                                    <FontAwesome name="plus" size={16} color="black" />
+                                                </Pressable>
+                                            )}
+
+                                            {/* Si hay 5 beneficiarios, muestra solo el botón de eliminar en todos */}
+                                            {beneficiarios.length === 5 && (
+                                                <Pressable
+                                                    style={styles.removeBeneficiaryButton}
+                                                    onPress={() => handleRemoveBeneficiary(index)}
+                                                >
+                                                    <FontAwesome name="times" size={16} color="white" />
                                                 </Pressable>
                                             )}
                                         </View>
@@ -361,7 +382,7 @@ const ModalEntry = ({ visible, onClose, respuesta, setRespuesta }) => {
                                 {/* ===========================================
                                    Selector de Fecha de Envío
                                    =========================================== */}
-                                <View style={styles.entryTypeContainer}>
+                                <View style={styles.entryTypeContainer2}>
                                     <Text style={styles.entryTypeText}>Fecha de envío</Text>
                                     <Pressable
                                         onPress={showDatePicker}
@@ -390,10 +411,6 @@ const ModalEntry = ({ visible, onClose, respuesta, setRespuesta }) => {
                            Botones de Cerrar y Enviar
                            =========================================== */}
                         <View style={styles.buttonContainer}>
-                            {/* Botón para cerrar el modal */}
-                            <Pressable style={styles.closeButton} onPress={onClose}>
-                                <Text style={styles.closeButtonText}>Cerrar</Text>
-                            </Pressable>
                             {/* Botón para enviar el formulario */}
                             <Pressable style={styles.submitButton} onPress={handleSubmit}>
                                 <Text style={styles.submitButtonText}>Enviar</Text>
@@ -414,9 +431,13 @@ const styles = StyleSheet.create({
     // ===================================
     modalBackground: {
         flex: 1,
-        justifyContent: 'center', // Centrar el modal verticalmente
-        alignItems: 'center',     // Centrar el modal horizontalmente
-        backgroundColor: 'rgba(0, 0, 0, 0.5)', // Fondo semitransparente
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    backgroundImage: {
+        width: '100%', // Cubre toda la pantalla
+        height: '100%', // Cubre toda la pantalla
+        justifyContent: 'center', // Centrar los elementos del modal
     },
 
     // ===================================
@@ -424,18 +445,13 @@ const styles = StyleSheet.create({
     // ===== Principal del Modal =========
     // ===================================
     modalContainer: {
-        width: '90%',
-        backgroundColor: 'white',
-        paddingBottom: 15,
-        borderRadius: 10,
-        justifyContent: 'space-between',
-        alignItems: 'stretch', // Alinear elementos hijos para que ocupen el ancho completo
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.8,
-        shadowRadius: 10,
-        elevation: 5,
-        maxHeight: '80%', // Altura máxima del modal
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        justifyContent: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.7)',
     },
 
     // ===================================
@@ -452,11 +468,10 @@ const styles = StyleSheet.create({
     entryTypeContainer: {
         justifyContent: 'space-between',
         flexDirection: 'row',
-        marginLeft: 10,
-        width: '90%',
-        marginTop: 20,
+        width: '90%', // Ajustar para dejar espacio entre los elementos
+        alignItems: 'center', // Alineación vertical central
+        alignSelf: 'center', // Centra el contenedor en la pantalla
         marginBottom: 20,
-        alignItems: 'center', // Alinear verticalmente los elementos
     },
     toggleButton: {
         flexDirection: 'row',
@@ -465,21 +480,21 @@ const styles = StyleSheet.create({
         paddingVertical: 10,
         paddingHorizontal: 20,
         borderRadius: 10,
-        marginBottom: 10,
+        marginLeft: 10, // Alinearlo bien con la flecha
+    },
+    closeButton: {
+        backgroundColor: '#C19A6B',
+        padding: 10, // Reducir padding para que el botón no sea demasiado grande
+        borderRadius: 50, // Redondeado para que parezca un círculo
+    },
+    uploadButton: {
+        backgroundColor: '#C19A6B', // Añadir el mismo fondo que el closeButton para consistencia
+        padding: 10, // Similar al closeButton
+        borderRadius: 50,
     },
     toggleButtonText: {
         fontSize: 16,
         marginRight: 10,
-    },
-    addButton: {
-        backgroundColor: '#fff',
-        borderColor: '#000',
-        borderWidth: 1,
-        padding: 10,
-        borderRadius: 50,
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginLeft: 10,
     },
 
     // ===================================
@@ -487,30 +502,42 @@ const styles = StyleSheet.create({
     // ===== de Categoría ===============
     // ===================================
     optionsContainer: {
-        marginTop: 10,
-        marginBottom: 20,
-        width: '80%',
         flexDirection: 'row',
-        flexWrap: 'wrap', // Permite que las opciones se ajusten en múltiples líneas
-        justifyContent: 'space-between', // Distribuye espacio entre las opciones
-    },
-    optionButton: {
-        backgroundColor: '#fff',
-        borderColor: '#000',
-        borderWidth: 1,
-        paddingVertical: 8,
-        paddingHorizontal: 15,
-        borderRadius: 15,
-        margin: 5,
-    },
-    selectedOptions: {
-        borderColor: '#C19A6B', // Cambiar el color del borde si está seleccionado
-        borderWidth: 2,
-    },
-    optionText: {
-        fontSize: 12, // Tamaño reducido del texto para las opciones
+        flexWrap: 'wrap', // Permitir que los botones se ajusten a múltiples líneas
+        justifyContent: 'space-around', // Asegurar que haya espacio entre los botones
+        marginBottom: 20,
     },
 
+    optionButton: {
+        backgroundColor: '#F0C89E', // Color de fondo
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+        borderRadius: 10,
+        marginBottom: 15, // Separar verticalmente
+        marginHorizontal: 10, // Separar horizontalmente
+        flexDirection: 'row', // Para alinear el ícono de la hoja dentro del botón
+        alignItems: 'center', // Centrar verticalmente el ícono y el texto
+    },
+
+    selectedOption: {
+        backgroundColor: '#C19A6B', // Color para el botón seleccionado
+    },
+
+    optionText: {
+        fontSize: 16,
+        color: '#000', // Color del texto
+        marginRight: 10, // Añadir margen para que la hoja no se superponga
+    },
+
+    leafIcon: {
+        width: 40, // Tamaño del ícono de hoja
+        height: 40,
+        position: 'absolute',
+        right: -10
+        , // Posicionar la hoja a la derecha dentro del botón
+        top: '50%',
+        transform: [{ translateY: -13 }], // Centrar verticalmente la hoja dentro del botón
+    },
     // ===================================
     // ===== Estilos de Imagen ===========
     // ===== Seleccionada =================
@@ -518,24 +545,26 @@ const styles = StyleSheet.create({
     imageContainer: {
         position: 'relative', // Necesario para posicionar el ícono de basura
         width: '100%',
-        aspectRatio: 16 / 9, // Mantiene la proporción de la imagen (puedes ajustarlo según tus necesidades)
+        aspectRatio: 1, // Mantiene la proporción de la imagen (puedes ajustarlo según tus necesidades)
         marginBottom: 20,
         justifyContent: 'center',
         alignItems: 'center',
+        borderRadius: 20, // Añadimos un borde redondeado más grande al contenedor
+        overflow: 'hidden',
     },
     deleteIcon: {
         position: 'absolute',
         zIndex: 3,
         top: 10,
         left: 10,
-        backgroundColor: 'rgba(255, 255, 255, 0.7)', // Fondo semitransparente para que el ícono resalte
-        padding: 5,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)', // Fondo semitransparente para que el ícono resalte
+        padding: 10,
         borderRadius: 20,
     },
     image: {
         width: '100%',
         height: '100%',
-        borderRadius: 10,
+        borderRadius: 20,
     },
 
     // ===================================
@@ -545,7 +574,7 @@ const styles = StyleSheet.create({
     textInputContainer: {
         flexDirection: 'row',
         alignItems: 'flex-start', // Alinear el ícono en la parte superior del input
-        backgroundColor: '#F9C2C2',
+        backgroundColor: '#F0C89E',
         width: '100%',
         padding: 10,
         borderRadius: 10,
@@ -571,38 +600,72 @@ const styles = StyleSheet.create({
         justifyContent: 'space-around',
         width: '100%', // Alinear con el contenedor principal
         marginBottom: 20,
-        marginLeft: 10,
+        paddingHorizontal: 10, // Aseguramos un padding lateral consistente
     },
+
     beneficiarioRow: {
         flexDirection: 'row',
-        alignItems: 'center',
-        marginBottom: 10,
+        alignItems: 'center', // Alinear verticalmente el input y el botón
+        justifyContent: 'space-between', // Asegura que el input y el botón estén bien distribuidos
+        marginBottom: 15, // Reducimos el margen inferior para acercar más los elementos
+        width: '100%',
     },
+
     beneficiaryInput: {
         borderColor: '#ccc',
-        borderWidth: 1,
-        borderRadius: 5,
-        padding: 10,
-        marginVertical: 5,
-        flex: 1,
-    },
-    addBeneficiaryButton: {
-        marginLeft: 10,
         backgroundColor: '#F0C89E',
+        borderWidth: 1,
+        borderRadius: 10,
+        padding: 10,
+        flex: 1, // Dejar que el campo de texto ocupe el espacio disponible
+        marginRight: 10, // Añadir margen derecho para que el input no quede pegado al botón
+    },
+
+    removeBeneficiaryButton: {
+        backgroundColor: '#FF6347', // Color rojo para indicar eliminación
         padding: 10,
         borderRadius: 5,
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: 45,
+        height: 45,
+    },
+
+    addBeneficiaryButton: {
+        backgroundColor: '#C19A6B',
+        padding: 10,
+        borderRadius: 5,
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: 45,
+        height: 45,
     },
 
     // ===================================
     // ===== Estilos de Fecha ============
     // ===================================
+    entryTypeContainer2: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between', // Espaciado adecuado entre los elementos
+        backgroundColor: '#F0C89E',
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+        borderRadius: 10,
+        width: '100%', // Asegura que ocupe el 100% del contenedor
+        alignSelf: 'center',
+        marginBottom: 20,
+    },
+
     dateText: {
-        fontSize: 16, // Tamaño reducido para mejor alineación
+        fontSize: 16,
         fontWeight: 'bold',
         marginLeft: 10,
+        color: '#000',
     },
+
     dateSubtext: {
-        fontSize: 12, // Tamaño reducido para mejor alineación
+        fontSize: 12,
         color: '#666',
         marginLeft: 10,
     },
@@ -612,30 +675,21 @@ const styles = StyleSheet.create({
     // ===== Cerrar y Enviar ==============
     // ===================================
     buttonContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
+        alignItems: 'center',
         width: '100%',
     },
-    closeButton: {
-        backgroundColor: '#C19A6B',
-        paddingHorizontal: 20,
-        paddingVertical: 10,
-        borderRadius: 10,
-        marginTop: 20,
-        alignSelf: 'center', // Centrar el botón
-    },
-    closeButtonText: {
-        color: 'white',
-        fontWeight: 'bold',
-        fontSize: 16,
-    },
     submitButton: {
-        backgroundColor: '#4CAF50', // Verde para indicar acción positiva
+        backgroundColor: '#3B873E', // Verde para indicar acción positiva
         paddingHorizontal: 20,
         paddingVertical: 10,
         borderRadius: 10,
         marginTop: 10,
         alignSelf: 'center',
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 4,
+        elevation: 5,
     },
     submitButtonText: {
         color: 'white',
