@@ -13,6 +13,12 @@ async function bootstrap() {
     prefix: '/uploads/',
   });
 
+  app.useGlobalPipes(new ValidationPipe({
+    whitelist: true,
+    forbidNonWhitelisted: true,
+    transform: true,
+  }));
+
   app.enableCors(); // Habilita CORS
   await app.listen(3000, '0.0.0.0');
 

@@ -40,11 +40,11 @@ export class EntriesController {
     console.log('createEntryDto:', createEntryDto);
     console.log('Uploaded file:', file);
 
-    let media_url: string = null;
+    let media: string = null;
     if (file) {
-      media_url = `/uploads/${file.filename}`;
+      media = `/uploads/${file.filename}`;
     }
-    return this.entriesService.create(createEntryDto, media_url);
+    return this.entriesService.create(createEntryDto, media);
   }
 
   @Get()

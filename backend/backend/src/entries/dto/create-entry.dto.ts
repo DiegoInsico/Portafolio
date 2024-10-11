@@ -3,7 +3,7 @@ import { IsNotEmpty, IsString, IsIn, IsOptional } from 'class-validator';
 export class CreateEntryDto {
   @IsOptional()
   @IsString()
-  @IsIn(['Consejo', 'Reflexión', 'Deseo', 'Mensaje'])
+  @IsIn(['Consejo', 'Reflexión', 'Deseo', 'Mensaje', 'Recuerdo']) // Agrega 'Recuerdo' aquí
   category?: string;
 
   @IsNotEmpty()
@@ -12,5 +12,9 @@ export class CreateEntryDto {
 
   @IsOptional()
   @IsString()
-  media_url?: string;
+  media?: string;
+
+  @IsOptional()
+  @IsString()
+  date?: string; // Añade este campo
 }
