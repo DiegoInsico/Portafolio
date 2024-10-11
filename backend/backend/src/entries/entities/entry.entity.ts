@@ -5,14 +5,14 @@ export class Entry {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'varchar', length: 50 })
-  category: string;
+  @Column({ type: 'varchar', length: 50, nullable: true })
+  category?: string;
 
   @Column({ type: 'text' })
   message: string;
 
   @Column({ type: 'text', nullable: true })
-  media_url: string;
+  media_url?: string;
 
   @CreateDateColumn()
   created_at: Date;
