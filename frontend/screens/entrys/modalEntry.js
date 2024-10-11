@@ -4,6 +4,7 @@ import {
 } from 'react-native';
 import { FontAwesome, MaterialIcons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
+import * as FileSystem from 'expo-file-system';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import axiosInstance from '../../utils/axiosInstance';
 import { Platform } from 'react-native';
@@ -70,11 +71,64 @@ const ModalEntry = ({ visible, onClose }) => {
                 mediaTypes: ImagePicker.MediaTypeOptions.All,
                 allowsEditing: true,
                 quality: 1,
-                base64: false, // Asegura que no se retorne base64
+                base64: Platform.OS === 'web', // Solo obtenemos base64 en web
             });
             console.log('Resultado de ImagePicker:', result);
-            if (!result.canceled && result.assets && result.assets.length > 0 && result.assets[0].uri) {
-                setMedia(result.assets[0].uri);
+
+            if (!result.canceled && result.assets && result.assets.length > 0) {
+                const asset = result.assets[0];
+
+                if (Platform.OS === 'web') {
+                    const base64Data = asset.base64;
+                    if (!base64Data) {
+                        Alert.alert('Error', 'No se pudo obtener el archivo seleccionado.');
+                        return;
+                    }
+
+                    let mimeType = asset.mimeType || asset.type;
+                    if (!mimeType) {
+                        const uri = asset.uri;
+                        const fileExtension = uri.split('.').pop();
+                        mimeType = getMimeType(fileExtension);
+                    }
+
+                    if (!mimeType) {
+                        mimeType = 'application/octet-stream';
+                    }
+
+                    // Crear el Blob a partir de los datos base64
+                    const byteCharacters = atob(base64Data);
+                    const byteNumbers = new Array(byteCharacters.length);
+                    for (let i = 0; i < byteCharacters.length; i++) {
+                        byteNumbers[i] = byteCharacters.charCodeAt(i);
+                    }
+                    const byteArray = new Uint8Array(byteNumbers);
+                    const blob = new Blob([byteArray], { type: mimeType });
+
+                    setMedia({
+                        uri: asset.uri,
+                        type: mimeType,
+                        name: `media_${Date.now()}.${mimeType.split('/')[1] || 'bin'}`,
+                        data: blob,
+                    });
+                } else {
+                    // Código para plataformas nativas (Android, iOS)
+                    const uri = asset.uri;
+                    if (!uri) {
+                        Alert.alert('Error', 'No se pudo obtener la URI del archivo.');
+                        return;
+                    }
+
+                    const fileExtension = uri.split('.').pop();
+                    const mimeType = getMimeType(fileExtension);
+
+                    setMedia({
+                        uri: uri,
+                        type: mimeType,
+                        name: uri.split('/').pop(),
+                    });
+                }
+
                 Alert.alert('Archivo seleccionado', '¡El archivo ha sido seleccionado con éxito!');
             } else {
                 console.log('Selección cancelada o URI no válida');
@@ -84,7 +138,6 @@ const ModalEntry = ({ visible, onClose }) => {
             Alert.alert('Error', 'Ocurrió un error al seleccionar el archivo.');
         }
     };
-
 
     //Función para remover la imagen seleccionada
     const removeMedia = () => {
@@ -160,57 +213,52 @@ const ModalEntry = ({ visible, onClose }) => {
                 return 'application/octet-stream';
         }
     };
+    const logFormData = (formData) => {
+        for (let pair of formData.entries()) {
+            console.log(`${pair[0]}:`, pair[1]);
+        }
+    };
     //Función para manejar el envío del formulario
     const handleSubmit = async () => {
-        // Validaciones previas...
 
         const formData = new FormData();
         formData.append('category', selectedOption);
         formData.append('message', respuesta);
         formData.append('date', date.toISOString());
 
-        // Adjuntar la imagen/video si está presente
         if (media) {
-            const filename = media.split('/').pop();
-            const mimeType = getMimeType(filename);
-
-            // Asegurarse de que `media` es una cadena válida antes de llamar a `.replace`
-            const uri = Platform.OS === 'android' ? media : media.replace('file://', '');
-
-            formData.append('media', {
-                uri,
-                name: filename,
-                type: mimeType,
-            });
+            if (Platform.OS === 'web') {
+                // Crear un objeto File a partir del Blob
+                const file = new File([media.data], media.name, { type: media.type });
+                formData.append('media', file);
+            } else {
+                formData.append('media', {
+                    uri: media.uri,
+                    name: media.name,
+                    type: media.type,
+                });
+            }
         }
 
-        // **No** agregar 'media_url' al FormData
-        // Elimina cualquier línea que haga `formData.append('media_url', ...)`
-
-
-        // Enviar los datos al backend
         try {
-            const response = await axiosInstance.post("/entries/submit", formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-            });
-
-            if (response.status === 201 || response.status === 200) {
+            const response = await axiosInstance.post('/entries/submit', formData);
+            if (response.status >= 200 && response.status < 300) {
                 resetForm();
                 onClose();
                 Alert.alert('Éxito', 'La entrada se ha enviado correctamente.');
             } else {
-                const error = response.data?.message || 'Error desconocido.';
-                Alert.alert('Error', `Error al enviar el formulario: ${error}`);
+                Alert.alert('Error', 'Ocurrió un error al enviar el formulario.');
             }
+
         } catch (error) {
             console.error('Error al enviar el formulario:', error);
-            Alert.alert('Error', 'Ocurrió un error al enviar el formulario. Por favor, intenta nuevamente.');
+            if (error.response && error.response.data) {
+                Alert.alert('Error', `Error al enviar el formulario: ${error.response.data.message || 'Error desconocido'}`);
+            } else {
+                Alert.alert('Error', 'Ocurrió un error al enviar el formulario. Por favor, intenta nuevamente.');
+            }
         }
     };
-
-
 
     // ===========================
     // ======== RENDERIZADO ======
@@ -292,8 +340,7 @@ const ModalEntry = ({ visible, onClose }) => {
                                     <FontAwesome name="trash" size={30} color="red" />
                                 </Pressable>
                                 {/* Mostrar la imagen seleccionada */}
-                                <Image source={{ uri: media }} style={styles.image} resizeMode="contain"
-                                    name='media' />
+                                <Image source={{ uri: media.uri }} style={styles.image} resizeMode="contain" name='media' />
                             </View>
                         )}
 
