@@ -1,5 +1,3 @@
-// screens/RequestPasswordReset.js
-
 import React, { useState } from "react";
 import {
   View,
@@ -12,10 +10,11 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import axiosInstance from "../../utils/axiosInstance";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import { Ionicons } from "@expo/vector-icons";
+import { sendPasswordResetEmail } from "firebase/auth"; // Importa la función de Firebase
+import { auth } from "../../utils/firebase"; // Importa la configuración de Firebase
 
 // Definir el esquema de validación con Yup
 const ResetPasswordSchema = Yup.object().shape({
@@ -27,33 +26,28 @@ const ResetPasswordSchema = Yup.object().shape({
 export default function RequestPasswordReset({ navigation }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Función para manejar la solicitud de reseteo de contraseña
+  // Función para manejar la solicitud de reseteo de contraseña con Firebase
   const handleRequestReset = async (values, actions) => {
     const { correo } = values;
-    console.log("Correo a enviar:", { correo });
+    console.log("Correo a enviar:", correo);
     setIsSubmitting(true);
     try {
-      const response = await axiosInstance.post("/auth/request-password-reset", {
-        correo: correo,
-      });
-
-      // Mostrar mensaje de éxito
-      console.log(
+      // Utiliza Firebase para enviar el enlace de restablecimiento de contraseña
+      await sendPasswordResetEmail(auth, correo);
+      
+      Alert.alert(
         "Éxito",
         "Si el correo está registrado, recibirás un enlace para restablecer tu contraseña."
       );
-
+      
       // Navegar de regreso a la pantalla de Login
       navigation.goBack();
     } catch (error) {
-      console.error(error);
-      if (axios.isAxiosError(error) && error.response) {
-        const serverMessage =
-          error.response.data.message || "Error al solicitar reseteo de contraseña.";
-        Alert.alert("Error", serverMessage);
-      } else {
-        Alert.alert("Error", "Ocurrió un error inesperado.");
-      }
+      console.error("Error al solicitar reseteo de contraseña:", error.message);
+      Alert.alert(
+        "Error",
+        error.message || "Ocurrió un error al solicitar el reseteo de contraseña."
+      );
     } finally {
       setIsSubmitting(false);
       actions.setSubmitting(false);

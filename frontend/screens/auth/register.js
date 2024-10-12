@@ -1,18 +1,10 @@
-// screens/Register.js
-
 import React, { useState } from 'react';
 import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  Alert,
-  Image,
-  ActivityIndicator,
+  View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ActivityIndicator,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import axiosInstance from '../../utils/axiosInstance';
+import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth'; // Importamos el método para crear usuario y actualizar perfil
+import { auth } from '../../utils/firebase'; // Asegúrate de tener correctamente configurada la autenticación de Firebase
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 import { Ionicons } from '@expo/vector-icons';
@@ -42,27 +34,24 @@ export default function Registro({ navigation }) {
 
   // Función para manejar el registro
   const handleRegister = async (values, actions) => {
-    console.log('Datos a enviar:', values);
     setIsSubmitting(true);
     try {
-      const response = await axiosInstance.post('/auth/register', {
-        usuario: values.usuario,
-        correo: values.correo,
-        contrasena: values.contrasena,
-        confirmarContrasena: values.confirmarContrasena,
+      // Crear el usuario con correo y contraseña en Firebase Authentication
+      const userCredential = await createUserWithEmailAndPassword(
+        auth, values.correo, values.contrasena
+      );
+      const user = userCredential.user;
+
+      // Actualizar el perfil del usuario para añadir el nombre de usuario
+      await updateProfile(user, {
+        displayName: values.usuario,
       });
 
-      console.log('Respuesta del servidor:', response.data);
-      navigation.navigate('Login');
+      Alert.alert('Registro exitoso', 'Cuenta creada correctamente. Ahora puedes iniciar sesión.');
+      navigation.navigate('Login'); // Navegar al login tras el registro
     } catch (error) {
-      console.error(error);
-      if (axios.isAxiosError(error) && error.response) {
-        const serverMessage =
-          error.response.data.message || 'Error al registrar usuario.';
-        console.log("Error" , serverMessage)
-      } else {
-        Alert.alert('Error', 'Ocurrió un error inesperado.');
-      }
+      console.error('Error al registrar:', error.message);
+      Alert.alert('Error', error.message || 'Ocurrió un error al registrar.');
     } finally {
       setIsSubmitting(false);
       actions.setSubmitting(false);
@@ -71,64 +60,28 @@ export default function Registro({ navigation }) {
 
   return (
     <LinearGradient
-      colors={[
-        "#D4AF37", // Dorado suave
-        "#E6C47F", // Melocotón suave/dorado claro
-        "#C2A66B", // Dorado oscuro más neutro
-        "#4B4E6D", // Azul grisáceo oscuro para las sombras
-        "#2C3E50", // Negro grisáceo oscuro en la parte inferior
-      ]}
+      colors={['#D4AF37', '#E6C47F', '#C2A66B', '#4B4E6D', '#2C3E50']}
       start={{ x: 0, y: 0 }}
       end={{ x: 0, y: 1 }}
       style={styles.background}
     >
-      <Image
-        source={require("../../assets/background/imagen-fondo.png")} // Reemplaza con la ruta de tu imagen
-        style={styles.image}
-        resizeMode="cover"
-      />
-
-      <View style={styles.container}>
-        <Image
-          source={require("../../assets/background/florLogo.png")} // Reemplaza con la ruta de tu imagen
-          style={styles.logo}
-          resizeMode="cover"
-        />
-        <Text style={styles.titleSoul}>Soul</Text>
-      </View>
-
       <View style={styles.container}>
         <Text style={styles.title}>Regístrate</Text>
 
         <Formik
           initialValues={{
-            usuario: '',
-            correo: '',
-            contrasena: '',
-            confirmarContrasena: '',
+            usuario: '', correo: '', contrasena: '', confirmarContrasena: '',
           }}
           validationSchema={RegisterSchema}
           onSubmit={handleRegister}
         >
           {({
-            handleChange,
-            handleBlur,
-            handleSubmit,
-            values,
-            errors,
-            touched,
-            isValid,
-            dirty,
+            handleChange, handleBlur, handleSubmit, values, errors, touched, isValid, dirty,
           }) => (
             <View style={styles.form}>
               {/* Nombre de Usuario */}
               <View style={styles.inputContainer}>
-                <Ionicons
-                  name="person"
-                  size={20}
-                  color="#666"
-                  style={styles.iconStyle}
-                />
+                <Ionicons name="person" size={20} color="#666" style={styles.iconStyle} />
                 <TextInput
                   style={styles.input}
                   placeholder="Nombre de Usuario"
@@ -145,12 +98,7 @@ export default function Registro({ navigation }) {
 
               {/* Correo Electrónico */}
               <View style={styles.inputContainer}>
-                <Ionicons
-                  name="mail"
-                  size={20}
-                  color="#666"
-                  style={styles.iconStyle}
-                />
+                <Ionicons name="mail" size={20} color="#666" style={styles.iconStyle} />
                 <TextInput
                   style={styles.input}
                   placeholder="Correo Electrónico"
@@ -168,12 +116,7 @@ export default function Registro({ navigation }) {
 
               {/* Contraseña */}
               <View style={styles.inputContainer}>
-                <Ionicons
-                  name="lock-closed"
-                  size={20}
-                  color="#666"
-                  style={styles.iconStyle}
-                />
+                <Ionicons name="lock-closed" size={20} color="#666" style={styles.iconStyle} />
                 <TextInput
                   style={styles.input}
                   placeholder="Contraseña"
@@ -188,11 +131,7 @@ export default function Registro({ navigation }) {
                   onPress={() => setShowPassword(!showPassword)}
                   style={styles.toggleButton}
                 >
-                  <Ionicons
-                    name={showPassword ? 'eye' : 'eye-off'}
-                    size={20}
-                    color="#666"
-                  />
+                  <Ionicons name={showPassword ? 'eye' : 'eye-off'} size={20} color="#666" />
                 </TouchableOpacity>
               </View>
               {touched.contrasena && errors.contrasena && (
@@ -201,12 +140,7 @@ export default function Registro({ navigation }) {
 
               {/* Confirmar Contraseña */}
               <View style={styles.inputContainer}>
-                <Ionicons
-                  name="lock-open"
-                  size={20}
-                  color="#666"
-                  style={styles.iconStyle}
-                />
+                <Ionicons name="lock-open" size={20} color="#666" style={styles.iconStyle} />
                 <TextInput
                   style={styles.input}
                   placeholder="Confirmar Contraseña"
@@ -221,25 +155,16 @@ export default function Registro({ navigation }) {
                   onPress={() => setShowConfirmPassword(!showConfirmPassword)}
                   style={styles.toggleButton}
                 >
-                  <Ionicons
-                    name={showConfirmPassword ? 'eye' : 'eye-off'}
-                    size={20}
-                    color="#666"
-                  />
+                  <Ionicons name={showConfirmPassword ? 'eye' : 'eye-off'} size={20} color="#666" />
                 </TouchableOpacity>
               </View>
               {touched.confirmarContrasena && errors.confirmarContrasena && (
-                <Text style={styles.errorText}>
-                  {errors.confirmarContrasena}
-                </Text>
+                <Text style={styles.errorText}>{errors.confirmarContrasena}</Text>
               )}
 
               {/* Botón de Registro */}
               <TouchableOpacity
-                style={[
-                  styles.button,
-                  !(isValid && dirty) && styles.buttonDisabled,
-                ]}
+                style={[styles.button, !(isValid && dirty) && styles.buttonDisabled]}
                 onPress={handleSubmit}
                 disabled={!(isValid && dirty) || isSubmitting}
               >
@@ -253,13 +178,9 @@ export default function Registro({ navigation }) {
           )}
         </Formik>
 
-        {/* Enlace para navegar al Login */}
-        <View style={styles.footer}>
-          <Text style={styles.footerText}>¿Ya tienes una cuenta?</Text>
-          <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-            <Text style={styles.footerLink}> Inicia sesión</Text>
-          </TouchableOpacity>
-        </View>
+        <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+          <Text style={styles.footerLink}>¿Ya tienes una cuenta? Inicia sesión</Text>
+        </TouchableOpacity>
       </View>
     </LinearGradient>
   );

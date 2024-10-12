@@ -1,5 +1,3 @@
-// screens/Login.js
-
 import React, { useState } from "react";
 import {
   View,
@@ -12,11 +10,11 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import axiosInstance from "../../utils/axiosInstance";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import { Ionicons } from "@expo/vector-icons";
-import axios from "axios";
+import { signInWithEmailAndPassword } from "firebase/auth"; // Importa la función de autenticación de Firebase
+import { auth } from "../../utils/firebase"; // Asegúrate de importar auth desde tu archivo firebase.js
 
 // Definir el esquema de validación con Yup
 const LoginSchema = Yup.object().shape({
@@ -30,18 +28,15 @@ export default function Login({ navigation }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-  // Función para manejar el login
+  // Función para manejar el login usando Firebase
   const handleLogin = async (values, actions) => {
     const { correo, contrasena } = values;
     console.log("Datos a enviar:", { correo, contrasena });
     setIsSubmitting(true);
-    try {
-      const response = await axiosInstance.post("/auth/login", {
-        correo: values.correo,
-        contrasena: values.contrasena,
-      });
 
-      const token = response.data.access_token;
+    try {
+      await signInWithEmailAndPassword(auth, correo, contrasena); // Usa Firebase para autenticar
+
       console.log("Login Exitoso.");
       Alert.alert("Éxito", "Has iniciado sesión correctamente.");
       navigation.reset({
@@ -49,21 +44,8 @@ export default function Login({ navigation }) {
         routes: [{ name: "Home" }],
       });
     } catch (error) {
-      console.error(error);
-      if (axios.isAxiosError(error) && error.response) {
-        const status = error.response.status;
-        let serverMessage = "Error al iniciar sesión.";
-        if (status === 400) {
-          serverMessage = "Solicitud inválida.";
-        } else if (status === 401) {
-          serverMessage = "Credenciales inválidas.";
-        } else if (status === 500) {
-          serverMessage = "Error en el servidor. Inténtalo más tarde.";
-        }
-        Alert.alert("Error", serverMessage);
-      } else {
-        Alert.alert("Error", "Ocurrió un error inesperado.");
-      }
+      console.error("Error al iniciar sesión:", error.message);
+      Alert.alert("Error", error.message || "Ocurrió un error al iniciar sesión.");
     } finally {
       setIsSubmitting(false);
       actions.setSubmitting(false);
@@ -201,7 +183,7 @@ export default function Login({ navigation }) {
                 <Text style={styles.linkText}>Has olvidado tu contraseña?</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity onPress={() => navigation.navigate("Register")}>
+              <TouchableOpacity onPress={() => navigation.navigate("Registro")}>
                 <Text style={styles.linkText}>
                   ¿No tienes una cuenta? Regístrate
                 </Text>
