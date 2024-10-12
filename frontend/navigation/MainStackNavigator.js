@@ -25,7 +25,7 @@ const MainStackNavigator = () => {
       <Stack.Screen
         name="Home"
         component={Home}
-        options={{ title: "Inicio" }}
+        options={{ title: "Inicio", headerShown: false  }}
       />
       <Stack.Screen
         name="RequestPasswordReset"
