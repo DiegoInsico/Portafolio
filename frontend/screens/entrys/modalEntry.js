@@ -77,6 +77,7 @@ const ModalEntry = ({ visible, onClose }) => {
 
             if (!result.canceled && result.assets && result.assets.length > 0) {
                 const asset = result.assets[0];
+                console.log('URI del archivo:', asset.uri);
 
                 if (Platform.OS === 'web') {
                     const base64Data = asset.base64;
@@ -213,11 +214,7 @@ const ModalEntry = ({ visible, onClose }) => {
                 return 'application/octet-stream';
         }
     };
-    const logFormData = (formData) => {
-        for (let pair of formData.entries()) {
-            console.log(`${pair[0]}:`, pair[1]);
-        }
-    };
+
     //Función para manejar el envío del formulario
     const handleSubmit = async () => {
 
@@ -227,21 +224,26 @@ const ModalEntry = ({ visible, onClose }) => {
         formData.append('date', date.toISOString());
 
         if (media) {
-            if (Platform.OS === 'web') {
-                // Crear un objeto File a partir del Blob
-                const file = new File([media.data], media.name, { type: media.type });
-                formData.append('media', file);
-            } else {
-                formData.append('media', {
-                    uri: media.uri,
-                    name: media.name,
-                    type: media.type,
-                });
+            if (media) {
+                console.log('Media:', media);
+                if (Platform.OS === 'web') {
+                    const file = new File([media.data], media.name, { type: media.type });
+                    formData.append('media', file);
+                } else {
+                    formData.append('media', {
+                        uri: media.uri,
+                        name: media.name,
+                        type: media.type,
+                    });
+                }
             }
         }
 
+        logFormData(formData);
+
         try {
             const response = await axiosInstance.post('/entries/submit', formData);
+            console.log('Respuesta del servidor:', response); 
             if (response.status >= 200 && response.status < 300) {
                 resetForm();
                 onClose();
@@ -257,6 +259,12 @@ const ModalEntry = ({ visible, onClose }) => {
             } else {
                 Alert.alert('Error', 'Ocurrió un error al enviar el formulario. Por favor, intenta nuevamente.');
             }
+        }
+    };
+    const logFormData = (formData) => {
+        console.log('FormData contenido:');
+        for (let key in formData._parts) {
+            console.log(`${formData._parts[key][0]}:`, formData._parts[key][1]);
         }
     };
 

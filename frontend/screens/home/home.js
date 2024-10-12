@@ -174,19 +174,6 @@ export default function Home({ navigation }) {
         <Background>
             <Navbar />
             <View style={styles.dailyContainer}>
-                <View style={styles.questionContainer}>
-                    <Text style={styles.questionText}>¿Cuál fue tu viaje más importante?</Text>
-                </View>
-                <View>
-                    <Pressable style={styles.addButton} onPress={handlePress}>
-                        <FontAwesome name="plus" size={40} color="white" />
-                    </Pressable>
-                </View>
-                <ModalEntry
-                    visible={modalVisible}
-                    onClose={handleCloseModal}
-                />
-
                 <View style={styles.entryListContainer}>
                     <EntryListScreen entries={entries} />
                 </View>
@@ -207,19 +194,6 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: 'center',
         paddingBottom: 10,
-    },
-    questionContainer: {
-        backgroundColor: '#C19A6B',
-        paddingVertical: 15,
-        paddingHorizontal: 10,
-        borderRadius: 30,
-        marginBottom: 10,
-    },
-    questionText: {
-        fontSize: 12,
-        color: 'black',
-        fontWeight: 'bold',
-        textAlign: 'center',
     },
     entryListContainer: {
         flexGrow: 1,
