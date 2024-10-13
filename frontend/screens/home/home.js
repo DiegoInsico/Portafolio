@@ -172,12 +172,13 @@ export default function Home({ navigation }) {
     };
     return (
         <Background>
-            <Navbar />
+            
             <View style={styles.dailyContainer}>
                 <View style={styles.entryListContainer}>
                     <EntryListScreen entries={entries} />
                 </View>
             </View>
+            <Navbar />
         </Background>
 
     );
