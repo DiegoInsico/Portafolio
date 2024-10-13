@@ -4,6 +4,7 @@ import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 
+// Tu configuración de Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyBRI4q2P-BbqG43sJkApiF-ifVLQZlsxnU",
   authDomain: "soul2024-abe2f.firebaseapp.com",
@@ -15,9 +16,10 @@ const firebaseConfig = {
 
 // Inicializa Firebase
 const app = initializeApp(firebaseConfig);
+
+// Inicializa los servicios de Firebase que vas a usar
+const auth = getAuth(app);
 const db = getFirestore(app);
 const storage = getStorage(app);
-// Inicializa Firebase Authentication y obtiene una instancia
-const auth = getAuth(app);
 
 export { auth, db, storage };

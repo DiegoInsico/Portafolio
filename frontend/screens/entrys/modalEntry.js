@@ -1,4 +1,4 @@
-// Importaciones necesarias
+// ModalEntry.js
 import React, { useState } from "react";
 import {
   Modal,
@@ -15,9 +15,8 @@ import {
 } from "react-native";
 import { FontAwesome, MaterialIcons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
-import * as FileSystem from "expo-file-system";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
-import { db, storage } from '../../utils/firebase'; // Asegúrate de que la ruta sea correcta
+import { db, storage, auth } from '../../utils/firebase'; // Asegúrate de que la ruta sea correcta
 import { collection, addDoc, Timestamp } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
@@ -77,8 +76,7 @@ const ModalEntry = ({ visible, onClose }) => {
   // Función para seleccionar una imagen o video de la galería
   const pickMedia = async () => {
     try {
-      const { status } =
-        await ImagePicker.requestMediaLibraryPermissionsAsync();
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (status !== "granted") {
         Alert.alert(
           "Permiso denegado",
@@ -286,6 +284,13 @@ const ModalEntry = ({ visible, onClose }) => {
       }
     }
 
+    // Obtener el usuario actual
+    const currentUser = auth.currentUser;
+    if (!currentUser) {
+      Alert.alert("Error", "No se pudo obtener el usuario autenticado.");
+      return;
+    }
+
     // Preparar los datos para Firestore
     const entryData = {
       category: selectedOption,
@@ -294,6 +299,7 @@ const ModalEntry = ({ visible, onClose }) => {
       mediaURL: mediaURL || null,
       beneficiaries: beneficiarios.filter((b) => b.trim() !== ""), // Filtrar beneficiarios vacíos
       createdAt: Timestamp.now(),
+      userId: currentUser.uid, // Relacionar la entrada con el ID del usuario
     };
 
     try {
@@ -332,7 +338,7 @@ const ModalEntry = ({ visible, onClose }) => {
                            Sección de Tipo de Entrada y Carga de Media
                            =========================================== */}
             <View style={styles.entryTypeContainer}>
-              {/* Botón para mostrar/ocultar opciones de categoría */}
+              {/* Botón para cerrar el modal */}
               <Pressable style={styles.closeButton} onPress={onClose}>
                 {/* Icono de flecha hacia atrás */}
                 <FontAwesome name="arrow-left" size={24} color="white" />

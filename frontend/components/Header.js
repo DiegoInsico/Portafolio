@@ -1,10 +1,26 @@
+// src/components/Navbar.js
 import React, { useState, useRef } from 'react';
-import { View, StyleSheet, Pressable, SafeAreaView, StatusBar, Animated } from 'react-native';
+import {
+  View,
+  StyleSheet,
+  Pressable,
+  SafeAreaView,
+  StatusBar,
+  Animated,
+  TouchableOpacity,
+  Text,
+  Alert,
+} from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import ModalEntry from '../screens/entrys/modalEntry';
+import { useNavigation } from '@react-navigation/native'; // Importa el hook useNavigation
+import { signOut } from 'firebase/auth'; // Importa la función signOut de Firebase Auth
+import { auth } from '../utils/firebase'; // Asegúrate de importar auth correctamente
 
 export default function Navbar() {
   const [modalVisible, setModalVisible] = useState(false);
+  const navigation = useNavigation(); // Inicializa el objeto de navegación
+
   const handlePress2 = () => {
     setModalVisible(true); // Abrir el modal
   };
@@ -36,6 +52,21 @@ export default function Navbar() {
         useNativeDriver: true,
       }),
     ]).start();
+  };
+
+  // Función para manejar el cierre de sesión
+  const handleSignOut = async () => {
+    try {
+      await signOut(auth); // Cerrar sesión con Firebase
+      Alert.alert("Éxito", "Has cerrado sesión correctamente.");
+      navigation.reset({
+        index: 0,
+        routes: [{ name: "Login" }], // Redirigir a la pantalla de Login
+      });
+    } catch (error) {
+      console.error("Error al cerrar sesión:", error);
+      Alert.alert("Error", "Ocurrió un error al cerrar sesión.");
+    }
   };
 
   return (
@@ -104,6 +135,15 @@ export default function Navbar() {
           </Animated.View>
         </Pressable>
 
+        {/* Botón de Cerrar Sesión */}
+        <TouchableOpacity onPress={handleSignOut} style={styles.logoutButton}>
+          <FontAwesome
+            name="sign-out"
+            size={30}
+            color="white"
+          />
+        </TouchableOpacity>
+
       </View>
     </SafeAreaView>
   );
@@ -169,5 +209,19 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 8,
     backgroundColor: '#D4AF37',  // Dorado suave para el fondo del botón seleccionado
+  },
+  logoutButton: {
+    backgroundColor: '#FF6347', // Rojo para indicar cerrar sesión
+    borderRadius: 25,
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: 50,
+    height: 50,
+    shadowColor: '#2C3E50',  // Negro grisáceo oscuro para sombras del botón
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 8,
+    marginLeft: 10, // Espacio entre botones
   },
 });

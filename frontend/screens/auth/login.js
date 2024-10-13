@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+// src/screens/Login.js
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -13,7 +14,10 @@ import { LinearGradient } from "expo-linear-gradient";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import { Ionicons } from "@expo/vector-icons";
-import { signInWithEmailAndPassword } from "firebase/auth"; // Importa la función de autenticación de Firebase
+import {
+  signInWithEmailAndPassword,
+  onAuthStateChanged,
+} from "firebase/auth"; // Importa la función de autenticación de Firebase
 import { auth } from "../../utils/firebase"; // Asegúrate de importar auth desde tu archivo firebase.js
 
 // Definir el esquema de validación con Yup
@@ -27,6 +31,21 @@ const LoginSchema = Yup.object().shape({
 export default function Login({ navigation }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        // Si el usuario ya está autenticado, redirigir a Home
+        navigation.reset({
+          index: 0,
+          routes: [{ name: "Home" }],
+        });
+      }
+    });
+
+    // Limpia el listener al desmontar el componente
+    return () => unsubscribe();
+  }, []);
 
   // Función para manejar el login usando Firebase
   const handleLogin = async (values, actions) => {
@@ -45,7 +64,16 @@ export default function Login({ navigation }) {
       });
     } catch (error) {
       console.error("Error al iniciar sesión:", error.message);
-      Alert.alert("Error", error.message || "Ocurrió un error al iniciar sesión.");
+      // Personaliza los mensajes de error según el código de error
+      let errorMessage = "Ocurrió un error al iniciar sesión.";
+      if (error.code === "auth/user-not-found") {
+        errorMessage = "No se encontró ningún usuario con este correo electrónico.";
+      } else if (error.code === "auth/wrong-password") {
+        errorMessage = "Contraseña incorrecta.";
+      } else if (error.code === "auth/invalid-email") {
+        errorMessage = "Correo electrónico inválido.";
+      }
+      Alert.alert("Error", errorMessage);
     } finally {
       setIsSubmitting(false);
       actions.setSubmitting(false);
@@ -180,7 +208,7 @@ export default function Login({ navigation }) {
               <TouchableOpacity
                 onPress={() => navigation.navigate("RequestPasswordReset")}
               >
-                <Text style={styles.linkText}>Has olvidado tu contraseña?</Text>
+                <Text style={styles.linkText}>¿Has olvidado tu contraseña?</Text>
               </TouchableOpacity>
 
               <TouchableOpacity onPress={() => navigation.navigate("Registro")}>
@@ -211,7 +239,6 @@ const styles = StyleSheet.create({
   logo: {
     width: 150, // Ajusta el ancho de la imagen
     height: 150, // Ajusta la altura de la imagen
-    position: "flex",
     marginTop: 50,
     shadowColor: "#000000", // Color de la sombra
     shadowOffset: { width: 5, height: 5 }, // Desplazamiento de la sombra (horizonte/vertical)
