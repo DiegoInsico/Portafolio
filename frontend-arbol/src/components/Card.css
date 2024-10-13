@@ -1,0 +1,62 @@
+/* src/components/Card.css */
+
+.card {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 8px;
+    margin: 10px;
+    padding: 15px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    max-width: 15rem; /* Permite que la tarjeta no exceda el contenedor */
+    width: auto; /* El ancho se determina por el contenido */
+  }
+  
+  .card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+  }
+  
+  .card p {
+    margin: 0;
+    text-align: center;
+    word-wrap: break-word; /* Permite que el texto se ajuste al ancho */
+  }
+  
+  .media-content {
+    max-width: 100%;
+    height: auto;
+    border-radius: 4px;
+    margin-top: 10px;
+    object-fit: cover; /* Asegura que la imagen cubra el área sin distorsión */
+  }
+  
+  /* Específico para imágenes pequeñas */
+  .media-content.small-image {
+    max-width: 150px; /* Ajusta según tus necesidades */
+    max-height: 150px;
+  }
+  
+@media (max-width: 600px) {
+    .card {
+      width: 90%;
+    }
+    .media-content.small-image {
+        max-width: 100px; /* Reducir el tamaño máximo para imágenes pequeñas en pantallas pequeñas */
+        max-height: 100px;
+      }
+  }
+  
+  /* components/CardDetail.css */
+  
+  @media (max-width: 600px) {
+    .modal-content {
+      width: 95%;
+      padding: 20px;
+    }
+  }
+  

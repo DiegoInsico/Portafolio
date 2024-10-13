@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "507152982336",
+    "project_id": "soul2024-abe2f",
+    "storage_bucket": "soul2024-abe2f.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:507152982336:android:080f5da787015c36c25aa5",
+        "android_client_info": {
+          "package_name": "com.soul_2024"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAomHhnFK9826E8l2ubXwVXOgU_zm-Q8Hw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
