@@ -1,3 +1,4 @@
+// Importaciones necesarias
 import React, { useState } from "react";
 import {
   Modal,
@@ -10,14 +11,15 @@ import {
   Alert,
   Image,
   ImageBackground,
+  Platform,
 } from "react-native";
 import { FontAwesome, MaterialIcons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import * as FileSystem from "expo-file-system";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
-import axiosInstance from "../../utils/axiosInstance";
-import { Platform } from "react-native";
-import { supabase } from '../../utils/supabaseClient'; // Asegúrate de que la ruta sea correcta
+import { db, storage } from '../../utils/firebase'; // Asegúrate de que la ruta sea correcta
+import { collection, addDoc, Timestamp } from "firebase/firestore";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 /**
  * ModalEntry Component
@@ -27,27 +29,27 @@ import { supabase } from '../../utils/supabaseClient'; // Asegúrate de que la r
  * manejo de beneficiarios.
  */
 const ModalEntry = ({ visible, onClose }) => {
-  //Almacenar la URI de la imagen y video seleccionada
+  // Almacenar la URI de la imagen y video seleccionada
   const [media, setMedia] = useState(null);
   const [respuesta, setRespuesta] = useState("");
 
-  //Categorias
-  //Visibilidad de las opciones de categoría
+  // Categorias
+  // Visibilidad de las opciones de categoría
   const [isCategoriesVisible, setIsCategoriesVisible] = useState(false);
   const tiposDeEntrada = ["Mensaje", "Consejo", "Recuerdo", "Reflexión"];
-  //Almacenar las opciones seleccionadas
+  // Almacenar las opciones seleccionadas
   const [selectedOption, setSelectedOption] = useState("");
 
-  //Fecha asignada
-  //Almacenar la fecha seleccionada
+  // Fecha asignada
+  // Almacenar la fecha seleccionada
   const [date, setDate] = useState(new Date());
-  //Visibilidad del selector de fecha
+  // Visibilidad del selector de fecha
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
 
-  //Manejar la altura dinámica del TextInput
+  // Manejar la altura dinámica del TextInput
   const [inputHeight, setInputHeight] = useState(20);
 
-  //Almacenar la lista de beneficiarios
+  // Almacenar la lista de beneficiarios
   const [beneficiarios, setBeneficiarios] = useState([""]); // Inicia con un input vacío
 
   // ===========================
@@ -55,24 +57,24 @@ const ModalEntry = ({ visible, onClose }) => {
   // ===========================
 
   // Funciones de Categorias
-  //Función para alternar la visibilidad de las opciones de categoría
+  // Función para alternar la visibilidad de las opciones de categoría
   const toggleOptions = () => {
     setIsCategoriesVisible(!isCategoriesVisible);
   };
-  //Función para manejar la selección de opciones de categoría
+  // Función para manejar la selección de opciones de categoría
   const handleSelectOption = (option) => {
     setSelectedOption(option); // Establecer el valor de la opción seleccionada
   };
-  //Determinar si se deben mostrar los campos de beneficiarios y fecha
+  // Determinar si se deben mostrar los campos de beneficiarios y fecha
   const showBeneficiariosFecha = [
     "Mensaje",
     "Consejo",
     "Recuerdo",
-    "Reflexion",
+    "Reflexión",
   ].includes(selectedOption);
 
-  //Funciones de Media
-  //Función para seleccionar una imagen o video de la galería
+  // Funciones de Media
+  // Función para seleccionar una imagen o video de la galería
   const pickMedia = async () => {
     try {
       const { status } =
@@ -160,13 +162,13 @@ const ModalEntry = ({ visible, onClose }) => {
     }
   };
 
-  //Función para remover la imagen seleccionada
+  // Función para remover la imagen seleccionada
   const removeMedia = () => {
     setMedia(null);
   };
 
-  //Funciones de Fecha
-  //Funciones para manejar el selector de fecha
+  // Funciones de Fecha
+  // Funciones para manejar el selector de fecha
   const showDatePicker = () => {
     setDatePickerVisibility(true);
   };
@@ -177,7 +179,7 @@ const ModalEntry = ({ visible, onClose }) => {
     setDate(selectedDate);
     hideDatePicker();
   };
-  //Función para formatear la fecha seleccionada
+  // Función para formatear la fecha seleccionada
   const formatDate = (date) => {
     const day = date.getDate().toString().padStart(2, "0");
     const month = (date.getMonth() + 1).toString().padStart(2, "0");
@@ -185,8 +187,8 @@ const ModalEntry = ({ visible, onClose }) => {
     return `${day}/${month}/${year}`;
   };
 
-  //Funciones de Beneficiarios
-  //Función para agregar un nuevo beneficiario
+  // Funciones de Beneficiarios
+  // Función para agregar un nuevo beneficiario
   const addBeneficiario = () => {
     if (beneficiarios.length < 5) {
       setBeneficiarios([...beneficiarios, ""]); // Añade un nuevo campo vacío
@@ -197,15 +199,15 @@ const ModalEntry = ({ visible, onClose }) => {
     updatedBeneficiarios.splice(index, 1); // Elimina el beneficiario en el índice dado
     setBeneficiarios(updatedBeneficiarios); // Actualiza el estado con la lista modificada
   };
-  //Función para manejar el cambio en el campo de beneficiario
+  // Función para manejar el cambio en el campo de beneficiario
   const handleBeneficiarioChange = (text, index) => {
     const newBeneficiarios = [...beneficiarios];
     newBeneficiarios[index] = text;
     setBeneficiarios(newBeneficiarios);
   };
 
-  //Funciones de Formulario
-  //Función para resetear el formulario a su estado inicial
+  // Funciones de Formulario
+  // Función para resetear el formulario a su estado inicial
   const resetForm = () => {
     setRespuesta("");
     setMedia(null);
@@ -235,43 +237,48 @@ const ModalEntry = ({ visible, onClose }) => {
     }
   };
 
-  const uploadToSupabaseStorage = async (fileUri, fileName) => {
+  // Función para subir archivos a Firebase Storage
+  const uploadToFirebaseStorage = async (fileUri, fileName) => {
     try {
-      const file = await FileSystem.readAsStringAsync(fileUri, {
-        encoding: FileSystem.EncodingType.Base64,
-      });
-      const { data, error } = await supabase.storage
-        .from("uploads") // El bucket de Supabase Storage
-        .upload(`public/${fileName}`, file, { contentType: "image/jpeg" }); // Cambia contentType según el tipo de archivo
+      const response = await fetch(fileUri);
+      const blob = await response.blob();
 
-      if (error) {
-        throw error;
-      }
+      const storageRef = ref(storage, `uploads/${fileName}`);
+      await uploadBytes(storageRef, blob);
+      const downloadURL = await getDownloadURL(storageRef);
 
-      return data.Key; // Retorna la URL o key del archivo subido
+      return downloadURL; // Retorna la URL pública del archivo subido
     } catch (error) {
-      console.error("Error al subir archivo a Supabase Storage:", error);
+      console.error("Error al subir archivo a Firebase Storage:", error);
       Alert.alert("Error", "Ocurrió un error al subir el archivo.");
     }
   };
 
   const handleSubmit = async () => {
-    const formData = new FormData();
-    formData.append("category", selectedOption);
-    formData.append("message", respuesta);
-    formData.append("date", date.toISOString());
+    // Validar campos obligatorios
+    if (!selectedOption) {
+      Alert.alert("Error", "Por favor, selecciona un tipo de entrada.");
+      return;
+    }
+    if (!respuesta.trim()) {
+      Alert.alert("Error", "Por favor, ingresa una respuesta.");
+      return;
+    }
+
+    // Opcional: Validar beneficiarios si es necesario
+    // ...
+
+    let mediaURL = null;
 
     if (media) {
       try {
         const fileName = media.name;
         const fileUri = media.uri;
-        const uploadedFileUrl = await uploadToSupabaseStorage(
-          fileUri,
-          fileName
-        ); // Sube el archivo a Supabase
+        mediaURL = await uploadToFirebaseStorage(fileUri, fileName); // Sube el archivo a Firebase
 
-        if (uploadedFileUrl) {
-          formData.append("media", uploadedFileUrl); // Añade la URL del archivo subido a los datos del formulario
+        if (!mediaURL) {
+          Alert.alert("Error", "No se pudo obtener la URL del archivo subido.");
+          return;
         }
       } catch (error) {
         console.error("Error al subir el archivo:", error);
@@ -279,37 +286,28 @@ const ModalEntry = ({ visible, onClose }) => {
       }
     }
 
+    // Preparar los datos para Firestore
+    const entryData = {
+      category: selectedOption,
+      message: respuesta,
+      date: Timestamp.fromDate(date),
+      mediaURL: mediaURL || null,
+      beneficiaries: beneficiarios.filter((b) => b.trim() !== ""), // Filtrar beneficiarios vacíos
+      createdAt: Timestamp.now(),
+    };
+
     try {
-      const response = await axiosInstance.post("/entries/submit", formData);
-      if (response.status >= 200 && response.status < 300) {
-        resetForm();
-        onClose();
-        Alert.alert("Éxito", "La entrada se ha enviado correctamente.");
-      } else {
-        Alert.alert("Error", "Ocurrió un error al enviar el formulario.");
-      }
+      const docRef = await addDoc(collection(db, "entries"), entryData);
+      console.log("Documento escrito con ID: ", docRef.id);
+      resetForm();
+      onClose();
+      Alert.alert("Éxito", "La entrada se ha enviado correctamente.");
     } catch (error) {
       console.error("Error al enviar el formulario:", error);
-      if (error.response && error.response.data) {
-        Alert.alert(
-          "Error",
-          `Error al enviar el formulario: ${
-            error.response.data.message || "Error desconocido"
-          }`
-        );
-      } else {
-        Alert.alert(
-          "Error",
-          "Ocurrió un error al enviar el formulario. Por favor, intenta nuevamente."
-        );
-      }
-    }
-  };
-
-  const logFormData = (formData) => {
-    console.log("FormData contenido:");
-    for (let key in formData._parts) {
-      console.log(`${formData._parts[key][0]}:`, formData._parts[key][1]);
+      Alert.alert(
+        "Error",
+        "Ocurrió un error al enviar el formulario. Por favor, intenta nuevamente."
+      );
     }
   };
 
@@ -370,7 +368,6 @@ const ModalEntry = ({ visible, onClose }) => {
                       styles.optionButton,
                       selectedOption === tipo && styles.selectedOption, // Aplicar estilo si está seleccionado
                     ]}
-                    name="category"
                     onPress={() => handleSelectOption(tipo)}
                   >
                     <Text style={styles.optionText}>{tipo}</Text>
@@ -401,7 +398,6 @@ const ModalEntry = ({ visible, onClose }) => {
                   source={{ uri: media.uri }}
                   style={styles.image}
                   resizeMode="contain"
-                  name="media"
                 />
               </View>
             )}
@@ -423,7 +419,6 @@ const ModalEntry = ({ visible, onClose }) => {
                 ]}
                 placeholder="Cuadro de texto"
                 multiline
-                name="message"
                 value={respuesta}
                 onChangeText={setRespuesta}
                 onContentSizeChange={(e) =>
@@ -445,7 +440,6 @@ const ModalEntry = ({ visible, onClose }) => {
                         style={styles.beneficiaryInput}
                         value={beneficiario}
                         maxLength={50}
-                        name="beneficiario"
                         onChangeText={(text) =>
                           handleBeneficiarioChange(text, index)
                         }
@@ -506,7 +500,6 @@ const ModalEntry = ({ visible, onClose }) => {
                   <Pressable
                     onPress={showDatePicker}
                     style={{ flexDirection: "row", alignItems: "center" }}
-                    name="fecha_entrega"
                   >
                     <MaterialIcons name="date-range" size={24} color="black" />
                     <Text style={styles.dateText}>{formatDate(date)}</Text>
@@ -544,6 +537,7 @@ const ModalEntry = ({ visible, onClose }) => {
 
 export default ModalEntry;
 
+// Estilos del componente
 const styles = StyleSheet.create({
   // ===================================
   // ===== Estilos del Fondo Modal =====

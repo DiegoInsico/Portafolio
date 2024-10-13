@@ -149,6 +149,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#4B4E6D',  // Dorado suave para el botón central
     padding: 0,
     borderRadius: 30,
+    marginVertical:5,
     justifyContent: 'center',
     alignItems: 'center',
     width: 60,

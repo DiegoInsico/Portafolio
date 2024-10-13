@@ -5,12 +5,13 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Registro from "../screens/auth/register";
 import Login from "../screens/auth/login";
 import RequestPasswordReset from "../screens/auth/resetPass";
+import Home from "../screens/home/home";
 
 const Stack = createNativeStackNavigator();
 
 const MainStackNavigator = () => {
   return (
-    <Stack.Navigator initialRouteName="Login">
+    <Stack.Navigator initialRouteName="Home">
 
       <Stack.Screen
         name="Login"
@@ -26,6 +27,11 @@ const MainStackNavigator = () => {
         name="RequestPasswordReset"
         component={RequestPasswordReset}
         options={{ title: "Cambiar Contraseña", headerShown: false }}
+      />
+      <Stack.Screen
+        name="Home"
+        component={Home}
+        options={{ title: "Inicio", headerShown: false }}
       />
     </Stack.Navigator>
   );
