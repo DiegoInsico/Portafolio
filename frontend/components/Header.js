@@ -1,36 +1,108 @@
 import React, { useState, useRef } from 'react';
-import { View, StyleSheet, TouchableOpacity, Pressable, SafeAreaView, StatusBar } from 'react-native';
-import { FontAwesome } from '@expo/vector-icons';
+import { View, StyleSheet, Pressable, SafeAreaView, StatusBar, Animated } from 'react-native';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import ModalEntry from '../screens/entrys/modalEntry';
 
 export default function Navbar() {
   const [modalVisible, setModalVisible] = useState(false);
-  const handlePress = () => {
+  const handlePress2 = () => {
     setModalVisible(true); // Abrir el modal
   };
 
   const handleCloseModal = () => {
     setModalVisible(false); // Cerrar el modal
   };
+  const [selectedButton, setSelectedButton] = useState(null);
+
+  // Refs para la escala animada
+  const scaleHome = useRef(new Animated.Value(1)).current;
+  const scaleAdd = useRef(new Animated.Value(1)).current;
+  const scaleProfile = useRef(new Animated.Value(1)).current;
+
+  // Función para manejar la animación y la selección de botones
+  const handlePress = (buttonName, scaleRef) => {
+    setSelectedButton(buttonName); // Cambiar el botón seleccionado
+
+    // Animar el botón presionado
+    Animated.sequence([
+      Animated.timing(scaleRef, {
+        toValue: 1.2, // Agrandar ligeramente
+        duration: 200,
+        useNativeDriver: true,
+      }),
+      Animated.timing(scaleRef, {
+        toValue: 1, // Volver al tamaño original
+        duration: 200,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  };
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar backgroundColor="black" barStyle="light-content" />
+      <ModalEntry
+        visible={modalVisible}
+        onClose={handleCloseModal}
+      />
       <View style={styles.navbar}>
-        {/* Menú hamburguesa alineado a la derecha */}
-        <Pressable style={styles.addButton} onPress={handlePress}>
-          <FontAwesome name="plus" size={40} color="white" />
+
+        {/* Botón de la Casa */}
+        <Pressable
+          onPress={() => handlePress('home', scaleHome)}
+        >
+          <Animated.View
+            style={[
+              styles.buttonContainer,
+              { transform: [{ scale: scaleHome }] },
+              selectedButton === 'home' && styles.selectedButton
+            ]}
+          >
+            <FontAwesome
+              name="home"
+              size={30}
+              color={selectedButton === 'home' ? 'black' : "white"}
+            />
+          </Animated.View>
         </Pressable>
 
-        {/* Icono de perfil centrado */}
-        <View style={styles.inputContainer}>
-          <Pressable style={styles.addButton} onPress={handlePress}>
-            <FontAwesome name="plus" size={40} color="white" />
-          </Pressable>
-        </View>
-        <ModalEntry
-          visible={modalVisible}
-          onClose={handleCloseModal}
-        />
+        {/* Botón del Centro */}
+        <Pressable 
+          onPress={handlePress2}
+        >
+          <Animated.View
+            style={[
+              styles.centerButton,
+              { transform: [{ scale: scaleAdd }] },
+              selectedButton === 'add' && styles.selectedButton
+            ]}
+          >
+            <FontAwesome
+              name="plus"
+              size={40}
+              color={selectedButton === 'add' ? 'black' : "white"}
+            />
+          </Animated.View>
+        </Pressable>
+
+        {/* Botón del Perfil */}
+        <Pressable
+          onPress={() => handlePress('profile', scaleProfile)}
+        >
+          <Animated.View
+            style={[
+              styles.buttonContainer,
+              { transform: [{ scale: scaleProfile }] },
+              selectedButton === 'profile' && styles.selectedButton
+            ]}
+          >
+            <FontAwesome
+              name="user"
+              size={30}
+              color={selectedButton === 'profile' ? 'black' : "white"}
+            />
+          </Animated.View>
+        </Pressable>
 
       </View>
     </SafeAreaView>
@@ -39,40 +111,62 @@ export default function Navbar() {
 
 const styles = StyleSheet.create({
   safeArea: {
-    flex: 0, // Solo afecta el navbar, no toda la pantalla
-    backgroundColor: '#ee684b', // Color de fondo del área segura
-    paddingTop: StatusBar.currentHeight || 0, // Asegura espacio para la barra de estado
+    flex: 0,
+    backgroundColor: '#E6C47F',  // Melocotón suave como color de fondo del área segura
   },
   navbar: {
-    height: 0, // Ajuste para la altura del navbar
-    backgroundColor: '#ee684b', // Color del navbar
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: '#C2A66B',
+    paddingHorizontal: 20,
+    borderRadius: 30,
+    shadowColor: '#4B4E6D',  // Azul grisáceo oscuro para las sombras del navbar
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 8,
+    marginHorizontal: 20,
+    position: 'absolute',
+    bottom: 20,
+    left: 0,
+    right: 0,
+  },
+  buttonContainer: {
+    backgroundColor: '#4B4E6D',  // Mantener blanco para contrastar con el fondo dorado
+    borderRadius: 25,
     justifyContent: 'center',
     alignItems: 'center',
-    position: 'relative', // Posición relativa para el perfil
+    width: 50,
+    height: 50,
+    shadowColor: '#2C3E50',  // Negro grisáceo oscuro para sombras de los botones
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 8,
   },
-  inputContainer: {
-    position: 'absolute',
-    top: -50, // Este valor mueve el perfil hacia abajo para que sobresalga del navbar
-    left: '50%',
-    transform: [{ translateX: -40 }], // Centrar el perfil horizontalmente
-    width: 80,
-    height: 80,
-    border: 10,
-    borderColor: '#ee684b',
-    borderRadius: 40, // Hace que el contenedor sea circular
-    backgroundColor: '#C19A6B', // Fondo blanco detrás de la imagen
+  centerButton: {
+    backgroundColor: '#4B4E6D',  // Dorado suave para el botón central
+    padding: 0,
+    borderRadius: 30,
     justifyContent: 'center',
     alignItems: 'center',
-    zIndex: 1, // Asegura que el perfil esté por encima del navbar
+    width: 60,
+    height: 60,
+    position: 'relative',
+    bottom: 0,
+    shadowColor: '#4B4E6D',  // Sombra con azul grisáceo oscuro
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 8,
   },
-  profileIcon: {
-    width: 70,
-    height: 70,
-    borderRadius: 35, // Hace que la imagen sea circular
-  },
-  menuButton: {
-    position: 'absolute',
-    right: 20, // Alinea el botón de menú a la derecha
-    top: -38, // Ajusta la posición vertical del botón de menú
+  selectedButton: {
+    shadowColor: '#2C3E50',  // Negro grisáceo oscuro para sombras del botón seleccionado
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 8,
+    backgroundColor: '#D4AF37',  // Dorado suave para el fondo del botón seleccionado
   },
 });
