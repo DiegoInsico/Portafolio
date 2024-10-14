@@ -68,6 +68,7 @@ export default function Home({ navigation }) {
         </Pressable>
         {/* Modal para crear una nueva entrada */}
         <ModalEntry visible={modalVisible} onClose={handleCloseModal} />
+        
       </View>
       <Navbar />
     </Background>

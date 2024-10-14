@@ -12,6 +12,7 @@ import {
   Image,
   ImageBackground,
   Platform,
+  TouchableOpacity,
 } from "react-native";
 import { FontAwesome, MaterialIcons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
@@ -28,22 +29,22 @@ import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
  * manejo de beneficiarios.
  */
 const ModalEntry = ({ visible, onClose }) => {
-  // Almacenar la URI de la imagen y video seleccionada
+  // Almacenar la URI de la imagen seleccionada
   const [media, setMedia] = useState(null);
   const [respuesta, setRespuesta] = useState("");
 
   // Categorias
-  // Visibilidad de las opciones de categoría
   const [isCategoriesVisible, setIsCategoriesVisible] = useState(false);
   const tiposDeEntrada = ["Mensaje", "Consejo", "Recuerdo", "Reflexión"];
-  // Almacenar las opciones seleccionadas
   const [selectedOption, setSelectedOption] = useState("");
 
-  // Fecha asignada
-  // Almacenar la fecha seleccionada
+  // Fecha de envío
   const [date, setDate] = useState(new Date());
-  // Visibilidad del selector de fecha
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+
+  // Fecha de recuerdo (solo para "Recuerdo")
+  const [recuerdoDate, setRecuerdoDate] = useState(new Date());
+  const [isRecuerdoDatePickerVisible, setRecuerdoDatePickerVisibility] = useState(false);
 
   // Manejar la altura dinámica del TextInput
   const [inputHeight, setInputHeight] = useState(20);
@@ -51,28 +52,35 @@ const ModalEntry = ({ visible, onClose }) => {
   // Almacenar la lista de beneficiarios
   const [beneficiarios, setBeneficiarios] = useState([""]); // Inicia con un input vacío
 
+  // Estado para agregar beneficiarios y fecha en categorías no "Mensaje"
+  const [addBeneficiarios, setAddBeneficiarios] = useState(false);
+
   // ===========================
   // ======== FUNCIONES ========
   // ===========================
 
-  // Funciones de Categorias
   // Función para alternar la visibilidad de las opciones de categoría
   const toggleOptions = () => {
     setIsCategoriesVisible(!isCategoriesVisible);
   };
+
   // Función para manejar la selección de opciones de categoría
   const handleSelectOption = (option) => {
     setSelectedOption(option); // Establecer el valor de la opción seleccionada
+    if (option !== "Mensaje") {
+      setAddBeneficiarios(false); // Resetear si no es "Mensaje"
+    }
+    if (option !== "Recuerdo") {
+      setRecuerdoDate(new Date()); // Resetear la fecha de recuerdo si no es "Recuerdo"
+    }
   };
-  // Determinar si se deben mostrar los campos de beneficiarios y fecha
-  const showBeneficiariosFecha = [
-    "Mensaje",
-    "Consejo",
-    "Recuerdo",
-    "Reflexión",
-  ].includes(selectedOption);
 
-  // Funciones de Media
+  // Determinar si se deben mostrar los campos de beneficiarios y fecha de envío
+  const showBeneficiariosFecha = selectedOption === "Mensaje" || addBeneficiarios;
+
+  // Determinar si se debe mostrar el campo de fecha de recuerdo
+  const showRecuerdoDate = selectedOption === "Recuerdo";
+
   // Función para seleccionar una imagen o video de la galería
   const pickMedia = async () => {
     try {
@@ -165,8 +173,7 @@ const ModalEntry = ({ visible, onClose }) => {
     setMedia(null);
   };
 
-  // Funciones de Fecha
-  // Funciones para manejar el selector de fecha
+  // Funciones para manejar el selector de fecha de envío
   const showDatePicker = () => {
     setDatePickerVisibility(true);
   };
@@ -174,9 +181,30 @@ const ModalEntry = ({ visible, onClose }) => {
     setDatePickerVisibility(false);
   };
   const handleConfirm = (selectedDate) => {
+    if (selectedDate > new Date()) {
+      Alert.alert("Error", "La fecha de envío no puede ser en el futuro.");
+      return;
+    }
     setDate(selectedDate);
     hideDatePicker();
   };
+
+  // Funciones para manejar el selector de fecha de recuerdo
+  const showRecuerdoDatePicker = () => {
+    setRecuerdoDatePickerVisibility(true);
+  };
+  const hideRecuerdoDatePicker = () => {
+    setRecuerdoDatePickerVisibility(false);
+  };
+  const handleRecuerdoConfirm = (selectedDate) => {
+    if (selectedDate > new Date()) {
+      Alert.alert("Error", "La fecha del recuerdo no puede ser en el futuro.");
+      return;
+    }
+    setRecuerdoDate(selectedDate);
+    hideRecuerdoDatePicker();
+  };
+
   // Función para formatear la fecha seleccionada
   const formatDate = (date) => {
     const day = date.getDate().toString().padStart(2, "0");
@@ -185,8 +213,7 @@ const ModalEntry = ({ visible, onClose }) => {
     return `${day}/${month}/${year}`;
   };
 
-  // Funciones de Beneficiarios
-  // Función para agregar un nuevo beneficiario
+  // Funciones para manejar los beneficiarios
   const addBeneficiario = () => {
     if (beneficiarios.length < 5) {
       setBeneficiarios([...beneficiarios, ""]); // Añade un nuevo campo vacío
@@ -197,24 +224,25 @@ const ModalEntry = ({ visible, onClose }) => {
     updatedBeneficiarios.splice(index, 1); // Elimina el beneficiario en el índice dado
     setBeneficiarios(updatedBeneficiarios); // Actualiza el estado con la lista modificada
   };
-  // Función para manejar el cambio en el campo de beneficiario
   const handleBeneficiarioChange = (text, index) => {
     const newBeneficiarios = [...beneficiarios];
     newBeneficiarios[index] = text;
     setBeneficiarios(newBeneficiarios);
   };
 
-  // Funciones de Formulario
   // Función para resetear el formulario a su estado inicial
   const resetForm = () => {
     setRespuesta("");
     setMedia(null);
     setDate(new Date());
-    setIsCategoriesVisible(false);
     setSelectedOption("");
     setBeneficiarios([""]);
+    setAddBeneficiarios(false);
+    setRecuerdoDate(new Date());
     setInputHeight(20);
   };
+
+  // Función para obtener el MIME type basado en la extensión del archivo
   const getMimeType = (filename) => {
     const extension = filename.split(".").pop().toLowerCase();
     switch (extension) {
@@ -253,18 +281,56 @@ const ModalEntry = ({ visible, onClose }) => {
   };
 
   const handleSubmit = async () => {
-    // Validar campos obligatorios
+    // Validar que una categoría esté seleccionada
     if (!selectedOption) {
       Alert.alert("Error", "Por favor, selecciona un tipo de entrada.");
       return;
     }
-    if (!respuesta.trim()) {
-      Alert.alert("Error", "Por favor, ingresa una respuesta.");
+
+    // Validar que al menos haya texto o una imagen
+    if (!respuesta.trim() && !media) {
+      Alert.alert(
+        "Error",
+        "Por favor, ingresa una respuesta o selecciona una imagen."
+      );
       return;
     }
 
-    // Opcional: Validar beneficiarios si es necesario
-    // ...
+    // Validaciones específicas según la categoría
+    if (selectedOption === "Mensaje") {
+      // Beneficiarios y fecha de envío son obligatorios
+      if (
+        beneficiarios.length === 0 ||
+        beneficiarios[0].trim() === ""
+      ) {
+        Alert.alert("Error", "Por favor, ingresa al menos un beneficiario.");
+        return;
+      }
+      if (!date) {
+        Alert.alert("Error", "Por favor, selecciona una fecha de envío.");
+        return;
+      }
+    }
+
+    if (selectedOption !== "Mensaje" && addBeneficiarios) {
+      // Beneficiarios y fecha de envío son opcionales pero si se agregan, deben ser válidos
+      if (
+        beneficiarios.length === 0 ||
+        beneficiarios[0].trim() === ""
+      ) {
+        Alert.alert("Error", "Por favor, ingresa al menos un beneficiario.");
+        return;
+      }
+      if (!date) {
+        Alert.alert("Error", "Por favor, selecciona una fecha de envío.");
+        return;
+      }
+    }
+
+    if (showRecuerdoDate && !recuerdoDate) {
+      Alert.alert("Error", "Por favor, selecciona una fecha de recuerdo.");
+      return;
+    }
 
     let mediaURL = null;
 
@@ -294,11 +360,14 @@ const ModalEntry = ({ visible, onClose }) => {
     // Preparar los datos para Firestore
     const entryData = {
       category: selectedOption,
-      message: respuesta,
-      date: Timestamp.fromDate(date),
+      message: respuesta.trim() || null,
+      date: showBeneficiariosFecha ? Timestamp.fromDate(date) : null, // Fecha de envío
+      recuerdoDate: showRecuerdoDate ? Timestamp.fromDate(recuerdoDate) : null, // Fecha de recuerdo
       mediaURL: mediaURL || null,
-      beneficiaries: beneficiarios.filter((b) => b.trim() !== ""), // Filtrar beneficiarios vacíos
-      createdAt: Timestamp.now(),
+      beneficiaries: showBeneficiariosFecha
+        ? beneficiarios.filter((b) => b.trim() !== "")
+        : [],
+      createdAt: Timestamp.now(), // Fecha de subida
       userId: currentUser.uid, // Relacionar la entrada con el ID del usuario
     };
 
@@ -391,6 +460,21 @@ const ModalEntry = ({ visible, onClose }) => {
             )}
 
             {/* ===========================================
+                           Botón para Agregar Beneficiarios y Fecha (Categorías No "Mensaje")
+                           =========================================== */}
+            {selectedOption !== "Mensaje" && selectedOption !== "" && !addBeneficiarios && (
+              <TouchableOpacity
+                onPress={() => setAddBeneficiarios(true)}
+                style={styles.addBeneficiariosButton}
+              >
+                <Text style={styles.addBeneficiariosButtonText}>
+                  Agregar Beneficiarios y Fecha
+                </Text>
+                <FontAwesome name="plus-circle" size={24} color="#3B873E" />
+              </TouchableOpacity>
+            )}
+
+            {/* ===========================================
                            Sección de Imagen Seleccionada
                            =========================================== */}
             {media && (
@@ -452,46 +536,23 @@ const ModalEntry = ({ visible, onClose }) => {
                         placeholder="Beneficiario"
                       />
 
-                      {/* Si solo hay 1 beneficiario, mostramos el botón agregar */}
-                      {beneficiarios.length === 1 && (
-                        <Pressable
-                          style={styles.addBeneficiaryButton}
-                          onPress={addBeneficiario}
-                        >
-                          <FontAwesome name="plus" size={16} color="black" />
-                        </Pressable>
-                      )}
-
-                      {/* Si hay más de 1 beneficiario, muestra el botón de eliminar excepto en el último */}
-                      {beneficiarios.length > 1 &&
-                        index < beneficiarios.length - 1 && (
-                          <Pressable
-                            style={styles.removeBeneficiaryButton}
-                            onPress={() => handleRemoveBeneficiary(index)}
-                          >
-                            <FontAwesome name="times" size={16} color="white" />
-                          </Pressable>
-                        )}
-
-                      {/* El último beneficiario tiene el botón agregar si hay menos de 5 beneficiarios */}
-                      {beneficiarios.length > 1 &&
-                        index === beneficiarios.length - 1 &&
-                        beneficiarios.length < 5 && (
-                          <Pressable
-                            style={styles.addBeneficiaryButton}
-                            onPress={addBeneficiario}
-                          >
-                            <FontAwesome name="plus" size={16} color="black" />
-                          </Pressable>
-                        )}
-
-                      {/* Si hay 5 beneficiarios, muestra solo el botón de eliminar en todos */}
-                      {beneficiarios.length === 5 && (
+                      {/* Botón para eliminar beneficiario */}
+                      {beneficiarios.length > 1 && (
                         <Pressable
                           style={styles.removeBeneficiaryButton}
                           onPress={() => handleRemoveBeneficiary(index)}
                         >
                           <FontAwesome name="times" size={16} color="white" />
+                        </Pressable>
+                      )}
+
+                      {/* Botón para agregar beneficiario */}
+                      {index === beneficiarios.length - 1 && beneficiarios.length < 5 && (
+                        <Pressable
+                          style={styles.addBeneficiaryButton}
+                          onPress={addBeneficiario}
+                        >
+                          <FontAwesome name="plus" size={16} color="black" />
                         </Pressable>
                       )}
                     </View>
@@ -509,12 +570,12 @@ const ModalEntry = ({ visible, onClose }) => {
                   >
                     <MaterialIcons name="date-range" size={24} color="black" />
                     <Text style={styles.dateText}>{formatDate(date)}</Text>
-                    <Text style={styles.dateSubtext}>Días del mes</Text>
+                    <Text style={styles.dateSubtext}> Días del mes</Text>
                   </Pressable>
                 </View>
 
                 {/* ===========================================
-                                   Componente de Selector de Fecha
+                                   Componente de Selector de Fecha de Envío
                                    =========================================== */}
                 <DateTimePickerModal
                   isVisible={isDatePickerVisible}
@@ -526,7 +587,51 @@ const ModalEntry = ({ visible, onClose }) => {
             )}
 
             {/* ===========================================
-                           Botones de Cerrar y Enviar
+                           Selector de Fecha de Recuerdo (Solo para "Recuerdo")
+                           =========================================== */}
+            {showRecuerdoDate && (
+              <>
+                <View style={styles.entryTypeContainer2}>
+                  <Text style={styles.entryTypeText}>Fecha del recuerdo</Text>
+                  <Pressable
+                    onPress={showRecuerdoDatePicker}
+                    style={{ flexDirection: "row", alignItems: "center" }}
+                  >
+                    <MaterialIcons name="date-range" size={24} color="black" />
+                    <Text style={styles.dateText}>{formatDate(recuerdoDate)}</Text>
+                    <Text style={styles.dateSubtext}> Días del mes</Text>
+                  </Pressable>
+                </View>
+
+                {/* ===========================================
+                                   Componente de Selector de Fecha de Recuerdo
+                                   =========================================== */}
+                <DateTimePickerModal
+                  isVisible={isRecuerdoDatePickerVisible}
+                  mode="date"
+                  onConfirm={handleRecuerdoConfirm}
+                  onCancel={hideRecuerdoDatePicker}
+                />
+              </>
+            )}
+
+            {/* ===========================================
+                           Botón para Quitar Beneficiarios y Fecha (Categorías No "Mensaje")
+                           =========================================== */}
+            {selectedOption !== "Mensaje" && selectedOption !== "" && addBeneficiarios && (
+              <TouchableOpacity
+                onPress={() => setAddBeneficiarios(false)}
+                style={styles.removeBeneficiariosButton}
+              >
+                <Text style={styles.removeBeneficiariosButtonText}>
+                  Quitar Beneficiarios y Fecha
+                </Text>
+                <FontAwesome name="minus-circle" size={24} color="#FF6347" />
+              </TouchableOpacity>
+            )}
+
+            {/* ===========================================
+                           Botones de Enviar
                            =========================================== */}
             <View style={styles.buttonContainer}>
               {/* Botón para enviar el formulario */}
@@ -613,6 +718,36 @@ const styles = StyleSheet.create({
   },
   toggleButtonText: {
     fontSize: 16,
+    marginRight: 10,
+  },
+  addBeneficiariosButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#D4AF37",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 10,
+    alignSelf: "center",
+    marginBottom: 20,
+  },
+  addBeneficiariosButtonText: {
+    fontSize: 16,
+    color: "#000",
+    marginRight: 10,
+  },
+  removeBeneficiariosButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#FF6347",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 10,
+    alignSelf: "center",
+    marginTop: 10,
+  },
+  removeBeneficiariosButtonText: {
+    fontSize: 16,
+    color: "#fff",
     marginRight: 10,
   },
 
@@ -775,6 +910,11 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
 
+  entryTypeText: {
+    fontSize: 16,
+    color: "#000",
+  },
+
   dateText: {
     fontSize: 16,
     fontWeight: "bold",
@@ -790,7 +930,7 @@ const styles = StyleSheet.create({
 
   // ===================================
   // ===== Estilos de Botones ==========
-  // ===== Cerrar y Enviar ==============
+  // ===== Enviar ==============
   // ===================================
   buttonContainer: {
     alignItems: "center",
@@ -813,5 +953,43 @@ const styles = StyleSheet.create({
     color: "white",
     fontWeight: "bold",
     fontSize: 16,
+  },
+
+  // ===================================
+  // ===== Estilos del Botón de Agregar Beneficiarios ========
+  // ===================================
+  addBeneficiariosButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#D4AF37",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 10,
+    alignSelf: "center",
+    marginBottom: 20,
+  },
+  addBeneficiariosButtonText: {
+    fontSize: 16,
+    color: "#000",
+    marginRight: 10,
+  },
+
+  // ===================================
+  // ===== Estilos del Botón para Quitar Beneficiarios ========
+  // ===================================
+  removeBeneficiariosButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#FF6347",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 10,
+    alignSelf: "center",
+    marginTop: 10,
+  },
+  removeBeneficiariosButtonText: {
+    fontSize: 16,
+    color: "#fff",
+    marginRight: 10,
   },
 });

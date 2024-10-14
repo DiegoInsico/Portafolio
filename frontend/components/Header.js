@@ -13,41 +13,45 @@ import {
 } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import ModalEntry from '../screens/entrys/modalEntry';
-import { useNavigation } from '@react-navigation/native'; // Importa el hook useNavigation
-import { signOut } from 'firebase/auth'; // Importa la función signOut de Firebase Auth
-import { auth } from '../utils/firebase'; // Asegúrate de importar auth correctamente
+import SideBar from './sideBar/sideBar';
+import { useNavigation } from '@react-navigation/native';
+import { signOut } from 'firebase/auth';
+import { auth } from '../utils/firebase';
+import PropTypes from 'prop-types';
 
-export default function Navbar() {
+export default function Navbar({ onOptionsPress }) { // Acepta la prop onOptionsPress
   const [modalVisible, setModalVisible] = useState(false);
-  const navigation = useNavigation(); // Inicializa el objeto de navegación
+  const navigation = useNavigation();
+  
 
   const handlePress2 = () => {
-    setModalVisible(true); // Abrir el modal
+    setModalVisible(true);
   };
 
   const handleCloseModal = () => {
-    setModalVisible(false); // Cerrar el modal
+    setModalVisible(false);
   };
+
   const [selectedButton, setSelectedButton] = useState(null);
 
   // Refs para la escala animada
   const scaleHome = useRef(new Animated.Value(1)).current;
   const scaleAdd = useRef(new Animated.Value(1)).current;
-  const scaleProfile = useRef(new Animated.Value(1)).current;
+  const scaleOptions = useRef(new Animated.Value(1)).current;
 
   // Función para manejar la animación y la selección de botones
   const handlePress = (buttonName, scaleRef) => {
-    setSelectedButton(buttonName); // Cambiar el botón seleccionado
+    setSelectedButton(buttonName);
 
     // Animar el botón presionado
     Animated.sequence([
       Animated.timing(scaleRef, {
-        toValue: 1.2, // Agrandar ligeramente
+        toValue: 1.2,
         duration: 200,
         useNativeDriver: true,
       }),
       Animated.timing(scaleRef, {
-        toValue: 1, // Volver al tamaño original
+        toValue: 1,
         duration: 200,
         useNativeDriver: true,
       }),
@@ -57,11 +61,11 @@ export default function Navbar() {
   // Función para manejar el cierre de sesión
   const handleSignOut = async () => {
     try {
-      await signOut(auth); // Cerrar sesión con Firebase
+      await signOut(auth);
       Alert.alert("Éxito", "Has cerrado sesión correctamente.");
       navigation.reset({
         index: 0,
-        routes: [{ name: "Login" }], // Redirigir a la pantalla de Login
+        routes: [{ name: "Login" }],
       });
     } catch (error) {
       console.error("Error al cerrar sesión:", error);
@@ -98,7 +102,7 @@ export default function Navbar() {
         </Pressable>
 
         {/* Botón del Centro */}
-        <Pressable 
+        <Pressable
           onPress={handlePress2}
         >
           <Animated.View
@@ -116,21 +120,24 @@ export default function Navbar() {
           </Animated.View>
         </Pressable>
 
-        {/* Botón del Perfil */}
+        {/* Botón de Opciones (reemplazando al Perfil) */}
         <Pressable
-          onPress={() => handlePress('profile', scaleProfile)}
+          onPress={() => {
+            handlePress('options', scaleOptions);
+            if (onOptionsPress) onOptionsPress(); // Llamar a la función para abrir el SideBar
+          }}
         >
           <Animated.View
             style={[
               styles.buttonContainer,
-              { transform: [{ scale: scaleProfile }] },
-              selectedButton === 'profile' && styles.selectedButton
+              { transform: [{ scale: scaleOptions }] },
+              selectedButton === 'options' && styles.selectedButton
             ]}
           >
             <FontAwesome
-              name="user"
+              name="bars" // Icono de opciones (hamburguesa)
               size={30}
-              color={selectedButton === 'profile' ? 'black' : "white"}
+              color={selectedButton === 'options' ? 'black' : "white"}
             />
           </Animated.View>
         </Pressable>
@@ -148,6 +155,10 @@ export default function Navbar() {
     </SafeAreaView>
   );
 }
+
+Navbar.propTypes = {
+  onOptionsPress: PropTypes.func, // Definir el tipo de prop
+};
 
 const styles = StyleSheet.create({
   safeArea: {
@@ -173,7 +184,7 @@ const styles = StyleSheet.create({
     right: 0,
   },
   buttonContainer: {
-    backgroundColor: '#4B4E6D',  // Mantener blanco para contrastar con el fondo dorado
+    backgroundColor: '#4B4E6D',  // Mantener color consistente para los botones
     borderRadius: 25,
     justifyContent: 'center',
     alignItems: 'center',
@@ -186,10 +197,10 @@ const styles = StyleSheet.create({
     elevation: 8,
   },
   centerButton: {
-    backgroundColor: '#4B4E6D',  // Dorado suave para el botón central
+    backgroundColor: '#4B4E6D',  // Color consistente para el botón central
     padding: 0,
     borderRadius: 30,
-    marginVertical:5,
+    marginVertical: 5,
     justifyContent: 'center',
     alignItems: 'center',
     width: 60,
