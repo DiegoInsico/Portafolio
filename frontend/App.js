@@ -1,21 +1,19 @@
-// App.js
-import React, { useState, useEffect } from 'react';
-import { ActivityIndicator, View, StyleSheet } from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
-
-import Login from './screens/auth/login';
-import Home from './screens/home/home';
-import Registro from './screens/auth/register'; // Asegúrate de tener este componente
-import EditProfile from './screens/profile/editProfile'; // Renombrado a EditProfile para coherencia
-import RequestPasswordReset from './screens/auth/resetPass'; // Asegúrate de tener este componente
-
-import { auth } from './utils/firebase'; // Ajusta la ruta según tu estructura de carpetas
-import { onAuthStateChanged } from 'firebase/auth';
+import React, { useState, useEffect } from "react";
+import { ActivityIndicator, View, StyleSheet } from "react-native";
+import { NavigationContainer } from "@react-navigation/native";
+import { createStackNavigator } from "@react-navigation/stack";
+import Login from "./screens/auth/login";
+import EntriesHome from "./screens/entrys/entriesHome";
+import Registro from "./screens/auth/register";
+import EditarPerfil from "./screens/profile/editProfile";
+import RequestPasswordReset from "./screens/auth/resetPass";
+import Home from "./screens/home/home";
+import { auth } from "./utils/firebase";
+import { onAuthStateChanged } from "firebase/auth";
 
 const Stack = createStackNavigator();
 
-// Pantalla de Carga Mientras se Verifica el Estado de Autenticación
+// Pantalla de carga mientras se verifica el estado de autenticación
 function SplashScreen() {
   return (
     <View style={styles.splashContainer}>
@@ -34,58 +32,66 @@ export default function App() {
       if (initializing) setInitializing(false);
     });
 
-    // Limpia el listener al desmontar el componente
-    return unsubscribe;
+    return unsubscribe; // Limpia el listener al desmontar el componente
   }, [initializing]);
 
   if (initializing) return <SplashScreen />;
 
   return (
     <NavigationContainer>
-      <Stack.Navigator>
-        {user ? (
-          <>
-            {/* Si el usuario está autenticado, mostrar el stack de la aplicación */}
-            <Stack.Screen
-              name="Home"
-              component={Home}
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen
-              name="EditProfile" // Agregamos la pantalla de editar perfil para el usuario autenticado
-              component={EditProfile}
-              options={{ headerShown: false }}
-            />
-          </>
-        ) : (
-          <>
-            {/* Si el usuario no está autenticado, mostrar el stack de autenticación */}
-            <Stack.Screen
-              name="Login"
-              component={Login}
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen
-              name="Registro"
-              component={Registro}
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen
-              name="RequestPasswordReset"
-              component={RequestPasswordReset}
-              options={{ headerShown: false }}
-            />
-          </>
-        )}
-      </Stack.Navigator>
+      <View style={styles.container}>
+        <Stack.Navigator screenOptions={{ headerShown: false }}>
+          {user ? (
+            <>
+              <Stack.Screen
+                name="Home"
+                component={Home}
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="EntriesHome"
+                component={EntriesHome}
+                options={{ title: "Tus Entradas" }}
+              />
+              <Stack.Screen
+                name="EditarPerfil"
+                component={EditarPerfil}
+                options={{ title: "Editar Perfil" }}
+              />
+            </>
+          ) : (
+            <>
+              <Stack.Screen
+                name="Login"
+                component={Login}
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="Registro"
+                component={Registro}
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="RequestPasswordReset"
+                component={RequestPasswordReset}
+                options={{ headerShown: false }}
+              />
+            </>
+          )}
+        </Stack.Navigator>
+      </View>
     </NavigationContainer>
   );
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    paddingBottom: 0, // Añade un espacio para que el contenido no se solape con el navbar
+  },
   splashContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

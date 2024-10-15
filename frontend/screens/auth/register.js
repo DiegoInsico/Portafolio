@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import {
-  View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ActivityIndicator,
+  Image, View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ActivityIndicator,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth'; // Importamos el método para crear usuario y actualizar perfil
-import { auth } from '../../utils/firebase'; // Asegúrate de tener correctamente configurada la autenticación de Firebase
+import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth'; 
+import { auth } from '../../utils/firebase'; 
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 import { Ionicons } from '@expo/vector-icons';
@@ -32,23 +32,20 @@ export default function Registro({ navigation }) {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  // Función para manejar el registro
   const handleRegister = async (values, actions) => {
     setIsSubmitting(true);
     try {
-      // Crear el usuario con correo y contraseña en Firebase Authentication
       const userCredential = await createUserWithEmailAndPassword(
         auth, values.correo, values.contrasena
       );
       const user = userCredential.user;
 
-      // Actualizar el perfil del usuario para añadir el nombre de usuario
       await updateProfile(user, {
         displayName: values.usuario,
       });
 
       Alert.alert('Registro exitoso', 'Cuenta creada correctamente. Ahora puedes iniciar sesión.');
-      navigation.navigate('Login'); // Navegar al login tras el registro
+      navigation.navigate('Login'); 
     } catch (error) {
       console.error('Error al registrar:', error.message);
       Alert.alert('Error', error.message || 'Ocurrió un error al registrar.');
@@ -66,6 +63,11 @@ export default function Registro({ navigation }) {
       style={styles.background}
     >
       <View style={styles.container}>
+      <Image
+          source={require("../../assets/background/florLogo.png")} // Reemplaza con la ruta de tu imagen
+          style={styles.logo}
+          resizeMode="cover"
+        />
         <Text style={styles.title}>Regístrate</Text>
 
         <Formik
@@ -193,7 +195,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   container: {
-    width: '90%',
+    width: '100%', // Ajustamos el ancho del contenedor para que se centre
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 20,
@@ -201,7 +203,6 @@ const styles = StyleSheet.create({
   logo: {
     width: 150, // Ajusta el ancho de la imagen
     height: 150, // Ajusta la altura de la imagen
-    position: "flex",
     marginTop: 50,
     shadowColor: "#000000", // Color de la sombra
     shadowOffset: { width: 5, height: 5 }, // Desplazamiento de la sombra (horizonte/vertical)
@@ -217,13 +218,6 @@ const styles = StyleSheet.create({
     bottom: 0, // Pega la imagen al fondo
     opacity: 0.8, // Ajusta la opacidad de la imagen
   },
-  titleSoul: {
-    fontSize: 28,
-    fontWeight: "bold",
-    color: "#000000",
-    alignSelf: "center",
-    fontFamily: "Montserrat",
-  },
   title: {
     fontSize: 28,
     fontWeight: 'bold',
@@ -232,26 +226,28 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
   form: {
-    width: '100%',
+    width: '85%', // Cambiamos a 85% para que los inputs no se extiendan hasta los bordes
+    alignItems: 'center', // Centramos el contenido del formulario
   },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderColor: '#ff9999', // Color del borde constante
-    borderWidth: 1, // Ancho del borde constante
+    borderColor: '#ff9999',
+    borderWidth: 1,
     borderRadius: 8,
-    paddingHorizontal: 10,
-    marginBottom: 10,
+    paddingHorizontal: 8,
+    marginBottom: 8,
+    width: '100%', // Los inputs cubren el 100% del contenedor del formulario
     backgroundColor: '#f9f9f9',
   },
   iconStyle: {
     marginRight: 5,
   },
   input: {
-    height: 50,
-    width: "100%",
+    height: 45, 
+    width: '85%', 
     paddingHorizontal: 10,
-    backgroundColor: "#f9f9f9",
+    backgroundColor: '#f9f9f9',
   },
   toggleButton: {
     padding: 5,
@@ -263,10 +259,11 @@ const styles = StyleSheet.create({
   },
   button: {
     backgroundColor: '#ff9999',
-    paddingVertical: 15,
+    paddingVertical: 12,
     borderRadius: 8,
     alignItems: 'center',
     marginTop: 10,
+    width: '85%', 
   },
   buttonDisabled: {
     backgroundColor: '#ccc',
@@ -276,18 +273,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
-  footer: {
-    flexDirection: 'row',
-    marginTop: 15,
-    justifyContent: 'center',
-  },
-  footerText: {
-    color: '#333',
-    fontSize: 14,
-  },
   footerLink: {
-    color: '#6200EE',
+    color: '#fff',
     fontWeight: 'bold',
     fontSize: 14,
+    marginTop: 20,
   },
 });

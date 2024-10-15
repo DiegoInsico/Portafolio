@@ -1,29 +1,35 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef } from "react";
 import {
   View,
   StyleSheet,
   Pressable,
-  SafeAreaView,
   StatusBar,
   Animated,
-} from 'react-native';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import ModalEntry from '../screens/entrys/modalEntry';
-import PropTypes from 'prop-types';
+  TouchableOpacity,
+} from "react-native";
+import FontAwesome from "react-native-vector-icons/FontAwesome";
+import { useNavigation } from "@react-navigation/native";
+import PropTypes from "prop-types";
+import ModalEntry from "../screens/entrys/modalEntry"; // Importa tu ModalEntry
+import SideBar from "./sideBar";
 
-export default function Navbar({ navigation, onToggleSideBar }) {
+export default function Navbar({ onOptionsPress }) {
+  const navigation = useNavigation();
+
+  // Estado para controlar la visibilidad del ModalEntry
   const [modalVisible, setModalVisible] = useState(false);
+  const [sidebarVisible, setSidebarVisible] = useState(false); // Controla la visibilidad del SideBar
 
   // Refs para la escala animada de los botones
   const scaleHome = useRef(new Animated.Value(1)).current;
   const scaleAdd = useRef(new Animated.Value(1)).current;
   const scaleOptions = useRef(new Animated.Value(1)).current;
 
-  // Función para manejar la animación y la selección de botones
+  // Función para manejar la animación de los botones
   const handlePress = (scaleRef) => {
     Animated.sequence([
       Animated.timing(scaleRef, {
-        toValue: 1.1, // Reducido a 1.1 para evitar un efecto exagerado
+        toValue: 1.1,
         duration: 250,
         useNativeDriver: true,
       }),
@@ -36,142 +42,132 @@ export default function Navbar({ navigation, onToggleSideBar }) {
   };
 
   // Función para abrir el modal
-  const handlePressAdd = () => {
-    handlePress(scaleAdd);
+  const openModal = () => {
     setModalVisible(true);
   };
 
-  // Función para cerrar el modal
-  const handleCloseModal = () => {
+  const closeModal = () => {
     setModalVisible(false);
   };
 
+  // Función para abrir y cerrar el SideBar
+  const toggleSidebar = () => {
+    setSidebarVisible(!sidebarVisible);
+  };
+
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <StatusBar backgroundColor="black" barStyle="light-content" />
+    <>
+      <SideBar visible={sidebarVisible} onClose={toggleSidebar} />
 
-      {modalVisible && <ModalEntry visible={modalVisible} onClose={handleCloseModal} />}
+      <View style={styles.navbarContainer}>
+        <StatusBar backgroundColor="black" barStyle="light-content" />
+        <View style={styles.navbar}>
+          {/* Botón de Home - Navegar a Home */}
+          <Pressable onPress={() => navigation.navigate("Home")}>
+            <Animated.View
+              style={[
+                styles.buttonContainer,
+                { transform: [{ scale: scaleHome }] },
+              ]}
+            >
+              <FontAwesome name="home" size={30} color="black" />
+            </Animated.View>
+          </Pressable>
 
-      <View style={styles.navbar}>
-        {/* Botón de la Casa */}
-        <Pressable
-          onPressIn={() => handlePress(scaleHome)}
-          onPressOut={() => navigation.navigate('Home')}
-          style={({ pressed }) => [
-            styles.buttonContainer,
-            { backgroundColor: pressed ? '#3B3D53' : '#4B4E6D' }, // Cambio de color al presionar
-          ]}
-          accessible={true}
-          accessibilityLabel="Ir a la página de inicio"
-        >
-          <Animated.View
-            style={[
-              styles.buttonContainer,
-              { transform: [{ scale: scaleHome }] },
-            ]}
-          >
-            <FontAwesome name="home" size={30} color="white" />
-          </Animated.View>
-        </Pressable>
+          {/* Botón de Agregar - Navegar a EntriesHome */}
+          <Pressable onPress={() => navigation.navigate("EntriesHome")}>
+            <Animated.View
+              style={[
+                styles.centerButton,
+                { transform: [{ scale: scaleAdd }] },
+              ]}
+            >
+              <FontAwesome name="tasks" size={30} color="black" />
+            </Animated.View>
+          </Pressable>
 
-        {/* Botón del Centro (Agregar) */}
-        <Pressable
-          onPress={handlePressAdd}
-          style={({ pressed }) => [
-            styles.centerButton,
-            { backgroundColor: pressed ? '#3B3D53' : '#4B4E6D' }, // Cambio de color al presionar
-          ]}
-          accessible={true}
-          accessibilityLabel="Agregar nueva entrada"
-        >
-          <Animated.View
-            style={[
-              styles.centerButton,
-              { transform: [{ scale: scaleAdd }] },
-            ]}
-          >
-            <FontAwesome name="plus" size={40} color="white" />
-          </Animated.View>
-        </Pressable>
+          {/* Botón de Opciones (abrir Sidebar) */}
+          <Pressable onPress={toggleSidebar}>
+            <Animated.View
+              style={[
+                styles.buttonContainer,
+                { transform: [{ scale: scaleOptions }] },
+              ]}
+            >
+              <FontAwesome name="user" size={30} color="black" />
+            </Animated.View>
+          </Pressable>
+        </View>
 
-        {/* Botón de Opciones (Sidebar) */}
-        <Pressable
-          onPressIn={() => handlePress(scaleOptions)}
-          onPressOut={onToggleSideBar}
-          style={({ pressed }) => [
-            styles.buttonContainer,
-            { backgroundColor: pressed ? '#3B3D53' : '#4B4E6D' }, // Cambio de color al presionar
-          ]}
-          accessible={true}
-          accessibilityLabel="Abrir el menú"
-        >
-          <Animated.View
-            style={[
-              styles.buttonContainer,
-              { transform: [{ scale: scaleOptions }] },
-            ]}
-          >
-            <FontAwesome name="bars" size={30} color="white" />
-          </Animated.View>
-        </Pressable>
+        {/* Modal para crear una nueva entrada */}
+        <ModalEntry visible={modalVisible} onClose={closeModal} />
       </View>
-    </SafeAreaView>
+    </>
   );
 }
 
 Navbar.propTypes = {
-  navigation: PropTypes.object.isRequired,
-  onToggleSideBar: PropTypes.func.isRequired,
+  onOptionsPress: PropTypes.func,
 };
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 0,
-    backgroundColor: '#E6C47F',
+  navbarContainer: {
+    flex: 1,
+    justifyContent: "flex-end",
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: "#D4AF37",
   },
   navbar: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: '#C2A66B',
-    paddingHorizontal: 20,
-    borderRadius: 30,
-    shadowColor: '#4B4E6D',
+    flexDirection: "row",
+    justifyContent: "space-around",
+    alignItems: "center",
+    backgroundColor: "#D4AF37",
+    paddingVertical: 10,
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+    height: 80,
+    shadowColor: "#4B4E6D",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 4,
     elevation: 8,
-    marginHorizontal: 20,
-    position: 'absolute',
-    bottom: 20,
-    left: 0,
-    right: 0,
   },
   buttonContainer: {
-    backgroundColor: '#4B4E6D',
+    backgroundColor: "#4B4E6D",
     borderRadius: 25,
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: 50,
-    height: 50,
-    shadowColor: '#2C3E50',
+    justifyContent: "center",
+    alignItems: "center",
+    width: 60,
+    height: 60,
+    shadowColor: "#2C3E50",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 4,
     elevation: 8,
   },
   centerButton: {
-    backgroundColor: '#4B4E6D',
-    padding: 0,
-    borderRadius: 30,
+    backgroundColor: "#4B4E6D",
+    borderRadius: 25,
     marginVertical: 5,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     width: 60,
     height: 60,
-    position: 'relative',
-    bottom: 0,
-    shadowColor: '#4B4E6D',
+    shadowColor: "#2C3E50",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 8,
+  },
+  logoutButton: {
+    backgroundColor: "#FF6347",
+    borderRadius: 25,
+    width: 60,
+    height: 60,
+    shadowColor: "#2C3E50",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 4,

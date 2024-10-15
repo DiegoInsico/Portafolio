@@ -93,11 +93,6 @@ export default function Login({ navigation }) {
       end={{ x: 0, y: 1 }}
       style={styles.background}
     >
-      <Image
-        source={require("../../assets/background/imagen-fondo.png")} // Reemplaza con la ruta de tu imagen
-        style={styles.image}
-        resizeMode="cover"
-      />
 
       <View style={styles.container}>
         <Image

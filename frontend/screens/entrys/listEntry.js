@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { ResponsiveGrid } from 'react-native-flexible-grid';
-import EntryItem from '../entrys/entryItem'; // Asegúrate de ajustar la ruta
+import EntryItem from './entryItem'; // Asegúrate de ajustar la ruta
 
 
 

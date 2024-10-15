@@ -162,7 +162,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   container: {
-    width: "90%",
+    width: "100%",
     justifyContent: "center",
     alignItems: "center",
     paddingHorizontal: 20,
@@ -200,7 +200,7 @@ const styles = StyleSheet.create({
     alignSelf: "center",
   },
   form: {
-    width: "100%",
+    width: "85%",
   },
   inputContainer: {
     flexDirection: "row",
@@ -211,6 +211,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     marginBottom: 10,
     backgroundColor: "#f9f9f9",
+    width: '100%'
   },
   iconStyle: {
     marginRight: 5,
@@ -237,8 +238,8 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   linkText: {
-    color: "#000000",
-    marginTop: 10,
+    color: "#fff",
+    marginTop: 20,
     textAlign: "center",
     fontSize: 14,
     fontWeight: "bold",

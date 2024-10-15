@@ -403,13 +403,8 @@ const ModalEntry = ({ visible, onClose }) => {
         />
         <View style={styles.modalContainer}>
           <ScrollView contentContainerStyle={styles.scrollContentContainer}>
-            {/* ===========================================
-                           Sección de Tipo de Entrada y Carga de Media
-                           =========================================== */}
             <View style={styles.entryTypeContainer}>
-              {/* Botón para cerrar el modal */}
               <Pressable style={styles.closeButton} onPress={onClose}>
-                {/* Icono de flecha hacia atrás */}
                 <FontAwesome name="arrow-left" size={24} color="white" />
               </Pressable>
               <Pressable style={styles.toggleButton} onPress={toggleOptions}>
@@ -420,7 +415,6 @@ const ModalEntry = ({ visible, onClose }) => {
                   color="black"
                 />
               </Pressable>
-              {/* Botón para cargar media */}
               <Pressable onPress={pickMedia}>
                 <FontAwesome
                   name="upload"
@@ -431,9 +425,6 @@ const ModalEntry = ({ visible, onClose }) => {
               </Pressable>
             </View>
 
-            {/* ===========================================
-                           Sección de Opciones de Categoría
-                           =========================================== */}
             {isCategoriesVisible && (
               <View style={styles.optionsContainer}>
                 {tiposDeEntrada.map((tipo, index) => (
@@ -447,7 +438,6 @@ const ModalEntry = ({ visible, onClose }) => {
                   >
                     <Text style={styles.optionText}>{tipo}</Text>
 
-                    {/* Mostrar la hoja si está seleccionado */}
                     {selectedOption === tipo && (
                       <Image
                         source={require("../../assets/test/hoja.png")} // Ruta a la hoja de otoño
@@ -459,9 +449,6 @@ const ModalEntry = ({ visible, onClose }) => {
               </View>
             )}
 
-            {/* ===========================================
-                           Botón para Agregar Beneficiarios y Fecha (Categorías No "Mensaje")
-                           =========================================== */}
             {selectedOption !== "Mensaje" && selectedOption !== "" && !addBeneficiarios && (
               <TouchableOpacity
                 onPress={() => setAddBeneficiarios(true)}
@@ -474,16 +461,14 @@ const ModalEntry = ({ visible, onClose }) => {
               </TouchableOpacity>
             )}
 
-            {/* ===========================================
-                           Sección de Imagen Seleccionada
-                           =========================================== */}
+
             {media && (
               <View style={styles.imageContainer}>
-                {/* Botón para eliminar la imagen */}
+
                 <Pressable style={styles.deleteIcon} onPress={removeMedia}>
                   <FontAwesome name="trash" size={30} color="red" />
                 </Pressable>
-                {/* Mostrar la imagen seleccionada */}
+
                 <Image
                   source={{ uri: media.uri }}
                   style={styles.image}
@@ -492,9 +477,6 @@ const ModalEntry = ({ visible, onClose }) => {
               </View>
             )}
 
-            {/* ===========================================
-                           Campo de Texto Multilinea
-                           =========================================== */}
             <View style={styles.textInputContainer}>
               <FontAwesome
                 name="microphone"
@@ -517,12 +499,9 @@ const ModalEntry = ({ visible, onClose }) => {
               />
             </View>
 
-            {/* ===========================================
-                           Sección de Beneficiarios y Fecha de Envío
-                           =========================================== */}
             {showBeneficiariosFecha && (
               <>
-                {/* Lista de Beneficiarios */}
+
                 <View style={styles.beneficiariesContainer}>
                   {beneficiarios.map((beneficiario, index) => (
                     <View key={index} style={styles.beneficiarioRow}>
@@ -536,7 +515,6 @@ const ModalEntry = ({ visible, onClose }) => {
                         placeholder="Beneficiario"
                       />
 
-                      {/* Botón para eliminar beneficiario */}
                       {beneficiarios.length > 1 && (
                         <Pressable
                           style={styles.removeBeneficiaryButton}
@@ -546,7 +524,6 @@ const ModalEntry = ({ visible, onClose }) => {
                         </Pressable>
                       )}
 
-                      {/* Botón para agregar beneficiario */}
                       {index === beneficiarios.length - 1 && beneficiarios.length < 5 && (
                         <Pressable
                           style={styles.addBeneficiaryButton}
@@ -559,9 +536,7 @@ const ModalEntry = ({ visible, onClose }) => {
                   ))}
                 </View>
 
-                {/* ===========================================
-                                   Selector de Fecha de Envío
-                                   =========================================== */}
+
                 <View style={styles.entryTypeContainer2}>
                   <Text style={styles.entryTypeText}>Fecha de envío</Text>
                   <Pressable
@@ -574,9 +549,6 @@ const ModalEntry = ({ visible, onClose }) => {
                   </Pressable>
                 </View>
 
-                {/* ===========================================
-                                   Componente de Selector de Fecha de Envío
-                                   =========================================== */}
                 <DateTimePickerModal
                   isVisible={isDatePickerVisible}
                   mode="date"
@@ -586,9 +558,6 @@ const ModalEntry = ({ visible, onClose }) => {
               </>
             )}
 
-            {/* ===========================================
-                           Selector de Fecha de Recuerdo (Solo para "Recuerdo")
-                           =========================================== */}
             {showRecuerdoDate && (
               <>
                 <View style={styles.entryTypeContainer2}>
@@ -603,9 +572,6 @@ const ModalEntry = ({ visible, onClose }) => {
                   </Pressable>
                 </View>
 
-                {/* ===========================================
-                                   Componente de Selector de Fecha de Recuerdo
-                                   =========================================== */}
                 <DateTimePickerModal
                   isVisible={isRecuerdoDatePickerVisible}
                   mode="date"
@@ -615,9 +581,6 @@ const ModalEntry = ({ visible, onClose }) => {
               </>
             )}
 
-            {/* ===========================================
-                           Botón para Quitar Beneficiarios y Fecha (Categorías No "Mensaje")
-                           =========================================== */}
             {selectedOption !== "Mensaje" && selectedOption !== "" && addBeneficiarios && (
               <TouchableOpacity
                 onPress={() => setAddBeneficiarios(false)}
@@ -630,11 +593,9 @@ const ModalEntry = ({ visible, onClose }) => {
               </TouchableOpacity>
             )}
 
-            {/* ===========================================
-                           Botones de Enviar
-                           =========================================== */}
+
             <View style={styles.buttonContainer}>
-              {/* Botón para enviar el formulario */}
+
               <Pressable style={styles.submitButton} onPress={handleSubmit}>
                 <Text style={styles.submitButtonText}>Enviar</Text>
               </Pressable>
