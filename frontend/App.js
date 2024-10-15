@@ -58,6 +58,81 @@ export default function App() {
                 component={EditarPerfil}
                 options={{ title: "Editar Perfil" }}
               />
+                          <Stack.Screen
+              name="Profile"
+              component={Profile}
+              options={{ title: "Perfil del Usuario" }}
+            />
+            <Stack.Screen
+              name="Configuracion"
+              component={Configuracion}
+              options={{ title: "Configuraciones" }}
+            />
+            <Stack.Screen
+              name="AdminCuenta"
+              component={AdminCuenta}
+              options={{ title: "Administrar Cuenta" }}
+            />
+            <Stack.Screen
+              name="Acces"
+              component={Acces}
+              options={{ title: "Accesibilidad" }}
+            />
+            <Stack.Screen
+              name="Ajustes"
+              component={Ajustes}
+              options={{ title: "Ajustes" }}
+            />
+
+            {/* seguridad */}
+            <Stack.Screen
+              name="Seguridad"
+              component={Seguridad}
+              options={{ title: "Seguridad" }}
+            />
+            <Stack.Screen
+              name="AlertSeg"
+              component={AlertSeg}
+              options={{ title: "Alerta de Seguridad" }}
+            />
+            <Stack.Screen
+              name="BloSes"
+              component={BloSes}
+              options={{ title: "Bloqueo de Sesion" }}
+            />
+            <Stack.Screen
+              name="Veri"
+              component={Veri}
+              options={{ title: "Verificacion" }}
+            />
+
+            <Stack.Screen
+              name="AdminTest"
+              component={AdminTest}
+              options={{ title: "Administrar Testigos" }}
+            />
+            <Stack.Screen
+              name="AgregarTest"
+              component={AgregarTest}
+              options={{ title: "Agregar Testigos" }}
+            />
+            <Stack.Screen
+              name="ModificarTest"
+              component={ModificarTest}
+              options={{ title: "Modificar Testigos" }}
+            />
+            <Stack.Screen
+              name="EliminarTest"
+              component={EliminarTest}
+              options={{ title: "Eliminar Testigos" }}
+            />
+
+            <Stack.Screen
+              name="AdminBene"
+              component={AdminBene}
+              options={{ title: "Administrar Beneficiarios" }}
+            />
+
             </>
           ) : (
             <>
