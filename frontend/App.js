@@ -1,17 +1,33 @@
 // App.js
-import React, { useState, useEffect } from 'react';
-import { ActivityIndicator, View, StyleSheet } from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
+import React, { useState, useEffect } from "react";
+import { ActivityIndicator, View, StyleSheet } from "react-native";
+import { NavigationContainer } from "@react-navigation/native";
+import { createStackNavigator } from "@react-navigation/stack";
 
-import Login from './screens/auth/login';
-import Home from './screens/home/home';
-import Registro from './screens/auth/register'; // Asegúrate de tener este componente
-import EditarPerfil from './screens/profile/editProfile';
-import RequestPasswordReset from './screens/auth/resetPass'; // Asegúrate de tener este componente
+import Login from "./screens/auth/login";
+import Home from "./screens/home/home";
+import Registro from "./screens/auth/register"; // Asegúrate de tener este componente
+import EditProfile from "./screens/profile/editProfile"; // Renombrado a EditProfile para coherencia
+import RequestPasswordReset from "./screens/auth/resetPass"; // Asegúrate de tener este componente
 
-import { auth } from './utils/firebase'; // Ajusta la ruta según tu estructura de carpetas
-import { onAuthStateChanged } from 'firebase/auth';
+import { auth } from "./utils/firebase"; // Ajusta la ruta según tu estructura de carpetas
+import { onAuthStateChanged } from "firebase/auth";
+
+import Profile from './screens/profile/profile'; 
+import Configuracion from './screens/config/configuracion'; 
+import Seguridad from './screens/config/opciones/Seguridad'; 
+import AlertSeg from './screens/config/opciones/seguridad/alertSeg'; 
+import BloSes from './screens/config/opciones/seguridad/bloSes'; 
+import Veri from './screens/config/opciones/seguridad/veri'; 
+import AdminBene from './screens/Beneficiarios/adminBene'; 
+import AdminCuenta from './screens/config/opciones/adminCuenta'; 
+import AdminTest from './screens/testigos/adminTestigo'; 
+
+import Acces from './screens/config/opciones/acces';
+import Ajustes from './screens/config/opciones/ajustes';
+import EliminarTest from './screens/testigos/opciones/eliminarTes';
+import ModificarTest from './screens/testigos/opciones/modificarTes';
+import AgregarTest from './screens/testigos/opciones/AgregarTes';
 
 const Stack = createStackNavigator();
 
@@ -44,15 +60,96 @@ export default function App() {
     <NavigationContainer>
       <Stack.Navigator>
         {user ? (
-          // Si el usuario está autenticado, mostrar el stack de la aplicación
-          <Stack.Screen
-            name="Home"
-            component={Home}
-            options={{ headerShown: false }}
-          />
-        ) : (
-          // Si el usuario no está autenticado, mostrar el stack de autenticación
           <>
+            {/* Si el usuario está autenticado, mostrar el stack de la aplicación */}
+            <Stack.Screen
+              name="Home"
+              component={Home}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="EditProfile" // Agregamos la pantalla de editar perfil para el usuario autenticado
+              component={EditProfile}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="Profile"
+              component={Profile}
+              options={{ title: "Perfil del Usuario" }}
+            />
+            <Stack.Screen
+              name="Configuracion"
+              component={Configuracion}
+              options={{ title: "Configuraciones" }}
+            />
+            <Stack.Screen
+              name="AdminCuenta"
+              component={AdminCuenta}
+              options={{ title: "Administrar Cuenta" }}
+            />
+            <Stack.Screen
+              name="Acces"
+              component={Acces}
+              options={{ title: "Accesibilidad" }}
+            />
+            <Stack.Screen
+              name="Ajustes"
+              component={Ajustes}
+              options={{ title: "Ajustes" }}
+            />
+
+            {/* seguridad */}
+            <Stack.Screen
+              name="Seguridad"
+              component={Seguridad}
+              options={{ title: "Seguridad" }}
+            />
+            <Stack.Screen
+              name="AlertSeg"
+              component={AlertSeg}
+              options={{ title: "Alerta de Seguridad" }}
+            />
+            <Stack.Screen
+              name="BloSes"
+              component={BloSes}
+              options={{ title: "Bloqueo de Sesion" }}
+            />
+            <Stack.Screen
+              name="Veri"
+              component={Veri}
+              options={{ title: "Verificacion" }}
+            />
+
+            <Stack.Screen
+              name="AdminTest"
+              component={AdminTest}
+              options={{ title: "Administrar Testigos" }}
+            />
+            <Stack.Screen
+              name="AgregarTest"
+              component={AgregarTest}
+              options={{ title: "Agregar Testigos" }}
+            />
+            <Stack.Screen
+              name="ModificarTest"
+              component={ModificarTest}
+              options={{ title: "Modificar Testigos" }}
+            />
+            <Stack.Screen
+              name="EliminarTest"
+              component={EliminarTest}
+              options={{ title: "Eliminar Testigos" }}
+            />
+
+            <Stack.Screen
+              name="AdminBene"
+              component={AdminBene}
+              options={{ title: "Administrar Beneficiarios" }}
+            />
+          </>
+        ) : (
+          <>
+            {/* Si el usuario no está autenticado, mostrar el stack de autenticación */}
             <Stack.Screen
               name="Login"
               component={Login}
@@ -68,11 +165,6 @@ export default function App() {
               component={RequestPasswordReset}
               options={{ headerShown: false }}
             />
-            <Stack.Screen
-              name="EditarPerfil"
-              component={EditarPerfil}
-              options={{ title: 'Editar Perfil' }}
-            />
           </>
         )}
       </Stack.Navigator>
@@ -83,7 +175,7 @@ export default function App() {
 const styles = StyleSheet.create({
   splashContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

@@ -1,25 +1,22 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
+import { View, StyleSheet, ImageBackground } from 'react-native';
 
 const BackgroundWrapper = ({ children }) => {
   return (
-    <LinearGradient
-      colors={[
-        "#D4AF37", // Dorado suave
-        "#E6C47F", // Melocotón suave/dorado claro
-        "#C2A66B", // Dorado oscuro más neutro
-        "#4B4E6D", // Azul grisáceo oscuro para las sombras
-        "#2C3E50", // Negro grisáceo oscuro en la parte inferior
-      ]}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 0, y: 1 }}
-      style={styles.background}
-    >
-      <View style={styles.overlay}>
-        {children}
-      </View>
-    </LinearGradient>
+    <View style={styles.background}>
+      <ImageBackground
+        source={require("../assets/test/background.webp")} // Ruta a tu imagen de fondo
+        style={styles.backgroundImage}
+      >
+        {/* Capa oscura superpuesta */}
+        <View style={styles.overlayDarken} />
+
+        {/* Contenido */}
+        <View style={styles.content}>
+          {children}
+        </View>
+      </ImageBackground>
+    </View>
   );
 };
 
@@ -27,9 +24,20 @@ const styles = StyleSheet.create({
   background: {
     flex: 1,
   },
-  overlay: {
+  backgroundImage: {
+    flex: 0,
+    resizeMode: 'cover', // Ajustar la imagen de fondo para cubrir toda la pantalla
+    width: '100%',
+    height: '100%',
+  },
+  overlayDarken: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0, 0, 0, 0.2)', // Capa oscura con opacidad
+  },
+  content: {
     flex: 1,
-    padding: 0,
+    paddingHorizontal: 0, // Ajusta según sea necesario
+    justifyContent: 'center',
   },
 });
 

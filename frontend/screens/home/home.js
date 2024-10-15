@@ -5,22 +5,14 @@ import { FontAwesome } from '@expo/vector-icons';
 import PropTypes from 'prop-types';
 import EntryListScreen from './listEntry'; // Asegúrate de que la ruta sea correcta
 import Navbar from '../../components/Header';
-import ModalEntry from '../entrys/modalEntry';
-import Background from '../../components/background';
+import SideBar from '../../components/sideBar'; // Asegúrate de que la ruta sea correcta
+import Background from '../../components/background'; // Asegúrate de que la ruta sea correcta
 import { db, auth } from '../../utils/firebase';
 import { collection, query, where, onSnapshot, orderBy } from "firebase/firestore";
 
 export default function Home({ navigation }) {
-  const [modalVisible, setModalVisible] = useState(false);
   const [entries, setEntries] = useState([]);
-
-  const handlePress = () => {
-    setModalVisible(true); // Abrir el modal
-  };
-
-  const handleCloseModal = () => {
-    setModalVisible(false); // Cerrar el modal
-  };
+  const [sideBarVisible, setSideBarVisible] = useState(false); // Estado para mostrar el Sidebar
 
   useEffect(() => {
     const unsubscribeAuth = auth.onAuthStateChanged((user) => {
@@ -29,7 +21,7 @@ export default function Home({ navigation }) {
         Alert.alert("No autenticado", "Por favor, inicia sesión para acceder a esta sección.");
         navigation.navigate('Login'); // Asegúrate de tener una pantalla de Login configurada
       } else {
-        // Escuchar las entradas del usuario
+        // Escuchar las entradas del usuario  
         const q = query(
           collection(db, "entries"),
           where("userId", "==", user.uid),
@@ -54,23 +46,29 @@ export default function Home({ navigation }) {
 
     // Limpia el listener de autenticación al desmontar el componente
     return () => unsubscribeAuth();
-  }, []);
+  }, [navigation]);
+
+  // Función para manejar la visibilidad del Sidebar
+  const handleSideBarToggle = () => {
+    setSideBarVisible(!sideBarVisible);
+  };
 
   return (
     <Background>
+      {/* Lista de entradas */}
       <View style={styles.dailyContainer}>
         <View style={styles.entryListContainer}>
           <EntryListScreen entries={entries} />
         </View>
-        {/* Botón para abrir el modal de entrada */}
-        <Pressable style={styles.floatingButton} onPress={handlePress}>
-          <FontAwesome name="plus" size={24} color="white" />
-        </Pressable>
-        {/* Modal para crear una nueva entrada */}
-        <ModalEntry visible={modalVisible} onClose={handleCloseModal} />
-        
       </View>
-      <Navbar />
+
+      {/* Navbar: Pasamos la función para controlar el sidebar */}
+      <Navbar navigation={navigation} onToggleSideBar={handleSideBarToggle} />
+
+      {/* Sidebar */}
+      {sideBarVisible && (
+        <SideBar visible={sideBarVisible} onClose={handleSideBarToggle} navigation={navigation} />
+      )}
     </Background>
   );
 }
@@ -90,17 +88,5 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     width: '100%',
     paddingHorizontal: 0,
-  },
-  floatingButton: {
-    position: 'absolute',
-    bottom: 30,
-    right: 30,
-    backgroundColor: '#3B873E',
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    justifyContent: 'center',
-    alignItems: 'center',
-    elevation: 5,
   },
 });
