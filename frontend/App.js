@@ -7,7 +7,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import Login from './screens/auth/login';
 import Home from './screens/home/home';
 import Registro from './screens/auth/register'; // Asegúrate de tener este componente
-import EditarPerfil from './screens/profile/editProfile';
+import EditProfile from './screens/profile/editProfile'; // Renombrado a EditProfile para coherencia
 import RequestPasswordReset from './screens/auth/resetPass'; // Asegúrate de tener este componente
 
 import { auth } from './utils/firebase'; // Ajusta la ruta según tu estructura de carpetas
@@ -44,15 +44,22 @@ export default function App() {
     <NavigationContainer>
       <Stack.Navigator>
         {user ? (
-          // Si el usuario está autenticado, mostrar el stack de la aplicación
-          <Stack.Screen
-            name="Home"
-            component={Home}
-            options={{ headerShown: false }}
-          />
-        ) : (
-          // Si el usuario no está autenticado, mostrar el stack de autenticación
           <>
+            {/* Si el usuario está autenticado, mostrar el stack de la aplicación */}
+            <Stack.Screen
+              name="Home"
+              component={Home}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="EditProfile" // Agregamos la pantalla de editar perfil para el usuario autenticado
+              component={EditProfile}
+              options={{ headerShown: false }}
+            />
+          </>
+        ) : (
+          <>
+            {/* Si el usuario no está autenticado, mostrar el stack de autenticación */}
             <Stack.Screen
               name="Login"
               component={Login}
@@ -67,11 +74,6 @@ export default function App() {
               name="RequestPasswordReset"
               component={RequestPasswordReset}
               options={{ headerShown: false }}
-            />
-            <Stack.Screen
-              name="EditarPerfil"
-              component={EditarPerfil}
-              options={{ title: 'Editar Perfil' }}
             />
           </>
         )}
