@@ -5,25 +5,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="2137b152-a29a-4d26-8781-e8af1c953a9c" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/Portafolio.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/caches/deviceStreaming.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/screens/entrys/entriesHome.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/App.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/App.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/components/Header.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/components/Header.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/components/sideBar.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/components/sideBar.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package-lock.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/screens/auth/login.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/screens/auth/login.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/screens/auth/register.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/screens/auth/register.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/screens/auth/resetPass.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/screens/auth/resetPass.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/screens/entrys/entryItem.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/screens/entrys/entryItem.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/screens/entrys/modalEntry.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/screens/entrys/modalEntry.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/screens/entrys/entriesHome.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/screens/entrys/entriesHome.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/screens/home/home.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/screens/home/home.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/screens/home/listEntry.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/screens/entrys/listEntry.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

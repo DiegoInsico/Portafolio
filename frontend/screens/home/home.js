@@ -76,7 +76,7 @@ const Home = ({ navigation }) => {
   const renderEntryItem = ({ item }) => {
     return (
       <View style={styles.entryContainer}>
-        {/* Si hay media (imagen o video) */}
+
         {item.media && item.isVideo ? (
           <Video
             source={{ uri: item.media }}
@@ -89,14 +89,12 @@ const Home = ({ navigation }) => {
           <Image source={{ uri: item.media }} style={styles.media} resizeMode="cover" />
         ) : null}
 
-        {/* Texto de la entrada */}
         {item.text && (
           <View style={styles.textContainer}>
             <Text style={styles.entryText}>{item.text}</Text>
           </View>
         )}
 
-        {/* Fecha de la entrada */}
         {item.createdAt && (
           <Text style={styles.createdAt}>{item.createdAt}</Text>
         )}
@@ -164,13 +162,9 @@ const Home = ({ navigation }) => {
         <Text style={styles.buttonText}>Presioname para generar otra pregunta</Text>
       </TouchableOpacity>
 
-        <TouchableOpacity onPress={fetchEntries} style={styles.button}>
-          <Text style={styles.buttonText}>Recargar Entradas</Text>
-        </TouchableOpacity>
-
         <Text style={styles.carouselTitle}>Tus Entradas Recientes</Text>
 
-        {/* FlatList para mostrar entradas */}
+
         <FlatList
           data={entries}
           renderItem={renderEntryItem}
@@ -201,12 +195,12 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 10,
-    color: '#4B4E6D',
+    color: '#fff',
     textAlign: 'center',
   },
   subText: {
     fontSize: 16,
-    color: '#777',
+    color: '#fff',
     marginBottom: 20,
     textAlign: 'center',
   },

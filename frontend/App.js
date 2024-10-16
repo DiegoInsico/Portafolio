@@ -5,9 +5,10 @@ import { createStackNavigator } from "@react-navigation/stack";
 import Login from "./screens/auth/login";
 import EntriesHome from "./screens/entrys/entriesHome";
 import Registro from "./screens/auth/register";
-import EditarPerfil from "./screens/profile/editProfile";
+import EditProfile from "./screens/profile/editProfile";
 import RequestPasswordReset from "./screens/auth/resetPass";
 import Home from "./screens/home/home";
+import Baul from "./screens/chest/baul";
 import { auth } from "./utils/firebase";
 import { onAuthStateChanged } from "firebase/auth";
 
@@ -54,9 +55,14 @@ export default function App() {
                 options={{ title: "Tus Entradas" }}
               />
               <Stack.Screen
-                name="EditarPerfil"
-                component={EditarPerfil}
-                options={{ title: "Editar Perfil" }}
+                name="EditProfile"
+                component={EditProfile}
+                options={{ title: "EditProfile" }}
+              />
+                <Stack.Screen
+                name="Baul"
+                component={Baul}
+                options={{ title: "Baul" }}
               />
             </>
           ) : (

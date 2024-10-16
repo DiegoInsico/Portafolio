@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Alert } from 'react-native';
+import { View, StyleSheet, Alert, TouchableOpacity, Text } from 'react-native';
 import PropTypes from 'prop-types';
 import EntryListScreen from './listEntry';
 import ModalEntry from '../entrys/modalEntry';
@@ -7,6 +7,7 @@ import Navbar from '../../components/Header';
 import Background from '../../components/background';
 import { db, auth } from '../../utils/firebase';
 import { collection, query, where, onSnapshot, orderBy } from 'firebase/firestore';
+import { FontAwesome } from "@expo/vector-icons"; // Importar íconos
 
 export default function EntriesHome({ navigation }) {
   const [modalVisible, setModalVisible] = useState(false);
@@ -53,6 +54,13 @@ export default function EntriesHome({ navigation }) {
   return (
     <Background>
       <View style={styles.dailyContainer}>
+        
+        {/* Botón Dorado Centrado en la Parte Superior */}
+        <TouchableOpacity style={styles.goldenButton} onPress={handlePress}>
+          <FontAwesome name="plus" size={24} color="#fff" />
+          <Text style={styles.goldenButtonText}>Añadir</Text>
+        </TouchableOpacity>
+        
         <View style={styles.entryListContainer}>
           <EntryListScreen entries={entries} />
         </View>
@@ -70,13 +78,38 @@ EntriesHome.propTypes = {
 const styles = StyleSheet.create({
   dailyContainer: {
     flex: 1,
-    paddingTop: 40,
+    paddingTop: 60, // Aumentar el paddingTop para dejar espacio para el botón
     alignItems: 'center',
     paddingBottom: 90,
+    position: 'relative', // Necesario para posicionar el botón absoluto dentro
   },
   entryListContainer: {
     flexGrow: 1,
     width: '100%',
     paddingHorizontal: 0,
   },
+  goldenButton: {
+    position: 'absolute',
+    top: 10, // Ajusta según necesites
+    alignSelf: 'center',
+    backgroundColor: '#D4AF37', // Color dorado
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 30,
+    flexDirection: 'row',
+    alignItems: 'center',
+    elevation: 5, // Sombra para dar efecto de profundidad (Android)
+    shadowColor: '#000', // Sombra para iOS
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
+  },
+  goldenButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    marginLeft: 10, // Espacio entre el ícono y el texto
+    fontWeight: 'bold',
+  },
+  // ... otros estilos existentes
 });
+

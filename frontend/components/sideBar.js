@@ -11,8 +11,8 @@ import {
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
-import { signOut } from 'firebase/auth';
-import { auth } from '../utils/firebase';
+import { signOut } from "firebase/auth";
+import { auth } from "../utils/firebase";
 
 const { width } = Dimensions.get("window");
 
@@ -43,10 +43,10 @@ const SideBar = ({ visible, onClose }) => {
       await signOut(auth);
       navigation.reset({
         index: 0,
-        routes: [{ name: 'Login' }],
+        routes: [{ name: "Login" }],
       });
     } catch (error) {
-      console.error('Error al cerrar sesión:', error);
+      console.error("Error al cerrar sesión:", error);
     }
   };
   if (!visible) return null;
@@ -77,16 +77,6 @@ const SideBar = ({ visible, onClose }) => {
 
               {/* Opciones de Navegación */}
               <View style={styles.optionsContainer}>
-                <TouchableOpacity
-                  style={styles.optionButton}
-                  onPress={() => {
-                    onClose();
-                    navigation.navigate("ArbolDeVida");
-                  }}
-                >
-                  <FontAwesome name="tree" size={24} color="#FFFFFF" />
-                  <Text style={styles.optionText}>Árbol de Vida</Text>
-                </TouchableOpacity>
 
                 <TouchableOpacity
                   style={styles.optionButton}
@@ -107,6 +97,18 @@ const SideBar = ({ visible, onClose }) => {
                 >
                   <FontAwesome name="gear" size={24} color="#FFFFFF" />
                   <Text style={styles.optionText}>Configuraciones</Text>
+                </TouchableOpacity>
+
+                {/* Botón de Baul */}
+                <TouchableOpacity
+                  style={styles.optionButton}
+                  onPress={() => {
+                    onClose();
+                    navigation.navigate("Baul"); // Asume que tienes una pantalla 'Baul' en tu navegación
+                  }}
+                >
+                  <FontAwesome name="archive" size={24} color="#FFFFFF" />
+                  <Text style={styles.optionText}>Baúl</Text>
                 </TouchableOpacity>
 
                 {/* Botón de Cerrar Sesión */}
