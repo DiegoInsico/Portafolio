@@ -9,6 +9,7 @@ import Home from "./screens/home/home";
 import Registro from "./screens/auth/register"; 
 import EditProfile from "./screens/profile/editProfile"; 
 import RequestPasswordReset from "./screens/auth/resetPass"; 
+import EntriesHome from "./screens/entrys/entriesHome"
 import { auth } from "./utils/firebase"; 
 import { onAuthStateChanged } from "firebase/auth";
 
@@ -169,6 +170,12 @@ export default function App() {
               <Stack.Screen
                 name="DesbloqApp"
                 component={DesbloqApp}
+                options={{ headerShown: false }}
+              />
+
+              <Stack.Screen
+                name="EntriesHome"
+                component={EntriesHome}
                 options={{ headerShown: false }}
               />
 
