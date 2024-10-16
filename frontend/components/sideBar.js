@@ -85,13 +85,7 @@ const SideBar = ({ visible, onClose }) => {
                                     <FontAwesome name="clock-o" size={24} color="#FFFFFF" />
                                     <Text style={styles.optionText}>Mensajes Programados</Text>
                                 </TouchableOpacity>
-                                <TouchableOpacity
-                                    style={styles.optionButton}
-                                    onPress={() => {
-                                        onClose();
-                                        navigation.navigate('config');
-                                    }}
-                                >
+                                <TouchableOpacity style={styles.optionButton} onPress={() => navigation.navigate('Configuracion')}>
                                     <FontAwesome name="gear" size={24} color="#FFFFFF" />
                                     <Text style={styles.optionText}>Configuraciones</Text>
                                 </TouchableOpacity>

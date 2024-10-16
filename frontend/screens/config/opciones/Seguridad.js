@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, Alert, Modal, TextInput, StyleSheet } fro
 import { useNavigation } from '@react-navigation/native';
 import { deleteUser, reauthenticateWithCredential, EmailAuthProvider } from 'firebase/auth';
 import { auth } from '../../../utils/firebase'; // Asegúrate de que la ruta de firebase sea correcta
+import BackgroundWrapper from '../../../components/background'; // Importar el fondo
 
 const Seguridad = () => {
   const [isModalVisible, setModalVisible] = useState(false);
@@ -71,88 +72,95 @@ const Seguridad = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Privacidad y Seguridad</Text>
+    <BackgroundWrapper>
+      <View style={styles.container}>
+        <Text style={styles.title}>Privacidad y Seguridad</Text>
 
-      {/* Verificación en dos pasos */}
-      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Veri')}>
-        <Text style={styles.buttonText}>Verificación en Dos Pasos</Text>
-      </TouchableOpacity>
+        {/* Verificación en dos pasos */}
+        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Veri')}>
+          <Text style={styles.buttonText}>Verificación en Dos Pasos</Text>
+        </TouchableOpacity>
 
-      {/* Bloqueo Automático */}
-      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('BloSes')}>
-        <Text style={styles.buttonText}>Bloqueo Automático</Text>
-      </TouchableOpacity>
+        {/* bloqueo de aplicacion */}
+        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('BloqApp')}>
+          <Text style={styles.buttonText}>Bloqueo de la aplicacion</Text>
+        </TouchableOpacity>
 
-      {/* Alerta de seguridad */}
-      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('AlertSeg')}>
-        <Text style={styles.buttonText}>Alertas de Seguridad</Text>
-      </TouchableOpacity>
+        {/* Bloqueo Automático */}
+        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('BloSes')}>
+          <Text style={styles.buttonText}>Bloqueo Automático</Text>
+        </TouchableOpacity>
 
-      {/* Eliminar cuenta */}
-      <TouchableOpacity style={styles.button} onPress={openModal}>
-        <Text style={styles.buttonText}>Eliminar Cuenta</Text>
-      </TouchableOpacity>
+        {/* Alerta de seguridad */}
+        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('AlertSeg')}>
+          <Text style={styles.buttonText}>Alertas de Seguridad</Text>
+        </TouchableOpacity>
 
-      {/* Modal para confirmar la eliminación */}
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={isModalVisible}
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Advertencia</Text>
-            <Text style={styles.modalText}>
-              Al eliminar la cuenta, no podrás recuperar tus datos. Si deseas recuperar información, contacta a correofalso@gmail.com.
-            </Text>
-            <Text style={styles.modalText}>
-              Para continuar introduce tu correo y contraseña
-            </Text>
-            <Text style={styles.modalText}>Confirmando en {counter} segundos.</Text>
+        {/* Eliminar cuenta */}
+        <TouchableOpacity style={styles.button} onPress={openModal}>
+          <Text style={styles.buttonText}>Eliminar Cuenta</Text>
+        </TouchableOpacity>
 
-            {/* Input de correo */}
-            <TextInput
-              style={styles.input}
-              placeholder="Ingresa tu correo"
-              value={email}
-              onChangeText={setEmail}
-              keyboardType="email-address"
-              autoCapitalize="none"
-            />
+        {/* Modal para confirmar la eliminación */}
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={isModalVisible}
+          onRequestClose={() => setModalVisible(false)}
+        >
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>Advertencia</Text>
+              <Text style={styles.modalText}>
+                Al eliminar la cuenta, no podrás recuperar tus datos. Si deseas recuperar información, contacta a correofalso@gmail.com.
+              </Text>
+              <Text style={styles.modalText}>
+                Para continuar introduce tu correo y contraseña
+              </Text>
+              <Text style={styles.modalText}>Confirmando en {counter} segundos.</Text>
 
-            {/* Input de contraseña */}
-            <TextInput
-              style={styles.input}
-              placeholder="Ingresa tu contraseña"
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry
-            />
+              {/* Input de correo */}
+              <TextInput
+                style={styles.input}
+                placeholder="Ingresa tu correo"
+                value={email}
+                onChangeText={setEmail}
+                keyboardType="email-address"
+                autoCapitalize="none"
+              />
 
-            <View style={styles.buttonContainer}>
-              {/* Botón de cancelar */}
-              <TouchableOpacity
-                style={styles.cancelButton}
-                onPress={() => setModalVisible(false)}
-              >
-                <Text style={styles.cancelButtonText}>Cancelar</Text>
-              </TouchableOpacity>
+              {/* Input de contraseña */}
+              <TextInput
+                style={styles.input}
+                placeholder="Ingresa tu contraseña"
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry
+              />
 
-              {/* Botón de eliminar (habilitado solo cuando el temporizador llega a 0) */}
-              <TouchableOpacity
-                style={[styles.deleteButton, { backgroundColor: canDelete ? 'red' : 'grey' }]}
-                onPress={handleDeleteAccount}
-                disabled={!canDelete || loading}
-              >
-                <Text style={styles.deleteButtonText}>{loading ? 'Eliminando...' : 'Eliminar'}</Text>
-              </TouchableOpacity>
+              <View style={styles.buttonContainer}>
+                {/* Botón de cancelar */}
+                <TouchableOpacity
+                  style={styles.cancelButton}
+                  onPress={() => setModalVisible(false)}
+                >
+                  <Text style={styles.cancelButtonText}>Cancelar</Text>
+                </TouchableOpacity>
+
+                {/* Botón de eliminar (habilitado solo cuando el temporizador llega a 0) */}
+                <TouchableOpacity
+                  style={[styles.deleteButton, { backgroundColor: canDelete ? 'red' : 'grey' }]}
+                  onPress={handleDeleteAccount}
+                  disabled={!canDelete || loading}
+                >
+                  <Text style={styles.deleteButtonText}>{loading ? 'Eliminando...' : 'Eliminar'}</Text>
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
-        </View>
-      </Modal>
-    </View>
+        </Modal>
+      </View>
+    </BackgroundWrapper>
   );
 };
 
@@ -166,12 +174,15 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     marginBottom: 20,
+    color: 'white',
   },
   button: {
     backgroundColor: '#3B873E',
     padding: 15,
     borderRadius: 10,
     marginBottom: 20,
+    width: '80%',
+    alignItems: 'center',
   },
   buttonText: {
     color: 'white',
