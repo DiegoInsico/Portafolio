@@ -1,19 +1,39 @@
 import React, { useState, useEffect } from "react";
-import { ActivityIndicator, View, StyleSheet } from "react-native";
+import { ActivityIndicator, View, StyleSheet, ImageBackground, AppState } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
-import Login from "./screens/auth/login";
-import EntriesHome from "./screens/entrys/entriesHome";
-import Registro from "./screens/auth/register";
-import EditarPerfil from "./screens/profile/editProfile";
-import RequestPasswordReset from "./screens/auth/resetPass";
+import AsyncStorage from '@react-native-async-storage/async-storage'; // Para manejar el almacenamiento local
+
+import Login from './screens/auth/login'; 
 import Home from "./screens/home/home";
-import { auth } from "./utils/firebase";
+import Registro from "./screens/auth/register"; 
+import EditProfile from "./screens/profile/editProfile"; 
+import RequestPasswordReset from "./screens/auth/resetPass"; 
+import { auth } from "./utils/firebase"; 
 import { onAuthStateChanged } from "firebase/auth";
+
+// import Profile from './screens/profile/profile'; 
+import Configuracion from './screens/config/configuracion'; 
+import Seguridad from './screens/config/opciones/Seguridad'; 
+import AlertSeg from './screens/config/opciones/seguridad/alertSeg'; 
+import BloSes from './screens/config/opciones/seguridad/bloSes'; 
+import Veri from './screens/config/opciones/seguridad/veri'; 
+import AdminBene from './screens/Beneficiarios/adminBene'; 
+import AdminCuenta from './screens/config/opciones/adminCuenta'; 
+import AdminTest from './screens/testigos/adminTestigo'; 
+import BloqApp from './screens/config/opciones/seguridad/bloqApp';
+import DesbloqApp from './screens/config/opciones/seguridad/desbloqApp';
+
+import Acces from './screens/config/opciones/acces';
+import Ajustes from './screens/config/opciones/ajustes';
+import EliminarTest from './screens/testigos/opciones/eliminarTes';
+import ModificarTest from './screens/testigos/opciones/modificarTes';
+import AgregarTest from './screens/testigos/opciones/AgregarTes';
+import Temas from './screens/config/opciones/temas'; 
 
 const Stack = createStackNavigator();
 
-// Pantalla de carga mientras se verifica el estado de autenticación
+// Pantalla de Carga Mientras se Verifica el Estado de Autenticación
 function SplashScreen() {
   return (
     <View style={styles.splashContainer}>
@@ -25,117 +45,167 @@ function SplashScreen() {
 export default function App() {
   const [user, setUser] = useState(null);
   const [initializing, setInitializing] = useState(true);
+  const [isLocked, setIsLocked] = useState(false); // Estado global para el bloqueo de la app
+  const [isPasswordEnabled, setIsPasswordEnabled] = useState(false);
+
+  // Estado para manejar la imagen de fondo global
+  const [backgroundImage, setBackgroundImage] = useState(require('./assets/test/background.webp'));
+
+  // Verificar si hay un PIN guardado en AsyncStorage al iniciar
+  const checkPin = async () => {
+    try {
+      const savedPin = await AsyncStorage.getItem('userPin');
+      const isEnabled = await AsyncStorage.getItem('isPasswordEnabled');
+      setIsPasswordEnabled(isEnabled === 'true');
+      if (savedPin && isEnabled === 'true') {
+        setIsLocked(true); // Bloqueamos si hay PIN guardado
+      }
+    } catch (error) {
+      console.error('Error verificando el PIN:', error);
+    }
+  };
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
       if (initializing) setInitializing(false);
     });
+    checkPin(); // Verificar si la app debe estar bloqueada al iniciar
 
-    return unsubscribe; // Limpia el listener al desmontar el componente
+    return () => unsubscribe();
   }, [initializing]);
+
+  // Manejar el cambio de estado de la app (background/foreground)
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', (nextAppState) => {
+      if (nextAppState === 'background' && isPasswordEnabled) {
+        setIsLocked(true); // Bloquear la app cuando se minimiza si el bloqueo está habilitado
+      }
+    });
+
+    return () => {
+      subscription.remove();
+    };
+  }, [isPasswordEnabled]);
 
   if (initializing) return <SplashScreen />;
 
+  if (isLocked) {
+    // Si la app está bloqueada, mostramos la página de desbloqueo
+    return (
+      <DesbloqApp setIsLocked={setIsLocked} /> // Pasamos la función para desbloquear
+    );
+  }
+
   return (
-    <NavigationContainer>
-      <View style={styles.container}>
-        <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <ImageBackground source={backgroundImage} style={styles.background}>
+      <NavigationContainer>
+        <Stack.Navigator>
           {user ? (
             <>
+              {/* Si el usuario está autenticado, mostrar el stack de la aplicación */}
               <Stack.Screen
                 name="Home"
                 component={Home}
                 options={{ headerShown: false }}
               />
               <Stack.Screen
-                name="EntriesHome"
-                component={EntriesHome}
-                options={{ title: "Tus Entradas" }}
+                name="EditProfile"
+                component={EditProfile}
+                options={{ headerShown: false }}
+              />
+              {/* <Stack.Screen
+                name="Profile"
+                component={Profile}
+                options={{ headerShown: false }}
+              /> */}
+              <Stack.Screen
+                name="Configuracion"
+                component={Configuracion}
+                options={{ headerShown: false }}
               />
               <Stack.Screen
-                name="EditarPerfil"
-                component={EditarPerfil}
-                options={{ title: "Editar Perfil" }}
+                name="AdminCuenta"
+                component={AdminCuenta}
+                options={{ headerShown: false }}
               />
-                          <Stack.Screen
-              name="Profile"
-              component={Profile}
-              options={{ title: "Perfil del Usuario" }}
-            />
-            <Stack.Screen
-              name="Configuracion"
-              component={Configuracion}
-              options={{ title: "Configuraciones" }}
-            />
-            <Stack.Screen
-              name="AdminCuenta"
-              component={AdminCuenta}
-              options={{ title: "Administrar Cuenta" }}
-            />
-            <Stack.Screen
-              name="Acces"
-              component={Acces}
-              options={{ title: "Accesibilidad" }}
-            />
-            <Stack.Screen
-              name="Ajustes"
-              component={Ajustes}
-              options={{ title: "Ajustes" }}
-            />
+              <Stack.Screen
+                name="Acces"
+                component={Acces}
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="Ajustes"
+                component={Ajustes}
+                options={{ headerShown: false }}
+              />
+              {/* seguridad */}
+              <Stack.Screen
+                name="Seguridad"
+                component={Seguridad}
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="AlertSeg"
+                component={AlertSeg}
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="BloSes"
+                component={BloSes}
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="Veri"
+                component={Veri}
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="BloqApp"
+                component={BloqApp}
+                options={{ headerShown: false }}
+              />
 
-            {/* seguridad */}
-            <Stack.Screen
-              name="Seguridad"
-              component={Seguridad}
-              options={{ title: "Seguridad" }}
-            />
-            <Stack.Screen
-              name="AlertSeg"
-              component={AlertSeg}
-              options={{ title: "Alerta de Seguridad" }}
-            />
-            <Stack.Screen
-              name="BloSes"
-              component={BloSes}
-              options={{ title: "Bloqueo de Sesion" }}
-            />
-            <Stack.Screen
-              name="Veri"
-              component={Veri}
-              options={{ title: "Verificacion" }}
-            />
+              <Stack.Screen
+                name="DesbloqApp"
+                component={DesbloqApp}
+                options={{ headerShown: false }}
+              />
 
-            <Stack.Screen
-              name="AdminTest"
-              component={AdminTest}
-              options={{ title: "Administrar Testigos" }}
-            />
-            <Stack.Screen
-              name="AgregarTest"
-              component={AgregarTest}
-              options={{ title: "Agregar Testigos" }}
-            />
-            <Stack.Screen
-              name="ModificarTest"
-              component={ModificarTest}
-              options={{ title: "Modificar Testigos" }}
-            />
-            <Stack.Screen
-              name="EliminarTest"
-              component={EliminarTest}
-              options={{ title: "Eliminar Testigos" }}
-            />
+              {/* PASAMOS Temas como "children" */}
+              <Stack.Screen name="Temas" options={{ headerShown: false }}>
+                {() => <Temas setBackgroundImage={setBackgroundImage} />}
+              </Stack.Screen>
 
-            <Stack.Screen
-              name="AdminBene"
-              component={AdminBene}
-              options={{ title: "Administrar Beneficiarios" }}
-            />
-
+              <Stack.Screen
+                name="AdminTest"
+                component={AdminTest}
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="AgregarTest"
+                component={AgregarTest}
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="ModificarTest"
+                component={ModificarTest}
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="EliminarTest"
+                component={EliminarTest}
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="AdminBene"
+                component={AdminBene}
+                options={{ headerShown: false }}
+              />
             </>
           ) : (
             <>
+              {/* Si el usuario no está autenticado, mostrar el stack de autenticación */}
               <Stack.Screen
                 name="Login"
                 component={Login}
@@ -154,19 +224,20 @@ export default function App() {
             </>
           )}
         </Stack.Navigator>
-      </View>
-    </NavigationContainer>
+      </NavigationContainer>
+    </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingBottom: 0, // Añade un espacio para que el contenido no se solape con el navbar
-  },
   splashContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+  },
+  background: {
+    flex: 1,
+    width: '100%',
+    height: '100%',
   },
 });

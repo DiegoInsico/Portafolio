@@ -102,7 +102,7 @@ const SideBar = ({ visible, onClose }) => {
                   style={styles.optionButton}
                   onPress={() => {
                     onClose();
-                    navigation.navigate("config");
+                    navigation.navigate("Configuracion");
                   }}
                 >
                   <FontAwesome name="gear" size={24} color="#FFFFFF" />
