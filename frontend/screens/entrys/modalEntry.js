@@ -1,956 +1,710 @@
-// ModalEntry.js
-import React, { useState } from "react";
+import React, { useState, useEffect } from 'react';
 import {
   Modal,
   View,
   Text,
   TextInput,
-  Pressable,
-  StyleSheet,
-  ScrollView,
-  Alert,
-  Image,
-  ImageBackground,
-  Platform,
   TouchableOpacity,
-} from "react-native";
-import { FontAwesome, MaterialIcons } from "@expo/vector-icons";
-import * as ImagePicker from "expo-image-picker";
-import DateTimePickerModal from "react-native-modal-datetime-picker";
-import { db, storage, auth } from '../../utils/firebase'; // Asegúrate de que la ruta sea correcta
-import { collection, addDoc, Timestamp } from "firebase/firestore";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+  StyleSheet,
+  Image,
+  ScrollView,
+  Platform,
+  Alert,
+  Switch,
+  Animated
+} from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
+import RNPickerSelect from 'react-native-picker-select';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import { Audio } from 'expo-av';
+import { Video } from 'expo-av';
+import { FontAwesome, MaterialIcons, Entypo } from '@expo/vector-icons';
+import axios from 'axios';
 
-/**
- * ModalEntry Component
- *
- * Este componente representa un modal que actúa como un formulario para enviar datos.
- * Incluye campos para texto, selección de opciones, carga de imágenes y videos, selección de fecha y
- * manejo de beneficiarios.
- */
 const ModalEntry = ({ visible, onClose }) => {
-  // Almacenar la URI de la imagen seleccionada
+  const [categoria, setCategoria] = useState('');
+  const [descripcion, setDescripcion] = useState('');
+  const [texto, setTexto] = useState('');
+  const [audioRecording, setAudioRecording] = useState(null);
+  const [isRecording, setIsRecording] = useState(false);
+  const [sound, setSound] = useState(null);
   const [media, setMedia] = useState(null);
-  const [respuesta, setRespuesta] = useState("");
+  const [mediaType, setMediaType] = useState(null);
+  const [isBaul, setIsBaul] = useState(false);
+  const [isAudioMode, setIsAudioMode] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [spotifyResults, setSpotifyResults] = useState([]);
+  const [isSpotifyMode, setIsSpotifyMode] = useState(false);
+  const [audioDuration, setAudioDuration] = useState(0);
+  const [audioPosition, setAudioPosition] = useState(0);
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const today = new Date();
 
-  // Categorias
-  const [isCategoriesVisible, setIsCategoriesVisible] = useState(false);
-  const tiposDeEntrada = ["Mensaje", "Consejo", "Recuerdo", "Reflexión"];
-  const [selectedOption, setSelectedOption] = useState("");
+  const progressAnim = useState(new Animated.Value(0))[0];
 
-  // Fecha de envío
-  const [date, setDate] = useState(new Date());
-  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
-
-  // Fecha de recuerdo (solo para "Recuerdo")
-  const [recuerdoDate, setRecuerdoDate] = useState(new Date());
-  const [isRecuerdoDatePickerVisible, setRecuerdoDatePickerVisibility] = useState(false);
-
-  // Manejar la altura dinámica del TextInput
-  const [inputHeight, setInputHeight] = useState(20);
-
-  // Almacenar la lista de beneficiarios
-  const [beneficiarios, setBeneficiarios] = useState([""]); // Inicia con un input vacío
-
-  // Estado para agregar beneficiarios y fecha en categorías no "Mensaje"
-  const [addBeneficiarios, setAddBeneficiarios] = useState(false);
-
-  // ===========================
-  // ======== FUNCIONES ========
-  // ===========================
-
-  // Función para alternar la visibilidad de las opciones de categoría
-  const toggleOptions = () => {
-    setIsCategoriesVisible(!isCategoriesVisible);
-  };
-
-  // Función para manejar la selección de opciones de categoría
-  const handleSelectOption = (option) => {
-    setSelectedOption(option); // Establecer el valor de la opción seleccionada
-    if (option !== "Mensaje") {
-      setAddBeneficiarios(false); // Resetear si no es "Mensaje"
-    }
-    if (option !== "Recuerdo") {
-      setRecuerdoDate(new Date()); // Resetear la fecha de recuerdo si no es "Recuerdo"
-    }
-  };
-
-  // Determinar si se deben mostrar los campos de beneficiarios y fecha de envío
-  const showBeneficiariosFecha = selectedOption === "Mensaje" || addBeneficiarios;
-
-  // Determinar si se debe mostrar el campo de fecha de recuerdo
-  const showRecuerdoDate = selectedOption === "Recuerdo";
-
-  // Función para seleccionar una imagen o video de la galería
-  const pickMedia = async () => {
-    try {
-      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (status !== "granted") {
-        Alert.alert(
-          "Permiso denegado",
-          "Se requiere permiso para acceder a la galería."
-        );
-        return;
-      }
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.All,
-        allowsEditing: true,
-        quality: 1,
-        base64: Platform.OS === "web", // Solo obtenemos base64 en web
-      });
-      console.log("Resultado de ImagePicker:", result);
-
-      if (!result.canceled && result.assets && result.assets.length > 0) {
-        const asset = result.assets[0];
-        console.log("URI del archivo:", asset.uri);
-
-        if (Platform.OS === "web") {
-          const base64Data = asset.base64;
-          if (!base64Data) {
-            Alert.alert("Error", "No se pudo obtener el archivo seleccionado.");
-            return;
-          }
-
-          let mimeType = asset.mimeType || asset.type;
-          if (!mimeType) {
-            const uri = asset.uri;
-            const fileExtension = uri.split(".").pop();
-            mimeType = getMimeType(fileExtension);
-          }
-
-          if (!mimeType) {
-            mimeType = "application/octet-stream";
-          }
-
-          // Crear el Blob a partir de los datos base64
-          const byteCharacters = atob(base64Data);
-          const byteNumbers = new Array(byteCharacters.length);
-          for (let i = 0; i < byteCharacters.length; i++) {
-            byteNumbers[i] = byteCharacters.charCodeAt(i);
-          }
-          const byteArray = new Uint8Array(byteNumbers);
-          const blob = new Blob([byteArray], { type: mimeType });
-
-          setMedia({
-            uri: asset.uri,
-            type: mimeType,
-            name: `media_${Date.now()}.${mimeType.split("/")[1] || "bin"}`,
-            data: blob,
-          });
-        } else {
-          // Código para plataformas nativas (Android, iOS)
-          const uri = asset.uri;
-          if (!uri) {
-            Alert.alert("Error", "No se pudo obtener la URI del archivo.");
-            return;
-          }
-
-          const fileExtension = uri.split(".").pop();
-          const mimeType = getMimeType(fileExtension);
-
-          setMedia({
-            uri: uri,
-            type: mimeType,
-            name: uri.split("/").pop(),
-          });
+  useEffect(() => {
+    (async () => {
+      if (Platform.OS !== 'web') {
+        const { status: mediaStatus } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        if (mediaStatus !== 'granted') {
+          Alert.alert('Permiso requerido', 'Se necesitan permisos para acceder a la galería.');
         }
 
-        Alert.alert(
-          "Archivo seleccionado",
-          "¡El archivo ha sido seleccionado con éxito!"
-        );
-      } else {
-        console.log("Selección cancelada o URI no válida");
-      }
-    } catch (error) {
-      console.log("Error al seleccionar archivo:", error);
-      Alert.alert("Error", "Ocurrió un error al seleccionar el archivo.");
-    }
-  };
-
-  // Función para remover la imagen seleccionada
-  const removeMedia = () => {
-    setMedia(null);
-  };
-
-  // Funciones para manejar el selector de fecha de envío
-  const showDatePicker = () => {
-    setDatePickerVisibility(true);
-  };
-  const hideDatePicker = () => {
-    setDatePickerVisibility(false);
-  };
-  const handleConfirm = (selectedDate) => {
-    if (selectedDate > new Date()) {
-      Alert.alert("Error", "La fecha de envío no puede ser en el futuro.");
-      return;
-    }
-    setDate(selectedDate);
-    hideDatePicker();
-  };
-
-  // Funciones para manejar el selector de fecha de recuerdo
-  const showRecuerdoDatePicker = () => {
-    setRecuerdoDatePickerVisibility(true);
-  };
-  const hideRecuerdoDatePicker = () => {
-    setRecuerdoDatePickerVisibility(false);
-  };
-  const handleRecuerdoConfirm = (selectedDate) => {
-    if (selectedDate > new Date()) {
-      Alert.alert("Error", "La fecha del recuerdo no puede ser en el futuro.");
-      return;
-    }
-    setRecuerdoDate(selectedDate);
-    hideRecuerdoDatePicker();
-  };
-
-  // Función para formatear la fecha seleccionada
-  const formatDate = (date) => {
-    const day = date.getDate().toString().padStart(2, "0");
-    const month = (date.getMonth() + 1).toString().padStart(2, "0");
-    const year = date.getFullYear();
-    return `${day}/${month}/${year}`;
-  };
-
-  // Funciones para manejar los beneficiarios
-  const addBeneficiario = () => {
-    if (beneficiarios.length < 5) {
-      setBeneficiarios([...beneficiarios, ""]); // Añade un nuevo campo vacío
-    }
-  };
-  const handleRemoveBeneficiary = (index) => {
-    const updatedBeneficiarios = [...beneficiarios];
-    updatedBeneficiarios.splice(index, 1); // Elimina el beneficiario en el índice dado
-    setBeneficiarios(updatedBeneficiarios); // Actualiza el estado con la lista modificada
-  };
-  const handleBeneficiarioChange = (text, index) => {
-    const newBeneficiarios = [...beneficiarios];
-    newBeneficiarios[index] = text;
-    setBeneficiarios(newBeneficiarios);
-  };
-
-  // Función para resetear el formulario a su estado inicial
-  const resetForm = () => {
-    setRespuesta("");
-    setMedia(null);
-    setDate(new Date());
-    setSelectedOption("");
-    setBeneficiarios([""]);
-    setAddBeneficiarios(false);
-    setRecuerdoDate(new Date());
-    setInputHeight(20);
-  };
-
-  // Función para obtener el MIME type basado en la extensión del archivo
-  const getMimeType = (filename) => {
-    const extension = filename.split(".").pop().toLowerCase();
-    switch (extension) {
-      case "jpg":
-      case "jpeg":
-        return "image/jpeg";
-      case "png":
-        return "image/png";
-      case "gif":
-        return "image/gif";
-      case "mp4":
-        return "video/mp4";
-      case "mov":
-        return "video/quicktime";
-      // Añade más tipos según tus necesidades
-      default:
-        return "application/octet-stream";
-    }
-  };
-
-  // Función para subir archivos a Firebase Storage
-  const uploadToFirebaseStorage = async (fileUri, fileName) => {
-    try {
-      const response = await fetch(fileUri);
-      const blob = await response.blob();
-
-      const storageRef = ref(storage, `uploads/${fileName}`);
-      await uploadBytes(storageRef, blob);
-      const downloadURL = await getDownloadURL(storageRef);
-
-      return downloadURL; // Retorna la URL pública del archivo subido
-    } catch (error) {
-      console.error("Error al subir archivo a Firebase Storage:", error);
-      Alert.alert("Error", "Ocurrió un error al subir el archivo.");
-    }
-  };
-
-  const handleSubmit = async () => {
-    // Validar que una categoría esté seleccionada
-    if (!selectedOption) {
-      Alert.alert("Error", "Por favor, selecciona un tipo de entrada.");
-      return;
-    }
-
-    // Validar que al menos haya texto o una imagen
-    if (!respuesta.trim() && !media) {
-      Alert.alert(
-        "Error",
-        "Por favor, ingresa una respuesta o selecciona una imagen."
-      );
-      return;
-    }
-
-    // Validaciones específicas según la categoría
-    if (selectedOption === "Mensaje") {
-      // Beneficiarios y fecha de envío son obligatorios
-      if (
-        beneficiarios.length === 0 ||
-        beneficiarios[0].trim() === ""
-      ) {
-        Alert.alert("Error", "Por favor, ingresa al menos un beneficiario.");
-        return;
-      }
-      if (!date) {
-        Alert.alert("Error", "Por favor, selecciona una fecha de envío.");
-        return;
-      }
-    }
-
-    if (selectedOption !== "Mensaje" && addBeneficiarios) {
-      // Beneficiarios y fecha de envío son opcionales pero si se agregan, deben ser válidos
-      if (
-        beneficiarios.length === 0 ||
-        beneficiarios[0].trim() === ""
-      ) {
-        Alert.alert("Error", "Por favor, ingresa al menos un beneficiario.");
-        return;
-      }
-      if (!date) {
-        Alert.alert("Error", "Por favor, selecciona una fecha de envío.");
-        return;
-      }
-    }
-
-    if (showRecuerdoDate && !recuerdoDate) {
-      Alert.alert("Error", "Por favor, selecciona una fecha de recuerdo.");
-      return;
-    }
-
-    let mediaURL = null;
-
-    if (media) {
-      try {
-        const fileName = media.name;
-        const fileUri = media.uri;
-        mediaURL = await uploadToFirebaseStorage(fileUri, fileName); // Sube el archivo a Firebase
-
-        if (!mediaURL) {
-          Alert.alert("Error", "No se pudo obtener la URL del archivo subido.");
-          return;
+        const { status: audioStatus } = await Audio.requestPermissionsAsync();
+        if (audioStatus !== 'granted') {
+          Alert.alert('Permiso requerido', 'Se necesitan permisos para acceder al micrófono.');
         }
-      } catch (error) {
-        console.error("Error al subir el archivo:", error);
-        return; // Detén la ejecución si hay un error subiendo el archivo
       }
-    }
+    })();
 
-    // Obtener el usuario actual
-    const currentUser = auth.currentUser;
-    if (!currentUser) {
-      Alert.alert("Error", "No se pudo obtener el usuario autenticado.");
-      return;
-    }
-
-    // Preparar los datos para Firestore
-    const entryData = {
-      category: selectedOption,
-      message: respuesta.trim() || null,
-      date: showBeneficiariosFecha ? Timestamp.fromDate(date) : null, // Fecha de envío
-      recuerdoDate: showRecuerdoDate ? Timestamp.fromDate(recuerdoDate) : null, // Fecha de recuerdo
-      mediaURL: mediaURL || null,
-      beneficiaries: showBeneficiariosFecha
-        ? beneficiarios.filter((b) => b.trim() !== "")
-        : [],
-      createdAt: Timestamp.now(), // Fecha de subida
-      userId: currentUser.uid, // Relacionar la entrada con el ID del usuario
+    return () => {
+      if (sound) {
+        sound.unloadAsync();
+      }
+      if (audioRecording) {
+        audioRecording.stopAndUnloadAsync();
+      }
     };
+  }, []);
 
+  const seleccionarMedia = async () => {
     try {
-      const docRef = await addDoc(collection(db, "entries"), entryData);
-      console.log("Documento escrito con ID: ", docRef.id);
-      resetForm();
-      onClose();
-      Alert.alert("Éxito", "La entrada se ha enviado correctamente.");
+      let resultado = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.All,
+        quality: 1,
+      });
+
+      if (!resultado.cancelled) {
+        let type;
+        let selectedMedia;
+
+        if (resultado.assets && resultado.assets.length > 0) {
+          type = resultado.assets[0].type;
+          selectedMedia = resultado.assets[0];
+        } else {
+          type = resultado.type;
+          selectedMedia = resultado;
+        }
+
+        if (type === 'image') {
+          setMediaType('image');
+          setMedia(selectedMedia);
+        } else if (type === 'video') {
+          setMediaType('video');
+          setMedia(selectedMedia);
+        } else {
+          Alert.alert('Tipo de medio no soportado', 'Por favor, selecciona una imagen o un video.');
+        }
+      }
     } catch (error) {
-      console.error("Error al enviar el formulario:", error);
-      Alert.alert(
-        "Error",
-        "Ocurrió un error al enviar el formulario. Por favor, intenta nuevamente."
-      );
+      console.log('Error al seleccionar media:', error);
+      Alert.alert('Error', 'Hubo un problema al seleccionar el medio.');
     }
   };
 
-  // ===========================
-  // ======== RENDERIZADO ======
-  // ===========================
+  const eliminarMedia = () => {
+    setMedia(null);
+    setMediaType(null);
+  };
+
+  // Función para buscar canciones en Spotify usando Axios
+  const buscarCancionesSpotify = async (query) => {
+    try {
+      const response = await axios.get(`http://10.0.2.2:3000/spotify/search`, {
+        params: {
+          query: query,
+        },
+      });
+      setSpotifyResults(response.data); // Guardar los resultados de Spotify
+    } catch (error) {
+      console.error('Error al buscar canciones en Spotify:', error);
+    }
+  };
+
+  const iniciarGrabacion = async () => {
+    try {
+      if (audioRecording) {
+        await audioRecording.stopAndUnloadAsync();
+        setAudioRecording(null);
+      }
+
+      await Audio.setAudioModeAsync({
+        allowsRecordingIOS: true,
+        playsInSilentModeIOS: true,
+      });
+
+      const { recording } = await Audio.Recording.createAsync(
+        Audio.RECORDING_OPTIONS_PRESET_HIGH_QUALITY
+      );
+
+      setAudioRecording(recording);
+      setIsRecording(true);
+    } catch (error) {
+      console.log('Error al iniciar la grabación:', error);
+      Alert.alert('Error', 'No se pudo iniciar la grabación de audio.');
+    }
+  };
+
+  const detenerGrabacion = async () => {
+    try {
+      if (audioRecording) {
+        setIsRecording(false);
+        await audioRecording.stopAndUnloadAsync();
+        const uri = audioRecording.getURI();
+        setAudioRecording({ uri });
+      }
+    } catch (error) {
+      console.log('Error al detener la grabación:', error);
+      Alert.alert('Error', 'No se pudo detener la grabación de audio.');
+    }
+  };
+
+  const reproducirAudio = async () => {
+    try {
+      if (audioRecording && audioRecording.uri) {
+        const { sound } = await Audio.Sound.createAsync(
+          { uri: audioRecording.uri },
+          {
+            shouldPlay: true,
+            progressUpdateIntervalMillis: 100,
+            positionMillis: 0,
+            onPlaybackStatusUpdate: (status) => {
+              if (status.isLoaded) {
+                setAudioDuration(status.durationMillis);
+                setAudioPosition(status.positionMillis);
+                setIsPlaying(status.isPlaying);
+
+                // Actualizar barra de progreso
+                Animated.timing(progressAnim, {
+                  toValue: status.positionMillis / status.durationMillis,
+                  duration: 100,
+                  useNativeDriver: false,
+                }).start();
+              }
+
+              if (status.didJustFinish) {
+                setIsPlaying(false);
+              }
+            },
+          }
+        );
+
+        setSound(sound);
+        await sound.playAsync();
+      }
+    } catch (error) {
+      console.log('Error al reproducir audio:', error);
+      Alert.alert('Error', 'No se pudo reproducir el audio.');
+    }
+  };
+
+  const pausarAudio = async () => {
+    if (sound) {
+      await sound.pauseAsync();
+      setIsPlaying(false);
+    }
+  };
+
+  const eliminarAudio = () => {
+    setAudioRecording(null);
+    setIsPlaying(false);
+    setAudioDuration(0);
+    setAudioPosition(0);
+    if (sound) {
+      sound.unloadAsync();
+      setSound(null);
+    }
+  };
+
+  const handleGuardar = async () => {
+    if (!categoria) {
+      Alert.alert('Error', 'Por favor, selecciona una categoría.');
+      return;
+    }
+
+    if (!texto && !media && !audioRecording) {
+      Alert.alert('Error', 'Por favor, agrega al menos un contenido a la entrada.');
+      return;
+    }
+
+    const nuevaEntrada = {
+      categoria,
+      descripcion,
+      texto,
+      audio: audioRecording,
+      media,
+      mediaType,
+      isBaul,
+      fechaRecuerdo: categoria === 'recuerdo' ? selectedDate : null,
+    };
+    console.log('Nueva Entrada:', nuevaEntrada);
+
+    setCategoria('');
+    setDescripcion('');
+    setTexto('');
+    setAudioRecording(null);
+    setSound(null);
+    setMedia(null);
+    setMediaType(null);
+    setIsBaul(false);
+    setSelectedDate(new Date());
+    onClose();
+  };
+
+  const onChangeDate = (event, selectedDate) => {
+    const currentDate = selectedDate || new Date();
+    setShowDatePicker(false);
+    if (currentDate < today) {
+      setSelectedDate(currentDate);
+    } else {
+      Alert.alert('Error', 'La fecha debe ser anterior a hoy.');
+    }
+  };
+
   return (
     <Modal
+      visible={visible}
       animationType="slide"
       transparent={true}
-      visible={visible}
       onRequestClose={onClose}
     >
-      <View style={styles.modalBackground}>
-        <ImageBackground
-          source={require("../../assets/test/fondo.jpeg")} // Ruta a tu imagen
-          style={styles.backgroundImage}
-        />
-        <View style={styles.modalContainer}>
-          <ScrollView contentContainerStyle={styles.scrollContentContainer}>
-            <View style={styles.entryTypeContainer}>
-              <Pressable style={styles.closeButton} onPress={onClose}>
-                <FontAwesome name="arrow-left" size={24} color="white" />
-              </Pressable>
-              <Pressable style={styles.toggleButton} onPress={toggleOptions}>
-                <Text style={styles.toggleButtonText}>Tipo de entrada</Text>
-                <FontAwesome
-                  name={isCategoriesVisible ? "chevron-up" : "chevron-down"}
-                  size={24}
-                  color="black"
-                />
-              </Pressable>
-              <Pressable onPress={pickMedia}>
-                <FontAwesome
-                  name="upload"
-                  size={24}
-                  color="white"
-                  style={styles.uploadButton}
-                />
-              </Pressable>
-            </View>
+      <ScrollView contentContainerStyle={styles.modalContainer}>
+        <View style={styles.modalContent}>
+          <Text style={styles.titulo}>Crear Nueva Entrada</Text>
 
-            {isCategoriesVisible && (
-              <View style={styles.optionsContainer}>
-                {tiposDeEntrada.map((tipo, index) => (
-                  <Pressable
-                    key={index}
-                    style={[
-                      styles.optionButton,
-                      selectedOption === tipo && styles.selectedOption, // Aplicar estilo si está seleccionado
-                    ]}
-                    onPress={() => handleSelectOption(tipo)}
-                  >
-                    <Text style={styles.optionText}>{tipo}</Text>
-
-                    {selectedOption === tipo && (
-                      <Image
-                        source={require("../../assets/test/hoja.png")} // Ruta a la hoja de otoño
-                        style={styles.leafIcon}
-                      />
-                    )}
-                  </Pressable>
-                ))}
-              </View>
-            )}
-
-            {selectedOption !== "Mensaje" && selectedOption !== "" && !addBeneficiarios && (
-              <TouchableOpacity
-                onPress={() => setAddBeneficiarios(true)}
-                style={styles.addBeneficiariosButton}
-              >
-                <Text style={styles.addBeneficiariosButtonText}>
-                  Agregar Beneficiarios y Fecha
-                </Text>
-                <FontAwesome name="plus-circle" size={24} color="#3B873E" />
-              </TouchableOpacity>
-            )}
-
-
-            {media && (
-              <View style={styles.imageContainer}>
-
-                <Pressable style={styles.deleteIcon} onPress={removeMedia}>
-                  <FontAwesome name="trash" size={30} color="red" />
-                </Pressable>
-
-                <Image
-                  source={{ uri: media.uri }}
-                  style={styles.image}
-                  resizeMode="contain"
-                />
-              </View>
-            )}
-
-            <View style={styles.textInputContainer}>
-              <FontAwesome
-                name="microphone"
-                size={24}
-                color="black"
-                style={styles.microphoneIcon}
+          {/* Switch para alternar entre medios locales y Spotify */}
+          <View style={styles.switchContainer}>
+            <Text style={styles.label}>Seleccionar desde:</Text>
+            <View style={styles.switchWrapper}>
+              <Text style={{ marginRight: 10 }}>Imagen/Video</Text>
+              <Switch
+                value={isSpotifyMode}
+                onValueChange={() => setIsSpotifyMode(!isSpotifyMode)}
               />
+              <Text style={{ marginLeft: 10 }}>Spotify</Text>
+            </View>
+          </View>
+
+          {/* Campo de búsqueda para Spotify */}
+          {isSpotifyMode && (
+            <View>
               <TextInput
-                style={[
-                  styles.textInput,
-                  { height: Math.max(20, inputHeight) },
-                ]}
-                placeholder="Cuadro de texto"
-                multiline
-                value={respuesta}
-                onChangeText={setRespuesta}
-                onContentSizeChange={(e) =>
-                  setInputHeight(e.nativeEvent.contentSize.height)
-                }
+                style={styles.input}
+                placeholder="Buscar canción en Spotify"
+                value={searchQuery}
+                onChangeText={(text) => {
+                  setSearchQuery(text);
+                  if (text.length > 2) {
+                    buscarCancionesSpotify(text);
+                  }
+                }}
               />
             </View>
+          )}
 
-            {showBeneficiariosFecha && (
-              <>
-
-                <View style={styles.beneficiariesContainer}>
-                  {beneficiarios.map((beneficiario, index) => (
-                    <View key={index} style={styles.beneficiarioRow}>
-                      <TextInput
-                        style={styles.beneficiaryInput}
-                        value={beneficiario}
-                        maxLength={50}
-                        onChangeText={(text) =>
-                          handleBeneficiarioChange(text, index)
-                        }
-                        placeholder="Beneficiario"
-                      />
-
-                      {beneficiarios.length > 1 && (
-                        <Pressable
-                          style={styles.removeBeneficiaryButton}
-                          onPress={() => handleRemoveBeneficiary(index)}
-                        >
-                          <FontAwesome name="times" size={16} color="white" />
-                        </Pressable>
-                      )}
-
-                      {index === beneficiarios.length - 1 && beneficiarios.length < 5 && (
-                        <Pressable
-                          style={styles.addBeneficiaryButton}
-                          onPress={addBeneficiario}
-                        >
-                          <FontAwesome name="plus" size={16} color="black" />
-                        </Pressable>
-                      )}
+          {/* Mostrar resultados de Spotify */}
+          {isSpotifyMode && spotifyResults.length > 0 && (
+            <View>
+              {spotifyResults.map((track) => (
+                <TouchableOpacity
+                  key={track.id}
+                  onPress={() => setMedia(track)}
+                >
+                  <View style={styles.trackContainer}>
+                    <Image
+                      source={{ uri: track.album.images[0].url }}
+                      style={styles.trackImage}
+                    />
+                    <View>
+                      <Text style={styles.trackName}>{track.name}</Text>
+                      <Text style={styles.trackArtist}>{track.artists[0].name}</Text>
                     </View>
-                  ))}
-                </View>
-
-
-                <View style={styles.entryTypeContainer2}>
-                  <Text style={styles.entryTypeText}>Fecha de envío</Text>
-                  <Pressable
-                    onPress={showDatePicker}
-                    style={{ flexDirection: "row", alignItems: "center" }}
-                  >
-                    <MaterialIcons name="date-range" size={24} color="black" />
-                    <Text style={styles.dateText}>{formatDate(date)}</Text>
-                    <Text style={styles.dateSubtext}> Días del mes</Text>
-                  </Pressable>
-                </View>
-
-                <DateTimePickerModal
-                  isVisible={isDatePickerVisible}
-                  mode="date"
-                  onConfirm={handleConfirm}
-                  onCancel={hideDatePicker}
-                />
-              </>
-            )}
-
-            {showRecuerdoDate && (
-              <>
-                <View style={styles.entryTypeContainer2}>
-                  <Text style={styles.entryTypeText}>Fecha del recuerdo</Text>
-                  <Pressable
-                    onPress={showRecuerdoDatePicker}
-                    style={{ flexDirection: "row", alignItems: "center" }}
-                  >
-                    <MaterialIcons name="date-range" size={24} color="black" />
-                    <Text style={styles.dateText}>{formatDate(recuerdoDate)}</Text>
-                    <Text style={styles.dateSubtext}> Días del mes</Text>
-                  </Pressable>
-                </View>
-
-                <DateTimePickerModal
-                  isVisible={isRecuerdoDatePickerVisible}
-                  mode="date"
-                  onConfirm={handleRecuerdoConfirm}
-                  onCancel={hideRecuerdoDatePicker}
-                />
-              </>
-            )}
-
-            {selectedOption !== "Mensaje" && selectedOption !== "" && addBeneficiarios && (
-              <TouchableOpacity
-                onPress={() => setAddBeneficiarios(false)}
-                style={styles.removeBeneficiariosButton}
-              >
-                <Text style={styles.removeBeneficiariosButtonText}>
-                  Quitar Beneficiarios y Fecha
-                </Text>
-                <FontAwesome name="minus-circle" size={24} color="#FF6347" />
-              </TouchableOpacity>
-            )}
-
-
-            <View style={styles.buttonContainer}>
-
-              <Pressable style={styles.submitButton} onPress={handleSubmit}>
-                <Text style={styles.submitButtonText}>Enviar</Text>
-              </Pressable>
+                  </View>
+                </TouchableOpacity>
+              ))}
             </View>
-          </ScrollView>
+          )}
+
+          {/* Botón para seleccionar imagen o video */}
+          {!media && !isSpotifyMode && (
+            <TouchableOpacity
+              style={styles.iconoGaleria}
+              onPress={seleccionarMedia}
+            >
+              <Entypo name="image" size={50} color="#007BFF" />
+            </TouchableOpacity>
+          )}
+
+          {/* Vista Previa de Media */}
+          {media && mediaType === 'image' && (
+            <View style={styles.mediaContainer}>
+              <Image source={{ uri: media.uri }} style={styles.mediaPreview} />
+              <TouchableOpacity style={styles.eliminarIcono} onPress={eliminarMedia}>
+                <MaterialIcons name="close" size={24} color="red" />
+              </TouchableOpacity>
+            </View>
+          )}
+          {media && mediaType === 'video' && (
+            <View style={styles.mediaContainer}>
+              <Video
+                source={{ uri: media.uri }}
+                rate={1.0}
+                volume={1.0}
+                isMuted={false}
+                resizeMode="cover"
+                shouldPlay={false}
+                isLooping
+                style={styles.mediaPreview}
+                useNativeControls
+              />
+              <TouchableOpacity style={styles.eliminarIcono} onPress={eliminarMedia}>
+                <MaterialIcons name="close" size={24} color="red" />
+              </TouchableOpacity>
+            </View>
+          )}
+
+          {/* Switch entre Texto y Audio */}
+          <View style={styles.switchContainer}>
+            <Text style={styles.label}>Modo de Entrada:</Text>
+            <View style={styles.switchWrapper}>
+              <Text style={{ marginRight: 10 }}>Texto</Text>
+              <Switch
+                value={isAudioMode}
+                onValueChange={() => setIsAudioMode(!isAudioMode)}
+              />
+              <Text style={{ marginLeft: 10 }}>Audio</Text>
+            </View>
+          </View>
+
+          {/* Campo de Texto o Modo de Audio */}
+          <View style={styles.inputContainer}>
+            {!isAudioMode ? (
+              // Modo de Texto
+              <View style={styles.textoContainer}>
+                <Text style={styles.label}>Texto:</Text>
+                <TextInput
+                  style={styles.inputTexto}
+                  multiline
+                  numberOfLines={4}
+                  placeholder="Escribe tu texto aquí"
+                  value={texto}
+                  onChangeText={setTexto}
+                />
+              </View>
+            ) : (
+              // Modo de Audio
+              <View style={styles.audioContainer}>
+                <TouchableOpacity
+                  style={styles.botonAudio}
+                  onPress={isRecording ? detenerGrabacion : iniciarGrabacion}
+                >
+                  <FontAwesome
+                    name="microphone"
+                    size={30}
+                    color={isRecording ? 'red' : '#007BFF'}
+                  />
+                </TouchableOpacity>
+                {audioRecording && !isRecording && (
+                  <View style={styles.audioPlaybackContainer}>
+                    <TouchableOpacity onPress={isPlaying ? pausarAudio : reproducirAudio}>
+                      <MaterialIcons name={isPlaying ? 'pause' : 'play-arrow'} size={30} color="#17a2b8" />
+                    </TouchableOpacity>
+                    <View style={styles.progressBarContainer}>
+                      <Animated.View style={[styles.progressBar, {
+                        width: progressAnim.interpolate({
+                          inputRange: [0, 1],
+                          outputRange: ["0%", "100%"]
+                        })
+                      }]} />
+                    </View>
+                    <Text style={styles.audioTime}>
+                      {Math.floor(audioPosition / 1000)} s / {Math.floor(audioDuration / 1000)} s
+                    </Text>
+                    <TouchableOpacity onPress={eliminarAudio} style={styles.botonEliminarAudio}>
+                      <MaterialIcons name="delete" size={30} color="red" />
+                    </TouchableOpacity>
+                  </View>
+                )}
+              </View>
+            )}
+          </View>
+
+          {/* Categoría */}
+          <Text style={styles.label}>Categoría:</Text>
+          <RNPickerSelect
+            onValueChange={(value) => {
+              setCategoria(value);
+              if (value === 'recuerdo') {
+                setShowDatePicker(true);
+              }
+            }}
+            items={[
+              { label: 'Selecciona una categoría', value: '' },
+              { label: 'Viaje', value: 'viaje' },
+              { label: 'Evento', value: 'evento' },
+              { label: 'Personal', value: 'personal' },
+              { label: 'Recuerdo', value: 'recuerdo' },
+            ]}
+            placeholder={{
+              label: 'Selecciona una categoría',
+              value: '',
+              color: '#9EA0A4',
+            }}
+            style={pickerSelectStyles}
+            value={categoria}
+          />
+
+          {/* Mostrar DatePicker si se selecciona "Recuerdo" */}
+          {categoria === 'recuerdo' && (
+            <>
+              <TouchableOpacity onPress={() => setShowDatePicker(true)}>
+                <Text style={styles.label}>Seleccionar Fecha del Recuerdo</Text>
+              </TouchableOpacity>
+              {showDatePicker && (
+                <DateTimePicker
+                  value={selectedDate}
+                  mode="date"
+                  display="default"
+                  onChange={onChangeDate}
+                  maximumDate={today}
+                />
+              )}
+            </>
+          )}
+
+          {/* Descripción */}
+          <Text style={styles.label}>Descripción:</Text>
+          <TextInput
+            style={styles.input}
+            multiline
+            numberOfLines={3}
+            placeholder="Agrega una descripción"
+            value={descripcion}
+            onChangeText={setDescripcion}
+          />
+
+          {/* Switch del Baúl */}
+          <View style={styles.switchContainer}>
+            <Text style={styles.label}>¿Agregar al Baúl?</Text>
+            <Switch
+              value={isBaul}
+              onValueChange={() => setIsBaul(!isBaul)}
+            />
+          </View>
+
+          {/* Imagen del Baúl Abierto/Cerrado */}
+          {isBaul ? (
+            <Image source={require('../../assets/test/baul.webp')} style={styles.baulImagen} />
+          ) : (
+            <Image source={require('../../assets/test/baulCerrado.webp')} style={styles.baulImagen} />
+          )}
+
+          {/* Botones de Guardar y Cancelar */}
+          <View style={styles.botonContainer}>
+            <TouchableOpacity
+              style={styles.botonGuardar}
+              onPress={handleGuardar}
+            >
+              <Text style={styles.botonTexto}>Guardar</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.botonCancelar}
+              onPress={onClose}
+            >
+              <Text style={styles.botonTexto}>Cancelar</Text>
+            </TouchableOpacity>
+          </View>
         </View>
-      </View>
+      </ScrollView>
     </Modal>
   );
 };
 
-export default ModalEntry;
-
-// Estilos del componente
 const styles = StyleSheet.create({
-  // ===================================
-  // ===== Estilos del Fondo Modal =====
-  // ===================================
-  modalBackground: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  backgroundImage: {
-    width: "100%", // Cubre toda la pantalla
-    height: "100%", // Cubre toda la pantalla
-    justifyContent: "center", // Centrar los elementos del modal
-  },
-
-  // ===================================
-  // ===== Estilos del Contenedor =====
-  // ===== Principal del Modal =========
-  // ===================================
   modalContainer: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    justifyContent: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.7)",
-  },
-
-  // ===================================
-  // ===== Estilos del ScrollView =====
-  // ===================================
-  scrollContentContainer: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.7)',
     padding: 20,
   },
-
-  // ===================================
-  // ===== Estilos de Tipo de Entrada ===
-  // ===== y Botón de Carga de Media ====
-  // ===================================
-  entryTypeContainer: {
-    justifyContent: "space-between",
-    flexDirection: "row",
-    width: "90%", // Ajustar para dejar espacio entre los elementos
-    alignItems: "center", // Alineación vertical central
-    alignSelf: "center", // Centra el contenedor en la pantalla
-    marginBottom: 20,
-  },
-  toggleButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#F0C89E",
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 10,
-    marginLeft: 10, // Alinearlo bien con la flecha
-  },
-  closeButton: {
-    backgroundColor: "#C19A6B",
-    padding: 10, // Reducir padding para que el botón no sea demasiado grande
-    borderRadius: 50, // Redondeado para que parezca un círculo
-  },
-  uploadButton: {
-    backgroundColor: "#C19A6B", // Añadir el mismo fondo que el closeButton para consistencia
-    padding: 10, // Similar al closeButton
-    borderRadius: 50,
-  },
-  toggleButtonText: {
-    fontSize: 16,
-    marginRight: 10,
-  },
-  addBeneficiariosButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#D4AF37",
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 10,
-    alignSelf: "center",
-    marginBottom: 20,
-  },
-  addBeneficiariosButtonText: {
-    fontSize: 16,
-    color: "#000",
-    marginRight: 10,
-  },
-  removeBeneficiariosButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#FF6347",
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 10,
-    alignSelf: "center",
-    marginTop: 10,
-  },
-  removeBeneficiariosButtonText: {
-    fontSize: 16,
-    color: "#fff",
-    marginRight: 10,
-  },
-
-  // ===================================
-  // ===== Estilos de Opciones ========
-  // ===== de Categoría ===============
-  // ===================================
-  optionsContainer: {
-    flexDirection: "row",
-    flexWrap: "wrap", // Permitir que los botones se ajusten a múltiples líneas
-    justifyContent: "space-around", // Asegurar que haya espacio entre los botones
-    marginBottom: 20,
-  },
-
-  optionButton: {
-    backgroundColor: "#F0C89E", // Color de fondo
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 10,
-    marginBottom: 15, // Separar verticalmente
-    marginHorizontal: 10, // Separar horizontalmente
-    flexDirection: "row", // Para alinear el ícono de la hoja dentro del botón
-    alignItems: "center", // Centrar verticalmente el ícono y el texto
-  },
-
-  selectedOption: {
-    backgroundColor: "#C19A6B", // Color para el botón seleccionado
-  },
-
-  optionText: {
-    fontSize: 16,
-    color: "#000", // Color del texto
-    marginRight: 10, // Añadir margen para que la hoja no se superponga
-  },
-
-  leafIcon: {
-    width: 40, // Tamaño del ícono de hoja
-    height: 40,
-    position: "absolute",
-    right: -10, // Posicionar la hoja a la derecha dentro del botón
-    top: "50%",
-    transform: [{ translateY: -13 }], // Centrar verticalmente la hoja dentro del botón
-  },
-  // ===================================
-  // ===== Estilos de Imagen ===========
-  // ===== Seleccionada =================
-  // ===================================
-  imageContainer: {
-    position: "relative", // Necesario para posicionar el ícono de basura
-    width: "100%",
-    aspectRatio: 1, // Mantiene la proporción de la imagen (puedes ajustarlo según tus necesidades)
-    marginBottom: 20,
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: 20, // Añadimos un borde redondeado más grande al contenedor
-    overflow: "hidden",
-  },
-  deleteIcon: {
-    position: "absolute",
-    zIndex: 3,
-    top: 10,
-    left: 10,
-    backgroundColor: "rgba(0, 0, 0, 0.5)", // Fondo semitransparente para que el ícono resalte
-    padding: 10,
-    borderRadius: 20,
-  },
-  image: {
-    width: "100%",
-    height: "100%",
-    borderRadius: 20,
-  },
-
-  // ===================================
-  // ===== Estilos del Campo de ========
-  // ===== Texto Multilinea ============
-  // ===================================
-  textInputContainer: {
-    flexDirection: "row",
-    alignItems: "flex-start", // Alinear el ícono en la parte superior del input
-    backgroundColor: "#F0C89E",
-    width: "100%",
-    padding: 10,
-    borderRadius: 10,
-    marginBottom: 20,
-  },
-  microphoneIcon: {
-    marginRight: 10,
-    marginTop: 10, // Alinear con el texto cuando el input crece
-  },
-  textInput: {
-    flex: 1,
-    padding: 10,
-    fontSize: 16,
-    backgroundColor: "white",
-    borderRadius: 10,
-  },
-
-  // ===================================
-  // ===== Estilos de Beneficiarios ===
-  // ===================================
-  beneficiariesContainer: {
-    flexDirection: "column",
-    justifyContent: "space-around",
-    width: "100%", // Alinear con el contenedor principal
-    marginBottom: 20,
-    paddingHorizontal: 10, // Aseguramos un padding lateral consistente
-  },
-
-  beneficiarioRow: {
-    flexDirection: "row",
-    alignItems: "center", // Alinear verticalmente el input y el botón
-    justifyContent: "space-between", // Asegura que el input y el botón estén bien distribuidos
-    marginBottom: 15, // Reducimos el margen inferior para acercar más los elementos
-    width: "100%",
-  },
-
-  beneficiaryInput: {
-    borderColor: "#ccc",
-    backgroundColor: "#F0C89E",
-    borderWidth: 1,
-    borderRadius: 10,
-    padding: 10,
-    flex: 1, // Dejar que el campo de texto ocupe el espacio disponible
-    marginRight: 10, // Añadir margen derecho para que el input no quede pegado al botón
-  },
-
-  removeBeneficiaryButton: {
-    backgroundColor: "#FF6347", // Color rojo para indicar eliminación
-    padding: 10,
-    borderRadius: 5,
-    justifyContent: "center",
-    alignItems: "center",
-    width: 45,
-    height: 45,
-  },
-
-  addBeneficiaryButton: {
-    backgroundColor: "#C19A6B",
-    padding: 10,
-    borderRadius: 5,
-    justifyContent: "center",
-    alignItems: "center",
-    width: 45,
-    height: 45,
-  },
-
-  // ===================================
-  // ===== Estilos de Fecha ============
-  // ===================================
-  entryTypeContainer2: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between", // Espaciado adecuado entre los elementos
-    backgroundColor: "#F0C89E",
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 10,
-    width: "100%", // Asegura que ocupe el 100% del contenedor
-    alignSelf: "center",
-    marginBottom: 20,
-  },
-
-  entryTypeText: {
-    fontSize: 16,
-    color: "#000",
-  },
-
-  dateText: {
-    fontSize: 16,
-    fontWeight: "bold",
-    marginLeft: 10,
-    color: "#000",
-  },
-
-  dateSubtext: {
-    fontSize: 12,
-    color: "#666",
-    marginLeft: 10,
-  },
-
-  // ===================================
-  // ===== Estilos de Botones ==========
-  // ===== Enviar ==============
-  // ===================================
-  buttonContainer: {
-    alignItems: "center",
-    width: "100%",
-  },
-  submitButton: {
-    backgroundColor: "#3B873E", // Verde para indicar acción positiva
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 10,
-    marginTop: 10,
-    alignSelf: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
+  modalContent: {
+    width: '90%',
+    backgroundColor: '#FFF',
+    borderRadius: 15,
+    padding: 20,
     elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
   },
-  submitButtonText: {
-    color: "white",
-    fontWeight: "bold",
+  titulo: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    marginBottom: 15,
+    textAlign: 'center',
+    color: '#333',
+  },
+  label: {
+    marginTop: 10,
+    marginBottom: 5,
+    fontWeight: '600',
+    color: '#555',
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 10,
+    padding: 10,
+    textAlignVertical: 'top',
+    backgroundColor: '#f9f9f9',
+  },
+  inputTexto: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 10,
+    padding: 10,
+    textAlignVertical: 'top',
+    backgroundColor: '#f9f9f9',
+    height: 100,
+    marginTop: 5,
+  },
+  switchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: 15,
+  },
+  botonGuardar: {
+    backgroundColor: '#28a745',
+    padding: 12,
+    borderRadius: 10,
+    flex: 1,
+    marginRight: 5,
+    elevation: 3,
+  },
+  botonCancelar: {
+    backgroundColor: '#6c757d',
+    padding: 12,
+    borderRadius: 10,
+    flex: 1,
+    marginLeft: 5,
+    elevation: 3,
+  },
+  botonTexto: {
+    color: '#fff',
+    textAlign: 'center',
+    fontWeight: '600',
     fontSize: 16,
   },
-
-  // ===================================
-  // ===== Estilos del Botón de Agregar Beneficiarios ========
-  // ===================================
-  addBeneficiariosButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#D4AF37",
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 10,
-    alignSelf: "center",
-    marginBottom: 20,
+  botonContainer: {
+    flexDirection: 'row',
+    marginTop: 20,
   },
-  addBeneficiariosButtonText: {
-    fontSize: 16,
-    color: "#000",
-    marginRight: 10,
+  iconoGaleria: {
+    alignSelf: 'center',
+    marginVertical: 15,
   },
-
-  // ===================================
-  // ===== Estilos del Botón para Quitar Beneficiarios ========
-  // ===================================
-  removeBeneficiariosButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#FF6347",
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 10,
-    alignSelf: "center",
+  baulImagen: {
+    width: 80,
+    height: 80,
+    alignSelf: 'center',
+    marginVertical: 15,
+  },
+  mediaContainer: {
+    position: 'relative',
+    width: '100%',
     marginTop: 10,
   },
-  removeBeneficiariosButtonText: {
-    fontSize: 16,
-    color: "#fff",
+  mediaPreview: {
+    width: '100%',
+    height: 200,
+    borderRadius: 10,
+  },
+  eliminarIcono: {
+    position: 'absolute',
+    top: 5,
+    right: 5,
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    padding: 5,
+    borderRadius: 15,
+  },
+  trackContainer: {
+    flexDirection: 'row',
+    marginVertical: 5,
+  },
+  trackImage: {
+    width: 50,
+    height: 50,
     marginRight: 10,
+  },
+  trackName: {
+    fontWeight: 'bold',
+  },
+  trackArtist: {
+    color: 'gray',
+  },
+  audioContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  botonAudio: {
+    marginRight: 15,
+  },
+  audioPlaybackContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  progressBarContainer: {
+    flex: 1,
+    height: 5,
+    backgroundColor: '#e0e0e0',
+    borderRadius: 5,
+    overflow: 'hidden',
+    marginHorizontal: 10,
+  },
+  progressBar: {
+    height: '100%',
+    backgroundColor: '#17a2b8',
+  },
+  audioTime: {
+    color: '#555',
+    marginRight: 10,
+  },
+  botonEliminarAudio: {
+    marginLeft: 10,
   },
 });
+
+// Estilos para react-native-picker-select
+const pickerSelectStyles = StyleSheet.create({
+  inputIOS: {
+    fontSize: 16,
+    paddingVertical: 12,
+    paddingHorizontal: 10,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
+    color: 'black',
+    paddingRight: 30,
+    backgroundColor: '#f9f9f9',
+  },
+  inputAndroid: {
+    fontSize: 16,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    borderWidth: 0.5,
+    borderColor: '#ccc',
+    borderRadius: 5,
+    color: 'black',
+    paddingRight: 30,
+    backgroundColor: '#f9f9f9',
+  },
+});
+
+export default ModalEntry;
