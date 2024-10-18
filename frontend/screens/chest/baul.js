@@ -19,7 +19,6 @@ import {
   doc,
 } from "firebase/firestore";
 import { LinearGradient } from "expo-linear-gradient";
-import Navbar from "../../components/Header";
 
 const Baul = ({ navigation }) => {
   const [archivedEntries, setArchivedEntries] = useState([]);
@@ -124,7 +123,6 @@ const Baul = ({ navigation }) => {
         )}
       </View>
 
-      <Navbar />
     </LinearGradient>
   );
 };

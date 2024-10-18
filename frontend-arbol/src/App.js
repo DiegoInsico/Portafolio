@@ -13,7 +13,7 @@ function App() {
 
   useEffect(() => {
     axios
-      .get('http://localhost:3000/entries') // Asegúrate de que esta URL es correcta
+      .get('http://10.0.2.2:3000/entries') // Asegúrate de que esta URL es correcta
       .then((response) => {
         setEntradas(response.data);
         setCargando(false);

@@ -3,7 +3,6 @@ import { View, StyleSheet, Alert, TouchableOpacity, Text } from 'react-native';
 import PropTypes from 'prop-types';
 import EntryListScreen from './listEntry';
 import ModalEntry from '../entrys/modalEntry';
-import Navbar from '../../components/Header'; 
 import Background from '../../components/background';
 import { db, auth } from '../../utils/firebase';
 import { collection, query, where, onSnapshot, orderBy } from 'firebase/firestore';
@@ -66,7 +65,6 @@ export default function EntriesHome({ navigation }) {
         </View>
         <ModalEntry visible={modalVisible} onClose={handleCloseModal} />
       </View>
-      <Navbar onAddPress={handlePress} /> 
     </Background>
   );
 }

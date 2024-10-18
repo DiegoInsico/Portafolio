@@ -1,42 +1,92 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, ActivityIndicator, StyleSheet, Alert, Dimensions, Animated, Easing, TouchableOpacity, FlatList, Image } from 'react-native';
-import axios from 'axios';
-import { Video } from 'expo-av';
-import Navbar from '../../components/Header'; 
-import { getAuth } from "firebase/auth";
-import { collection, query, where, onSnapshot, orderBy } from 'firebase/firestore';
-import { db } from '../../utils/firebase'; // Asegúrate de tener la configuración correcta de Firebase
-import { LinearGradient } from 'expo-linear-gradient';
+import React, { useEffect, useRef, useState } from "react";
+import {
+  View,
+  Text,
+  ActivityIndicator,
+  StyleSheet,
+  Alert,
+  Dimensions,
+  Animated,
+  Easing,
+  TouchableOpacity,
+  Image,
+  RefreshControl,
+} from "react-native";
+import axios from "axios";
+import { Video } from "expo-av";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import {
+  collection,
+  query,
+  where,
+  onSnapshot,
+  orderBy,
+} from "firebase/firestore";
+import { db } from "../../utils/firebase";
+import { LinearGradient } from "expo-linear-gradient";
 
-const { width: viewportWidth } = Dimensions.get('window');
+const { width: viewportWidth } = Dimensions.get("window");
 
 const Home = ({ navigation }) => {
-  const [question, setQuestion] = useState('');
+  // FUNCIONALIDADES
+  const [question, setQuestion] = useState("");
   const [loading, setLoading] = useState(true);
   const [userId, setUserId] = useState(null);
   const [entries, setEntries] = useState([]);
-  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const [refreshing, setRefreshing] = useState(false); // Estado para el refresh
 
+  // CONST DE ANIMACIONES
+  const scrollX = useRef(new Animated.Value(0)).current; // Animación del desplazamiento
+
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const scaleAnim = useRef(new Animated.Value(0.5)).current;
+
+  // Animaciones
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 2000,
+        useNativeDriver: true,
+      }),
+      Animated.spring(scaleAnim, {
+        toValue: 1,
+        friction: 3,
+        tension: 40,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, [fadeAnim, scaleAnim]);
+
+  // Detectar si hay una sesión activa al iniciar la app
   useEffect(() => {
     const auth = getAuth();
-    const user = auth.currentUser;
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        // Usuario autenticado
+        setUserId(user.uid);
+        setLoading(false);
+      } else {
+        // No hay un usuario autenticado
+        Alert.alert(
+          "Sesión no iniciada",
+          "Por favor inicia sesión para continuar."
+        );
+        navigation.navigate("Login"); // Navegar a la página de inicio de sesión si no está autenticado
+      }
+    });
 
-    if (user) {
-      setUserId(user.uid);
-    } else {
-      Alert.alert('Error', 'No se ha encontrado un usuario autenticado.');
-      navigation.navigate('Login');
-    }
+    // Limpiar el listener al desmontar el componente
+    return () => unsubscribe();
   }, [navigation]);
 
   const fetchEntries = () => {
     if (!userId) return;
 
-    // Realizamos la consulta a Firebase
     const q = query(
-      collection(db, 'entries'),
-      where('userId', '==', userId),
-      orderBy('createdAt', 'desc')
+      collection(db, "entries"),
+      where("userId", "==", userId),
+      orderBy("createdAt", "desc")
     );
 
     const unsubscribe = onSnapshot(
@@ -49,8 +99,12 @@ const Home = ({ navigation }) => {
             id: doc.id,
             text: data.message,
             media: data.mediaURL || null,
-            isVideo: data.mediaURL ? data.mediaURL.endsWith('.mp4') || data.mediaURL.endsWith('.mov') : false,
-            createdAt: data.createdAt ? data.createdAt.toDate().toLocaleDateString() : '',
+            isVideo: data.mediaURL
+              ? data.mediaURL.endsWith(".mp4") || data.mediaURL.endsWith(".mov")
+              : false,
+            createdAt: data.createdAt
+              ? data.createdAt.toDate().toLocaleDateString()
+              : "",
           });
         });
         setEntries(entriesData);
@@ -59,7 +113,7 @@ const Home = ({ navigation }) => {
       (error) => {
         console.error("Error al obtener las entradas: ", error);
         setLoading(false);
-        Alert.alert('Error', 'Ocurrió un error al obtener las entradas.');
+        Alert.alert("Error", "Ocurrió un error al obtener las entradas.");
       }
     );
 
@@ -72,11 +126,45 @@ const Home = ({ navigation }) => {
     }
   }, [userId]);
 
-  // Función para renderizar cada entrada
-  const renderEntryItem = ({ item }) => {
+  if (loading) {
     return (
-      <View style={styles.entryContainer}>
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#4B4E6D" />
+        <Text>Cargando...</Text>
+      </View>
+    );
+  }
 
+  const onRefresh = () => {
+    setRefreshing(true); // Inicia el estado de refresh
+    fetchEntries(); // Llama a la función que refresca las entradas
+    setRefreshing(false); // Termina el estado de refresh
+  };
+
+  const renderEntryItem = ({ item, index }) => {
+    // Rango de entrada para la interpolación de escala y opacidad
+    const inputRange = [
+      (index - 1) * viewportWidth * 0.8,
+      index * viewportWidth * 0.8,
+      (index + 1) * viewportWidth * 0.8,
+    ];
+
+    const scale = scrollX.interpolate({
+      inputRange,
+      outputRange: [0.8, 1, 0.8],
+      extrapolate: "clamp",
+    });
+
+    const opacity = scrollX.interpolate({
+      inputRange,
+      outputRange: [0.7, 1, 0.7],
+      extrapolate: "clamp",
+    });
+
+    return (
+      <Animated.View
+        style={[styles.entryContainer, { transform: [{ scale }], opacity }]}
+      >
         {item.media && item.isVideo ? (
           <Video
             source={{ uri: item.media }}
@@ -86,7 +174,11 @@ const Home = ({ navigation }) => {
             isLooping
           />
         ) : item.media ? (
-          <Image source={{ uri: item.media }} style={styles.media} resizeMode="cover" />
+          <Image
+            source={{ uri: item.media }}
+            style={styles.media}
+            resizeMode="cover"
+          />
         ) : null}
 
         {item.text && (
@@ -98,34 +190,34 @@ const Home = ({ navigation }) => {
         {item.createdAt && (
           <Text style={styles.createdAt}>{item.createdAt}</Text>
         )}
-      </View>
+      </Animated.View>
     );
   };
 
-  // Función para animar la opacidad de la pregunta
   const animateQuestion = () => {
     Animated.timing(fadeAnim, {
       toValue: 1,
       duration: 1000,
-      easing: Easing.bounce, // Animación de rebote
+      easing: Easing.bounce,
       useNativeDriver: true,
     }).start();
   };
 
   const fetchQuestion = () => {
     if (!userId) {
-      console.error('No userId available');
+      console.error("No userId available");
       return;
     }
 
     setLoading(true);
-    axios.get('http://10.0.2.2:3000/api/question', { params: { userId: userId } })
-      .then(response => {
+    axios
+      .get("http://10.0.2.2:3000/api/question", { params: { userId: userId } })
+      .then((response) => {
         setQuestion(response.data.question);
         setLoading(false);
         animateQuestion();
       })
-      .catch(error => {
+      .catch((error) => {
         console.error("Error fetching the question: ", error);
         setLoading(false);
       });
@@ -133,48 +225,58 @@ const Home = ({ navigation }) => {
 
   return (
     <LinearGradient
-      colors={[
-        "#D4AF37", // Dorado suave
-        "#E6C47F", // Melocotón suave/dorado claro
-        "#C2A66B", // Dorado oscuro más neutro
-        "#4B4E6D", // Azul grisáceo oscuro para las sombras
-        "#2C3E50", // Negro grisáceo oscuro en la parte inferior
-      ]}
+      colors={["#1C1C1C", "#1C1C1C"]}
       start={{ x: 0, y: 0 }}
       end={{ x: 0, y: 1 }}
       style={styles.background}
     >
       <View style={styles.container}>
-      <Text style={styles.welcomeText}>¡Hola!</Text>
-      <Text style={styles.subText}>Soy tu alma.</Text>
-
-      {loading ? (
-        <ActivityIndicator size="large" color="#4B4E6D" />
-      ) : (
-        <Animated.View style={[styles.questionContainer, { opacity: fadeAnim }]}>
-          <Text style={styles.questionText}>
-            {question || 'No se pudo cargar la pregunta'}
-          </Text>
+        <Animated.View
+          style={[{ opacity: fadeAnim, transform: [{ scale: scaleAnim }] }]}
+        >
+          <Text style={styles.welcomeText}>¡Bienvenido!</Text>
         </Animated.View>
-      )}
 
-      <TouchableOpacity onPress={fetchQuestion} style={styles.button}>
-        <Text style={styles.buttonText}>Presioname para generar otra pregunta</Text>
-      </TouchableOpacity>
+        {loading ? (
+          <ActivityIndicator size="large" color="#4B4E6D" />
+        ) : (
+          <Animated.View
+            style={[styles.questionContainer, { opacity: fadeAnim }]}
+          >
+            <Text style={styles.questionText}>
+              {question || "No se pudo cargar la pregunta"}
+            </Text>
+          </Animated.View>
+        )}
+
+        <TouchableOpacity onPress={fetchQuestion} style={styles.button}>
+          <Text style={styles.buttonText}>
+            Presioname para generar otra pregunta
+          </Text>
+        </TouchableOpacity>
 
         <Text style={styles.carouselTitle}>Tus Entradas Recientes</Text>
 
-
-        <FlatList
+        <Animated.FlatList
           data={entries}
           renderItem={renderEntryItem}
           keyExtractor={(item) => item.id}
           horizontal
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.carouselContainer}
+          snapToInterval={viewportWidth * 0.8} // Hace que los items "encajen" en el centro
+          decelerationRate="fast"
+          onScroll={Animated.event(
+            [{ nativeEvent: { contentOffset: { x: scrollX } } }],
+            { useNativeDriver: true }
+          )}
+          scrollEventThrottle={16}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
         />
+
         <View style={styles.navbarSpacing} />
-        <Navbar />
       </View>
     </LinearGradient>
   );
@@ -186,54 +288,57 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    justifyContent: 'flex-start', // Posiciona el contenido en la parte superior
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     paddingTop: 20,
     paddingHorizontal: 20,
   },
   welcomeText: {
-    fontSize: 24,
-    fontWeight: 'bold',
+    fontSize: 18,
+    fontWeight: "bold",
     marginBottom: 10,
-    color: '#fff',
-    textAlign: 'center',
-  },
-  subText: {
-    fontSize: 16,
-    color: '#fff',
-    marginBottom: 20,
-    textAlign: 'center',
+    color: "#000000",
+    textAlign: "center",
+    backgroundColor: "#FFD700",
+    width: 200,
+    padding: 7,
+    borderRadius: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 2, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   questionContainer: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#fff",
     padding: 20,
     borderRadius: 10,
     elevation: 5,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
   },
   questionText: {
     fontSize: 18,
-    color: '#333',
-    textAlign: 'center',
+    color: "#000000",
+    textAlign: "center",
   },
   button: {
-    display: 'flex',
+    display: "flex",
     borderRadius: 5,
     marginBottom: 20,
-    alignItems: 'center',
+    alignItems: "center",
   },
   buttonText: {
     fontSize: 16,
-    color: '#000',
-    textAlign: 'center',
+    color: "#fff",
+    textAlign: "center",
   },
   carouselTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
-    color: '#4B4E6D',
+    fontWeight: "bold",
+    color: "#fff",
     marginBottom: 10,
   },
   carouselContainer: {
@@ -241,21 +346,22 @@ const styles = StyleSheet.create({
     height: 300,
   },
   entryContainer: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderRadius: 10,
     padding: 10,
-    marginRight: 10,
+    marginRight: 1,
+    margin: 2,
     width: viewportWidth * 0.8,
     elevation: 3,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   media: {
-    width: '100%',
+    width: "100%",
     height: 200,
     borderRadius: 10,
     marginBottom: 10,
@@ -265,16 +371,16 @@ const styles = StyleSheet.create({
   },
   entryText: {
     fontSize: 16,
-    color: '#333',
-    textAlign: 'center',
+    color: "#333",
+    textAlign: "center",
   },
   createdAt: {
     fontSize: 12,
-    color: '#777',
+    color: "#777",
     marginTop: 10,
   },
   navbarSpacing: {
-    height: 85, // Espacio para que los elementos no queden ocultos detrás del Navbar
+    height: 85,
   },
 });
 
