@@ -10,7 +10,7 @@ import Home from "./screens/home/home";
 import Registro from "./screens/auth/register"; 
 import EditProfile from "./screens/profile/editProfile"; 
 import RequestPasswordReset from "./screens/auth/resetPass"; 
-import EntriesHome from "./screens/entrys/entriesHome"
+import EntriesHome from "./screens/entrys/entriesHome";
 import { auth } from "./utils/firebase"; 
 import { onAuthStateChanged } from "firebase/auth";
 
@@ -99,134 +99,132 @@ export default function App() {
   }
 
   return (
-
-      <ImageBackground source={backgroundImage} style={styles.background}>
-        <NavigationContainer>
-          <BloqueoProvider>
-            <Stack.Navigator>
-              {user ? (
-                <>
-                  {/* Si el usuario está autenticado, mostrar el stack de la aplicación */}
-                  <Stack.Screen
-                    name="Home"
-                    component={Home}
-                    options={{ headerShown: false }}
-                  />
-                  <Stack.Screen
-                    name="EditProfile"
-                    component={EditProfile}
-                    options={{ headerShown: false }}
-                  />
-                  <Stack.Screen
-                    name="Configuracion"
-                    component={Configuracion}
-                    options={{ headerShown: false }}
-                  />
-                  <Stack.Screen
-                    name="AdminCuenta"
-                    component={AdminCuenta}
-                    options={{ headerShown: false }}
-                  />
-                  <Stack.Screen
-                    name="Acces"
-                    component={Acces}
-                    options={{ headerShown: false }}
-                  />
-                  <Stack.Screen
-                    name="Ajustes"
-                    component={Ajustes}
-                    options={{ headerShown: false }}
-                  />
-                  {/* seguridad */}
-                  <Stack.Screen
-                    name="Seguridad"
-                    component={Seguridad}
-                    options={{ headerShown: false }}
-                  />
-                  <Stack.Screen
-                    name="AlertSeg"
-                    component={AlertSeg}
-                    options={{ headerShown: false }}
-                  />
-                  <Stack.Screen
-                    name="BloSes"
-                    component={BloSes}
-                    options={{ headerShown: false }}
-                  />
-                  <Stack.Screen
-                    name="Veri"
-                    component={Veri}
-                    options={{ headerShown: false }}
-                  />
-                  <Stack.Screen
-                    name="BloqApp"
-                    component={BloqApp}
-                    options={{ headerShown: false }}
-                  />
-                  <Stack.Screen
-                    name="DesbloqApp"
-                    component={DesbloqApp}
-                    options={{ headerShown: false }}
-                  />
-                  <Stack.Screen
-                    name="EntriesHome"
-                    component={EntriesHome}
-                    options={{ headerShown: false }}
-                  />
-                  <Stack.Screen name="Temas" options={{ headerShown: false }}>
-                    {() => <Temas setBackgroundImage={setBackgroundImage} />}
-                  </Stack.Screen>
-                  <Stack.Screen
-                    name="AdminTest"
-                    component={AdminTest}
-                    options={{ headerShown: false }}
-                  />
-                  <Stack.Screen
-                    name="AgregarTest"
-                    component={AgregarTest}
-                    options={{ headerShown: false }}
-                  />
-                  <Stack.Screen
-                    name="ModificarTest"
-                    component={ModificarTest}
-                    options={{ headerShown: false }}
-                  />
-                  <Stack.Screen
-                    name="EliminarTest"
-                    component={EliminarTest}
-                    options={{ headerShown: false }}
-                  />
-                  <Stack.Screen
-                    name="AdminBene"
-                    component={AdminBene}
-                    options={{ headerShown: false }}
-                  />
-                </>
-              ) : (
-                <>
-                  {/* Si el usuario no está autenticado, mostrar el stack de autenticación */}
-                  <Stack.Screen
-                    name="Login"
-                    component={Login}
-                    options={{ headerShown: false }}
-                  />
-                  <Stack.Screen
-                    name="Registro"
-                    component={Registro}
-                    options={{ headerShown: false }}
-                  />
-                  <Stack.Screen
-                    name="RequestPasswordReset"
-                    component={RequestPasswordReset}
-                    options={{ headerShown: false }}
-                  />
-                </>
-              )}
-            </Stack.Navigator>
-          </BloqueoProvider>          
-        </NavigationContainer>
-      </ImageBackground>
-
+    <ImageBackground source={backgroundImage} style={styles.background}>
+      <NavigationContainer>
+        <BloqueoProvider>
+          <Stack.Navigator>
+            {user ? (
+              <>
+                {/* Si el usuario está autenticado, mostrar el stack de la aplicación */}
+                <Stack.Screen
+                  name="Home"
+                  component={Home}
+                  options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                  name="EditProfile"
+                  component={EditProfile}
+                  options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                  name="Configuracion"
+                  component={Configuracion}
+                  options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                  name="AdminCuenta"
+                  component={AdminCuenta}
+                  options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                  name="Acces"
+                  component={Acces}
+                  options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                  name="Ajustes"
+                  component={Ajustes}
+                  options={{ headerShown: false }}
+                />
+                {/* seguridad */}
+                <Stack.Screen
+                  name="Seguridad"
+                  component={Seguridad}
+                  options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                  name="AlertSeg"
+                  component={AlertSeg}
+                  options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                  name="BloSes"
+                  component={BloSes}
+                  options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                  name="Veri"
+                  component={Veri}
+                  options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                  name="BloqApp"
+                  component={BloqApp}
+                  options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                  name="DesbloqApp"
+                  component={DesbloqApp}
+                  options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                  name="EntriesHome"
+                  component={EntriesHome}
+                  options={{ headerShown: false }}
+                />
+                <Stack.Screen name="Temas" options={{ headerShown: false }}>
+                  {() => <Temas setBackgroundImage={setBackgroundImage} />}
+                </Stack.Screen>
+                <Stack.Screen
+                  name="AdminTest"
+                  component={AdminTest}
+                  options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                  name="AgregarTest"
+                  component={AgregarTest}
+                  options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                  name="ModificarTest"
+                  component={ModificarTest}
+                  options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                  name="EliminarTest"
+                  component={EliminarTest}
+                  options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                  name="AdminBene"
+                  component={AdminBene}
+                  options={{ headerShown: false }}
+                />
+              </>
+            ) : (
+              <>
+                {/* Si el usuario no está autenticado, mostrar el stack de autenticación */}
+                <Stack.Screen
+                  name="Login"
+                  component={Login}
+                  options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                  name="Registro"
+                  component={Registro}
+                  options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                  name="RequestPasswordReset"
+                  component={RequestPasswordReset}
+                  options={{ headerShown: false }}
+                />
+              </>
+            )}
+          </Stack.Navigator>
+        </BloqueoProvider>          
+      </NavigationContainer>
+    </ImageBackground>
   );
 }
 

@@ -1,38 +1,24 @@
-import React, { createContext, useState, useRef, useEffect } from 'react';
+import React, { createContext, useState } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigation } from '@react-navigation/native';
 
 export const BloqueoContext = createContext();
 
 export const BloqueoProvider = ({ children }) => {
   const [bloqueoActivado, setBloqueoActivado] = useState(false);
-  const [tiempoBloqueo, setTiempoBloqueo] = useState(15); // Tiempo por defecto en segundos
-  const [temporizadorActivo, setTemporizadorActivo] = useState(false);
-  const intervalIdRef = useRef(null);
+  const navigation = useNavigation();
 
+  // Iniciar el temporizador para el cierre de sesión o bloqueo de la app
   const iniciarTemporizador = (cerrarSesion) => {
-    if (bloqueoActivado && !temporizadorActivo) {
-      let tiempoRestante = tiempoBloqueo;
-
-      setTemporizadorActivo(true);
-      intervalIdRef.current = setInterval(() => {
-        tiempoRestante -= 1;
-
-        // Agregar console.log para mostrar el tiempo restante
-        console.log(`Tiempo restante: ${tiempoRestante} segundos`);
-
-        if (tiempoRestante <= 0) {
-          detenerTemporizador();
-          console.log("Sesión cerrada por inactividad.");
-          cerrarSesion(); // Aquí se invoca la función de cerrar sesión desde fuera del contexto
-        }
-      }, 1000);
-    }
+    // Lógica para iniciar el temporizador que llame a cerrarSesion
   };
 
-  const detenerTemporizador = () => {
-    if (intervalIdRef.current) {
-      clearInterval(intervalIdRef.current);
-      intervalIdRef.current = null;
-      setTemporizadorActivo(false);
+  // Función para verificar si la app está bloqueada al reingresar
+  const desbloquearApp = async () => {
+    const blockEnabled = await AsyncStorage.getItem('blockEnabled');
+    if (blockEnabled === 'true') {
+      // Redirigir a la pantalla de desbloqueo si el bloqueo está activado
+      navigation.navigate('DesbloqApp');
     }
   };
 
@@ -41,10 +27,8 @@ export const BloqueoProvider = ({ children }) => {
       value={{
         bloqueoActivado,
         setBloqueoActivado,
-        tiempoBloqueo,
-        setTiempoBloqueo,
         iniciarTemporizador,
-        detenerTemporizador,
+        desbloquearApp,
       }}
     >
       {children}

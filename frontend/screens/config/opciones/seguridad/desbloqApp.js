@@ -1,47 +1,39 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import BackgroundWrapper from '../../../../components/background'; // Fondo personalizado
 
-const DesbloqApp = ({ navigation }) => {
-  const [inputPin, setInputPin] = useState(''); // Para el PIN que el usuario ingresa al desbloquear
+const DesbloqApp = ({ setIsLocked }) => {
+  const [pin, setPin] = useState('');
 
-  // Función para verificar el PIN/Contraseña almacenado en AsyncStorage
-  const unlockApp = async () => {
+  const desbloquearApp = async () => {
     try {
       const savedPin = await AsyncStorage.getItem('userPin');
-      const blockEnabled = await AsyncStorage.getItem('blockEnabled');
-
-      if (blockEnabled === 'true' && savedPin === inputPin) {
-        Alert.alert('Desbloqueado', 'Has desbloqueado la aplicación.');
-        navigation.reset({
-          index: 0,
-          routes: [{ name: 'Home' }], // Redirigir a Home
-        });
+      if (pin === savedPin) {
+        setIsLocked(false); // Desbloquear la app
       } else {
-        Alert.alert('Error', 'El PIN/Contraseña es incorrecto o el bloqueo está deshabilitado.');
+        Alert.alert('Error', 'El PIN ingresado es incorrecto.');
       }
     } catch (error) {
-      console.error('Error verificando el PIN:', error);
+      Alert.alert('Error', 'Hubo un problema al desbloquear la app.');
     }
   };
 
   return (
-    <BackgroundWrapper>
-      <View style={styles.container}>
-        <Text style={styles.title}>Desbloquear Aplicación</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Ingresa tu PIN o Contraseña"
-          value={inputPin}
-          onChangeText={setInputPin}
-          secureTextEntry={true}
-        />
-        <TouchableOpacity style={styles.button} onPress={unlockApp}>
-          <Text style={styles.buttonText}>Desbloquear</Text>
-        </TouchableOpacity>
-      </View>
-    </BackgroundWrapper>
+    <View style={styles.container}>
+      <Text style={styles.title}>Desbloquear App</Text>
+
+      <TextInput
+        style={styles.input}
+        placeholder="Ingresa el PIN"
+        value={pin}
+        onChangeText={setPin}
+        secureTextEntry
+      />
+
+      <TouchableOpacity style={styles.button} onPress={desbloquearApp}>
+        <Text style={styles.buttonText}>Desbloquear</Text>
+      </TouchableOpacity>
+    </View>
   );
 };
 
@@ -49,31 +41,27 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center',
     padding: 20,
   },
   title: {
     fontSize: 24,
+    fontWeight: 'bold',
     marginBottom: 20,
-    color: 'white',
   },
   input: {
-    width: '100%',
+    borderWidth: 1,
     padding: 10,
-    marginVertical: 10,
-    backgroundColor: 'white',
-    borderRadius: 10,
+    borderRadius: 5,
+    marginBottom: 20,
   },
   button: {
-    backgroundColor: '#3B873E',
+    backgroundColor: '#4CAF50',
     padding: 15,
-    borderRadius: 10,
-    width: '100%',
+    borderRadius: 5,
     alignItems: 'center',
   },
   buttonText: {
-    color: 'white',
-    fontSize: 18,
+    color: '#fff',
     fontWeight: 'bold',
   },
 });
