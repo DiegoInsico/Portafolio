@@ -1,37 +1,33 @@
-import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
-import { Alert } from 'react-native';
-import { signOut } from '../utils/firebase';
-import { auth } from './utils/firebase'; // Asegúrate de que la ruta sea correcta
-import { useNavigation } from '@react-navigation/native';
+import React, { createContext, useState, useRef, useEffect } from 'react';
 
-const BloqueoContext = createContext();
-
-export const useBloqueo = () => useContext(BloqueoContext);
+export const BloqueoContext = createContext();
 
 export const BloqueoProvider = ({ children }) => {
   const [bloqueoActivado, setBloqueoActivado] = useState(false);
-  const [tiempoBloqueo, setTiempoBloqueo] = useState('30s'); // Valor predeterminado
+  const [tiempoBloqueo, setTiempoBloqueo] = useState(15); // Tiempo por defecto en segundos
   const [temporizadorActivo, setTemporizadorActivo] = useState(false);
   const intervalIdRef = useRef(null);
-  const navigation = useNavigation();
 
-  // Función para iniciar el temporizador global
-  const iniciarTemporizador = () => {
+  const iniciarTemporizador = (cerrarSesion) => {
     if (bloqueoActivado && !temporizadorActivo) {
-      let tiempoRestante = convertirTiempo(tiempoBloqueo); // Convertir el tiempo a segundos
-      setTemporizadorActivo(true);
+      let tiempoRestante = tiempoBloqueo;
 
+      setTemporizadorActivo(true);
       intervalIdRef.current = setInterval(() => {
         tiempoRestante -= 1;
+
+        // Agregar console.log para mostrar el tiempo restante
+        console.log(`Tiempo restante: ${tiempoRestante} segundos`);
+
         if (tiempoRestante <= 0) {
           detenerTemporizador();
-          cerrarSesion(); // Cerrar sesión cuando el tiempo se agote
+          console.log("Sesión cerrada por inactividad.");
+          cerrarSesion(); // Aquí se invoca la función de cerrar sesión desde fuera del contexto
         }
       }, 1000);
     }
   };
 
-  // Función para detener el temporizador global
   const detenerTemporizador = () => {
     if (intervalIdRef.current) {
       clearInterval(intervalIdRef.current);
@@ -39,47 +35,6 @@ export const BloqueoProvider = ({ children }) => {
       setTemporizadorActivo(false);
     }
   };
-
-  // Función para cerrar sesión y redirigir al usuario
-  const cerrarSesion = async () => {
-    try {
-      await signOut(auth);
-      Alert.alert(
-        'Sesión Cerrada',
-        'La sesión ha sido cerrada automáticamente por inactividad.',
-        [
-          {
-            text: 'OK',
-            onPress: () => navigation.reset({ index: 0, routes: [{ name: 'Login' }] }),
-          },
-        ]
-      );
-    } catch (error) {
-      Alert.alert('Error', 'No se pudo cerrar la sesión.');
-      console.error(error);
-    }
-  };
-
-  // Convertir el tiempo seleccionado en segundos
-  const convertirTiempo = (tiempo) => {
-    switch (tiempo) {
-      case '15s':
-        return 15;
-      case '30s':
-        return 30;
-      case '1m':
-        return 60;
-      case '5m':
-        return 5 * 60;
-      default:
-        return 30;
-    }
-  };
-
-  // Detener temporizador al salir del componente
-  useEffect(() => {
-    return () => detenerTemporizador();
-  }, []);
 
   return (
     <BloqueoContext.Provider
