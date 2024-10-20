@@ -157,6 +157,7 @@ const Home = ({ navigation }) => {
   }
 
   const onRefresh = () => {
+
     setRefreshing(true);
     fetchEntries();
     fetchQuestion(userId); // Volver a obtener la pregunta al refrescar
