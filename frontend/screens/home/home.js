@@ -13,7 +13,6 @@ import {
   RefreshControl,
 } from "react-native";
 import axios from "axios";
-import { Video } from "expo-av";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import {
   collection,
@@ -24,22 +23,30 @@ import {
 } from "firebase/firestore";
 import { db } from "../../utils/firebase";
 import { LinearGradient } from "expo-linear-gradient";
+import { FontAwesome } from "@expo/vector-icons";
+import ModalEntry from "../entrys/modalEntry";
 
 const { width: viewportWidth } = Dimensions.get("window");
 
 const Home = ({ navigation }) => {
-  // FUNCIONALIDADES
   const [question, setQuestion] = useState("");
   const [loading, setLoading] = useState(true);
   const [userId, setUserId] = useState(null);
   const [entries, setEntries] = useState([]);
-  const [refreshing, setRefreshing] = useState(false); // Estado para el refresh
-
-  // CONST DE ANIMACIONES
-  const scrollX = useRef(new Animated.Value(0)).current; // Animación del desplazamiento
+  const [refreshing, setRefreshing] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(0.5)).current;
+
+  //Abrir y cerrar el Modal
+  const handleOpenModal = () => {
+    setModalVisible(true);
+  };
+
+  const handleCloseModal = () => {
+    setModalVisible(false);
+  };
 
   // Animaciones
   useEffect(() => {
@@ -63,22 +70,42 @@ const Home = ({ navigation }) => {
     const auth = getAuth();
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
-        // Usuario autenticado
         setUserId(user.uid);
         setLoading(false);
       } else {
-        // No hay un usuario autenticado
         Alert.alert(
           "Sesión no iniciada",
           "Por favor inicia sesión para continuar."
         );
-        navigation.navigate("Login"); // Navegar a la página de inicio de sesión si no está autenticado
+        navigation.navigate("Login");
       }
     });
 
-    // Limpiar el listener al desmontar el componente
     return () => unsubscribe();
   }, [navigation]);
+
+  // Función para obtener la pregunta de la IA
+  const fetchQuestion = async (userId) => {
+    try {
+      const response = await axios.get(
+        `http://192.168.1.12:3000/api/question?userId=${userId}`
+      );
+      setQuestion(response.data.question);
+    } catch (error) {
+      console.error("Error al obtener la pregunta:", error);
+      Alert.alert(
+        "Error",
+        "Ocurrió un error al obtener la pregunta de reflexión."
+      );
+    }
+  };
+
+  useEffect(() => {
+    if (userId) {
+      fetchEntries();
+      fetchQuestion(userId); // Llamada a la IA para obtener la pregunta
+    }
+  }, [userId]);
 
   const fetchEntries = () => {
     if (!userId) return;
@@ -120,12 +147,6 @@ const Home = ({ navigation }) => {
     return () => unsubscribe();
   };
 
-  useEffect(() => {
-    if (userId) {
-      fetchEntries();
-    }
-  }, [userId]);
-
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
@@ -136,96 +157,29 @@ const Home = ({ navigation }) => {
   }
 
   const onRefresh = () => {
-    setRefreshing(true); // Inicia el estado de refresh
-    fetchEntries(); // Llama a la función que refresca las entradas
-    setRefreshing(false); // Termina el estado de refresh
-  };
 
-  const renderEntryItem = ({ item, index }) => {
-    // Rango de entrada para la interpolación de escala y opacidad
-    const inputRange = [
-      (index - 1) * viewportWidth * 0.8,
-      index * viewportWidth * 0.8,
-      (index + 1) * viewportWidth * 0.8,
-    ];
-
-    const scale = scrollX.interpolate({
-      inputRange,
-      outputRange: [0.8, 1, 0.8],
-      extrapolate: "clamp",
-    });
-
-    const opacity = scrollX.interpolate({
-      inputRange,
-      outputRange: [0.7, 1, 0.7],
-      extrapolate: "clamp",
-    });
-
-    return (
-      <Animated.View
-        style={[styles.entryContainer, { transform: [{ scale }], opacity }]}
-      >
-        {item.media && item.isVideo ? (
-          <Video
-            source={{ uri: item.media }}
-            style={styles.media}
-            useNativeControls
-            resizeMode="contain"
-            isLooping
-          />
-        ) : item.media ? (
-          <Image
-            source={{ uri: item.media }}
-            style={styles.media}
-            resizeMode="cover"
-          />
-        ) : null}
-
-        {item.text && (
-          <View style={styles.textContainer}>
-            <Text style={styles.entryText}>{item.text}</Text>
-          </View>
-        )}
-
-        {item.createdAt && (
-          <Text style={styles.createdAt}>{item.createdAt}</Text>
-        )}
-      </Animated.View>
-    );
-  };
-
-  const animateQuestion = () => {
-    Animated.timing(fadeAnim, {
-      toValue: 1,
-      duration: 1000,
-      easing: Easing.bounce,
-      useNativeDriver: true,
-    }).start();
-  };
-
-  const fetchQuestion = () => {
-    if (!userId) {
-      console.error("No userId available");
-      return;
-    }
-
-    setLoading(true);
-    axios
-      .get("http://192.168.100.43:3000/api/question", { params: { userId: userId } })
-      .then((response) => {
-        setQuestion(response.data.question);
-        setLoading(false);
-        animateQuestion();
-      })
-      .catch((error) => {
-        console.error("Error fetching the question: ", error);
-        setLoading(false);
-      });
+    setRefreshing(true);
+    fetchEntries();
+    fetchQuestion(userId); // Volver a obtener la pregunta al refrescar
+    setRefreshing(false);
   };
 
   return (
     <LinearGradient
-      colors={["#1C1C1C", "#1C1C1C"]}
+      colors={[
+        "#2C3E50",
+        "#4B4E6D",
+        "#C2A66B",
+        "#D1B17D",
+        "#E6C47F",
+        "#F0E4C2",
+        "#F0E4C2",
+        "#E6C47F",
+        "#D1B17D",
+        "#C2A66B",
+        "#4B4E6D",
+        "#2C3E50",
+      ]}
       start={{ x: 0, y: 0 }}
       end={{ x: 0, y: 1 }}
       style={styles.background}
@@ -237,44 +191,51 @@ const Home = ({ navigation }) => {
           <Text style={styles.welcomeText}>¡Bienvenido!</Text>
         </Animated.View>
 
-        {loading ? (
-          <ActivityIndicator size="large" color="#4B4E6D" />
-        ) : (
-          <Animated.View
-            style={[styles.questionContainer, { opacity: fadeAnim }]}
+        {/* Mostrar la pregunta de reflexión */}
+        {question ? (
+          <View style={styles.questionContainer}>
+            <Text style={styles.questionText}>{question}</Text>
+          </View>
+        ) : null}
+
+        {/* Contenedor de los botones */}
+        <View style={styles.containerBoton}>
+          {/* Botón circular "Nueva Entrada" */}
+          <TouchableOpacity
+            style={styles.roundButton}
+            onPress={handleOpenModal}
           >
-            <Text style={styles.questionText}>
-              {question || "No se pudo cargar la pregunta"}
-            </Text>
-          </Animated.View>
-        )}
+            <FontAwesome name="plus" size={32} color="#FFF" />
+            <Text style={styles.roundButtonText}>Nueva Entrada</Text>
+          </TouchableOpacity>
+          {/* ModalEntry */}
+          <ModalEntry visible={modalVisible} onClose={handleCloseModal} />
 
-        <TouchableOpacity onPress={fetchQuestion} style={styles.button}>
-          <Text style={styles.buttonText}>
-            Presioname para generar otra pregunta
-          </Text>
-        </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.baulButton}
+            onPress={() => navigation.navigate("Baul")} // Aquí redirige a la pantalla 'Baul'
+          >
+            <FontAwesome name="archive" size={24} color="#FFF" />
+            <Text style={styles.baulText}>Baúl</Text>
+          </TouchableOpacity>
 
-        <Text style={styles.carouselTitle}>Tus Entradas Recientes</Text>
+          {/* Contenedor de los botones pequeños (Configuración y Perfil) */}
+          <View style={styles.smallButtonsContainer}>
+            <TouchableOpacity
+              style={styles.smallButton}
+              onPress={() => alert("Perfil")}
+            >
+              <FontAwesome name="user" size={24} color="#FFF" />
+            </TouchableOpacity>
 
-        <Animated.FlatList
-          data={entries}
-          renderItem={renderEntryItem}
-          keyExtractor={(item) => item.id}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.carouselContainer}
-          snapToInterval={viewportWidth * 0.8} // Hace que los items "encajen" en el centro
-          decelerationRate="fast"
-          onScroll={Animated.event(
-            [{ nativeEvent: { contentOffset: { x: scrollX } } }],
-            { useNativeDriver: true }
-          )}
-          scrollEventThrottle={16}
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-          }
-        />
+            <TouchableOpacity
+              style={styles.smallButton}
+              onPress={() => alert("Configuración")}
+            >
+              <FontAwesome name="cog" size={24} color="#FFF" />
+            </TouchableOpacity>
+          </View>
+        </View>
 
         <View style={styles.navbarSpacing} />
       </View>
@@ -294,47 +255,100 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   welcomeText: {
-    fontSize: 18,
+    fontSize: 24,
     fontWeight: "bold",
-    marginBottom: 10,
-    color: "#000000",
+    color: "#fff",
     textAlign: "center",
-    backgroundColor: "#FFD700",
     width: 200,
     padding: 7,
     borderRadius: 10,
+  },
+  // Estilo del contenedor de botones
+  containerBoton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-around",
+    width: "100%",
+    paddingHorizontal: 20,
+  },
+  roundButton: {
+    width: "45%",
+    height: 100,
+    borderRadius: 15,
+    backgroundColor: "#FF6F61",
+    alignItems: "center",
+    justifyContent: "center",
+    elevation: 8,
+    shadowColor: "#000",
+    shadowOffset: { width: 2, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+  },
+  roundButtonText: {
+    fontSize: 12,
+    color: "#FFF",
+    textAlign: "center",
+  },
+  baulButton: {
+    width: "30%",
+    height: 100,
+    backgroundColor: "#007ACC",
+    borderRadius: 15,
+    alignItems: "center",
+    justifyContent: "center",
+    elevation: 8,
+    shadowColor: "#000",
+    shadowOffset: { width: 2, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    marginLeft: 10,
+  },
+  baulText: {
+    color: "#FFF",
+    fontSize: 12,
+    fontWeight: "bold",
+  },
+  smallButtonsContainer: {
+    flexDirection: "column",
+    justifyContent: "space-between",
+    alignItems: "center",
+    height: 120, // Ajuste para el espacio entre los botones
+    marginTop: 12,
+    margin: 5,
+  },
+  smallButton: {
+    width: 50,
+    height: 50,
+    backgroundColor: "#28A745",
+    borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
+    elevation: 8,
+    shadowColor: "#000",
+    shadowOffset: { width: 2, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    marginBottom: 10,
+    marginLeft: 10,
+  },
+  // Question con IA
+  questionContainer: {
+    backgroundColor: "#fff",
+    padding: 10,
+    borderRadius: 10,
+    marginVertical: 5,
     shadowColor: "#000",
     shadowOffset: { width: 2, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
   },
-  questionContainer: {
-    backgroundColor: "#fff",
-    padding: 20,
-    borderRadius: 10,
-    elevation: 5,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-  },
   questionText: {
     fontSize: 18,
-    color: "#000000",
+    color: "#000",
     textAlign: "center",
   },
-  button: {
-    display: "flex",
-    borderRadius: 5,
-    marginBottom: 20,
-    alignItems: "center",
-  },
-  buttonText: {
-    fontSize: 16,
-    color: "#fff",
-    textAlign: "center",
-  },
+  // Carrusel
   carouselTitle: {
     fontSize: 18,
     fontWeight: "bold",
@@ -349,8 +363,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     borderRadius: 10,
     padding: 10,
-    marginRight: 1,
-    margin: 2,
+    margin: 5,
     width: viewportWidth * 0.8,
     elevation: 3,
     shadowColor: "#000",

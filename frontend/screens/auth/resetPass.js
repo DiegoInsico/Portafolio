@@ -57,32 +57,29 @@ export default function RequestPasswordReset({ navigation }) {
   return (
     <LinearGradient
       colors={[
-        "#D4AF37", // Dorado suave
-        "#E6C47F", // Melocotón suave/dorado claro
+        "#2C3E50", // Negro grisáceo oscuro en la parte superior
+        "#4B4E6D", // Azul grisáceo oscuro
         "#C2A66B", // Dorado oscuro más neutro
-        "#4B4E6D", // Azul grisáceo oscuro para las sombras
+        "#D1B17D", // Dorado intermedio
+        "#E6C47F", // Melocotón suave/dorado claro
+        "#F0E4C2", // Tono crema (suave luz)
+        "#F0E4C2", // Tono crema (suave luz) en el centro
+        "#E6C47F", // Melocotón suave/dorado claro
+        "#D1B17D", // Dorado intermedio
+        "#C2A66B", // Dorado oscuro más neutro
+        "#4B4E6D", // Azul grisáceo oscuro
         "#2C3E50", // Negro grisáceo oscuro en la parte inferior
       ]}
       start={{ x: 0, y: 0 }}
       end={{ x: 0, y: 1 }}
       style={styles.background}
     >
-      <Image
-        source={require("../../assets/background/imagen-fondo.png")} // Reemplaza con la ruta de tu imagen
-        style={styles.image}
-        resizeMode="cover"
-      />
-
       <View style={styles.container}>
         <Image
           source={require("../../assets/background/florLogo.png")} // Reemplaza con la ruta de tu imagen
           style={styles.logo}
           resizeMode="cover"
         />
-        <Text style={styles.titleSoul}>Soul</Text>
-      </View>
-
-      <View>
         <Text style={styles.title}>Restablecer Contraseña</Text>
 
         <Formik
@@ -102,13 +99,13 @@ export default function RequestPasswordReset({ navigation }) {
             isValid,
             dirty,
           }) => (
-            <View style={styles.form}>
+            <View style={styles.formContainer}>
               {/* Correo Electrónico */}
               <View style={styles.inputContainer}>
                 <Ionicons
                   name="mail"
                   size={20}
-                  color="#666"
+                  color="#000000"
                   style={styles.iconStyle}
                 />
                 <TextInput
@@ -120,7 +117,6 @@ export default function RequestPasswordReset({ navigation }) {
                   value={values.correo}
                   keyboardType="email-address"
                   autoCapitalize="none"
-                  underlineColorAndroid="transparent" // Eliminar subrayado en Android
                 />
               </View>
               {touched.correo && errors.correo && (
@@ -129,10 +125,7 @@ export default function RequestPasswordReset({ navigation }) {
 
               {/* Botón para solicitar reseteo */}
               <TouchableOpacity
-                style={[
-                  styles.button,
-                  !(isValid && dirty) && styles.buttonDisabled,
-                ]}
+                style={[styles.button, !(isValid && dirty) && styles.buttonDisabled]}
                 onPress={handleSubmit}
                 disabled={!(isValid && dirty) || isSubmitting}
               >
@@ -142,35 +135,46 @@ export default function RequestPasswordReset({ navigation }) {
                   <Text style={styles.buttonText}>Enviar Solicitud</Text>
                 )}
               </TouchableOpacity>
-
-              {/* Enlace para volver al Login */}
-              <TouchableOpacity onPress={() => navigation.goBack()}>
-                <Text style={styles.linkText}>Volver a Iniciar Sesión</Text>
-              </TouchableOpacity>
             </View>
           )}
         </Formik>
+
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Text style={styles.footerLink}>Volver a Iniciar Sesión</Text>
+        </TouchableOpacity>
       </View>
     </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
+  formContainer: {
+    width: '100%',
+    padding: 20, // Espaciado interno
+    borderRadius: 10,
+    backgroundColor: '#4B4E6D',
+    shadowColor: "#000",
+    shadowOffset: { width: 5, height: 5 },
+    shadowOpacity: 0.4,
+    shadowRadius: 10,
+    elevation: 10, // Sombra para Android
+    marginBottom: 30,
+    alignItems: 'center',
+  },
   background: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   container: {
-    width: "100%",
-    justifyContent: "center",
-    alignItems: "center",
+    width: '100%', // Ajustamos el ancho del contenedor para que se centre
+    justifyContent: 'center',
+    alignItems: 'center',
     paddingHorizontal: 20,
   },
   logo: {
     width: 150, // Ajusta el ancho de la imagen
     height: 150, // Ajusta la altura de la imagen
-    position: "flex",
     marginTop: 50,
     shadowColor: "#000000", // Color de la sombra
     shadowOffset: { width: 5, height: 5 }, // Desplazamiento de la sombra (horizonte/vertical)
@@ -178,75 +182,63 @@ const styles = StyleSheet.create({
     shadowRadius: 0, // Radio de difuminado de la sombra (IOS)
     elevation: 0, // Elevación para sombra en Android
   },
-  image: {
-    width: "70%", // Ajusta el ancho de la imagen
-    height: 200, // Ajusta la altura de la imagen
-    position: "absolute", // Usa "absolute" para posicionar la imagen
-    right: 0, // Pega la imagen a la derecha
-    bottom: 0, // Pega la imagen al fondo
-    opacity: 0.8, // Ajusta la opacidad de la imagen
-  },
-  titleSoul: {
-    fontSize: 28,
-    fontWeight: "bold",
-    color: "#000000",
-    alignSelf: "center",
-  },
   title: {
     fontSize: 28,
-    fontWeight: "bold",
-    color: "#000000",
+    fontWeight: 'bold',
+    color: '#000000',
     marginBottom: 20,
-    alignSelf: "center",
-  },
-  form: {
-    width: "85%",
+    alignSelf: 'center',
   },
   inputContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    borderColor: "#ff9999", // Color del borde constante
-    borderWidth: 1, // Ancho del borde constante
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderColor: '#ff9999',
+    borderWidth: 1,
     borderRadius: 8,
-    paddingHorizontal: 10,
-    marginBottom: 10,
-    backgroundColor: "#f9f9f9",
-    width: '100%'
+    paddingHorizontal: 8,
+    marginBottom: 8,
+    width: '100%', // Los inputs cubren el 100% del contenedor del formulario
+    backgroundColor: '#f9f9f9',
   },
   iconStyle: {
     marginRight: 5,
   },
   input: {
-    flex: 1,
-    height: 50,
-    color: "#333",
-    // No agregar borderWidth aquí para evitar bordes adicionales
-  },
-  button: {
-    backgroundColor: "#ff9999",
-    paddingVertical: 15,
-    borderRadius: 8,
-    alignItems: "center",
-    marginTop: 10,
-  },
-  buttonDisabled: {
-    backgroundColor: "#ccc",
-  },
-  buttonText: {
-    color: "#000000",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-  linkText: {
-    color: "#fff",
-    marginTop: 20,
-    textAlign: "center",
-    fontSize: 14,
-    fontWeight: "bold",
+    height: 45,
+    width: '85%',
+    paddingHorizontal: 10,
+    backgroundColor: '#f9f9f9',
   },
   errorText: {
-    color: "red",
+    color: 'red',
     marginBottom: 5,
     marginLeft: 10,
+  },
+  button: {
+    backgroundColor: '#ff9999',
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 10,
+    width: '85%', // Ajusta el ancho del botón
+  },
+  buttonDisabled: {
+    backgroundColor: "#BFA500",
+    shadowColor: "#000000", // Color de la sombra
+    shadowOffset: { width: 5, height: 5 }, // Desplazamiento de la sombra (horizonte/vertical)
+    shadowOpacity: 0.4, // Opacidad de la sombra
+    shadowRadius: 10, // Radio de difuminado de la sombra (IOS)
+    elevation: 10, // Elevación para sombra en Android
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  footerLink: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 14,
+    marginTop: 6,
   },
 });
