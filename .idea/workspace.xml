@@ -5,12 +5,21 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="2137b152-a29a-4d26-8781-e8af1c953a9c" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend-arbol/src/utils/axiosInstance.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend-arbol/src/utils/axiosInstance.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/App.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/App.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/components/ParallaxScrollView.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/components/sideBar.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/components/sideBar.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/app.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/assets/background/florLogo.png" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/assets/background/florLogo.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/assets/background/navbar.png" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/assets/background/navbar.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/components/MainTabs.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/components/MainTabs.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/components/SplashScreen.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/components/SplashScreen.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/screens/auth/login.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/screens/auth/login.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/screens/auth/register.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/screens/auth/register.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/screens/auth/resetPass.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/screens/auth/resetPass.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/screens/home/home.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/screens/home/home.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/utils/firebase.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/utils/firebase.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

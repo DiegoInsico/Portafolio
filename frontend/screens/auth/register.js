@@ -57,7 +57,20 @@ export default function Registro({ navigation }) {
 
   return (
     <LinearGradient
-      colors={['#D4AF37', '#E6C47F', '#C2A66B', '#4B4E6D', '#2C3E50']}
+      colors={[
+        "#2C3E50", // Negro grisáceo oscuro en la parte superior
+        "#4B4E6D", // Azul grisáceo oscuro
+        "#C2A66B", // Dorado oscuro más neutro
+        "#D1B17D", // Dorado intermedio
+        "#E6C47F", // Melocotón suave/dorado claro
+        "#F0E4C2", // Tono crema (suave luz)
+        "#F0E4C2", // Tono crema (suave luz) en el centro
+        "#E6C47F", // Melocotón suave/dorado claro
+        "#D1B17D", // Dorado intermedio
+        "#C2A66B", // Dorado oscuro más neutro
+        "#4B4E6D", // Azul grisáceo oscuro
+        "#2C3E50", // Negro grisáceo oscuro en la parte inferior
+      ]}
       start={{ x: 0, y: 0 }}
       end={{ x: 0, y: 1 }}
       style={styles.background}
@@ -80,10 +93,10 @@ export default function Registro({ navigation }) {
           {({
             handleChange, handleBlur, handleSubmit, values, errors, touched, isValid, dirty,
           }) => (
-            <View style={styles.form}>
+            <View style={styles.formContainer}>
               {/* Nombre de Usuario */}
               <View style={styles.inputContainer}>
-                <Ionicons name="person" size={20} color="#666" style={styles.iconStyle} />
+                <Ionicons name="person" size={20} color="#000000" style={styles.iconStyle} />
                 <TextInput
                   style={styles.input}
                   placeholder="Nombre de Usuario"
@@ -100,7 +113,7 @@ export default function Registro({ navigation }) {
 
               {/* Correo Electrónico */}
               <View style={styles.inputContainer}>
-                <Ionicons name="mail" size={20} color="#666" style={styles.iconStyle} />
+                <Ionicons name="mail" size={20} color="#000000" style={styles.iconStyle} />
                 <TextInput
                   style={styles.input}
                   placeholder="Correo Electrónico"
@@ -118,7 +131,7 @@ export default function Registro({ navigation }) {
 
               {/* Contraseña */}
               <View style={styles.inputContainer}>
-                <Ionicons name="lock-closed" size={20} color="#666" style={styles.iconStyle} />
+                <Ionicons name="lock-closed" size={20} color="#000000" style={styles.iconStyle} />
                 <TextInput
                   style={styles.input}
                   placeholder="Contraseña"
@@ -133,7 +146,7 @@ export default function Registro({ navigation }) {
                   onPress={() => setShowPassword(!showPassword)}
                   style={styles.toggleButton}
                 >
-                  <Ionicons name={showPassword ? 'eye' : 'eye-off'} size={20} color="#666" />
+                  <Ionicons name={showPassword ? 'eye' : 'eye-off'} size={20} color="#000000" />
                 </TouchableOpacity>
               </View>
               {touched.contrasena && errors.contrasena && (
@@ -142,7 +155,7 @@ export default function Registro({ navigation }) {
 
               {/* Confirmar Contraseña */}
               <View style={styles.inputContainer}>
-                <Ionicons name="lock-open" size={20} color="#666" style={styles.iconStyle} />
+                <Ionicons name="lock-open" size={20} color="#000000" style={styles.iconStyle} />
                 <TextInput
                   style={styles.input}
                   placeholder="Confirmar Contraseña"
@@ -157,7 +170,7 @@ export default function Registro({ navigation }) {
                   onPress={() => setShowConfirmPassword(!showConfirmPassword)}
                   style={styles.toggleButton}
                 >
-                  <Ionicons name={showConfirmPassword ? 'eye' : 'eye-off'} size={20} color="#666" />
+                  <Ionicons name={showConfirmPassword ? 'eye' : 'eye-off'} size={20} color="#000000" />
                 </TouchableOpacity>
               </View>
               {touched.confirmarContrasena && errors.confirmarContrasena && (
@@ -189,6 +202,19 @@ export default function Registro({ navigation }) {
 }
 
 const styles = StyleSheet.create({
+  formContainer: {
+    width: '100%',
+    padding: 20, // Espaciado interno
+    borderRadius: 10,
+    backgroundColor: '#4B4E6D',
+    shadowColor: "#000",
+    shadowOffset: { width: 5, height: 5 },
+    shadowOpacity: 0.4,
+    shadowRadius: 10,
+    elevation: 10, // Sombra para Android
+    marginBottom: 30,
+    alignItems: 'center',
+  },
   background: {
     flex: 1,
     justifyContent: 'center',
@@ -266,7 +292,13 @@ const styles = StyleSheet.create({
     width: '85%', 
   },
   buttonDisabled: {
-    backgroundColor: '#ccc',
+    color: "#fff",
+    backgroundColor: "#BFA500",
+    shadowColor: "#000000", // Color de la sombra
+    shadowOffset: { width: 5, height: 5 }, // Desplazamiento de la sombra (horizonte/vertical)
+    shadowOpacity: 0.4, // Opacidad de la sombra
+    shadowRadius: 10, // Radio de difuminado de la sombra (IOS)
+    elevation: 10, // Elevación para sombra en Android
   },
   buttonText: {
     color: '#000000',
@@ -277,6 +309,6 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: 'bold',
     fontSize: 14,
-    marginTop: 20,
+    marginTop: 6,
   },
 });

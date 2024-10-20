@@ -1,10 +1,18 @@
 import React, { useRef, useEffect, useState } from "react";
-import { Image, View, Text, TouchableOpacity, TouchableWithoutFeedback, StyleSheet, Animated } from "react-native";
+import {
+  Image,
+  View,
+  Text,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  StyleSheet,
+  Animated,
+} from "react-native";
 import { signOut } from "firebase/auth";
 import { auth } from "../utils/firebase";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 
-export default function Sidebar({ isVisible, toggleSidebar }) {
+export default function Sidebar({ isVisible, toggleSidebar, navigateToBaul }) {
   const [selected, setSelected] = useState(""); // Estado para la opción seleccionada
   const slideAnim = useRef(new Animated.Value(250)).current;
 
@@ -21,6 +29,8 @@ export default function Sidebar({ isVisible, toggleSidebar }) {
         duration: 300,
         useNativeDriver: true,
       }).start();
+      // Restablece la selección cuando el sidebar se cierra
+      setSelected(""); 
     }
   }, [isVisible]);
 
@@ -40,7 +50,9 @@ export default function Sidebar({ isVisible, toggleSidebar }) {
       <TouchableWithoutFeedback onPress={toggleSidebar}>
         <View style={styles.overlay} />
       </TouchableWithoutFeedback>
-      <Animated.View style={[styles.sidebarContainer, { transform: [{ translateX: slideAnim }] }]}>
+      <Animated.View
+        style={[styles.sidebarContainer, { transform: [{ translateX: slideAnim }] }]}
+      >
         <View style={styles.sidebarContent}>
           <View style={styles.profileContainer}>
             <Image
@@ -56,10 +68,15 @@ export default function Sidebar({ isVisible, toggleSidebar }) {
             ]}
             onPress={() => {
               setSelected("Baul");
-              toggleSidebar();
+              navigateToBaul(); // Navegar hacia la pantalla Baul
+              toggleSidebar(); // Cierra el sidebar al navegar
             }}
           >
-            <FontAwesome name="archive" size={20} color={selected === "Baul" ? "#D4AF37" : "#000"} />
+            <FontAwesome
+              name="archive"
+              size={20}
+              color={selected === "Baul" ? "#D4AF37" : "#000"}
+            />
             <Text style={styles.drawerButtonText}> Baúl</Text>
           </TouchableOpacity>
           <TouchableOpacity
@@ -72,7 +89,11 @@ export default function Sidebar({ isVisible, toggleSidebar }) {
               toggleSidebar();
             }}
           >
-            <FontAwesome name="cog" size={20} color={selected === "Configuraciones" ? "#D4AF37" : "#000"} />
+            <FontAwesome
+              name="cog"
+              size={20}
+              color={selected === "Configuraciones" ? "#D4AF37" : "#000"}
+            />
             <Text style={styles.drawerButtonText}> Configuraciones</Text>
           </TouchableOpacity>
           <TouchableOpacity
@@ -85,8 +106,17 @@ export default function Sidebar({ isVisible, toggleSidebar }) {
               handleSignOut();
             }}
           >
-            <FontAwesome name="sign-out" size={20} color={selected === "Cerrar Sesión" ? "#d9534f" : "#000"} />
-            <Text style={[styles.drawerButtonText, { color: selected === "Cerrar Sesión" ? "#d9534f" : "#000" }]}>
+            <FontAwesome
+              name="sign-out"
+              size={20}
+              color={selected === "Cerrar Sesión" ? "#d9534f" : "#000"}
+            />
+            <Text
+              style={[
+                styles.drawerButtonText,
+                { color: selected === "Cerrar Sesión" ? "#d9534f" : "#000" },
+              ]}
+            >
               Cerrar Sesión
             </Text>
           </TouchableOpacity>
