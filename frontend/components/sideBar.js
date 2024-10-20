@@ -12,7 +12,7 @@ import { signOut } from "firebase/auth";
 import { auth } from "../utils/firebase";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 
-export default function Sidebar({ isVisible, toggleSidebar, navigateToBaul }) {
+export default function SideBar({ isVisible, toggleSideBar, navigateToBaul }) {
   const [selected, setSelected] = useState(""); // Estado para la opción seleccionada
   const slideAnim = useRef(new Animated.Value(250)).current;
 
@@ -39,7 +39,7 @@ export default function Sidebar({ isVisible, toggleSidebar, navigateToBaul }) {
   const handleSignOut = async () => {
     try {
       await signOut(auth);
-      toggleSidebar();
+      toggleSideBar();
     } catch (error) {
       console.error("Error al cerrar sesión:", error);
     }
@@ -47,7 +47,7 @@ export default function Sidebar({ isVisible, toggleSidebar, navigateToBaul }) {
 
   return (
     <View style={StyleSheet.absoluteFill}>
-      <TouchableWithoutFeedback onPress={toggleSidebar}>
+      <TouchableWithoutFeedback onPress={toggleSideBar}>
         <View style={styles.overlay} />
       </TouchableWithoutFeedback>
       <Animated.View
@@ -69,7 +69,7 @@ export default function Sidebar({ isVisible, toggleSidebar, navigateToBaul }) {
             onPress={() => {
               setSelected("Baul");
               navigateToBaul(); // Navegar hacia la pantalla Baul
-              toggleSidebar(); // Cierra el sidebar al navegar
+              toggleSideBar(); // Cierra el sidebar al navegar
             }}
           >
             <FontAwesome
@@ -86,7 +86,7 @@ export default function Sidebar({ isVisible, toggleSidebar, navigateToBaul }) {
             ]}
             onPress={() => {
               setSelected("Configuraciones");
-              toggleSidebar();
+              toggleSideBar();
             }}
           >
             <FontAwesome

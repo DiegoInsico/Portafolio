@@ -1,10 +1,10 @@
 import { initializeApp } from "firebase/app";
 import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
+import { getFirestore, collection, getDocs, query, where } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// Tu configuración de Firebase
+// Configuración de Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyBRI4q2P-BbqG43sJkApiF-ifVLQZlsxnU",
   authDomain: "soul2024-abe2f.firebaseapp.com",
@@ -17,20 +17,20 @@ const firebaseConfig = {
 // Inicializa Firebase
 const app = initializeApp(firebaseConfig);
 
-// Inicializa los servicios de Firebase que vas a usar
+// Inicializa los servicios de Firebase
 const auth = getAuth(app);
 const db = getFirestore(app);
 const storage = getStorage(app);
 
 // Función para iniciar sesión y guardar la sesión
-const signIn = async (email, password) => {
+export const signIn = async (email, password) => {
   try {
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
-    
+
     // Guardar el ID token del usuario en AsyncStorage
     await AsyncStorage.setItem('userToken', user.uid);
-    
+
     console.log('Usuario autenticado y token guardado');
   } catch (error) {
     console.error("Error al iniciar sesión:", error);
@@ -38,7 +38,7 @@ const signIn = async (email, password) => {
 };
 
 // Recuperar el estado de autenticación
-const checkAuthState = async () => {
+export const checkAuthState = async () => {
   try {
     const userToken = await AsyncStorage.getItem('userToken');
     if (userToken) {
@@ -66,4 +66,41 @@ onAuthStateChanged(auth, async (user) => {
   }
 });
 
-export { auth, db, storage, signIn, checkAuthState };
+// Función para obtener las entradas desde Firestore
+export const getEntries = async () => {
+  try {
+    const user = auth.currentUser;
+
+    // Verificar si el usuario está autenticado
+    if (!user) {
+      console.log("No user is logged in");
+      throw new Error("No user is logged in");
+    }
+
+    console.log("User ID:", user.uid);
+
+    // Obtener solo las entradas del usuario actual
+    const entriesCollection = collection(db, 'entradas');
+    const q = query(entriesCollection, where("userId", "==", user.uid));
+    const snapshot = await getDocs(q);
+
+    console.log("Fetched entries count:", snapshot.size);
+
+    return snapshot.docs.map(doc => {
+      const data = doc.data();
+      // Convertir los campos de fecha a un formato legible si es necesario
+      if (data.fechaCreacion && data.fechaCreacion.toDate) {
+        data.fechaCreacion = data.fechaCreacion.toDate().toLocaleString();
+      }
+      if (data.fechaRecuerdo && data.fechaRecuerdo.toDate) {
+        data.fechaRecuerdo = data.fechaRecuerdo.toDate().toLocaleString();
+      }
+      return { id: doc.id, ...data };
+    });
+  } catch (error) {
+    console.error("Error fetching entries:", error);
+    throw error;
+  }
+};
+
+export { auth, db, storage };

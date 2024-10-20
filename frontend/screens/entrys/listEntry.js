@@ -1,34 +1,61 @@
-// src/screens/listEntry.js
 
-import React from 'react';
-import { FlatList, StyleSheet } from 'react-native';
-import PropTypes from 'prop-types';
-import EntryItem from './entryItem'; // Asegúrate de que el archivo de EntryItem esté correctamente importado
+import React, { useEffect, useState } from 'react';
+import { ScrollView, Text } from 'react-native';
+import PolaroidCard from './entryPolaroid';
+import { getEntries } from '../../utils/firebase';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
 
-const EntryListScreen = ({ entradas, onSelectEntry }) => {
-  const renderItem = ({ item }) => (
-    <EntryItem item={item} onPress={() => onSelectEntry(item)} /> // Pasa la entrada seleccionada
-  );
+const ListEntry = () => {
+  const [entries, setEntries] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    const auth = getAuth();
+    const unsubscribe = onAuthStateChanged(auth, user => {
+      if (user) {
+        setIsAuthenticated(true);
+        fetchEntries();
+      } else {
+        setIsAuthenticated(false);
+        setEntries([]);
+      }
+      setIsLoading(false);
+    });
+
+    return unsubscribe;
+  }, []);
+
+  const fetchEntries = async () => {
+    try {
+      const fetchedEntries = await getEntries();
+      setEntries(fetchedEntries);
+    } catch (error) {
+      console.error("Error fetching entries:", error);
+    }
+  };
+
+  if (isLoading) {
+    return <Text>Cargando...</Text>;
+  }
+
+  if (!isAuthenticated) {
+    return <Text>Por favor, inicia sesión para ver tus entradas.</Text>;
+  }
 
   return (
-    <FlatList
-      data={entradas}
-      keyExtractor={(item) => item.id}
-      renderItem={renderItem}
-      contentContainerStyle={styles.listContainer}
-    />
+    <ScrollView>
+      {entries.length === 0 ? (
+        <Text style={{ textAlign: 'center' }}>No hay entradas disponibles</Text>
+      ) : (
+        entries
+          .filter(entry => entry !== undefined) // Filtrar entradas que no sean undefined
+          .map(entry => (
+            <PolaroidCard key={entry.id} entry={entry} />
+          ))
+      )}
+    </ScrollView>
   );
 };
 
-EntryListScreen.propTypes = {
-  entradas: PropTypes.array.isRequired, // Cambié "entries" a "entradas"
-  onSelectEntry: PropTypes.func.isRequired, // Añade este prop para manejar la selección de la entrada
-};
-
-const styles = StyleSheet.create({
-  listContainer: {
-    paddingHorizontal: 16,
-  },
-});
-
-export default EntryListScreen;
+export default ListEntry;

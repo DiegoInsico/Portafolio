@@ -11,7 +11,9 @@ import { onAuthStateChanged } from "firebase/auth";
 // Importar componentes
 import SplashScreen from "./components/SplashScreen";
 import MainTabs from "./components/MainTabs";
+
 import SideBar from "./components/sideBar"; // Importar el componente Sidebar
+
 
 // Importar pantallas
 import Login from "./screens/auth/login";

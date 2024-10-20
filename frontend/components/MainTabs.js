@@ -4,11 +4,13 @@ import { View, StyleSheet } from "react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createStackNavigator } from "@react-navigation/stack";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
+
 import Sidebar from "../components/sideBar"; // Importar el componente Sidebar
+
 
 // Importar pantallas
 import Home from "../screens/home/home";
-import EntriesHome from "../screens/entrys/entriesHome";
+import ListEntry from "../screens/entrys/listEntry";
 import Baul from "../screens/chest/baul";
 
 const Tab = createBottomTabNavigator();
@@ -41,7 +43,7 @@ function MainTabs({ navigation }) {
 
             if (route.name === 'Home') {
               iconName = 'home';
-            } else if (route.name === 'EntriesHome') {
+            } else if (route.name === 'ListEntry') {
               iconName = 'tasks';
             } else if (route.name === 'SideBarButton') {
               iconName = 'bars';
@@ -68,8 +70,8 @@ function MainTabs({ navigation }) {
       >
         <Tab.Screen name="Home" component={Home} />
         <Tab.Screen
-          name="EntriesHome"
-          component={EntriesHome}
+          name="ListEntry"
+          component={ListEntry}
           options={{
             title: 'Tus Entradas',
             headerStyle: {
