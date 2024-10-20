@@ -1,147 +1,186 @@
-// src/components/EntryItem.js
-import React from "react";
-import { StyleSheet, View, Image, Text } from "react-native";
-import { Video, ResizeMode } from "expo-av";
+import React, { useState } from "react";
+import { View, Text, TouchableOpacity, Modal, TextInput, Button, Alert, StyleSheet, Switch } from "react-native";
+import { updateDoc, doc } from "firebase/firestore";
+import { db } from "../../utils/firebase";
 
 const EntryItem = ({ item }) => {
-  const isTextOnly = !item.media;
+  const [modalVisible, setModalVisible] = useState(false);
+  const [addToBaul, setAddToBaul] = useState(false); // Estado para "Sí" o "No" del switch
+  const [nickname, setNickname] = useState('');
+
+  // Manejar la acción de agregar al baúl
+  const handleAddToBaul = async () => {
+    if (!nickname) {
+      Alert.alert('Error', 'Por favor, introduce un apodo para la entrada.');
+      return;
+    }
+
+    try {
+      // Actualizar el documento en Firestore para marcarlo como archivado
+      const entryRef = doc(db, 'entries', item.id);
+      await updateDoc(entryRef, { baul: true, nickname });
+
+      Alert.alert('Éxito', 'La entrada ha sido agregada al Baúl.');
+      // Restablecer los estados y cerrar el modal
+      setModalVisible(false);
+      setAddToBaul(false);
+      setNickname('');
+    } catch (error) {
+      console.error('Error al agregar al Baúl: ', error);
+      Alert.alert('Error', 'Ocurrió un error al agregar la entrada al Baúl.');
+    }
+  };
 
   return (
-    <View
-      style={[styles.boxContainer, { height: (item.heightRatio ?? 1) * 150 }]}
-    >
-      {/* **Entradas con Imagen/Vídeo: Mostrar Fecha en la Parte Superior Izquierda** */}
-      {item.media && item.createdAt && (
-        <Text style={styles.createdAtTextTopLeft}>{item.createdAt}</Text>
-      )}
+    <View style={styles.entryContainer}>
+      {/* Entrada que al presionar abre el modal */}
+      <TouchableOpacity onPress={() => setModalVisible(true)}>
+        <Text style={styles.entryMessage}>{item.message}</Text>
+        <Text style={styles.entryDate}>{new Date(item.createdAt.seconds * 1000).toLocaleDateString()}</Text>
+      </TouchableOpacity>
 
-      {/* **Entradas de Solo Texto: Mostrar Texto en la Parte Superior y Fecha en la Inferior** */}
-      {!item.media && (
-        <View style={styles.textOnlyContainer}>
-          <Text style={styles.textOnly}>{item.text}</Text>
-          {item.createdAt && (
-            <Text style={styles.createdAtText}>{`${item.createdAt}`}</Text>
-          )}
+      {/* Modal para mostrar detalles y opción de agregar al Baúl */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalBackground}>
+          <View style={styles.modalView}>
+            {/* Hora de creación */}
+            <Text style={styles.modalText}>
+              Hora de creación: {new Date(item.createdAt.seconds * 1000).toLocaleTimeString()}
+            </Text>
+
+            {/* Categoría de la entrada */}
+            {item.category && (
+              <View style={styles.detailContainer}>
+                <Text style={styles.modalTitle}>Detalles de la Entrada:</Text>
+                <Text style={styles.detailText}>{item.category}</Text>
+              </View>
+            )}
+
+            {/* Mensaje de la entrada */}
+            <View style={styles.messageContainer}>
+              <Text style={styles.modalTitle}>Mensaje:</Text>
+              <Text style={styles.messageText}>{item.message}</Text>
+            </View>
+
+            {/* Switch para "Agregar al Baúl" */}
+            <View style={styles.switchBaulContainer}>
+              <Text style={styles.modalText}>¿Guardar en el baúl?</Text>
+              <Switch
+                value={addToBaul}
+                onValueChange={setAddToBaul}
+                thumbColor={addToBaul ? '#4CAF50' : '#f4f3f4'}
+                trackColor={{ false: '#767577', true: '#81b0ff' }}
+              />
+            </View>
+
+            {/* Mostrar el campo de apodo solo si se selecciona "Sí" */}
+            {addToBaul && (
+              <View style={styles.nicknameContainer}>
+                <TextInput
+                  placeholder="Apodo para la entrada"
+                  value={nickname}
+                  onChangeText={setNickname}
+                  style={styles.input}
+                />
+                <Button title="Agregar al Baúl" onPress={handleAddToBaul} />
+              </View>
+            )}
+
+            {/* Botón para cancelar */}
+            <Button title="Cancelar" onPress={() => setModalVisible(false)} color="red" />
+          </View>
         </View>
-      )}
-
-      {/* **Mostrar la Media (Imagen/Vídeo)** */}
-      {item.media &&
-        (item.isVideo ? (
-          <Video
-            source={{ uri: item.media }}
-            style={[
-              styles.box,
-              item.widthRatio === 2
-                ? styles.landscapeMedia
-                : styles.portraitMedia,
-            ]}
-            useNativeControls
-            resizeMode={ResizeMode.CONTAIN}
-            isLooping
-          />
-        ) : (
-          <Image
-            source={{ uri: item.media }}
-            style={[
-              styles.box,
-              item.widthRatio === 2
-                ? styles.landscapeMedia
-                : styles.portraitMedia,
-            ]}
-            resizeMode="cover"
-          />
-        ))}
-
-      {/* **Overlay del Texto Solo si Hay Media** */}
-      {item.text && item.media && (
-        <View style={styles.overlayBottom}>
-          <Text style={styles.overlayText}>{item.text}</Text>
-        </View>
-      )}
+      </Modal>
     </View>
   );
 };
 
+// Estilos del componente
 const styles = StyleSheet.create({
-  boxContainer: {
-    flex: 1,
-    margin: 5,
-    borderRadius: 10,
-    overflow: "hidden",
-    borderWidth: 1,
-    borderColor: "#black",
-    backgroundColor: "#black", // Fondo blanco para mejor contraste
-    position: "relative", // Para posicionar los textos absolutos
+  entryContainer: {
+    padding: 10,
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    marginBottom: 10,
+    elevation: 2,
   },
-  box: {
-    width: "100%",
-    height: "100%",
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "transparent",
-  },
-  landscapeMedia: {
-    width: "100%",
-    height: "100%", // Altura fija para imágenes horizontales
-  },
-  portraitMedia: {
-    width: "100%",
-    height: "100%", // Altura mayor para imágenes verticales
-  },
-  textOnlyContainer: {
-    flex: 1,
-    flexDirection: "column", // Cambiar a columna para alinear verticalmente
-    justifyContent: "space-evenly", // Distribuir espacio entre texto y fecha
-    alignItems: "center",
-    paddingTop: 10,
-    paddingHorizontal: 5,
-    backgroundColor: "#C19A6B", // Fondo para cuando es solo texto
-    minHeight: 150, // Altura mínima para casos con poco texto
-    flexGrow: 1, // Permite que el contenedor crezca con el texto
-    flexShrink: 1, // Permite que el contenedor se reduzca si es necesario
-    width: "100%", // Ocupar el ancho total del contenedor
-  },
-  textOnly: {
+  entryMessage: {
     fontSize: 16,
-    color: "#fff",
-    textAlign: "center",
+    color: '#333',
   },
-  // **Estilo para la Fecha de Creación en Entradas con Media**
-  createdAtTextTopLeft: {
-    position: "absolute",
-    top: 10, // Parte superior
-    left: 10, // Izquierda
+  entryDate: {
     fontSize: 12,
-    color: "#fff", // Blanco para contraste
-    backgroundColor: "rgba(0, 0, 0, 0.5)", // Fondo semi-transparente para legibilidad
-    paddingHorizontal: 5,
-    paddingVertical: 2,
-    borderRadius: 5,
-    zIndex: 1, // Asegura que esté sobre el contenido
+    color: '#999',
   },
-  createdAtText: {
-    fontSize: 12,
-    color: "#fff",
-    textAlign: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.3)",
-    borderRadius: 5,
+  modalBackground: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.7)', // Fondo semitransparente
+  },
+  modalView: {
+    width: '90%',
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    padding: 20,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
+    elevation: 5, // Sombra en Android
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 15,
+    color: '#333',
+  },
+  modalText: {
+    fontSize: 16,
+    color: '#333',
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+  messageContainer: {
+    marginBottom: 15,
+  },
+  messageText: {
+    fontSize: 16,
+    color: '#333',
+  },
+  detailContainer: {
+    width: '100%',
+    paddingVertical: 5,
+  },
+  detailText: {
+    fontSize: 14,
+    color: '#666',
+  },
+  switchBaulContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginVertical: 20,
+    width: '100%',
+  },
+  nicknameContainer: {
+    width: '100%',
+    alignItems: 'center',
     marginBottom: 20,
   },
-  overlayBottom: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: "rgba(0, 0, 0, 0.4)",
-    paddingVertical: 10,
-    paddingHorizontal: 5,
-  },
-  overlayText: {
-    color: "#fff",
-    fontSize: 14,
-    fontWeight: "bold",
-    textAlign: "center",
+  input: {
+    width: '100%',
+    padding: 10,
+    backgroundColor: '#f0f0f0',
+    borderRadius: 8,
+    marginBottom: 20,
+    textAlign: 'center',
   },
 });
 
