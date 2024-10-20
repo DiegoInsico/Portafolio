@@ -22,6 +22,7 @@ import CustomSwitch from '../../components/SwitchButton';
 import AudioRecorder from '../../components/audioComponent';
 import { MaterialIcons, Entypo } from '@expo/vector-icons';
 import axios from 'axios';
+import { getAuth } from "firebase/auth";
 import { db, storage } from '../../utils/firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
@@ -153,6 +154,15 @@ const ModalEntry = ({ visible, onClose }) => {
     }
 
     try {
+      const auth = getAuth(); // Obtener la instancia de autenticación
+      const user = auth.currentUser; // Obtener el usuario autenticado
+
+      // Verificar si el usuario está autenticado
+      if (!user) {
+        Alert.alert('Error', 'No hay un usuario autenticado. Por favor, inicia sesión.');
+        return;
+      }
+
       let mediaURL = null;
       let audioURL = null;
       let cancionData = null;
@@ -185,15 +195,9 @@ const ModalEntry = ({ visible, onClose }) => {
         };
       }
 
-      // Logs de depuración antes de construir nuevaEntrada
-      console.log('Antes de construir nuevaEntrada:');
-      console.log('texto:', texto);
-      console.log('audioURL:', audioURL);
-      console.log('mediaURL:', mediaURL);
-      console.log('cancion:', cancionData);
-
       // Construir nuevaEntrada asegurando la exclusividad
       const nuevaEntrada = {
+        userId: user.uid, // Añadir el ID del usuario autenticado
         categoria,
         texto: null,
         audio: null,
@@ -221,9 +225,6 @@ const ModalEntry = ({ visible, onClose }) => {
         nuevaEntrada.texto = texto;
       }
 
-      // Logs de depuración después de construir nuevaEntrada
-      console.log('Nueva Entrada:', nuevaEntrada);
-
       // Guardar en Firestore
       const docRef = await addDoc(collection(db, 'entradas'), nuevaEntrada);
       console.log('Documento escrito con ID: ', docRef.id);
@@ -245,7 +246,7 @@ const ModalEntry = ({ visible, onClose }) => {
       Alert.alert('Error', 'Hubo un problema al guardar la entrada. Por favor, intenta de nuevo.');
     }
   };
-
+  
   const onChangeDate = (event, selectedDate) => {
     const currentDate = selectedDate || new Date();
     setShowDatePicker(false);
