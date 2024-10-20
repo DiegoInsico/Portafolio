@@ -4,7 +4,9 @@ import { View, StyleSheet } from "react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createStackNavigator } from "@react-navigation/stack";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
-import Sidebar from "./sideBar"; // Importar el componente Sidebar
+
+import Sidebar from "../components/sideBar"; // Importar el componente Sidebar
+
 
 // Importar pantallas
 import Home from "../screens/home/home";

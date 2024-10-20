@@ -17,6 +17,7 @@ import {
   onSnapshot,
   updateDoc,
   doc,
+  orderBy, // Importar orderBy correctamente
 } from "firebase/firestore";
 import { LinearGradient } from "expo-linear-gradient";
 
@@ -33,10 +34,10 @@ const Baul = ({ navigation }) => {
         navigation.navigate("Login");
       } else {
         const q = query(
-          collection(db, "entries"),
+          collection(db, "entradas"), // Actualiza a "entradas"
           where("userId", "==", user.uid),
           where("archived", "==", true),
-          orderBy("createdAt", "desc")
+          orderBy("createdAt", "desc") // Utilizar orderBy correctamente aquí
         );
 
         const unsubscribe = onSnapshot(
@@ -75,7 +76,7 @@ const Baul = ({ navigation }) => {
           text: "Restaurar",
           onPress: async () => {
             try {
-              const entryRef = doc(db, "entries", id);
+              const entryRef = doc(db, "entradas", id);
               await updateDoc(entryRef, { archived: false });
               Alert.alert("Éxito", "Entrada restaurada exitosamente.");
             } catch (error) {
@@ -122,7 +123,6 @@ const Baul = ({ navigation }) => {
           />
         )}
       </View>
-
     </LinearGradient>
   );
 };
