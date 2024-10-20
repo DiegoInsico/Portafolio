@@ -211,7 +211,7 @@ const Home = ({ navigation }) => {
 
     setLoading(true);
     axios
-      .get("http://192.168.1.12:3000/api/question", { params: { userId: userId } })
+      .get("http://192.168.100.43:3000/api/question", { params: { userId: userId } })
       .then((response) => {
         setQuestion(response.data.question);
         setLoading(false);

@@ -4,45 +4,46 @@ import {
   View,
   Text,
   TextInput,
-  TouchableOpacity,
+  Pressable,
   StyleSheet,
   Image,
   ScrollView,
   Platform,
   Alert,
   Switch,
-  Animated
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import RNPickerSelect from 'react-native-picker-select';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import ColorPicker from '../../components/ColorPicker';
 import { Audio } from 'expo-av';
 import { Video } from 'expo-av';
-import { FontAwesome, MaterialIcons, Entypo } from '@expo/vector-icons';
+import CustomSwitch from '../../components/SwitchButton';
+import AudioRecorder from '../../components/audioComponent';
+import { MaterialIcons, Entypo } from '@expo/vector-icons';
 import axios from 'axios';
+import { db, storage } from '../../utils/firebase';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import uuid from 'react-native-uuid';
 
 const ModalEntry = ({ visible, onClose }) => {
   const [categoria, setCategoria] = useState('');
-  const [descripcion, setDescripcion] = useState('');
   const [texto, setTexto] = useState('');
-  const [audioRecording, setAudioRecording] = useState(null);
-  const [isRecording, setIsRecording] = useState(false);
+  const [audioUri, setAudioUri] = useState(null);
   const [sound, setSound] = useState(null);
   const [media, setMedia] = useState(null);
   const [mediaType, setMediaType] = useState(null);
-  const [isBaul, setIsBaul] = useState(false);
   const [isAudioMode, setIsAudioMode] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [spotifyResults, setSpotifyResults] = useState([]);
   const [isSpotifyMode, setIsSpotifyMode] = useState(false);
-  const [audioDuration, setAudioDuration] = useState(0);
-  const [audioPosition, setAudioPosition] = useState(0);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const [selectedColor, setSelectedColor] = useState('#ffffff');
+  const [baul, setBaul] = useState(false); // Nuevo estado para "baul"
+  const [cancion, setCancion] = useState(null); // Estado para canción de Spotify
   const today = new Date();
-
-  const progressAnim = useState(new Animated.Value(0))[0];
 
   useEffect(() => {
     (async () => {
@@ -61,13 +62,15 @@ const ModalEntry = ({ visible, onClose }) => {
 
     return () => {
       if (sound) {
-        sound.unloadAsync();
-      }
-      if (audioRecording) {
-        audioRecording.stopAndUnloadAsync();
+        sound.unloadAsync().catch(error => console.log('Error descargando el sonido:', error));
       }
     };
-  }, []);
+  }, [sound]);
+
+  const manejarGrabacionCompleta = (audio) => {
+    setAudioUri(audio.uri);
+    // Aquí puedes manejar el URI del audio grabado, por ejemplo, enviarlo a un servidor
+  };
 
   const seleccionarMedia = async () => {
     try {
@@ -91,9 +94,19 @@ const ModalEntry = ({ visible, onClose }) => {
         if (type === 'image') {
           setMediaType('image');
           setMedia(selectedMedia);
+          // Al seleccionar una imagen, limpiamos Spotify y audio/texto si es necesario
+          setIsSpotifyMode(false);
+          setCancion(null); // Limpia cualquier canción seleccionada
+          setAudioUri(null);
+          setTexto('');
         } else if (type === 'video') {
           setMediaType('video');
           setMedia(selectedMedia);
+          // Al seleccionar un video, limpiamos Spotify y audio/texto si es necesario
+          setIsSpotifyMode(false);
+          setCancion(null); // Limpia cualquier canción seleccionada
+          setAudioUri(null);
+          setTexto('');
         } else {
           Alert.alert('Tipo de medio no soportado', 'Por favor, selecciona una imagen o un video.');
         }
@@ -109,10 +122,14 @@ const ModalEntry = ({ visible, onClose }) => {
     setMediaType(null);
   };
 
+  const eliminarCancion = () => {
+    setCancion(null);
+  };
+
   // Función para buscar canciones en Spotify usando Axios
   const buscarCancionesSpotify = async (query) => {
     try {
-      const response = await axios.get(`http://10.0.2.2:3000/spotify/search`, {
+      const response = await axios.get(`http://192.168.100.43:3000/spotify/search`, {
         params: {
           query: query,
         },
@@ -123,134 +140,110 @@ const ModalEntry = ({ visible, onClose }) => {
     }
   };
 
-  const iniciarGrabacion = async () => {
-    try {
-      if (audioRecording) {
-        await audioRecording.stopAndUnloadAsync();
-        setAudioRecording(null);
-      }
-
-      await Audio.setAudioModeAsync({
-        allowsRecordingIOS: true,
-        playsInSilentModeIOS: true,
-      });
-
-      const { recording } = await Audio.Recording.createAsync(
-        Audio.RECORDING_OPTIONS_PRESET_HIGH_QUALITY
-      );
-
-      setAudioRecording(recording);
-      setIsRecording(true);
-    } catch (error) {
-      console.log('Error al iniciar la grabación:', error);
-      Alert.alert('Error', 'No se pudo iniciar la grabación de audio.');
-    }
-  };
-
-  const detenerGrabacion = async () => {
-    try {
-      if (audioRecording) {
-        setIsRecording(false);
-        await audioRecording.stopAndUnloadAsync();
-        const uri = audioRecording.getURI();
-        setAudioRecording({ uri });
-      }
-    } catch (error) {
-      console.log('Error al detener la grabación:', error);
-      Alert.alert('Error', 'No se pudo detener la grabación de audio.');
-    }
-  };
-
-  const reproducirAudio = async () => {
-    try {
-      if (audioRecording && audioRecording.uri) {
-        const { sound } = await Audio.Sound.createAsync(
-          { uri: audioRecording.uri },
-          {
-            shouldPlay: true,
-            progressUpdateIntervalMillis: 100,
-            positionMillis: 0,
-            onPlaybackStatusUpdate: (status) => {
-              if (status.isLoaded) {
-                setAudioDuration(status.durationMillis);
-                setAudioPosition(status.positionMillis);
-                setIsPlaying(status.isPlaying);
-
-                // Actualizar barra de progreso
-                Animated.timing(progressAnim, {
-                  toValue: status.positionMillis / status.durationMillis,
-                  duration: 100,
-                  useNativeDriver: false,
-                }).start();
-              }
-
-              if (status.didJustFinish) {
-                setIsPlaying(false);
-              }
-            },
-          }
-        );
-
-        setSound(sound);
-        await sound.playAsync();
-      }
-    } catch (error) {
-      console.log('Error al reproducir audio:', error);
-      Alert.alert('Error', 'No se pudo reproducir el audio.');
-    }
-  };
-
-  const pausarAudio = async () => {
-    if (sound) {
-      await sound.pauseAsync();
-      setIsPlaying(false);
-    }
-  };
-
-  const eliminarAudio = () => {
-    setAudioRecording(null);
-    setIsPlaying(false);
-    setAudioDuration(0);
-    setAudioPosition(0);
-    if (sound) {
-      sound.unloadAsync();
-      setSound(null);
-    }
-  };
-
   const handleGuardar = async () => {
+    // Validaciones iniciales
     if (!categoria) {
       Alert.alert('Error', 'Por favor, selecciona una categoría.');
       return;
     }
 
-    if (!texto && !media && !audioRecording) {
+    if (!texto && !media && !audioUri && !cancion) {
       Alert.alert('Error', 'Por favor, agrega al menos un contenido a la entrada.');
       return;
     }
 
-    const nuevaEntrada = {
-      categoria,
-      descripcion,
-      texto,
-      audio: audioRecording,
-      media,
-      mediaType,
-      isBaul,
-      fechaRecuerdo: categoria === 'recuerdo' ? selectedDate : null,
-    };
-    console.log('Nueva Entrada:', nuevaEntrada);
+    try {
+      let mediaURL = null;
+      let audioURL = null;
+      let cancionData = null;
 
-    setCategoria('');
-    setDescripcion('');
-    setTexto('');
-    setAudioRecording(null);
-    setSound(null);
-    setMedia(null);
-    setMediaType(null);
-    setIsBaul(false);
-    setSelectedDate(new Date());
-    onClose();
+      // Subir media (imagen o video) si existe y no es Spotify
+      if (media && media.type !== 'spotify') {
+        const mediaRef = ref(storage, `media/${uuid.v4()}_${media.uri.substring(media.uri.lastIndexOf('/') + 1)}`);
+        const response = await fetch(media.uri);
+        const blob = await response.blob();
+        await uploadBytes(mediaRef, blob);
+        mediaURL = await getDownloadURL(mediaRef);
+      }
+
+      // Subir audio si existe
+      if (audioUri) {
+        const audioRef = ref(storage, `audios/${uuid.v4()}_${audioUri.substring(audioUri.lastIndexOf('/') + 1)}`);
+        const response = await fetch(audioUri);
+        const blob = await response.blob();
+        await uploadBytes(audioRef, blob);
+        audioURL = await getDownloadURL(audioRef);
+      }
+
+      // Si hay una canción de Spotify seleccionada
+      if (cancion) {
+        cancionData = {
+          id: cancion.id,
+          name: cancion.name,
+          artist: cancion.artist,
+          albumImage: cancion.albumImage,
+        };
+      }
+
+      // Logs de depuración antes de construir nuevaEntrada
+      console.log('Antes de construir nuevaEntrada:');
+      console.log('texto:', texto);
+      console.log('audioURL:', audioURL);
+      console.log('mediaURL:', mediaURL);
+      console.log('cancion:', cancionData);
+
+      // Construir nuevaEntrada asegurando la exclusividad
+      const nuevaEntrada = {
+        categoria,
+        texto: null,
+        audio: null,
+        cancion: null,
+        media: null,
+        mediaType: null,
+        color: selectedColor,
+        baul,
+        fechaCreacion: serverTimestamp(),
+        fechaRecuerdo: categoria === 'recuerdo' ? selectedDate : null,
+      };
+
+      // Asignar cancion, media y luego audio o texto según corresponda
+      if (cancionData) {
+        nuevaEntrada.cancion = cancionData;
+      } else if (mediaURL) {
+        nuevaEntrada.media = mediaURL;
+        nuevaEntrada.mediaType = mediaType;
+      }
+
+      // Asignar audio o texto, asegurando que no coexistan
+      if (audioURL) {
+        nuevaEntrada.audio = audioURL;
+      } else if (texto) {
+        nuevaEntrada.texto = texto;
+      }
+
+      // Logs de depuración después de construir nuevaEntrada
+      console.log('Nueva Entrada:', nuevaEntrada);
+
+      // Guardar en Firestore
+      const docRef = await addDoc(collection(db, 'entradas'), nuevaEntrada);
+      console.log('Documento escrito con ID: ', docRef.id);
+
+      // Resetear el formulario
+      setCategoria('');
+      setTexto('');
+      setAudioUri(null);
+      setSound(null);
+      setMedia(null);
+      setMediaType(null);
+      setCancion(null);
+      setSelectedDate(new Date());
+      setBaul(false);
+      setSelectedColor('#ffffff');
+      onClose();
+    } catch (error) {
+      console.error('Error al guardar la entrada: ', error);
+      Alert.alert('Error', 'Hubo un problema al guardar la entrada. Por favor, intenta de nuevo.');
+    }
   };
 
   const onChangeDate = (event, selectedDate) => {
@@ -274,22 +267,30 @@ const ModalEntry = ({ visible, onClose }) => {
         <View style={styles.modalContent}>
           <Text style={styles.titulo}>Crear Nueva Entrada</Text>
 
-          {/* Switch para alternar entre medios locales y Spotify */}
-          <View style={styles.switchContainer}>
-            <Text style={styles.label}>Seleccionar desde:</Text>
-            <View style={styles.switchWrapper}>
-              <Text style={{ marginRight: 10 }}>Imagen/Video</Text>
-              <Switch
-                value={isSpotifyMode}
-                onValueChange={() => setIsSpotifyMode(!isSpotifyMode)}
-              />
-              <Text style={{ marginLeft: 10 }}>Spotify</Text>
-            </View>
-          </View>
+          {/* Switch para alternar entre Galeria/Video y Spotify */}
+          <CustomSwitch
+            style={styles.switchItem}
+            option1="Galeria"
+            option2="Spotify"
+            color1="#4CAF50" // Color cuando está en ON (Galeria/Video)
+            color2="#007BFF" // Color cuando está en OFF (Spotify)
+            value={isSpotifyMode}
+            onSwitch={(value) => {
+              setIsSpotifyMode(value);
+              if (value) {
+                eliminarMedia();    // Limpia cualquier media seleccionada
+                eliminarCancion();  // Limpia cualquier canción seleccionada
+                setAudioUri(null);   // Limpia audio si es necesario
+                setTexto('');        // Limpia texto si es necesario
+              } else {
+                setSpotifyResults([]); // Limpia los resultados de Spotify
+              }
+            }}
+          />
 
           {/* Campo de búsqueda para Spotify */}
-          {isSpotifyMode && (
-            <View>
+          {isSpotifyMode && !cancion && (
+            <View style={styles.spotifyContainer}>
               <TextInput
                 style={styles.input}
                 placeholder="Buscar canción en Spotify"
@@ -298,52 +299,72 @@ const ModalEntry = ({ visible, onClose }) => {
                   setSearchQuery(text);
                   if (text.length > 2) {
                     buscarCancionesSpotify(text);
+                  } else {
+                    setSpotifyResults([]); // Limpiar resultados si el texto es menor o igual a 2
                   }
                 }}
               />
+
+              {/* Mostrar resultados de Spotify solo si hay resultados y el campo de búsqueda no está vacío */}
+              {searchQuery.length > 2 && spotifyResults.length > 0 && (
+                <View style={styles.spotifyResultsContainer}>
+                  <ScrollView style={styles.spotifyResults}>
+                    {spotifyResults.map((track) => (
+                      <Pressable
+                        key={track.id}
+                        onPress={() => {
+                          setCancion({
+                            id: track.id,
+                            name: track.name,
+                            artist: track.artists[0].name,
+                            albumImage: track.album.images[0].url,
+                          });
+                          setSearchQuery('');        // Limpiar el campo de búsqueda
+                          setSpotifyResults([]);     // Limpiar los resultados de búsqueda
+                          // setIsSpotifyMode(false); // Eliminado para mantener el switch en Spotify
+                          setMedia(null);            // Limpia cualquier media seleccionada
+                          setMediaType(null);
+                          setAudioUri(null);         // Opcional: limpiar audio si es necesario
+                          setTexto('');              // Opcional: limpiar texto si es necesario
+                        }}
+                      >
+                        <View style={styles.trackContainer}>
+                          <Image
+                            source={{ uri: track.album.images[0].url }}
+                            style={styles.trackImage}
+                          />
+                          <View>
+                            <Text style={styles.trackName}>{track.name}</Text>
+                            <Text style={styles.trackArtist}>{track.artists[0].name}</Text>
+                          </View>
+                        </View>
+                      </Pressable>
+                    ))}
+                  </ScrollView>
+                </View>
+              )}
             </View>
           )}
 
-          {/* Mostrar resultados de Spotify */}
-          {isSpotifyMode && spotifyResults.length > 0 && (
-            <View>
-              {spotifyResults.map((track) => (
-                <TouchableOpacity
-                  key={track.id}
-                  onPress={() => setMedia(track)}
-                >
-                  <View style={styles.trackContainer}>
-                    <Image
-                      source={{ uri: track.album.images[0].url }}
-                      style={styles.trackImage}
-                    />
-                    <View>
-                      <Text style={styles.trackName}>{track.name}</Text>
-                      <Text style={styles.trackArtist}>{track.artists[0].name}</Text>
-                    </View>
-                  </View>
-                </TouchableOpacity>
-              ))}
+          {/* Vista Previa de Canción de Spotify */}
+          {cancion && (
+            <View style={styles.mediaContainer}>
+              <Image source={{ uri: cancion.albumImage }} style={styles.trackImageSelect} />
+              <Text style={styles.trackNameSelect}>{cancion.name}</Text>
+              <Text style={styles.trackArtistSelect}>{cancion.artist}</Text>
+              <Pressable style={styles.eliminarIcono} onPress={eliminarCancion}>
+                <MaterialIcons name="close" size={24} color="red" />
+              </Pressable>
             </View>
-          )}
-
-          {/* Botón para seleccionar imagen o video */}
-          {!media && !isSpotifyMode && (
-            <TouchableOpacity
-              style={styles.iconoGaleria}
-              onPress={seleccionarMedia}
-            >
-              <Entypo name="image" size={50} color="#007BFF" />
-            </TouchableOpacity>
           )}
 
           {/* Vista Previa de Media */}
           {media && mediaType === 'image' && (
             <View style={styles.mediaContainer}>
               <Image source={{ uri: media.uri }} style={styles.mediaPreview} />
-              <TouchableOpacity style={styles.eliminarIcono} onPress={eliminarMedia}>
+              <Pressable style={styles.eliminarIcono} onPress={eliminarMedia}>
                 <MaterialIcons name="close" size={24} color="red" />
-              </TouchableOpacity>
+              </Pressable>
             </View>
           )}
           {media && mediaType === 'video' && (
@@ -359,31 +380,44 @@ const ModalEntry = ({ visible, onClose }) => {
                 style={styles.mediaPreview}
                 useNativeControls
               />
-              <TouchableOpacity style={styles.eliminarIcono} onPress={eliminarMedia}>
+              <Pressable style={styles.eliminarIcono} onPress={eliminarMedia}>
                 <MaterialIcons name="close" size={24} color="red" />
-              </TouchableOpacity>
+              </Pressable>
             </View>
+          )}
+          {!media && !isSpotifyMode && (
+            <Pressable
+              style={styles.iconoGaleria}
+              onPress={seleccionarMedia}
+            >
+              <Entypo name="image" size={50} color="#007BFF" />
+            </Pressable>
           )}
 
           {/* Switch entre Texto y Audio */}
-          <View style={styles.switchContainer}>
-            <Text style={styles.label}>Modo de Entrada:</Text>
-            <View style={styles.switchWrapper}>
-              <Text style={{ marginRight: 10 }}>Texto</Text>
-              <Switch
-                value={isAudioMode}
-                onValueChange={() => setIsAudioMode(!isAudioMode)}
-              />
-              <Text style={{ marginLeft: 10 }}>Audio</Text>
-            </View>
-          </View>
+          <CustomSwitch
+            style={styles.switchItem}
+            option1="Texto"
+            option2="Audio"
+            color1="#007BFF" // Color cuando está en OFF (Texto)
+            color2="#4CAF50" // Color cuando está en ON (Audio)
+            value={isAudioMode}
+            onSwitch={(value) => {
+              setIsAudioMode(value);
+              if (value) {
+                setTexto(''); // Limpia el texto si se activa el modo Audio
+              } else {
+                setAudioUri(null);
+                setSound(null);
+              }
+            }}
+          />
 
           {/* Campo de Texto o Modo de Audio */}
-          <View style={styles.inputContainer}>
+          <View style={styles.switchContentContainer}>
             {!isAudioMode ? (
               // Modo de Texto
               <View style={styles.textoContainer}>
-                <Text style={styles.label}>Texto:</Text>
                 <TextInput
                   style={styles.inputTexto}
                   multiline
@@ -395,40 +429,21 @@ const ModalEntry = ({ visible, onClose }) => {
               </View>
             ) : (
               // Modo de Audio
-              <View style={styles.audioContainer}>
-                <TouchableOpacity
-                  style={styles.botonAudio}
-                  onPress={isRecording ? detenerGrabacion : iniciarGrabacion}
-                >
-                  <FontAwesome
-                    name="microphone"
-                    size={30}
-                    color={isRecording ? 'red' : '#007BFF'}
-                  />
-                </TouchableOpacity>
-                {audioRecording && !isRecording && (
-                  <View style={styles.audioPlaybackContainer}>
-                    <TouchableOpacity onPress={isPlaying ? pausarAudio : reproducirAudio}>
-                      <MaterialIcons name={isPlaying ? 'pause' : 'play-arrow'} size={30} color="#17a2b8" />
-                    </TouchableOpacity>
-                    <View style={styles.progressBarContainer}>
-                      <Animated.View style={[styles.progressBar, {
-                        width: progressAnim.interpolate({
-                          inputRange: [0, 1],
-                          outputRange: ["0%", "100%"]
-                        })
-                      }]} />
-                    </View>
-                    <Text style={styles.audioTime}>
-                      {Math.floor(audioPosition / 1000)} s / {Math.floor(audioDuration / 1000)} s
-                    </Text>
-                    <TouchableOpacity onPress={eliminarAudio} style={styles.botonEliminarAudio}>
-                      <MaterialIcons name="delete" size={30} color="red" />
-                    </TouchableOpacity>
-                  </View>
-                )}
+              <View style={styles.audioModeContainer}>
+                <AudioRecorder onRecordingComplete={manejarGrabacionCompleta} />
               </View>
             )}
+          </View>
+
+          {/* Selector de Color */}
+          <View style={styles.pickerContent}>
+            <Text>Dale color a tus emociones</Text>
+            <ColorPicker
+              selectedColor={selectedColor}
+              onColorSelect={(color) => {
+                setSelectedColor(color); // Actualiza el color seleccionado fuera del modal si es necesario
+              }}
+            />
           </View>
 
           {/* Categoría */}
@@ -438,6 +453,8 @@ const ModalEntry = ({ visible, onClose }) => {
               setCategoria(value);
               if (value === 'recuerdo') {
                 setShowDatePicker(true);
+              } else {
+                setShowDatePicker(false);
               }
             }}
             items={[
@@ -459,9 +476,9 @@ const ModalEntry = ({ visible, onClose }) => {
           {/* Mostrar DatePicker si se selecciona "Recuerdo" */}
           {categoria === 'recuerdo' && (
             <>
-              <TouchableOpacity onPress={() => setShowDatePicker(true)}>
+              <Pressable onPress={() => setShowDatePicker(true)} style={styles.datePickerPressable}>
                 <Text style={styles.label}>Seleccionar Fecha del Recuerdo</Text>
-              </TouchableOpacity>
+              </Pressable>
               {showDatePicker && (
                 <DateTimePicker
                   value={selectedDate}
@@ -474,47 +491,31 @@ const ModalEntry = ({ visible, onClose }) => {
             </>
           )}
 
-          {/* Descripción */}
-          <Text style={styles.label}>Descripción:</Text>
-          <TextInput
-            style={styles.input}
-            multiline
-            numberOfLines={3}
-            placeholder="Agrega una descripción"
-            value={descripcion}
-            onChangeText={setDescripcion}
-          />
-
-          {/* Switch del Baúl */}
-          <View style={styles.switchContainer}>
-            <Text style={styles.label}>¿Agregar al Baúl?</Text>
+          {/* Switch para "baul" */}
+          <View style={styles.switchBaulContainer}>
+            <Text style={styles.label}>¿Guardar en el baúl?</Text>
             <Switch
-              value={isBaul}
-              onValueChange={() => setIsBaul(!isBaul)}
+              value={baul}
+              onValueChange={setBaul}
+              thumbColor={baul ? '#4CAF50' : '#f4f3f4'}
+              trackColor={{ false: '#767577', true: '#81b0ff' }}
             />
           </View>
 
-          {/* Imagen del Baúl Abierto/Cerrado */}
-          {isBaul ? (
-            <Image source={require('../../assets/test/baul.webp')} style={styles.baulImagen} />
-          ) : (
-            <Image source={require('../../assets/test/baulCerrado.webp')} style={styles.baulImagen} />
-          )}
-
           {/* Botones de Guardar y Cancelar */}
           <View style={styles.botonContainer}>
-            <TouchableOpacity
+            <Pressable
               style={styles.botonGuardar}
               onPress={handleGuardar}
             >
               <Text style={styles.botonTexto}>Guardar</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
+            </Pressable>
+            <Pressable
               style={styles.botonCancelar}
               onPress={onClose}
             >
               <Text style={styles.botonTexto}>Cancelar</Text>
-            </TouchableOpacity>
+            </Pressable>
           </View>
         </View>
       </ScrollView>
@@ -523,6 +524,7 @@ const ModalEntry = ({ visible, onClose }) => {
 };
 
 const styles = StyleSheet.create({
+  /* ====== Modal Styles ====== */
   modalContainer: {
     flexGrow: 1,
     justifyContent: 'center',
@@ -541,10 +543,12 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
   },
+
+  /* ====== Text Styles ====== */
   titulo: {
     fontSize: 22,
     fontWeight: 'bold',
-    marginBottom: 15,
+    marginBottom: 10,
     textAlign: 'center',
     color: '#333',
   },
@@ -554,6 +558,8 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#555',
   },
+
+  /* ====== Input Styles ====== */
   input: {
     borderWidth: 1,
     borderColor: '#ddd',
@@ -561,6 +567,8 @@ const styles = StyleSheet.create({
     padding: 10,
     textAlignVertical: 'top',
     backgroundColor: '#f9f9f9',
+    width: '100%',
+    marginBottom: 10,
   },
   inputTexto: {
     borderWidth: 1,
@@ -571,12 +579,34 @@ const styles = StyleSheet.create({
     backgroundColor: '#f9f9f9',
     height: 100,
     marginTop: 5,
+    width: '100%',
+    marginBottom: 10,
   },
-  switchContainer: {
-    flexDirection: 'row',
+
+  /* ====== Switch Content Container ====== */
+  switchContentContainer: {
+    height: 150, // Altura fija para evitar cambios en la altura del modal
+    justifyContent: 'center',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    marginTop: 15,
+    marginVertical: 10,
+    width: '100%',
+  },
+  textoContainer: {
+    width: '100%',
+    height: '100%',
+    justifyContent: 'center',
+  },
+  audioModeContainer: {
+    width: '100%',
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  /* ====== Botón Styles ====== */
+  botonContainer: {
+    flexDirection: 'row',
+    marginTop: 10,
   },
   botonGuardar: {
     backgroundColor: '#28a745',
@@ -585,6 +615,7 @@ const styles = StyleSheet.create({
     flex: 1,
     marginRight: 5,
     elevation: 3,
+    marginBottom: 10,
   },
   botonCancelar: {
     backgroundColor: '#6c757d',
@@ -593,6 +624,7 @@ const styles = StyleSheet.create({
     flex: 1,
     marginLeft: 5,
     elevation: 3,
+    marginBottom: 10,
   },
   botonTexto: {
     color: '#fff',
@@ -600,84 +632,123 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     fontSize: 16,
   },
-  botonContainer: {
-    flexDirection: 'row',
-    marginTop: 20,
-  },
-  iconoGaleria: {
-    alignSelf: 'center',
-    marginVertical: 15,
-  },
-  baulImagen: {
-    width: 80,
-    height: 80,
-    alignSelf: 'center',
-    marginVertical: 15,
-  },
+
+  /* ====== Media Styles ====== */
   mediaContainer: {
+    alignItems: 'center',
     position: 'relative',
     width: '100%',
     marginTop: 10,
+    height: 220, // Altura fija para la vista previa de medios
+    marginBottom: 10,
   },
   mediaPreview: {
     width: '100%',
-    height: 200,
+    height: '100%',
     borderRadius: 10,
+    resizeMode: 'cover', // Asegura que la imagen cubra el contenedor
+  },
+  trackImageSelect: {
+    width: '100%',
+    height: 150,
+    borderRadius: 10,
+    resizeMode: 'cover', // Asegura que la imagen cubra el contenedor
   },
   eliminarIcono: {
     position: 'absolute',
-    top: 5,
-    right: 5,
+    top: 10,
+    right: 10,
     backgroundColor: 'rgba(0, 0, 0, 0.6)',
     padding: 5,
     borderRadius: 15,
   },
+
+  /* ====== Galería y Spotify Styles ====== */
+  iconoGaleria: {
+    alignSelf: 'center',
+    marginVertical: 15,
+    marginBottom: 10,
+  },
+  spotifyContainer: {
+    width: '100%',
+    marginVertical: 10,
+    position: 'relative', // Necesario para posicionar el contenedor de resultados absolutamente
+    marginBottom: 10,
+  },
+  spotifyResultsContainer: {
+    position: 'absolute',
+    top: 50, // Ajusta según la altura del TextInput
+    left: 0,
+    right: 0,
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    elevation: 5,
+    maxHeight: 200, // Altura máxima para mostrar aproximadamente 5 resultados
+    zIndex: 10, // Asegura que esté por encima de otros componentes
+  },
+  spotifyResults: {
+    paddingHorizontal: 10,
+  },
   trackContainer: {
     flexDirection: 'row',
     marginVertical: 5,
+    alignItems: 'center',
+    backgroundColor: '#f1f1f1',
+    padding: 10,
+    borderRadius: 10,
+    marginBottom: 10,
   },
   trackImage: {
     width: 50,
     height: 50,
     marginRight: 10,
+    borderRadius: 5,
   },
   trackName: {
     fontWeight: 'bold',
+    fontSize: 14,
+    color: '#333',
   },
   trackArtist: {
     color: 'gray',
+    fontSize: 12,
   },
-  audioContainer: {
+  trackNameSelect: {
+    fontWeight: 'bold',
+    marginTop: 5,
+    fontSize: 16,
+    color: '#333',
+  },
+  trackArtistSelect: {
+    color: 'gray',
+    fontSize: 14,
+  },
+
+  /* ====== Color Picker Styles ====== */
+  pickerContent: {
+    marginVertical: 10,
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    alignItems: 'center',
+    padding: 10,
+    marginBottom: 10,
+  },
+
+  /* ====== Baúl Switch Styles ====== */
+  switchBaulContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 10,
+    justifyContent: 'space-between',
+    marginVertical: 10,
+    marginBottom: 10,
   },
-  botonAudio: {
-    marginRight: 15,
+
+  /* ====== Additional Styles ====== */
+  switchItem: {
+    marginBottom: 10,
   },
-  audioPlaybackContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-  },
-  progressBarContainer: {
-    flex: 1,
-    height: 5,
-    backgroundColor: '#e0e0e0',
-    borderRadius: 5,
-    overflow: 'hidden',
-    marginHorizontal: 10,
-  },
-  progressBar: {
-    height: '100%',
-    backgroundColor: '#17a2b8',
-  },
-  audioTime: {
-    color: '#555',
-    marginRight: 10,
-  },
-  botonEliminarAudio: {
-    marginLeft: 10,
+  datePickerPressable: {
+    marginBottom: 10,
   },
 });
 
@@ -693,6 +764,8 @@ const pickerSelectStyles = StyleSheet.create({
     color: 'black',
     paddingRight: 30,
     backgroundColor: '#f9f9f9',
+    width: '100%',
+    marginBottom: 10,
   },
   inputAndroid: {
     fontSize: 16,
@@ -704,6 +777,8 @@ const pickerSelectStyles = StyleSheet.create({
     color: 'black',
     paddingRight: 30,
     backgroundColor: '#f9f9f9',
+    width: '100%',
+    marginBottom: 10,
   },
 });
 
