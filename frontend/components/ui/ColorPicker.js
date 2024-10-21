@@ -1,32 +1,17 @@
-import React, { useState, useRef } from 'react';
+import React from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, SafeAreaView } from 'react-native';
 import RBSheet from 'react-native-raw-bottom-sheet';
 
 const colors = [
-    '#6874e7',
-    '#b8304f',
-    '#758E4F',
-    '#fa3741',
-    '#F26419',
-    '#F6AE2D',
-    '#DFAEB4',
-    '#7A93AC',
-    '#33658A',
-    '#3d2b56',
-    '#42273B',
-    '#171A21',
+    '#6874e7', '#b8304f', '#758E4F', '#fa3741', '#F26419',
+    '#F6AE2D', '#DFAEB4', '#7A93AC', '#33658A', '#3d2b56',
+    '#42273B', '#171A21',
 ];
 
 const CIRCLE_SIZE = 40;
 
-export default function ColorPickerExample() {
-    const [selectedColor, setSelectedColor] = useState(colors[0]);
-    const sheet = useRef(null); // Referencia para RBSheet
-
-    const handleColorSelect = (color) => {
-        setSelectedColor(color);
-        sheet.current.close(); // Cerrar el RBSheet al seleccionar un color
-    };
+const ColorPicker = ({ selectedColor, onColorSelect }) => {
+    const sheet = React.useRef(null); // Referencia para RBSheet
 
     return (
         <SafeAreaView style={styles.container}>
@@ -59,18 +44,20 @@ export default function ColorPickerExample() {
                                 { backgroundColor: color },
                                 selectedColor === color && styles.selectedOption, // Borde para el color seleccionado
                             ]}
-                            onPress={() => handleColorSelect(color)} // Al seleccionar un color
+                            onPress={() => {
+                                onColorSelect(color); // Llamar a la función del componente padre para actualizar el color
+                                sheet.current.close(); // Cerrar el RBSheet al seleccionar un color
+                            }}
                         />
                     ))}
                 </View>
             </RBSheet>
         </SafeAreaView>
     );
-}
+};
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -123,3 +110,4 @@ const styles = StyleSheet.create({
     },
 });
 
+export default ColorPicker;
