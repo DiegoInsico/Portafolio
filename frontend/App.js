@@ -9,11 +9,10 @@ import { auth } from "./utils/firebase";
 import { onAuthStateChanged } from "firebase/auth";
 
 // Importar componentes
-import SplashScreen from "./components/SplashScreen";
-import MainTabs from "./components/MainTabs";
+import SplashScreen from "./components/ui/SplashScreen";
+import MainTabs from "./components/navigation/MainTabs";
 
-import SideBar from "./components/sideBar"; // Importar el componente Sidebar
-
+import SideBar from "./components/navigation/sideBar"; // Importar el componente Sidebar
 
 // Importar pantallas
 import Login from "./screens/auth/login";
@@ -40,7 +39,7 @@ export default function App() {
     });
 
     // Limpiar el listener
-    return unsubscribe; 
+    return unsubscribe;
   }, [initializing]);
 
   if (initializing) return <SplashScreen />;

@@ -1,7 +1,7 @@
 import React from 'react';
-import { View, Text, Image, StyleSheet } from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 
-const PolaroidCard = ({ entry }) => {
+const PolaroidCard = ({ entry, onPress }) => {
     if (!entry) {
         // Si entry es undefined, no se renderiza nada
         return null;
@@ -10,7 +10,7 @@ const PolaroidCard = ({ entry }) => {
     const { media, mediaType, categoria, texto, fechaCreacion } = entry;
 
     return (
-        <View style={styles.card}>
+        <TouchableOpacity onPress={onPress} style={styles.card}>
             {media && mediaType === 'image' && (
                 <Image source={{ uri: media }} style={styles.image} />
             )}
@@ -21,7 +21,7 @@ const PolaroidCard = ({ entry }) => {
                     <Text style={styles.date}>{fechaCreacion}</Text>
                 )}
             </View>
-        </View>
+        </TouchableOpacity>
     );
 };
 

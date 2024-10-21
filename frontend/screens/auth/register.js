@@ -4,10 +4,11 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth'; 
-import { auth } from '../../utils/firebase'; 
+import { auth, db } from '../../utils/firebase'; 
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 import { Ionicons } from '@expo/vector-icons';
+import { doc, setDoc } from "firebase/firestore"; // Importa setDoc para Firestore
 
 // Definir el esquema de validación con Yup
 const RegisterSchema = Yup.object().shape({
@@ -40,8 +41,17 @@ export default function Registro({ navigation }) {
       );
       const user = userCredential.user;
 
+      // Actualizar el perfil del usuario
       await updateProfile(user, {
         displayName: values.usuario,
+      });
+
+      // Crear documento en Firestore para el usuario
+      await setDoc(doc(db, "users", user.uid), {
+        displayName: values.usuario,
+        email: values.correo,
+        createdAt: new Date(),
+        // Agrega otros campos que quieras guardar
       });
 
       Alert.alert('Registro exitoso', 'Cuenta creada correctamente. Ahora puedes iniciar sesión.');
@@ -57,26 +67,11 @@ export default function Registro({ navigation }) {
 
   return (
     <LinearGradient
-      colors={[
-        "#2C3E50", // Negro grisáceo oscuro en la parte superior
-        "#4B4E6D", // Azul grisáceo oscuro
-        "#C2A66B", // Dorado oscuro más neutro
-        "#D1B17D", // Dorado intermedio
-        "#E6C47F", // Melocotón suave/dorado claro
-        "#F0E4C2", // Tono crema (suave luz)
-        "#F0E4C2", // Tono crema (suave luz) en el centro
-        "#E6C47F", // Melocotón suave/dorado claro
-        "#D1B17D", // Dorado intermedio
-        "#C2A66B", // Dorado oscuro más neutro
-        "#4B4E6D", // Azul grisáceo oscuro
-        "#2C3E50", // Negro grisáceo oscuro en la parte inferior
-      ]}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 0, y: 1 }}
+      colors={["#2C3E50", "#4B4E6D", "#D1B17D", "#FFD700"]}
       style={styles.background}
     >
       <View style={styles.container}>
-      <Image
+        <Image
           source={require("../../assets/background/florLogo.png")} // Reemplaza con la ruta de tu imagen
           style={styles.logo}
           resizeMode="cover"
@@ -96,7 +91,7 @@ export default function Registro({ navigation }) {
             <View style={styles.formContainer}>
               {/* Nombre de Usuario */}
               <View style={styles.inputContainer}>
-                <Ionicons name="person" size={20} color="#000000" style={styles.iconStyle} />
+                <Ionicons name="person" size={20} color="#000" style={styles.iconStyle} />
                 <TextInput
                   style={styles.input}
                   placeholder="Nombre de Usuario"
@@ -113,7 +108,7 @@ export default function Registro({ navigation }) {
 
               {/* Correo Electrónico */}
               <View style={styles.inputContainer}>
-                <Ionicons name="mail" size={20} color="#000000" style={styles.iconStyle} />
+                <Ionicons name="mail" size={20} color="#000" style={styles.iconStyle} />
                 <TextInput
                   style={styles.input}
                   placeholder="Correo Electrónico"
@@ -131,7 +126,7 @@ export default function Registro({ navigation }) {
 
               {/* Contraseña */}
               <View style={styles.inputContainer}>
-                <Ionicons name="lock-closed" size={20} color="#000000" style={styles.iconStyle} />
+                <Ionicons name="lock-closed" size={20} color="#000" style={styles.iconStyle} />
                 <TextInput
                   style={styles.input}
                   placeholder="Contraseña"
@@ -146,7 +141,7 @@ export default function Registro({ navigation }) {
                   onPress={() => setShowPassword(!showPassword)}
                   style={styles.toggleButton}
                 >
-                  <Ionicons name={showPassword ? 'eye' : 'eye-off'} size={20} color="#000000" />
+                  <Ionicons name={showPassword ? 'eye' : 'eye-off'} size={20} color="#000" />
                 </TouchableOpacity>
               </View>
               {touched.contrasena && errors.contrasena && (
@@ -155,7 +150,7 @@ export default function Registro({ navigation }) {
 
               {/* Confirmar Contraseña */}
               <View style={styles.inputContainer}>
-                <Ionicons name="lock-open" size={20} color="#000000" style={styles.iconStyle} />
+                <Ionicons name="lock-open" size={20} color="#000" style={styles.iconStyle} />
                 <TextInput
                   style={styles.input}
                   placeholder="Confirmar Contraseña"
@@ -170,7 +165,7 @@ export default function Registro({ navigation }) {
                   onPress={() => setShowConfirmPassword(!showConfirmPassword)}
                   style={styles.toggleButton}
                 >
-                  <Ionicons name={showConfirmPassword ? 'eye' : 'eye-off'} size={20} color="#000000" />
+                  <Ionicons name={showConfirmPassword ? 'eye' : 'eye-off'} size={20} color="#000" />
                 </TouchableOpacity>
               </View>
               {touched.confirmarContrasena && errors.confirmarContrasena && (
@@ -236,24 +231,12 @@ const styles = StyleSheet.create({
     shadowRadius: 0, // Radio de difuminado de la sombra (IOS)
     elevation: 0, // Elevación para sombra en Android
   },
-  image: {
-    width: "70%", // Ajusta el ancho de la imagen
-    height: 200, // Ajusta la altura de la imagen
-    position: "absolute", // Usa "absolute" para posicionar la imagen
-    right: 0, // Pega la imagen a la derecha
-    bottom: 0, // Pega la imagen al fondo
-    opacity: 0.8, // Ajusta la opacidad de la imagen
-  },
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#000000',
+    color: '#000',
     marginBottom: 20,
     alignSelf: 'center',
-  },
-  form: {
-    width: '85%', // Cambiamos a 85% para que los inputs no se extiendan hasta los bordes
-    alignItems: 'center', // Centramos el contenido del formulario
   },
   inputContainer: {
     flexDirection: 'row',
@@ -284,7 +267,7 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   button: {
-    backgroundColor: '#ff9999',
+    backgroundColor: '#FFD700',
     paddingVertical: 12,
     borderRadius: 8,
     alignItems: 'center',
@@ -292,13 +275,7 @@ const styles = StyleSheet.create({
     width: '85%', 
   },
   buttonDisabled: {
-    color: "#fff",
-    backgroundColor: "#BFA500",
-    shadowColor: "#000000", // Color de la sombra
-    shadowOffset: { width: 5, height: 5 }, // Desplazamiento de la sombra (horizonte/vertical)
-    shadowOpacity: 0.4, // Opacidad de la sombra
-    shadowRadius: 10, // Radio de difuminado de la sombra (IOS)
-    elevation: 10, // Elevación para sombra en Android
+    opacity: 0.5, // Reduce la opacidad si está deshabilitado
   },
   buttonText: {
     color: '#000000',

@@ -5,13 +5,13 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createStackNavigator } from "@react-navigation/stack";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 
-import Sidebar from "../components/sideBar"; // Importar el componente Sidebar
-
+import Sidebar from "./sideBar"; // Importar el componente Sidebar
 
 // Importar pantallas
-import Home from "../screens/home/home";
-import ListEntry from "../screens/entrys/listEntry";
-import Baul from "../screens/chest/baul";
+import Home from "../../screens/home/home";
+import ListEntry from "../../screens/entrys/listEntry";
+import Baul from "../../screens/chest/baul";
+import UserProfile from "../../screens/user/userProfile";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -19,8 +19,8 @@ const Stack = createStackNavigator();
 function MainTabs({ navigation }) {
   const [sidebarVisible, setSidebarVisible] = useState(false);
 
-  const toggleSidebar = () => {
-    setSidebarVisible(!sidebarVisible);
+  const handleToggleSidebar = () => {
+    setSidebarVisible((prev) => !prev);
   };
 
   return (
@@ -28,10 +28,14 @@ function MainTabs({ navigation }) {
       {/* Renderizar el Sidebar y pasar la función de navegación */}
       <Sidebar
         isVisible={sidebarVisible}
-        toggleSidebar={toggleSidebar}
+        toggleSidebar={handleToggleSidebar}
         navigateToBaul={() => {
-          toggleSidebar();
-          navigation.navigate("Baul"); // Navegar hacia "Baul"
+          handleToggleSidebar();
+          navigation.navigate("Baul");
+        }}
+        navigateToProfile={() => {
+          handleToggleSidebar();
+          navigation.navigate("Profile"); // Agregar la navegación al perfil
         }}
       />
 
@@ -40,7 +44,6 @@ function MainTabs({ navigation }) {
         screenOptions={({ route }) => ({
           tabBarIcon: ({ color, size }) => {
             let iconName;
-
             if (route.name === 'Home') {
               iconName = 'home';
             } else if (route.name === 'ListEntry') {
@@ -48,7 +51,6 @@ function MainTabs({ navigation }) {
             } else if (route.name === 'SideBarButton') {
               iconName = 'bars';
             }
-
             return <FontAwesome name={iconName} size={size} color={color} />;
           },
           tabBarActiveTintColor: '#FFD700',
@@ -74,9 +76,7 @@ function MainTabs({ navigation }) {
           component={ListEntry}
           options={{
             title: 'Tus Entradas',
-            headerStyle: {
-              backgroundColor: '#FFD700',
-            },
+            headerStyle: { backgroundColor: '#fff' },
             headerTitleStyle: {
               borderBottomColor: '#D4AF37',
               fontWeight: "bold",
@@ -91,7 +91,7 @@ function MainTabs({ navigation }) {
           listeners={{
             tabPress: (e) => {
               e.preventDefault();
-              toggleSidebar();
+              handleToggleSidebar();
             },
           }}
         >
@@ -106,7 +106,7 @@ export default function AppNavigator() {
   return (
     <Stack.Navigator>
       <Stack.Screen
-        name="Main" // Cambiar el nombre para evitar duplicados
+        name="Main"
         component={MainTabs}
         options={{ headerShown: false }}
       />
@@ -115,9 +115,21 @@ export default function AppNavigator() {
         component={Baul}
         options={{
           title: 'Baúl',
-          headerStyle: {
-            backgroundColor: '#FFD700',
+          headerStyle: { backgroundColor: '#fff' },
+          headerTitleStyle: {
+            fontWeight: 'bold',
+            fontSize: 20,
+            color: '#333',
           },
+        }}
+      />
+      {/* Agregar la ruta para el perfil */}
+      <Stack.Screen
+        name="Profile"
+        component={UserProfile} // Asegúrate de tener una pantalla de perfil
+        options={{
+          title: 'Perfil',
+          headerStyle: { backgroundColor: '#fff' },
           headerTitleStyle: {
             fontWeight: 'bold',
             fontSize: 20,

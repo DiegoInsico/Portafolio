@@ -3,8 +3,8 @@ import { View, Text, TouchableOpacity, Modal, TextInput, Button, Alert, StyleShe
 import { updateDoc, doc } from "firebase/firestore";
 import { db } from "../../utils/firebase";
 
-const EntryItem = ({ item }) => {
-  const [modalVisible, setModalVisible] = useState(false);
+const EntryItem = ({ item, onClose }) => {
+  const [modalVisible, setModalVisible] = useState(true);
   const [addToBaul, setAddToBaul] = useState(false); // Estado para "Sí" o "No" del switch
   const [nickname, setNickname] = useState('');
 
@@ -25,98 +25,83 @@ const EntryItem = ({ item }) => {
       setModalVisible(false);
       setAddToBaul(false);
       setNickname('');
+      onClose(); // Llamar a onClose para cerrar el modal
     } catch (error) {
       console.error('Error al agregar al Baúl: ', error);
       Alert.alert('Error', 'Ocurrió un error al agregar la entrada al Baúl.');
     }
   };
 
+  const creationDate = item.createdAt
+    ? new Date(item.createdAt.seconds * 1000).toLocaleDateString()
+    : "Fecha no disponible"; // Manejar si no hay createdAt
+
+  const creationTime = item.createdAt
+    ? new Date(item.createdAt.seconds * 1000).toLocaleTimeString()
+    : "Hora no disponible"; // Manejar si no hay createdAt
+
   return (
-    <View style={styles.entryContainer}>
-      {/* Entrada que al presionar abre el modal */}
-      <TouchableOpacity onPress={() => setModalVisible(true)}>
-        <Text style={styles.entryMessage}>{item.message}</Text>
-        <Text style={styles.entryDate}>{new Date(item.createdAt.seconds * 1000).toLocaleDateString()}</Text>
-      </TouchableOpacity>
+    <Modal
+      animationType="slide"
+      transparent={true}
+      visible={modalVisible}
+      onRequestClose={onClose}
+    >
+      <View style={styles.modalBackground}>
+        <View style={styles.modalView}>
+          {/* Hora de creación */}
+          <Text style={styles.modalText}>
+            Hora de creación: {item.fechaCreacion}
+          </Text>
 
-      {/* Modal para mostrar detalles y opción de agregar al Baúl */}
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <View style={styles.modalBackground}>
-          <View style={styles.modalView}>
-            {/* Hora de creación */}
-            <Text style={styles.modalText}>
-              Hora de creación: {new Date(item.createdAt.seconds * 1000).toLocaleTimeString()}
-            </Text>
-
-            {/* Categoría de la entrada */}
-            {item.category && (
-              <View style={styles.detailContainer}>
-                <Text style={styles.modalTitle}>Detalles de la Entrada:</Text>
-                <Text style={styles.detailText}>{item.category}</Text>
-              </View>
-            )}
-
-            {/* Mensaje de la entrada */}
-            <View style={styles.messageContainer}>
-              <Text style={styles.modalTitle}>Mensaje:</Text>
-              <Text style={styles.messageText}>{item.message}</Text>
+          {/* Categoría de la entrada */}
+          {item.category && (
+            <View style={styles.detailContainer}>
+              <Text style={styles.modalTitle}>Detalles de la Entrada:</Text>
+              <Text style={styles.detailText}>{item.categoria}</Text>
             </View>
+          )}
 
-            {/* Switch para "Agregar al Baúl" */}
-            <View style={styles.switchBaulContainer}>
-              <Text style={styles.modalText}>¿Guardar en el baúl?</Text>
-              <Switch
-                value={addToBaul}
-                onValueChange={setAddToBaul}
-                thumbColor={addToBaul ? '#4CAF50' : '#f4f3f4'}
-                trackColor={{ false: '#767577', true: '#81b0ff' }}
-              />
-            </View>
-
-            {/* Mostrar el campo de apodo solo si se selecciona "Sí" */}
-            {addToBaul && (
-              <View style={styles.nicknameContainer}>
-                <TextInput
-                  placeholder="Apodo para la entrada"
-                  value={nickname}
-                  onChangeText={setNickname}
-                  style={styles.input}
-                />
-                <Button title="Agregar al Baúl" onPress={handleAddToBaul} />
-              </View>
-            )}
-
-            {/* Botón para cancelar */}
-            <Button title="Cancelar" onPress={() => setModalVisible(false)} color="red" />
+          {/* Mensaje de la entrada */}
+          <View style={styles.messageContainer}>
+            <Text style={styles.modalTitle}>Mensaje:</Text>
+            <Text style={styles.messageText}>{item.texto}</Text>
           </View>
+
+          {/* Switch para "Agregar al Baúl" */}
+          <View style={styles.switchBaulContainer}>
+            <Text style={styles.modalText}>¿Guardar en el baúl?</Text>
+            <Switch
+              value={addToBaul}
+              onValueChange={setAddToBaul}
+              thumbColor={addToBaul ? '#4CAF50' : '#f4f3f4'}
+              trackColor={{ false: '#767577', true: '#81b0ff' }}
+            />
+          </View>
+
+          {/* Mostrar el campo de apodo solo si se selecciona "Sí" */}
+          {addToBaul && (
+            <View style={styles.nicknameContainer}>
+              <TextInput
+                placeholder="Apodo para la entrada"
+                value={nickname}
+                onChangeText={setNickname}
+                style={styles.input}
+              />
+              <Button title="Agregar al Baúl" onPress={handleAddToBaul} />
+            </View>
+          )}
+
+          {/* Botón para cancelar */}
+          <Button title="Cancelar" onPress={onClose} color="red" />
         </View>
-      </Modal>
-    </View>
+      </View>
+    </Modal>
   );
 };
 
 // Estilos del componente
 const styles = StyleSheet.create({
-  entryContainer: {
-    padding: 10,
-    backgroundColor: '#fff',
-    borderRadius: 8,
-    marginBottom: 10,
-    elevation: 2,
-  },
-  entryMessage: {
-    fontSize: 16,
-    color: '#333',
-  },
-  entryDate: {
-    fontSize: 12,
-    color: '#999',
-  },
   modalBackground: {
     flex: 1,
     justifyContent: 'center',
@@ -153,14 +138,6 @@ const styles = StyleSheet.create({
   messageText: {
     fontSize: 16,
     color: '#333',
-  },
-  detailContainer: {
-    width: '100%',
-    paddingVertical: 5,
-  },
-  detailText: {
-    fontSize: 14,
-    color: '#666',
   },
   switchBaulContainer: {
     flexDirection: 'row',
