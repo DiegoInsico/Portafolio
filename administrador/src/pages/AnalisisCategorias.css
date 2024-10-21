@@ -1,0 +1,12 @@
+.analisis-categorias-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    text-align: center;
+  }
+  
+  .chart-container {
+    width: 50%;
+    margin: 0 auto;
+  }
+  

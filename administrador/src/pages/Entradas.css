@@ -1,0 +1,67 @@
+/* Estilos generales para el contenedor de entradas */
+.entradas-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #2c2c3a; /* Fondo oscuro */
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+/* Estilos para el título principal */
+h1 {
+  text-align: center;
+  color: #f0a500; /* Color dorado */
+  margin-bottom: 20px;
+  font-size: 2rem;
+}
+
+/* Estilos para la lista de entradas */
+.entries-list {
+  list-style-type: none;
+  padding: 0;
+}
+
+/* Estilos para cada entrada */
+.entry-item {
+  background-color: #1e1e2f; /* Fondo oscuro */
+  color: #f0e6d2; /* Texto claro */
+  margin-bottom: 15px;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease-in-out;
+}
+
+.entry-item:hover {
+  transform: translateY(-5px); /* Efecto al pasar el mouse */
+}
+
+/* Encabezado de la entrada */
+.entry-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+}
+
+/* Estilo para la categoría de la entrada */
+.entry-category {
+  color: #ffce56; /* Color amarillo claro */
+  font-style: italic;
+}
+
+/* Mejoras en la tipografía */
+p {
+  margin: 5px 0;
+  font-size: 1rem;
+  color: #f0e6d2;
+}
+
+/* Estilo para el mensaje de carga de entradas */
+p {
+  text-align: center;
+  font-size: 1.2rem;
+  color: #ffce56; /* Color dorado */
+}

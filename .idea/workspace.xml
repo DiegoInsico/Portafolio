@@ -6,20 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="2137b152-a29a-4d26-8781-e8af1c953a9c" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/App.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/App.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/components/ColorPicker.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/components/MainTabs.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/components/SplashScreen.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/components/SwitchButton.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/components/audioComponent.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/components/background.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/components/sideBar.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/screens/auth/register.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/screens/auth/register.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/screens/entrys/entriesHome.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/screens/entrys/entryItem.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/screens/entrys/entryItem.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/screens/entrys/entryPolaroid.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/screens/entrys/entryPolaroid.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/screens/entrys/listEntry.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/screens/entrys/listEntry.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/screens/entrys/modalEntry.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/screens/entrys/modalEntry.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

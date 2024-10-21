@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { ScrollView, Text, ActivityIndicator, StyleSheet, Modal, View } from 'react-native';
-import PolaroidCard from './polaroidCard';
-import { LinearGradient } from "expo-linear-gradient";
-import SongCard from './songCard';
-import TextCard from './textCard';
-import { listenToEntries } from '../../utils/firebase';
+import { ScrollView, Text, Modal, View, StyleSheet } from 'react-native';
+import PolaroidCard from './entryPolaroid';
+import { getEntries } from '../../utils/firebase';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import EntryItem from './entryItem'; // Modal de detalles de la entrada
+import { LinearGradient } from 'expo-linear-gradient'; // Importa el gradiente
 
 const ListEntry = () => {
   const [entries, setEntries] = useState([]);
@@ -49,81 +47,62 @@ const ListEntry = () => {
   }
 
   return (
-    <View style={styles.gradientContainer}>
-      <LinearGradient
-        colors={[
-          "#2C3E50",
-          "#4B4E6D",
-          "#C2A66B",
-          "#D1B17D",
-          "#E6C47F",
-          "#F0E4C2",
-          "#F0E4C2",
-          "#E6C47F",
-          "#D1B17D",
-          "#C2A66B",
-          "#4B4E6D",
-          "#2C3E50",
-        ]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 0, y: 1 }}
-        style={styles.background}
-      >
-        <ScrollView contentContainerStyle={styles.container}>
-          {entries.length === 0 ? (
-            <Text style={styles.message}>No hay entradas disponibles</Text>
-          ) : (
-            entries
-              .filter(entry => entry !== undefined)
-              .map(entry => {
-                // Condicional para mostrar el componente correcto según el contenido de la entrada
-                if (entry.media && (entry.mediaType === 'image' || entry.mediaType === 'video')) {
-                  return <PolaroidCard key={entry.id} entry={entry} onPress={() => setSelectedEntry(entry)} />;
-                } else if (entry.cancion) {
-                  return <SongCard key={entry.id} entry={entry} onPress={() => setSelectedEntry(entry)} />;
-                } else if (entry.texto || entry.audio) {
-                  return <TextCard key={entry.id} entry={entry} onPress={() => setSelectedEntry(entry)} />;
-                } else {
-                  return null;
-                }
-              })
-          )}
-
-          {/* Modal que muestra los detalles de la entrada */}
-          {selectedEntry && (
-            <Modal
-              animationType="slide"
-              transparent={true}
-              visible={!!selectedEntry}
-              onRequestClose={closeModal}
-            >
-              <EntryItem
-                item={selectedEntry}
-                onClose={closeModal}  // Pasar la función para cerrar el modal
+    <LinearGradient
+      colors={[
+        "#2C3E50",
+        "#4B4E6D",
+        "#C2A66B",
+        "#D1B17D",
+        "#E6C47F",
+        "#F0E4C2",
+        "#F0E4C2",
+        "#E6C47F",
+        "#D1B17D",
+        "#C2A66B",
+        "#4B4E6D",
+        "#2C3E50",
+      ]}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 0, y: 1 }}
+      style={styles.background}
+    >
+      <ScrollView>
+        {entries.length === 0 ? (
+          <Text style={{ textAlign: 'center' }}>No hay entradas disponibles</Text>
+        ) : (
+          entries
+            .filter(entry => entry !== undefined) // Filtrar entradas que no sean undefined
+            .map(entry => (
+              <PolaroidCard 
+                key={entry.id} 
+                entry={entry} 
+                onPress={() => setSelectedEntry(entry)} // Seleccionar entrada para mostrar modal
               />
-            </Modal>
-          )}
-        </ScrollView>
-      </LinearGradient>
-    </View>
+            ))
+        )}
+
+        {/* Modal que muestra los detalles de la entrada */}
+        {selectedEntry && (
+          <Modal
+            animationType="slide"
+            transparent={true}
+            visible={!!selectedEntry}
+            onRequestClose={closeModal}
+          >
+            <EntryItem
+              item={selectedEntry}
+              onClose={closeModal}  // Pasar la función para cerrar el modal
+            />
+          </Modal>
+        )}
+      </ScrollView>
+    </LinearGradient>
   );
 };
 
 const styles = StyleSheet.create({
-  gradientContainer: {
-    flex: 1,
-  },
   background: {
     flex: 1,
-  },
-  container: {
-    padding: 16,
-    alignItems: 'center',  // Centra todos los elementos dentro del ScrollView
-  },
-  message: {
-    textAlign: 'center',
-    marginTop: 20,
-    fontSize: 16,
   },
 });
 
