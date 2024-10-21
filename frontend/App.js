@@ -31,6 +31,9 @@ import EliminarTest from './screens/testigos/opciones/eliminarTes';
 import ModificarTest from './screens/testigos/opciones/modificarTes';
 import AgregarTest from './screens/testigos/opciones/AgregarTes';
 import Temas from './screens/config/opciones/temas'; 
+import Fuentes from "./screens/config/opciones/accesibilidad/Text";
+import Vibracion from "./screens/config/opciones/accesibilidad/vibra";
+import ModDaltonico from "./screens/config/opciones/accesibilidad/modDal";
 
 const Stack = createStackNavigator();
 
@@ -198,6 +201,22 @@ export default function App() {
                 <Stack.Screen
                   name="AdminBene"
                   component={AdminBene}
+                  options={{ headerShown: false }}
+                />
+                {/* paginas de testeo */}
+                <Stack.Screen
+                  name="Fuentes"
+                  component={Fuentes}
+                  options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                  name="Vibracion"
+                  component={Vibracion}
+                  options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                  name="ModDaltonico"
+                  component={ModDaltonico}
                   options={{ headerShown: false }}
                 />
               </>
