@@ -24,7 +24,7 @@ import { MaterialIcons, Entypo } from "@expo/vector-icons";
 import axios from "axios";
 import { getAuth } from "firebase/auth";
 import { db, storage } from "../../utils/firebase";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { addDoc, updateDoc, collection, serverTimestamp } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import uuid from "react-native-uuid";
 
@@ -157,6 +157,19 @@ const ModalEntry = ({ visible, onClose }) => {
   };
 
   const handleGuardar = async () => {
+    // Obtener la instancia de autenticación
+    const auth = getAuth();
+    const user = auth.currentUser; // Obtener el usuario autenticado
+
+    // Verificar si el usuario está autenticado
+    if (!user) {
+      Alert.alert(
+        "Error",
+        "No hay un usuario autenticado. Por favor, inicia sesión."
+      );
+      return;
+    }
+
     // Validaciones iniciales
     if (!categoria) {
       Alert.alert("Error", "Por favor, selecciona una categoría.");
@@ -171,28 +184,7 @@ const ModalEntry = ({ visible, onClose }) => {
       return;
     }
 
-    // Verificar si el usuario está autenticado
-    if (!user) {
-      Alert.alert(
-        "Error",
-        "No hay un usuario autenticado. Por favor, inicia sesión."
-      );
-      return;
-    }
-
     try {
-      const auth = getAuth(); // Obtener la instancia de autenticación
-      const user = auth.currentUser; // Obtener el usuario autenticado
-
-      // Verificar si el usuario está autenticado
-      if (!user) {
-        Alert.alert(
-          "Error",
-          "No hay un usuario autenticado. Por favor, inicia sesión."
-        );
-        return;
-      }
-
       let mediaURL = null;
       let audioURL = null;
       let cancionData = null;
@@ -235,7 +227,6 @@ const ModalEntry = ({ visible, onClose }) => {
         };
       }
 
-      // Construir nuevaEntrada asegurando la exclusividad
       const nuevaEntrada = {
         userId: user.uid, // Añadir el ID del usuario autenticado
         categoria,
@@ -250,7 +241,6 @@ const ModalEntry = ({ visible, onClose }) => {
         fechaRecuerdo: categoria === "recuerdo" ? selectedDate : null,
       };
 
-      // Asignar cancion, media y luego audio o texto según corresponda
       if (cancionData) {
         nuevaEntrada.cancion = cancionData;
       } else if (mediaURL) {
@@ -258,16 +248,17 @@ const ModalEntry = ({ visible, onClose }) => {
         nuevaEntrada.mediaType = mediaType;
       }
 
-      // Asignar audio o texto, asegurando que no coexistan
       if (audioURL) {
         nuevaEntrada.audio = audioURL;
       } else if (texto) {
         nuevaEntrada.texto = texto;
       }
 
-      // Guardar en Firestore
-      const docRef = await addDoc(collection(db, "entradas"), nuevaEntrada);
-      console.log("Documento escrito con ID: ", docRef.id);
+      const docRef = await addDoc(collection(db, 'entradas'), nuevaEntrada);
+
+      await updateDoc(docRef, { id: docRef.id });
+
+      console.log('Documento escrito con ID: ', docRef.id);
 
       // Resetear el formulario
       setCategoria("");
@@ -486,9 +477,7 @@ const ModalEntry = ({ visible, onClose }) => {
             <Text>Dale color a tus emociones</Text>
             <ColorPicker
               selectedColor={selectedColor}
-              onColorSelect={(color) => {
-                setSelectedColor(color); // Actualiza el color seleccionado fuera del modal si es necesario
-              }}
+              onColorSelect={(color) => setSelectedColor(color)}
             />
           </View>
 
@@ -540,17 +529,6 @@ const ModalEntry = ({ visible, onClose }) => {
             </>
           )}
 
-          {/* Switch para "baul" */}
-          <View style={styles.switchBaulContainer}>
-            <Text style={styles.label}>¿Guardar en el baúl?</Text>
-            <Switch
-              value={baul}
-              onValueChange={setBaul}
-              thumbColor={baul ? "#4CAF50" : "#f4f3f4"}
-              trackColor={{ false: "#767577", true: "#81b0ff" }}
-            />
-          </View>
-
           {/* Botones de Guardar y Cancelar */}
           <View style={styles.botonContainer}>
             <Pressable style={styles.botonGuardar} onPress={handleGuardar}>
@@ -579,6 +557,8 @@ const styles = StyleSheet.create({
     width: "90%",
     backgroundColor: "#FFF",
     borderRadius: 15,
+    justifyContent: 'center',
+    alignItems: 'center',
     padding: 20,
     elevation: 5,
     shadowColor: "#000",

@@ -1,6 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
-import { getFirestore, collection, getDocs, query, where } from "firebase/firestore";
+import { getFirestore, collection, getDocs, onSnapshot, query, where, orderBy } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -39,18 +39,15 @@ export const signIn = async (email, password) => {
 
 // Recuperar el estado de autenticación
 export const checkAuthState = async () => {
-  try {
-    const userToken = await AsyncStorage.getItem('userToken');
-    if (userToken) {
-      console.log('Usuario ya autenticado');
-      // Aquí puedes redirigir al usuario a la pantalla principal
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      console.log('Usuario autenticado:', user.uid);
+      // Redirigir al usuario o permitir acceso
     } else {
       console.log('No hay sesión activa');
-      // Puedes redirigir al usuario a la pantalla de login
+      // Redirigir a la pantalla de inicio de sesión
     }
-  } catch (error) {
-    console.error('Error al verificar el estado de la sesión:', error);
-  }
+  });
 };
 
 // Escuchar el estado de autenticación de Firebase
@@ -90,10 +87,12 @@ export const getEntries = async () => {
       const data = doc.data();
       // Convertir los campos de fecha a un formato legible si es necesario
       if (data.fechaCreacion && data.fechaCreacion.toDate) {
-        data.fechaCreacion = data.fechaCreacion.toDate().toLocaleString();
+        const fecha = data.fechaCreacion.toDate();
+        data.fechaCreacion = `${fecha.getDate()}/${fecha.getMonth() + 1}/${fecha.getFullYear()}`;
       }
       if (data.fechaRecuerdo && data.fechaRecuerdo.toDate) {
-        data.fechaRecuerdo = data.fechaRecuerdo.toDate().toLocaleString();
+        const fechaRecuerdo = data.fechaRecuerdo.toDate();
+        data.fechaRecuerdo = `${fechaRecuerdo.getDate()}/${fechaRecuerdo.getMonth() + 1}/${fechaRecuerdo.getFullYear()}`;
       }
       return { id: doc.id, ...data };
     });
@@ -101,6 +100,44 @@ export const getEntries = async () => {
     console.error("Error fetching entries:", error);
     throw error;
   }
+};
+
+export const listenToEntries = (callback) => {
+  const unsubscribe = onAuthStateChanged(auth, (user) => {
+    if (!user) {
+      console.error("No user is logged in");
+      return;
+    }
+
+    const entriesCollection = collection(db, 'entradas');
+    const q = query(entriesCollection, where("userId", "==", user.uid), orderBy("fechaCreacion", "desc"));
+
+    return onSnapshot(q, (snapshot) => {
+      const entries = snapshot.docs.map(doc => {
+        const data = doc.data();
+        console.log("Data del documento:", data);
+
+        // Formatear fechas
+        if (data.fechaCreacion && data.fechaCreacion.toDate) {
+          const fecha = data.fechaCreacion.toDate();
+          data.fechaCreacionFormatted = `${fecha.getDate().toString().padStart(2, '0')}/${(fecha.getMonth() + 1).toString().padStart(2, '0')}/${fecha.getFullYear()}`;
+        }
+
+        if (data.fechaRecuerdo && data.fechaRecuerdo.toDate) {
+          const fechaRecuerdo = data.fechaRecuerdo.toDate();
+          data.fechaRecuerdoFormatted = `${fechaRecuerdo.getDate().toString().padStart(2, '0')}/${(fechaRecuerdo.getMonth() + 1).toString().padStart(2, '0')}/${fechaRecuerdo.getFullYear()}`;
+        }
+
+        return { id: doc.id, ...data };
+      });
+
+      callback(entries);
+    }, (error) => {
+      console.error("Error al escuchar las entradas:", error);
+    });
+  });
+
+  return () => unsubscribe();
 };
 
 export { auth, db, storage };
