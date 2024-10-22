@@ -1,0 +1,84 @@
+/* ArbolDeArce.css */
+.arbol-container {
+    position: relative;
+    text-align: center;
+    width: 400px;
+    margin: 0 auto;
+  }
+  
+  #arbol {
+    position: relative;
+    width: 400px;
+    height: 600px;
+    margin: 20px auto;
+    background: url('../assets/tronco.jpg') no-repeat center bottom;
+    background-size: contain;
+  }
+  
+  .hoja {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    background: url('../assets/hoja.jpg') no-repeat center;
+    background-size: contain;
+    transform: scale(0.1);
+    opacity: 0;
+    animation: crecer 2s forwards ease-in-out;
+  }
+  
+  @keyframes crecer {
+    0% {
+      transform: scale(0.1);
+      opacity: 0;
+    }
+    50% {
+      transform: scale(1.1);
+      opacity: 0.7;
+    }
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+  
+  
+  button {
+    margin: 10px;
+    padding: 10px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    cursor: pointer;
+  }
+  
+  button:hover {
+    background-color: #45a049;
+  }
+  
+  .contador {
+    margin-top: 20px;
+  }
+
+  /* MODAL */
+  
+  .modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .modal-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 5px;
+    width: 80%;
+    max-width: 500px;
+    text-align: center;
+  }
+  
