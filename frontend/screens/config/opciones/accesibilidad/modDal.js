@@ -1,7 +1,10 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { AppContext } from '../../../../context/appContext'; // Importa el contexto
 
 const ModDaltonico = () => {
+  const { modoDaltonico, toggleModoDaltonico } = useContext(AppContext); // Accede a modoDaltonico y toggleModoDaltonico
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Paleta de Colores (Modo Daltónico)</Text>
@@ -14,8 +17,13 @@ const ModDaltonico = () => {
         <View style={[styles.colorBox, { backgroundColor: '#ff00ff' }]} />
       </View>
 
-      <TouchableOpacity style={styles.button}>
-        <Text style={styles.buttonText}>Activar Modo Daltónico</Text>
+      <TouchableOpacity 
+        style={styles.button}
+        onPress={() => toggleModoDaltonico(!modoDaltonico)} // Alterna el modo daltónico
+      >
+        <Text style={styles.buttonText}>
+          {modoDaltonico ? 'Desactivar Modo Daltónico' : 'Activar Modo Daltónico'}
+        </Text>
       </TouchableOpacity>
     </View>
   );

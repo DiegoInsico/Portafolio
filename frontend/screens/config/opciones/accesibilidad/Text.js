@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useContext } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { AppContext } from '../../../../context/appContext'; // Importar el contexto
 
 const Fuentes = () => {
-  const [fontSize, setFontSize] = useState(16);
+  // Accedemos a fontSize y changeFontSize desde AppContext
+  const { fontSize, changeFontSize } = useContext(AppContext);
 
   return (
     <View style={styles.container}>
@@ -11,15 +13,15 @@ const Fuentes = () => {
       </Text>
 
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity style={styles.button} onPress={() => changeFontSize(fontSize + 2)}>
           <Text style={styles.buttonText}>Aumentar</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity style={styles.button} onPress={() => changeFontSize(16)}>
           <Text style={styles.buttonText}>Normal</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity style={styles.button} onPress={() => changeFontSize(fontSize - 2)}>
           <Text style={styles.buttonText}>Disminuir</Text>
         </TouchableOpacity>
       </View>

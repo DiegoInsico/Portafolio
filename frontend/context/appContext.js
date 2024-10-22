@@ -8,19 +8,31 @@ export const AppContext = createContext();
 export const AppProvider = ({ children }) => {
   const [bloqueoActivado, setBloqueoActivado] = useState(false); // Estado para bloqueo
   const [vibrationFeedback, setVibrationFeedback] = useState(false); // Estado para vibración
+  const [modoDaltonico, setModoDaltonico] = useState(false); // Estado para el modo daltónico
+  const [fontSize, setFontSize] = useState(16); // Estado para tamaño de fuente
 
   // Cargar configuraciones guardadas desde AsyncStorage
   useEffect(() => {
     const cargarConfiguraciones = async () => {
       const bloqueado = await AsyncStorage.getItem('blockEnabled');
       const vibracion = await AsyncStorage.getItem('vibrationEnabled');
+      const daltonico = await AsyncStorage.getItem('modoDaltonico');
+      const savedFontSize = await AsyncStorage.getItem('fontSize');
 
       if (bloqueado === 'true') setBloqueoActivado(true);
       if (vibracion === 'true') setVibrationFeedback(true);
+      if (daltonico === 'true') setModoDaltonico(true);
+      if (savedFontSize) setFontSize(parseInt(savedFontSize)); // Cargar el tamaño de fuente guardado
     };
 
     cargarConfiguraciones();
   }, []);
+
+  // Función para cambiar el tamaño de la fuente
+  const changeFontSize = async (newSize) => {
+    setFontSize(newSize);
+    await AsyncStorage.setItem('fontSize', newSize.toString()); // Guardar el tamaño en AsyncStorage
+  };
 
   // Función para activar/desactivar el bloqueo
   const toggleBloqueo = async (estado, navigation) => {
@@ -40,12 +52,10 @@ export const AppProvider = ({ children }) => {
     }
   };
 
-  // Función para verificar si la app está bloqueada al reingresar
-  const desbloquearApp = async (navigation) => {
-    const blockEnabled = await AsyncStorage.getItem('blockEnabled');
-    if (blockEnabled === 'true' && navigation) {
-      navigation.navigate('DesbloqApp'); // Redirigir a la pantalla de desbloqueo
-    }
+  // Función para activar/desactivar el modo daltónico
+  const toggleModoDaltonico = async (estado) => {
+    setModoDaltonico(estado);
+    await AsyncStorage.setItem('modoDaltonico', estado ? 'true' : 'false');
   };
 
   return (
@@ -53,9 +63,12 @@ export const AppProvider = ({ children }) => {
       value={{
         bloqueoActivado,
         vibrationFeedback,
+        modoDaltonico,
+        fontSize,
         toggleBloqueo,
         toggleVibration,
-        desbloquearApp,
+        toggleModoDaltonico,
+        changeFontSize, // Añadir changeFontSize al contexto
       }}
     >
       {children}

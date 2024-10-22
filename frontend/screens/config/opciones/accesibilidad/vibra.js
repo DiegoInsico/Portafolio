@@ -1,20 +1,41 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useContext } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, Vibration } from 'react-native';
+import { AppContext } from '../../../../context/appContext'; // Asegúrate de tener la ruta correcta
 
 const Vibracion = () => {
+  const { toggleVibration } = useContext(AppContext);
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Configuración de Vibración</Text>
 
-      <TouchableOpacity style={styles.button}>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => {
+          Vibration.vibrate(50); // Vibración suave
+          toggleVibration(true); // Guardar estado de vibración
+        }}
+      >
         <Text style={styles.buttonText}>Vibración Suave</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.button}>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => {
+          Vibration.vibrate(200); // Vibración media
+          toggleVibration(true); // Guardar estado de vibración
+        }}
+      >
         <Text style={styles.buttonText}>Vibración Media</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.button}>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => {
+          Vibration.vibrate(500); // Vibración fuerte
+          toggleVibration(true); // Guardar estado de vibración
+        }}
+      >
         <Text style={styles.buttonText}>Vibración Fuerte</Text>
       </TouchableOpacity>
     </View>
