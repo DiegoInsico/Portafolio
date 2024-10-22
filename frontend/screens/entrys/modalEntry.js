@@ -224,6 +224,7 @@ const ModalEntry = ({ visible, onClose }) => {
           name: cancion.name,
           artist: cancion.artist,
           albumImage: cancion.albumImage,
+          uri: cancion.uri, // Añadimos el 'uri' aquí
         };
       }
 
