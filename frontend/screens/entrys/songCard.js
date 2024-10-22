@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons'; // Para iconos de controles de reproducción
+import AudioPlayer from '../../components/audioPlayer';
 
 const SongCard = ({ entry }) => {
     if (!entry) {

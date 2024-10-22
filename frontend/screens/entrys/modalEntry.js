@@ -143,7 +143,7 @@ const ModalEntry = ({ visible, onClose }) => {
   const buscarCancionesSpotify = async (query) => {
     try {
       const response = await axios.get(
-        `http://192.168.100.43:3000/spotify/search`,
+        `http://192.168.1.6:3000/spotify/search`,
         {
           params: {
             query: query,
