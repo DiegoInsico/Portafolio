@@ -25,10 +25,12 @@ import { db } from "../../utils/firebase";
 import { LinearGradient } from "expo-linear-gradient";
 import { FontAwesome } from "@expo/vector-icons";
 import ModalEntry from "../entrys/modalEntry";
+import { useNavigation } from "@react-navigation/native";
 
 const { width: viewportWidth } = Dimensions.get("window");
 
 const Home = ({ navigation }) => {
+
   const [question, setQuestion] = useState("");
   const [loading, setLoading] = useState(true);
   const [userId, setUserId] = useState(null);
@@ -65,13 +67,19 @@ const Home = ({ navigation }) => {
     ]).start();
   }, [fadeAnim, scaleAnim]);
 
-  // Detectar si hay una sesión activa al iniciar la app
   useEffect(() => {
     const auth = getAuth();
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         setUserId(user.uid);
         setLoading(false);
+        if (!user.photoURL) {
+          Alert.alert(
+            "Foto de perfil faltante",
+            "Por favor, sube una foto de perfil para continuar."
+          );
+          navigation.navigate("Profile");
+        }
       } else {
         Alert.alert(
           "Sesión no iniciada",
@@ -82,7 +90,7 @@ const Home = ({ navigation }) => {
     });
 
     return () => unsubscribe();
-  }, [navigation]);
+}, [navigation]);
 
   // Función para obtener la pregunta de la IA
   const fetchQuestion = async (userId) => {

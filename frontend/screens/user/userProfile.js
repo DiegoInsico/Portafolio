@@ -2,156 +2,105 @@ import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
-  TextInput,
   Image,
-  Button,
   StyleSheet,
   TouchableOpacity,
-  Alert,
   ScrollView,
+  Alert,
 } from "react-native";
-import { getAuth, updateProfile } from "firebase/auth";
-import { db } from "../../utils/firebase"; // Asegúrate de tener configurado Firestore
-import * as ImagePicker from "expo-image-picker";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { doc, deleteDoc } from "firebase/firestore"; // Importa deleteDoc para Firestore
+import { getAuth } from "firebase/auth";
+import { db } from "../../utils/firebase";
+import { doc, getDoc, updateDoc } from "firebase/firestore"; // Firestore para manejar las preferencias
 import UserEntries from "../../components/general/userEntries";
-import NotificationPreferences from "../../components/general/notificationPreferences";
+import { FontAwesome } from "@expo/vector-icons";
 
-const UserProfile = () => {
+const UserProfile = ({ navigation }) => {
   const [user, setUser] = useState(null);
-  const [username, setUsername] = useState("");
   const [profileImage, setProfileImage] = useState("");
-  const [uploading, setUploading] = useState(false);
+  const [username, setUsername] = useState("");
+  const [description, setDescription] = useState("");
+  const [zodiacSign, setZodiacSign] = useState("");
+  const [belief, setBelief] = useState("");
+  const [personalityType, setPersonalityType] = useState("");
+  const [favoriteColor, setFavoriteColor] = useState("#2C3E50"); // Color favorito por defecto
+  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
 
   const auth = getAuth();
 
-  // Obtener la información del usuario
   useEffect(() => {
     const currentUser = auth.currentUser;
     if (currentUser) {
       setUser(currentUser);
-      setUsername(currentUser.displayName || "");
-      setProfileImage(
-        currentUser.photoURL || "https://example.com/default-avatar.png"
-      );
+      setUsername(currentUser.displayName || "Sin nombre de usuario");
+
+      // Obtener la información del perfil y las preferencias de notificación desde Firestore
+      const fetchUserProfile = async () => {
+        const profileDoc = doc(db, "profiles", currentUser.email); // Usar el correo como identificador
+        const profileSnapshot = await getDoc(profileDoc);
+
+        if (profileSnapshot.exists()) {
+          const profileData = profileSnapshot.data();
+          setProfileImage(
+            profileData.photoURL || "https://example.com/default-avatar.png"
+          );
+          setDescription(profileData.description || "Sin descripción");
+          setZodiacSign(profileData.zodiacSign || "Sin signo zodiacal");
+          setBelief(profileData.belief || "Sin creencias");
+          setPersonalityType(profileData.personalityType || "Sin personalidad");
+          setFavoriteColor(profileData.color || "#2C3E50"); // Recuperar el color favorito o usar uno por defecto
+          setNotificationsEnabled(profileData.notificationsEnabled || false);
+        }
+      };
+      fetchUserProfile();
     }
   }, []);
 
-  // Cambiar foto de perfil
-  const changeProfilePicture = async () => {
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 1,
-    });
+  // Función para manejar el cambio en las preferencias de notificación
+  const handleToggleNotification = async () => {
+    const userEmail = auth.currentUser.email;
+    const userDoc = doc(db, "profiles", userEmail);
 
-    if (!result.canceled) {
-      setUploading(true);
-      const imageUri = result.uri;
-      const response = await fetch(imageUri);
-      const blob = await response.blob();
-
-      const storageRef = ref(storage, `profile_pics/${user.uid}`);
-      await uploadBytes(storageRef, blob);
-      const downloadURL = await getDownloadURL(storageRef);
-
-      await updateProfile(user, { photoURL: downloadURL });
-      setProfileImage(downloadURL);
-      setUploading(false);
-
-      Alert.alert("Éxito", "La foto de perfil ha sido actualizada.");
-    }
-  };
-
-  // Guardar cambios del perfil
-  const handleSaveProfile = async () => {
     try {
-      await updateProfile(user, { displayName: username });
-      Alert.alert("Éxito", "Tu perfil ha sido actualizado.");
-    } catch (error) {
-      Alert.alert("Error", "Hubo un problema actualizando tu perfil.");
-    }
-  };
-
-  // Función para eliminar cuenta
-  const handleDeleteAccount = async () => {
-    const user = auth.currentUser;
-
-    if (user) {
+      await updateDoc(userDoc, { notificationsEnabled: !notificationsEnabled });
+      setNotificationsEnabled((prev) => !prev);
       Alert.alert(
-        "Confirmar Eliminación",
-        "¿Estás seguro de que deseas eliminar tu cuenta? Esta acción es irreversible.",
-        [
-          {
-            text: "Cancelar",
-            style: "cancel",
-          },
-          {
-            text: "Eliminar",
-            onPress: async () => {
-              try {
-                // Eliminar el documento del usuario en Firestore
-                await deleteDoc(doc(db, "users", user.uid));
-                console.log("Documento de usuario eliminado de Firestore");
-
-                // Eliminar el usuario de Firebase Authentication
-                await user.delete();
-                console.log("Usuario eliminado de Firebase Authentication");
-
-                Alert.alert("Éxito", "Tu cuenta ha sido eliminada exitosamente.");
-              } catch (error) {
-                console.error("Error al eliminar la cuenta:", error);
-                Alert.alert("Error", "Hubo un problema al eliminar tu cuenta.");
-              }
-            },
-          },
-        ]
+        "Éxito",
+        `Notificaciones ${!notificationsEnabled ? "activadas" : "desactivadas"}`
       );
+    } catch (error) {
+      console.error("Error al actualizar preferencias: ", error);
+      Alert.alert("Error", "Ocurrió un problema al actualizar tus preferencias.");
     }
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.header}>Perfil de Usuario</Text>
-
-      {/* Imagen de perfil */}
-      <TouchableOpacity onPress={changeProfilePicture}>
-        <Image source={{ uri: profileImage }} style={styles.profileImage} />
+    <ScrollView style={[styles.container, { backgroundColor: favoriteColor }]}>
+      {/* Botón de Notificaciones */}
+      <TouchableOpacity style={styles.notificationButton} onPress={handleToggleNotification}>
+        <FontAwesome name="bell" size={24} color={notificationsEnabled ? "#FFD700" : "#767577"} />
       </TouchableOpacity>
 
-      <Text style={styles.label}>Nombre de Usuario</Text>
-      <TextInput
-        style={styles.input}
-        value={username}
-        onChangeText={setUsername}
-        placeholder="Ingresa tu nombre de usuario"
-      />
+      {/* Botón de Editar Perfil */}
+      <TouchableOpacity
+        style={styles.editButton}
+        onPress={() => navigation.navigate("EditProfile")}
+      >
+        <FontAwesome name="pencil" size={24} color="#FFD700" />
+      </TouchableOpacity>
 
-      {/* Sección de preferencias de notificación */}
-      <NotificationPreferences />
+      {/* Imagen de perfil */}
+      <Image source={{ uri: profileImage }} style={styles.profileImage} />
+
+      {/* Información del perfil */}
+      <Text style={styles.usernameText}>{username}</Text>
+      <Text style={styles.infoText}>{description}</Text>
+      <Text style={styles.infoText}>{zodiacSign}</Text>
+      <Text style={styles.infoText}>{belief}</Text>
+      <Text style={styles.infoText}>{personalityType}</Text>
 
       {/* Sección de entradas del usuario */}
       <UserEntries userId={auth.currentUser.uid} />
-
-      {/* Botón para guardar cambios */}
-      <Button
-        title="Guardar Cambios"
-        onPress={handleSaveProfile}
-        color="#FFD700"
-      />
-
-      {/* Botón para borrar cuenta */}
-      <Button
-        title="Eliminar Cuenta"
-        onPress={handleDeleteAccount}
-        color="red" // Puedes cambiar el color como prefieras
-      />
-
-      {/* Indicador de carga al subir imagen */}
-      {uploading && <Text style={styles.uploading}>Subiendo imagen...</Text>}
-    </View>
+    </ScrollView>
   );
 };
 
@@ -159,15 +108,19 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    justifyContent: "center",
-    backgroundColor: "#2C3E50",
+    paddingTop: 50
   },
-  header: {
-    fontSize: 24,
-    fontWeight: "bold",
-    textAlign: "center",
-    marginBottom: 20,
-    color: "#FFD700", // Color dorado para el encabezado
+  notificationButton: {
+    position: "absolute",
+    top: 10,
+    left: 10,
+    padding: 10,
+  },
+  editButton: {
+    position: "absolute",
+    top: 10,
+    right: 10,
+    padding: 10,
   },
   profileImage: {
     width: 150,
@@ -178,23 +131,18 @@ const styles = StyleSheet.create({
     borderWidth: 3,
     borderColor: "#FFD700", // Borde dorado
   },
-  label: {
-    fontSize: 16,
-    marginBottom: 10,
-    color: "#FFD700", // Color dorado para la etiqueta
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: "#FFD700", // Borde dorado
-    borderRadius: 8,
-    padding: 10,
-    marginBottom: 20,
-    backgroundColor: "#fff", // Fondo blanco para el input
-  },
-  uploading: {
+  usernameText: {
+    fontSize: 24,
+    fontWeight: "bold",
     textAlign: "center",
-    marginTop: 20,
-    color: "#FFD700", // Color dorado para el texto de subida
+    marginBottom: 10,
+    color: "#FFD700",
+  },
+  infoText: {
+    fontSize: 16,
+    textAlign: "center",
+    marginBottom: 5,
+    color: "#FFF",
   },
 });
 

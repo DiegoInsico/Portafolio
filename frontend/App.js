@@ -75,6 +75,7 @@ export default function App() {
         >
           {user ? (
             <>
+              {/* // En la parte del stack para usuarios autenticados */}
               <Stack.Screen name="MainTabs" options={{ headerShown: false }}>
                 {() => <MainTabs toggleSidebar={toggleSidebar} />}
               </Stack.Screen>

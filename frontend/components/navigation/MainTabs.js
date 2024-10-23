@@ -12,6 +12,7 @@ import Home from "../../screens/home/home";
 import ListEntry from "../../screens/entrys/listEntry";
 import Baul from "../../screens/chest/baul";
 import UserProfile from "../../screens/user/userProfile";
+import EditProfile from "../../screens/profile/editProfile";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -121,6 +122,7 @@ export default function AppNavigator() {
             fontSize: 20,
             color: '#333',
           },
+          headerShown: false
         }}
       />
       {/* Agregar la ruta para el perfil */}
@@ -135,6 +137,21 @@ export default function AppNavigator() {
             fontSize: 20,
             color: '#333',
           },
+          headerShown: false
+        }}
+      />
+      <Stack.Screen
+        name="EditProfile"
+        component={EditProfile} // Asegúrate de tener una pantalla de perfil
+        options={{
+          title: 'EditProfile',
+          headerStyle: { backgroundColor: '#fff' },
+          headerTitleStyle: {
+            fontWeight: 'bold',
+            fontSize: 20,
+            color: '#333',
+          },
+          headerShown: false
         }}
       />
     </Stack.Navigator>
