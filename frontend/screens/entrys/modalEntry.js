@@ -24,7 +24,12 @@ import { MaterialIcons, Entypo } from "@expo/vector-icons";
 import axios from "axios";
 import { getAuth } from "firebase/auth";
 import { db, storage } from "../../utils/firebase";
-import { addDoc, updateDoc, collection, serverTimestamp } from "firebase/firestore";
+import {
+  addDoc,
+  updateDoc,
+  collection,
+  serverTimestamp,
+} from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import uuid from "react-native-uuid";
 
@@ -41,7 +46,7 @@ const ModalEntry = ({ visible, onClose }) => {
   const [isSpotifyMode, setIsSpotifyMode] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [selectedColor, setSelectedColor] = useState("#ffffff");
+  const [selectedColor, setSelectedColor] = useState("#fff");
   const [baul, setBaul] = useState(false); // Nuevo estado para "baul"
   const [cancion, setCancion] = useState(null); // Estado para canción de Spotify
   const today = new Date();
@@ -143,7 +148,7 @@ const ModalEntry = ({ visible, onClose }) => {
   const buscarCancionesSpotify = async (query) => {
     try {
       const response = await axios.get(
-        `http://192.168.100.43:3000/spotify/search`,
+        `http://192.168.1.12:3000/spotify/search`,
         {
           params: {
             query: query,
@@ -188,6 +193,7 @@ const ModalEntry = ({ visible, onClose }) => {
       let mediaURL = null;
       let audioURL = null;
       let cancionData = null;
+      let emociones = [];
 
       // Subir media (imagen o video) si existe y no es Spotify
       if (media && media.type !== "spotify") {
@@ -224,8 +230,15 @@ const ModalEntry = ({ visible, onClose }) => {
           name: cancion.name,
           artist: cancion.artist,
           albumImage: cancion.albumImage,
-          uri: cancion.uri, // Añadimos el 'uri' aquí
         };
+      }
+
+      // Análisis de emociones utilizando IA
+      if (texto) {
+      const response = await axios.get('http://192.168.1.12:3000/api/emotion', {
+        params: { text: texto },
+      });
+      emociones = response.data.emotions;
       }
 
       const nuevaEntrada = {
@@ -240,6 +253,7 @@ const ModalEntry = ({ visible, onClose }) => {
         baul,
         fechaCreacion: serverTimestamp(),
         fechaRecuerdo: categoria === "recuerdo" ? selectedDate : null,
+        emociones, // Aquí guardamos las emociones detectadas
       };
 
       if (cancionData) {
@@ -255,11 +269,11 @@ const ModalEntry = ({ visible, onClose }) => {
         nuevaEntrada.texto = texto;
       }
 
-      const docRef = await addDoc(collection(db, 'entradas'), nuevaEntrada);
+      const docRef = await addDoc(collection(db, "entradas"), nuevaEntrada);
 
       await updateDoc(docRef, { id: docRef.id });
 
-      console.log('Documento escrito con ID: ', docRef.id);
+      console.log("Documento escrito con ID: ", docRef.id);
 
       // Resetear el formulario
       setCategoria("");
@@ -475,7 +489,6 @@ const ModalEntry = ({ visible, onClose }) => {
 
           {/* Selector de Color */}
           <View style={styles.pickerContent}>
-            <Text>Dale color a tus emociones</Text>
             <ColorPicker
               selectedColor={selectedColor}
               onColorSelect={(color) => setSelectedColor(color)}
@@ -494,11 +507,142 @@ const ModalEntry = ({ visible, onClose }) => {
               }
             }}
             items={[
-              { label: "Selecciona una categoría", value: "" },
-              { label: "Viaje", value: "Viaje" },
-              { label: "Evento", value: "Evento" },
-              { label: "Personal", value: "Personal" },
-              { label: "Recuerdo", value: "Recuerdo" },
+              {
+                label: "Viaje",
+                value: "Viaje",
+              },
+              {
+                label: "Evento",
+                value: "Evento",
+              },
+              {
+                label: "Personal",
+                value: "Personal",
+              },
+              {
+                label: "Recuerdo",
+                value: "Recuerdo",
+              },
+              {
+                label: "Reflexión",
+                value: "Reflexión",
+              },
+              {
+                label: "Meta Alcanzada",
+                value: "Meta Alcanzada",
+              },
+              {
+                label: "Consejo",
+                value: "Consejo",
+              },
+              {
+                label: "Secreto",
+                value: "Secreto",
+              },
+              {
+                label: "Gratitud",
+                value: "Gratitud",
+              },
+              {
+                label: "Sueño",
+                value: "Sueño",
+              },
+              {
+                label: "Amistad",
+                value: "Amistad",
+              },
+              {
+                label: "Amor",
+                value: "Amor",
+              },
+              {
+                label: "Logro",
+                value: "Logro",
+              },
+              {
+                label: "Inspiración",
+                value: "Inspiración",
+              },
+              {
+                label: "Música",
+                value: "Música",
+              },
+              {
+                label: "Fotografía",
+                value: "Fotografía",
+              },
+              {
+                label: "Anécdota",
+                value: "Anécdota",
+              },
+              {
+                label: "Cumpleaños",
+                value: "Cumpleaños",
+              },
+              {
+                label: "Aprendizaje",
+                value: "Aprendizaje",
+              },
+              {
+                label: "Meditación",
+                value: "Meditación",
+              },
+              {
+                label: "Pensamiento",
+                value: "Pensamiento",
+              },
+              {
+                label: "Familia",
+                value: "Familia",
+              },
+              {
+                label: "Desafío",
+                value: "Desafío",
+              },
+              {
+                label: "Sueño Cumplido",
+                value: "Sueño Cumplido",
+              },
+              {
+                label: "Aventura",
+                value: "Aventura",
+              },
+              {
+                label: "Relación",
+                value: "Relación",
+              },
+              {
+                label: "Filosofía de Vida",
+                value: "Filosofía de Vida",
+              },
+              {
+                label: "Oración",
+                value: "Oración",
+              },
+              {
+                label: "Propuesta",
+                value: "Propuesta",
+              },
+              {
+                label: "Pérdida",
+                value: "Pérdida",
+              },
+              {
+                label: "Milagro",
+                value: "Milagro",
+              },
+              {
+                label: "Salud",
+                value: "Salud",
+              },
+              {
+                label: "Reconciliación",
+                value: "Reconciliación",
+              },
+              {
+                label: "Celebración",
+                value: "Celebración",
+              },
             ]}
             placeholder={{
               label: "Selecciona una categoría",
@@ -551,56 +695,55 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(0,0,0,0.7)",
+    backgroundColor: "rgba(0,0,0,0.8)",
     padding: 20,
   },
   modalContent: {
     width: "90%",
-    backgroundColor: "#FFF",
+    backgroundColor: "#4B4E6D",
     borderRadius: 15,
-    justifyContent: 'center',
-    alignItems: 'center',
     padding: 20,
     elevation: 5,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
+    alignItems: "center",
   },
-
   /* ====== Text Styles ====== */
   titulo: {
     fontSize: 22,
     fontWeight: "bold",
     marginBottom: 10,
     textAlign: "center",
-    color: "#333",
+    color: "#FFD700",
   },
   label: {
     marginTop: 10,
     marginBottom: 5,
     fontWeight: "600",
-    color: "#555",
+    color: "#FFD700",
   },
 
   /* ====== Input Styles ====== */
   input: {
     borderWidth: 1,
-    borderColor: "#ddd",
+    borderColor: "#FFD700",
     borderRadius: 10,
     padding: 10,
     textAlignVertical: "top",
-    backgroundColor: "#f9f9f9",
+    backgroundColor: "#2C3E50",
+    color: "#FFF",
     width: "100%",
     marginBottom: 10,
   },
   inputTexto: {
     borderWidth: 1,
-    borderColor: "#ddd",
+    borderColor: "#FFD700",
     borderRadius: 10,
     padding: 10,
     textAlignVertical: "top",
-    backgroundColor: "#f9f9f9",
+    backgroundColor: "#fff",
     height: 100,
     marginTop: 5,
     width: "100%",
@@ -609,7 +752,7 @@ const styles = StyleSheet.create({
 
   /* ====== Switch Content Container ====== */
   switchContentContainer: {
-    height: 150, // Altura fija para evitar cambios en la altura del modal
+    height: 150,
     justifyContent: "center",
     alignItems: "center",
     marginVertical: 10,
@@ -617,12 +760,10 @@ const styles = StyleSheet.create({
   },
   textoContainer: {
     width: "100%",
-    height: "100%",
     justifyContent: "center",
   },
   audioModeContainer: {
     width: "100%",
-    height: "100%",
     justifyContent: "center",
     alignItems: "center",
   },
@@ -633,7 +774,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   botonGuardar: {
-    backgroundColor: "#28a745",
+    backgroundColor: "#FFD700",
     padding: 12,
     borderRadius: 10,
     flex: 1,
@@ -651,7 +792,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   botonTexto: {
-    color: "#fff",
+    color: "#000000",
     textAlign: "center",
     fontWeight: "600",
     fontSize: 16,
@@ -663,14 +804,14 @@ const styles = StyleSheet.create({
     position: "relative",
     width: "100%",
     marginTop: 10,
-    height: 220, // Altura fija para la vista previa de medios
+    height: 220,
     marginBottom: 10,
   },
   mediaPreview: {
     width: "100%",
     height: "100%",
     borderRadius: 10,
-    resizeMode: "cover", // Asegura que la imagen cubra el contenedor
+    resizeMode: "cover",
   },
   trackImageSelect: {
     width: "100%",
@@ -751,7 +892,7 @@ const styles = StyleSheet.create({
   /* ====== Color Picker Styles ====== */
   pickerContent: {
     marginVertical: 10,
-    backgroundColor: "#fff",
+    backgroundColor: "#2C3E50",
     borderRadius: 10,
     alignItems: "center",
     padding: 10,
@@ -783,12 +924,12 @@ const pickerSelectStyles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 10,
     borderWidth: 1,
-    borderColor: "#ccc",
+    borderColor: "#FFD700",
     borderRadius: 5,
-    color: "black",
+    color: "white",
     paddingRight: 30,
-    backgroundColor: "#f9f9f9",
-    width: "100%",
+    backgroundColor: "#2C3E50",
+    width: "80%",
     marginBottom: 10,
   },
   inputAndroid: {
@@ -796,11 +937,11 @@ const pickerSelectStyles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 8,
     borderWidth: 0.5,
-    borderColor: "#ccc",
+    borderColor: "#FFD700",
     borderRadius: 5,
-    color: "black",
+    color: "white",
     paddingRight: 30,
-    backgroundColor: "#f9f9f9",
+    backgroundColor: "#2C3E50",
     width: "100%",
     marginBottom: 10,
   },

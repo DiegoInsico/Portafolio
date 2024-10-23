@@ -88,7 +88,7 @@ const Home = ({ navigation }) => {
   const fetchQuestion = async (userId) => {
     try {
       const response = await axios.get(
-        `http://192.168.100.43:3000/api/question?userId=${userId}`
+        `http://192.168.1.12:3000/api/question?userId=${userId}`
       );
       setQuestion(response.data.question);
     } catch (error) {
@@ -200,6 +200,7 @@ const Home = ({ navigation }) => {
 
         {/* Contenedor de los botones */}
         <View style={styles.containerBoton}>
+          
           {/* Botón circular "Nueva Entrada" */}
           <TouchableOpacity
             style={styles.roundButton}

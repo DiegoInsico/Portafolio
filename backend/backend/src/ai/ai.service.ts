@@ -29,7 +29,7 @@ export class AiService {
       const prompt = `
 Genera una pregunta de reflexión breve para el usuario basada en la siguiente información. 
 La pregunta debe promover la introspección personal del usuario, relacionada con sus experiencias de vida, emociones, aprendizajes, 
-o mensajes que desea dejar a sus seres queridos. Asegúrate de que las preguntas sean profundas, pero simples y fáciles de responder.
+o mensajes que desea dejar a sus seres queridos. Asegúrate de que las preguntas sean simples y fáciles de responder.
 
 Contexto del usuario:
 
@@ -71,6 +71,27 @@ Ejemplos de Preguntas:
         console.error('General Error:', error.message);
       }
       throw new Error('Error generating question from OpenAI');
+    }
+  }
+
+  // Funcion para generar emociones a partir del mensaje.
+  async generateEmotion(text: string): Promise<string[]> {
+    try {
+      const prompt = `
+        Analiza el siguiente texto y determina las dos emociones más predominantes, como "alegría", "tristeza", "amor", "nostalgia". No agregues explicaciones, solo responde con las emociones separadas por comas.
+        Texto: "${text}"
+      `;
+
+      const response = await this.openai.chat.completions.create({
+        model: 'gpt-3.5-turbo',
+        messages: [{ role: 'system', content: prompt }],
+      });
+
+      const emotions = response.choices[0].message.content.split(',').map(e => e.trim());
+      return emotions;
+    } catch (error) {
+      console.error('Error generating emotions:', error);
+      throw new Error('Error generating emotions from OpenAI');
     }
   }
 }
