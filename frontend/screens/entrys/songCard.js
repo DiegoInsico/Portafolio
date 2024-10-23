@@ -1,8 +1,8 @@
 import React from 'react';
-import { View, Text, Image, StyleSheet } from 'react-native';
+import { View, Text, Image, StyleSheet, Pressable } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons'; // Para iconos de controles de reproducción
 
-const SongCard = ({ entry }) => {
+const SongCard = ({ entry, onPress }) => {
     if (!entry) {
         return null;
     }
@@ -14,7 +14,7 @@ const SongCard = ({ entry }) => {
     const { cancion, color, texto, audio, fechaCreacion } = entry;
 
     return (
-        <View style={[styles.card, { borderColor: color }]}>
+        <Pressable onPress={onPress} style={[styles.card, { borderColor: color }]}>
             {cancion && (
                 <>
                     <Image source={{ uri: cancion.albumImage }} style={styles.albumImage} />
@@ -43,13 +43,13 @@ const SongCard = ({ entry }) => {
                 )}
 
             </View>
-        </View>
+        </Pressable>
     );
 };
 
 const styles = StyleSheet.create({
     card: {
-        alignContent:'center',
+        alignContent: 'center',
         backgroundColor: '#F4E4E4', // Fondo similar al de la imagen
         borderRadius: 15,
         borderWidth: 4,

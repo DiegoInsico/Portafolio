@@ -1,7 +1,7 @@
 import React from 'react';
-import { View, Text, Image, StyleSheet, Dimensions } from 'react-native';
+import { View, Text, Image, StyleSheet, Dimensions, Pressable } from 'react-native';
 
-const PolaroidCard = ({ entry }) => {
+const PolaroidCard = ({ entry, onPress }) => {
     if (!entry) {
         return null;
     }
@@ -12,8 +12,8 @@ const PolaroidCard = ({ entry }) => {
     const { media, mediaType, fechaCreacion, texto, audio, color } = entry;
 
     return (
-        <View style={styles.polaroidWrapper}>
-            <View style={[styles.polaroidContainer, {  borderColor: color || '#ffffff' }]}>
+        <Pressable onPress={onPress} style={styles.polaroidWrapper}>
+            <View style={[styles.polaroidContainer, { borderColor: color || '#ffffff' }]}>
                 <View style={styles.imageContainer}>
                     {media && mediaType === 'image' && (
                         <Image source={{ uri: media }} style={styles.image} />
@@ -34,7 +34,7 @@ const PolaroidCard = ({ entry }) => {
                     )}
                 </View>
             </View>
-        </View>
+        </Pressable>
     );
 };
 

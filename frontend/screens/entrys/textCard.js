@@ -1,8 +1,8 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Pressable } from 'react-native';
 import AudioPlayer from '../../components/audioPlayer'; // Importa el componente que creamos anteriormente
 
-const TextCard = ({ entry }) => {
+const TextCard = ({ entry, onPress }) => {
     if (!entry) {
         return null;
     }
@@ -14,7 +14,7 @@ const TextCard = ({ entry }) => {
     const { texto, audio, color, fechaCreacion } = entry;
 
     return (
-        <View style={styles.noteWrapper}>
+        <Pressable onPress={onPress} style={styles.noteWrapper}>
             <View style={[styles.card, { borderLeftColor: color || '#f28b82' }]}>
                 {/* Mostrar texto si está disponible */}
                 {texto && (
@@ -29,7 +29,7 @@ const TextCard = ({ entry }) => {
                     <Text style={styles.date}>{formattedFechaCreacion}</Text>
                 )}
             </View>
-        </View>
+        </Pressable>
     );
 };
 
