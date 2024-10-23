@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ScrollView, Text, ActivityIndicator, StyleSheet, Modal, View } from 'react-native';
+import { ScrollView, Text, ActivityIndicator,Pressable ,StyleSheet , Modal, View } from 'react-native';
 import PolaroidCard from './polaroidCard';
 import { LinearGradient } from "expo-linear-gradient";
 import SongCard from './songCard';

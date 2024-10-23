@@ -1,8 +1,8 @@
 import React from 'react';
-import { View, Text, Image, StyleSheet } from 'react-native';
+import { View, Text, Image, StyleSheet, Pressable } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons'; // Para iconos de controles de reproducción
 
-// Función para mapear emociones a emojis
+
 const emotionToEmoji = (emotion) => {
     switch (emotion.toLowerCase()) {
         case 'alegría':
@@ -84,7 +84,9 @@ const emotionToEmoji = (emotion) => {
     }
 };
 
-const SongCard = ({ entry }) => {
+const SongCard = ({ entry, onPress }) => {
+
+
     if (!entry) {
         return null;
     }
@@ -96,7 +98,10 @@ const SongCard = ({ entry }) => {
     const { cancion, color, texto, audio, fechaCreacion, emociones } = entry;
 
     return (
-        <View style={[styles.card, { borderColor: color }]}>
+
+        <Pressable onPress={onPress} style={[styles.card, { borderColor: color }]}>
+
+
             {/* Mostrar emociones flotantes en una "bandera" sobre la tarjeta */}
             {emociones && emociones.length > 0 && (
                 <View style={styles.emojiFlag}>
@@ -135,7 +140,7 @@ const SongCard = ({ entry }) => {
                     <AudioPlayer audioUri={audio} />
                 )}
             </View>
-        </View>
+        </Pressable>
     );
 };
 

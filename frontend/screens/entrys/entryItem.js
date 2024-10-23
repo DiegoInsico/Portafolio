@@ -1,85 +1,132 @@
 import React, { useState } from "react";
-import { View, Text, TouchableOpacity, Modal, TextInput, Button, Alert, StyleSheet, Switch } from "react-native";
+import {
+  View,
+  Text,
+  Modal,
+  TextInput,
+  Button,
+  Alert,
+  StyleSheet,
+  Switch,
+  ScrollView,
+} from "react-native";
 import { updateDoc, doc } from "firebase/firestore";
 import { db } from "../../utils/firebase";
 
-const EntryItem = ({ item, onClose }) => {
+// Importar los componentes de tarjeta
+import PolaroidCard from './polaroidCard';
+import SongCard from './songCard';
+import TextCard from './textCard';
+
+// Importar Picker para el selector de beneficiarios
+import { Picker } from '@react-native-picker/picker';
+
+const EntryItem = ({ item, onClose, beneficiaries }) => {
+  if (!item) {
+    return null;
+  }
+
   const [modalVisible, setModalVisible] = useState(true);
-  const [addToBaul, setAddToBaul] = useState(false); // Estado para "Sí" o "No" del switch
-  const [nickname, setNickname] = useState('');
+  const [addToBaul, setAddToBaul] = useState(false);
+  const [nickname, setNickname] = useState("");
+
+  const [addBeneficiary, setAddBeneficiary] = useState(false);
+  const [selectedBeneficiary, setSelectedBeneficiary] = useState("");
+
+  // Convertir createdAt a una fecha legible
+  const creationDateTime = item.createdAt
+    ? new Date(item.createdAt.seconds * 1000)
+    : null;
+
+  const formattedCreationDate = creationDateTime
+    ? creationDateTime.toLocaleDateString()
+    : "Fecha no disponible";
+
+  const formattedCreationTime = creationDateTime
+    ? creationDateTime.toLocaleTimeString()
+    : "Hora no disponible";
 
   // Manejar la acción de agregar al baúl
   const handleAddToBaul = async () => {
-    if (!nickname) {
-      Alert.alert('Error', 'Por favor, introduce un apodo para la entrada.');
+    try {
+      // Actualizar el documento en Firestore para marcarlo como archivado
+      const entryRef = doc(db, "entries", item.id);
+      await updateDoc(entryRef, { baul: true, nickname });
+
+      Alert.alert("Éxito", "La entrada ha sido agregada al Baúl.");
+      // Restablecer los estados y cerrar el modal
+      setModalVisible(false);
+      setAddToBaul(false);
+      setNickname("");
+      onClose();
+    } catch (error) {
+      console.error("Error al agregar al Baúl: ", error);
+      Alert.alert("Error", "Ocurrió un error al agregar la entrada al Baúl.");
+    }
+  };
+
+  // Manejar la acción de asignar beneficiario
+  const handleAssignBeneficiary = async () => {
+    if (!selectedBeneficiary) {
+      Alert.alert("Error", "Por favor, selecciona un beneficiario.");
       return;
     }
 
     try {
-      // Actualizar el documento en Firestore para marcarlo como archivado
-      const entryRef = doc(db, 'entries', item.id);
-      await updateDoc(entryRef, { baul: true, nickname });
+      // Actualizar el documento en Firestore para asociarlo con el beneficiario
+      const entryRef = doc(db, "entries", item.id);
+      await updateDoc(entryRef, { beneficiary: selectedBeneficiary });
 
-      Alert.alert('Éxito', 'La entrada ha sido agregada al Baúl.');
-      // Restablecer los estados y cerrar el modal
-      setModalVisible(false);
-      setAddToBaul(false);
-      setNickname('');
-      onClose(); // Llamar a onClose para cerrar el modal
+      Alert.alert("Éxito", "Beneficiario asignado correctamente.");
+      // Restablecer los estados
+      setAddBeneficiary(false);
+      setSelectedBeneficiary("");
     } catch (error) {
-      console.error('Error al agregar al Baúl: ', error);
-      Alert.alert('Error', 'Ocurrió un error al agregar la entrada al Baúl.');
+      console.error("Error al asignar beneficiario: ", error);
+      Alert.alert("Error", "Ocurrió un error al asignar el beneficiario.");
     }
   };
 
-  const creationDate = item.createdAt
-    ? new Date(item.createdAt.seconds * 1000).toLocaleDateString()
-    : "Fecha no disponible"; // Manejar si no hay createdAt
-
-  const creationTime = item.createdAt
-    ? new Date(item.createdAt.seconds * 1000).toLocaleTimeString()
-    : "Hora no disponible"; // Manejar si no hay createdAt
+  // Función para renderizar el componente de tarjeta apropiado
+  const renderEntryContent = () => {
+    if (item.media && (item.mediaType === 'image' || item.mediaType === 'video')) {
+      return <PolaroidCard entry={item} />;
+    } else if (item.cancion) {
+      return <SongCard entry={item} />;
+    } else if (item.texto || item.audio) {
+      return <TextCard entry={item} />;
+    } else {
+      return <Text>No hay contenido disponible</Text>;
+    }
+  };
 
   return (
     <Modal
       animationType="slide"
-      transparent={true}
+      transparent={false} // Hacer que el modal ocupe toda la pantalla
       visible={modalVisible}
       onRequestClose={onClose}
     >
-      <View style={styles.modalBackground}>
-        <View style={styles.modalView}>
-          {/* Hora de creación */}
-          <Text style={styles.modalText}>
-            Hora de creación: {item.fechaCreacion}
-          </Text>
+      <ScrollView contentContainerStyle={styles.modalContainer}>
+        {/* Contenido de la entrada */}
+        <View style={styles.entryContentContainer}>
+          {renderEntryContent()}
+        </View>
 
-          {/* Categoría de la entrada */}
-          {item.category && (
-            <View style={styles.detailContainer}>
-              <Text style={styles.modalTitle}>Detalles de la Entrada:</Text>
-              <Text style={styles.detailText}>{item.categoria}</Text>
-            </View>
-          )}
-
-          {/* Mensaje de la entrada */}
-          <View style={styles.messageContainer}>
-            <Text style={styles.modalTitle}>Mensaje:</Text>
-            <Text style={styles.messageText}>{item.texto}</Text>
-          </View>
-
+        {/* Opciones debajo del contenido */}
+        <View style={styles.optionsContainer}>
           {/* Switch para "Agregar al Baúl" */}
-          <View style={styles.switchBaulContainer}>
+          <View style={styles.optionItem}>
             <Text style={styles.modalText}>¿Guardar en el baúl?</Text>
             <Switch
               value={addToBaul}
               onValueChange={setAddToBaul}
-              thumbColor={addToBaul ? '#4CAF50' : '#f4f3f4'}
-              trackColor={{ false: '#767577', true: '#81b0ff' }}
+              thumbColor={addToBaul ? "#4CAF50" : "#f4f3f4"}
+              trackColor={{ false: "#767577", true: "#81b0ff" }}
             />
           </View>
 
-          {/* Mostrar el campo de apodo solo si se selecciona "Sí" */}
+          {/* Mostrar el campo de apodo y botón "Guardar" si se selecciona "Agregar al Baúl" */}
           {addToBaul && (
             <View style={styles.nicknameContainer}>
               <TextInput
@@ -88,76 +135,105 @@ const EntryItem = ({ item, onClose }) => {
                 onChangeText={setNickname}
                 style={styles.input}
               />
-              <Button title="Agregar al Baúl" onPress={handleAddToBaul} />
+              <Button title="Guardar en el Baúl" onPress={handleAddToBaul} />
             </View>
           )}
 
-          {/* Botón para cancelar */}
-          <Button title="Cancelar" onPress={onClose} color="red" />
+          {/* Pregunta para agregar beneficiario */}
+          <View style={styles.optionItem}>
+            <Text style={styles.modalText}>¿Agregar Beneficiario?</Text>
+            <Switch
+              value={addBeneficiary}
+              onValueChange={setAddBeneficiary}
+              thumbColor={addBeneficiary ? "#4CAF50" : "#f4f3f4"}
+              trackColor={{ false: "#767577", true: "#81b0ff" }}
+            />
+          </View>
+
+          {/* Mostrar el selector de beneficiarios si se selecciona "Sí" */}
+          {addBeneficiary && (
+            <View style={styles.beneficiaryContainer}>
+              <Picker
+                selectedValue={selectedBeneficiary}
+                onValueChange={(itemValue) => setSelectedBeneficiary(itemValue)}
+                style={styles.picker}
+              >
+                <Picker.Item label="Selecciona un beneficiario" value="" />
+                {beneficiaries.map((beneficiary) => (
+                  <Picker.Item
+                    key={beneficiary.id}
+                    label={beneficiary.name}
+                    value={beneficiary.id}
+                  />
+                ))}
+              </Picker>
+              <Button title="Asignar Beneficiario" onPress={handleAssignBeneficiary} />
+            </View>
+          )}
+
+          {/* Botón para cerrar el modal */}
+          <View style={styles.buttonContainer}>
+            <Button title="Cerrar" onPress={onClose} color="red" />
+          </View>
         </View>
-      </View>
+      </ScrollView>
     </Modal>
   );
 };
 
-// Estilos del componente
+// Estilos del componente (puedes ajustarlos según tus preferencias)
 const styles = StyleSheet.create({
-  modalBackground: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.7)', // Fondo semitransparente
-  },
-  modalView: {
-    width: '90%',
-    backgroundColor: '#fff',
-    borderRadius: 10,
+  modalContainer: {
     padding: 20,
+    backgroundColor: "#fff",
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 3,
-    elevation: 5, // Sombra en Android
   },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 15,
-    color: '#333',
+  entryContentContainer: {
+    marginBottom: 20,
+    width: '100%',
+    alignItems: 'center',
+  },
+  optionsContainer: {
+    marginBottom: 20,
+    width: '100%',
+    alignItems: 'center',
+  },
+  optionItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 10,
+    justifyContent: 'space-between',
+    width: '80%',
+  },
+  nicknameContainer: {
+    marginBottom: 20,
+    width: '80%',
+  },
+  beneficiaryContainer: {
+    marginBottom: 20,
+    width: '80%',
+  },
+  input: {
+    width: "100%",
+    padding: 10,
+    backgroundColor: "#f0f0f0",
+    borderRadius: 8,
+    marginBottom: 10,
+    textAlign: "center",
+  },
+  buttonContainer: {
+    marginBottom: 20,
+    width: '80%',
   },
   modalText: {
     fontSize: 16,
-    color: '#333',
+    color: "#333",
+    marginRight: 10,
+  },
+  picker: {
+    width: '100%',
+    height: 50,
     marginBottom: 10,
-    textAlign: 'center',
-  },
-  messageContainer: {
-    marginBottom: 15,
-  },
-  messageText: {
-    fontSize: 16,
-    color: '#333',
-  },
-  switchBaulContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginVertical: 20,
-    width: '100%',
-  },
-  nicknameContainer: {
-    width: '100%',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  input: {
-    width: '100%',
-    padding: 10,
-    backgroundColor: '#f0f0f0',
-    borderRadius: 8,
-    marginBottom: 20,
-    textAlign: 'center',
   },
 });
 

@@ -1,8 +1,7 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Pressable } from 'react-native';
 import AudioPlayer from '../../components/audioPlayer'; // Importa el componente que creamos anteriormente
 
-// Función para convertir las emociones en emojis
 const emotionToEmoji = (emotion) => {
     switch (emotion.toLowerCase()) {
         case 'alegría':
@@ -84,7 +83,9 @@ const emotionToEmoji = (emotion) => {
     }
 };
 
-const TextCard = ({ entry }) => {
+const TextCard = ({ entry, onPress }) => {
+
+
     if (!entry) {
         return null;
     }
@@ -96,7 +97,7 @@ const TextCard = ({ entry }) => {
     const { texto, audio, color, fechaCreacion, emociones } = entry;
 
     return (
-        <View style={styles.noteWrapper}>
+        <Pressable onPress={onPress} style={styles.noteWrapper}>
             <View style={[styles.card, { borderLeftColor: color || '#f28b82' }]}>
                 {/* Emociones flotantes sobre la tarjeta de texto */}
                 {emociones && emociones.length > 0 && (
@@ -122,7 +123,7 @@ const TextCard = ({ entry }) => {
                     <Text style={styles.date}>{formattedFechaCreacion}</Text>
                 )}
             </View>
-        </View>
+        </Pressable>
     );
 };
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Image, StyleSheet, Dimensions } from 'react-native';
+import { View, Text, Image, StyleSheet, Dimensions, Pressable } from 'react-native';
 
 const emotionToEmoji = (emotion) => {
     switch (emotion.toLowerCase()) {
@@ -82,7 +82,9 @@ const emotionToEmoji = (emotion) => {
     }
 };
 
-const PolaroidCard = ({ entry }) => {
+
+const PolaroidCard = ({ entry, onPress }) => {
+
     if (!entry) {
         return null;
     }
@@ -94,7 +96,8 @@ const PolaroidCard = ({ entry }) => {
     const { media, mediaType, fechaCreacion, texto, audio, color, emociones } = entry;
 
     return (
-        <View style={styles.polaroidWrapper}>
+
+        <Pressable onPress={onPress} style={styles.polaroidWrapper}>
             <View style={[styles.polaroidContainer, { borderColor: color || '#ffffff' }]}>
                 {/* Mostrar emociones flotantes en una "bandera" sobre la tarjeta */}
                 {emociones && emociones.length > 0 && (
@@ -106,6 +109,7 @@ const PolaroidCard = ({ entry }) => {
                         ))}
                     </View>
                 )}
+
 
                 <View style={styles.imageContainer}>
                     {media && mediaType === 'image' && (
@@ -128,7 +132,7 @@ const PolaroidCard = ({ entry }) => {
                     )}
                 </View>
             </View>
-        </View>
+        </Pressable>
     );
 };
 
