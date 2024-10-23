@@ -12,4 +12,9 @@ export class AiController {
     return { question };
   }
   
+  @Get('emotion')
+  async generateEmotion(@Query('text') text: string): Promise<{ emotions: string[] }> {
+    const emotions = await this.aiService.generateEmotion(text);
+    return { emotions };
+  }
 }

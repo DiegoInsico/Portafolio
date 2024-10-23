@@ -74,7 +74,7 @@ const styles = StyleSheet.create({
         elevation: 5, // Sombra en Android
     },
     colorText: {
-        color: '#fff',
+        color: '#000000',
         fontWeight: 'bold',
     },
     sheetContainer: {

@@ -46,7 +46,7 @@ const ModalEntry = ({ visible, onClose }) => {
   const [isSpotifyMode, setIsSpotifyMode] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [selectedColor, setSelectedColor] = useState("#ffffff");
+  const [selectedColor, setSelectedColor] = useState("#fff");
   const [baul, setBaul] = useState(false); // Nuevo estado para "baul"
   const [cancion, setCancion] = useState(null); // Estado para canción de Spotify
   const today = new Date();
@@ -148,7 +148,7 @@ const ModalEntry = ({ visible, onClose }) => {
   const buscarCancionesSpotify = async (query) => {
     try {
       const response = await axios.get(
-        `http://192.168.100.43:3000/spotify/search`,
+        `http://192.168.1.12:3000/spotify/search`,
         {
           params: {
             query: query,
@@ -193,6 +193,7 @@ const ModalEntry = ({ visible, onClose }) => {
       let mediaURL = null;
       let audioURL = null;
       let cancionData = null;
+      let emociones = [];
 
       // Subir media (imagen o video) si existe y no es Spotify
       if (media && media.type !== "spotify") {
@@ -232,6 +233,14 @@ const ModalEntry = ({ visible, onClose }) => {
         };
       }
 
+      // Análisis de emociones utilizando IA
+      if (texto) {
+      const response = await axios.get('http://192.168.1.12:3000/api/emotion', {
+        params: { text: texto },
+      });
+      emociones = response.data.emotions;
+      }
+
       const nuevaEntrada = {
         userId: user.uid, // Añadir el ID del usuario autenticado
         categoria,
@@ -244,6 +253,7 @@ const ModalEntry = ({ visible, onClose }) => {
         baul,
         fechaCreacion: serverTimestamp(),
         fechaRecuerdo: categoria === "recuerdo" ? selectedDate : null,
+        emociones, // Aquí guardamos las emociones detectadas
       };
 
       if (cancionData) {
@@ -479,7 +489,6 @@ const ModalEntry = ({ visible, onClose }) => {
 
           {/* Selector de Color */}
           <View style={styles.pickerContent}>
-            <Text>Dale color a tus emociones</Text>
             <ColorPicker
               selectedColor={selectedColor}
               onColorSelect={(color) => setSelectedColor(color)}
@@ -783,7 +792,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   botonTexto: {
-    color: "#fff",
+    color: "#000000",
     textAlign: "center",
     fontWeight: "600",
     fontSize: 16,
