@@ -5,15 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="2137b152-a29a-4d26-8781-e8af1c953a9c" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/caches/deviceStreaming.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/caches/deviceStreaming.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/components/ui/ColorPicker.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/components/ui/ColorPicker.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/screens/entrys/modalEntry.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/screens/entrys/modalEntry.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/screens/entrys/polaroidCard.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/screens/entrys/polaroidCard.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/screens/entrys/songCard.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/screens/entrys/songCard.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/screens/entrys/textCard.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/screens/entrys/textCard.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/screens/home/home.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/screens/home/home.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
