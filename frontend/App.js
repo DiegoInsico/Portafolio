@@ -11,8 +11,7 @@ import { onAuthStateChanged } from "firebase/auth";
 // Importar componentes
 import SplashScreen from "./components/ui/SplashScreen";
 import MainTabs from "./components/navigation/MainTabs";
-
-import SideBar from "./components/navigation/sideBar"; // Importar el componente Sidebar
+import SideBar from "./components/navigation/sideBar";
 
 // Importar pantallas
 import Login from "./screens/auth/login";
@@ -20,6 +19,7 @@ import Registro from "./screens/auth/register";
 import RequestPasswordReset from "./screens/auth/resetPass";
 import ModalEntry from "./screens/entrys/modalEntry";
 import Baul from "./screens/chest/baul";
+import SecuritySettings from "./components/security/SecurittySettings";
 
 const Stack = createStackNavigator();
 
@@ -37,8 +37,6 @@ export default function App() {
       setUser(currentUser);
       if (initializing) setInitializing(false);
     });
-
-    // Limpiar el listener
     return unsubscribe;
   }, [initializing]);
 
@@ -47,30 +45,46 @@ export default function App() {
   return (
     <NavigationContainer>
       <View style={styles.container}>
-        <SideBar visible={sidebarVisible} toggleSidebar={toggleSidebar} />
+        <SideBar
+          isVisible={sidebarVisible}
+          toggleSidebar={toggleSidebar}
+          navigateToBaul={() => {
+            toggleSidebar();
+            navigation.navigate("Baul");
+          }}
+          navigateToProfile={() => {
+            toggleSidebar();
+            navigation.navigate("Profile");
+          }}
+          navigateToSecuritySettings={() => {
+            toggleSidebar();
+            navigation.navigate("Configuración de Seguridad");
+          }}
+        />
+
         <Stack.Navigator
           screenOptions={{
             headerStyle: {
-              backgroundColor: "#4B4E6D", // Fondo de reserva en caso de que la imagen no se cargue
+              backgroundColor: "#4B4E6D",
             },
-            headerTintColor: "#000000", // Color del texto del encabezado
+            headerTintColor: "#000000",
             headerTitleStyle: {
               fontWeight: "bold",
               fontSize: 20,
             },
             headerTitle: () => (
               <Image
-                source={require("./assets/background/florLogo.png")} // Reemplaza con la ruta de tu logo
+                source={require("./assets/background/florLogo.png")}
                 style={{ width: 100, height: 40, resizeMode: "contain" }}
               />
             ),
             headerBackground: () => (
               <Image
-                source={require("./assets/background/navbar.png")} // Reemplaza con la ruta de tu imagen
+                source={require("./assets/background/navbar.png")}
                 style={{ width: "100%", height: "100%" }}
               />
             ),
-            ...TransitionPresets.SlideFromRightIOS, // Animación de transición entre pantallas
+            ...TransitionPresets.SlideFromRightIOS,
           }}
         >
           {user ? (
@@ -82,8 +96,8 @@ export default function App() {
                 name="ModalEntry"
                 component={ModalEntry}
                 options={{
-                  headerShown: false, // Opción para ocultar el encabezado si deseas que parezca un modal completo
-                  presentation: "modal", // Opción para presentar como modal en iOS
+                  headerShown: false,
+                  presentation: "modal",
                 }}
               />
               <Stack.Screen
@@ -92,12 +106,27 @@ export default function App() {
                 options={{
                   title: "Baúl",
                   headerStyle: {
-                    backgroundColor: "#FFD700", // Color del encabezado
+                    backgroundColor: "#FFD700",
                   },
                   headerTitleStyle: {
                     fontWeight: "bold",
                     fontSize: 20,
-                    color: "#333", // Color del texto del encabezado
+                    color: "#333",
+                  },
+                }}
+              />
+              <Stack.Screen
+                name="SecuritySettings"
+                component={SecuritySettings} // Define esta pantalla en tu proyecto
+                options={{
+                  title: "Configuración de Seguridad",
+                  headerStyle: {
+                    backgroundColor: "#4B4E6D",
+                  },
+                  headerTitleStyle: {
+                    fontWeight: "bold",
+                    fontSize: 20,
+                    color: "#FFD700",
                   },
                 }}
               />
@@ -139,6 +168,6 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#000000", // Cambia el fondo si es necesario
+    backgroundColor: "#000000",
   },
 });

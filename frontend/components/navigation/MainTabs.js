@@ -28,14 +28,18 @@ function MainTabs({ navigation }) {
       {/* Renderizar el Sidebar y pasar la función de navegación */}
       <Sidebar
         isVisible={sidebarVisible}
-        toggleSidebar={handleToggleSidebar}
+        toggleSidebar={handleToggleSidebar} // Función para abrir/cerrar sidebar
         navigateToBaul={() => {
-          handleToggleSidebar();
-          navigation.navigate("Baul");
+          handleToggleSidebar(); // Cierra el sidebar después de navegar
+          navigation.navigate("Baul"); // Navega a la pantalla Baul
         }}
         navigateToProfile={() => {
           handleToggleSidebar();
-          navigation.navigate("Profile"); // Agregar la navegación al perfil
+          navigation.navigate("Profile"); // Navega a la pantalla de perfil
+        }}
+        navigateToSecuritySettings={() => {
+          handleToggleSidebar();
+          navigation.navigate("SecuritySettings"); // Navega a la configuración de seguridad
         }}
       />
 
@@ -44,29 +48,29 @@ function MainTabs({ navigation }) {
         screenOptions={({ route }) => ({
           tabBarIcon: ({ color, size }) => {
             let iconName;
-            if (route.name === 'Home') {
-              iconName = 'home';
-            } else if (route.name === 'ListEntry') {
-              iconName = 'tasks';
-            } else if (route.name === 'SideBarButton') {
-              iconName = 'bars';
+            if (route.name === "Home") {
+              iconName = "home";
+            } else if (route.name === "ListEntry") {
+              iconName = "tasks";
+            } else if (route.name === "SideBarButton") {
+              iconName = "bars";
             }
             return <FontAwesome name={iconName} size={size} color={color} />;
           },
-          tabBarActiveTintColor: '#FFD700',
-          tabBarInactiveTintColor: '#A9A9A9',
+          tabBarActiveTintColor: "#FFD700",
+          tabBarInactiveTintColor: "#A9A9A9",
           tabBarStyle: {
-            backgroundColor: '#2C3E50',
+            backgroundColor: "#2C3E50",
             borderTopWidth: 2,
-            borderTopColor: '#D4AF37',
+            borderTopColor: "#D4AF37",
             height: 80,
             paddingBottom: 10,
             paddingTop: 5,
           },
           tabBarLabelStyle: {
             fontSize: 12,
-            fontWeight: 'bold',
-            fontFamily: 'sans-serif',
+            fontWeight: "bold",
+            fontFamily: "sans-serif",
           },
         })}
       >
@@ -75,10 +79,10 @@ function MainTabs({ navigation }) {
           name="ListEntry"
           component={ListEntry}
           options={{
-            title: 'Tus Entradas',
-            headerStyle: { backgroundColor: '#fff' },
+            title: "Tus Entradas",
+            headerStyle: { backgroundColor: "#fff" },
             headerTitleStyle: {
-              borderBottomColor: '#D4AF37',
+              borderBottomColor: "#D4AF37",
               fontWeight: "bold",
               fontSize: 20,
               color: "#333",
@@ -87,7 +91,7 @@ function MainTabs({ navigation }) {
         />
         <Tab.Screen
           name="SideBarButton"
-          options={{ title: 'Menú' }}
+          options={{ title: "Menú" }}
           listeners={{
             tabPress: (e) => {
               e.preventDefault();
@@ -114,12 +118,12 @@ export default function AppNavigator() {
         name="Baul"
         component={Baul}
         options={{
-          title: 'Baúl',
-          headerStyle: { backgroundColor: '#fff' },
+          title: "Baúl",
+          headerStyle: { backgroundColor: "#fff" },
           headerTitleStyle: {
-            fontWeight: 'bold',
+            fontWeight: "bold",
             fontSize: 20,
-            color: '#333',
+            color: "#333",
           },
         }}
       />
@@ -128,12 +132,12 @@ export default function AppNavigator() {
         name="Profile"
         component={UserProfile} // Asegúrate de tener una pantalla de perfil
         options={{
-          title: 'Perfil',
-          headerStyle: { backgroundColor: '#fff' },
+          title: "Perfil",
+          headerStyle: { backgroundColor: "#fff" },
           headerTitleStyle: {
-            fontWeight: 'bold',
+            fontWeight: "bold",
             fontSize: 20,
-            color: '#333',
+            color: "#333",
           },
         }}
       />

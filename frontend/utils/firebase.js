@@ -140,4 +140,5 @@ export const listenToEntries = (callback) => {
   return () => unsubscribe();
 };
 
+
 export { auth, db, storage };

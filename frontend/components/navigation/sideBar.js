@@ -12,7 +12,7 @@ import { signOut } from "firebase/auth";
 import { auth } from "../../utils/firebase";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 
-export default function SideBar({ isVisible, toggleSidebar, navigateToBaul, navigateToProfile }) {
+export default function SideBar({ isVisible, toggleSidebar, navigateToBaul, navigateToProfile, navigateToSecuritySettings }) {
   const [selected, setSelected] = useState(""); // Estado para la opción seleccionada
   const slideAnim = useRef(new Animated.Value(250)).current;
 
@@ -106,23 +106,24 @@ export default function SideBar({ isVisible, toggleSidebar, navigateToBaul, navi
             <Text style={styles.drawerButtonText}> Baúl</Text>
           </TouchableOpacity>
 
-          {/* Opción de Configuraciones */}
+          {/* Opción de Configuración de Seguridad */}
           <TouchableOpacity
             style={[
               styles.drawerButton,
-              selected === "Configuraciones" && styles.selectedButton,
+              selected === "ConfiguracionSeguridad" && styles.selectedButton,
             ]}
             onPress={() => {
-              setSelected("Configuraciones");
-              toggleSidebar(); // Usa toggleSidebar en lugar de toggleSideBar
+              setSelected("ConfiguracionSeguridad");
+              navigateToSecuritySettings(); // Navegar hacia la configuración de seguridad
+              toggleSidebar(); // Cierra el sidebar al navegar
             }}
           >
             <FontAwesome
-              name="cog"
+              name="lock"
               size={20}
-              color={selected === "Configuraciones" ? "#FFD700" : "#fff"}
+              color={selected === "ConfiguracionSeguridad" ? "#FFD700" : "#fff"}
             />
-            <Text style={styles.drawerButtonText}> Configuraciones</Text>
+            <Text style={styles.drawerButtonText}> Configuración de Seguridad</Text>
           </TouchableOpacity>
 
           {/* Opción de Cerrar Sesión */}

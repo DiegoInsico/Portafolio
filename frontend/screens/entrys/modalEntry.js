@@ -49,7 +49,10 @@ const ModalEntry = ({ visible, onClose }) => {
   const [selectedColor, setSelectedColor] = useState("#fff");
   const [baul, setBaul] = useState(false); // Nuevo estado para "baul"
   const [cancion, setCancion] = useState(null); // Estado para canción de Spotify
+  // Añadimos un estado para el nivel seleccionado
+  const [nivel, setNivel] = useState("1"); // Nivel predeterminado es 1
   const today = new Date();
+
 
   useEffect(() => {
     (async () => {
@@ -166,6 +169,18 @@ const ModalEntry = ({ visible, onClose }) => {
     const auth = getAuth();
     const user = auth.currentUser; // Obtener el usuario autenticado
 
+    // Comprobamos el límite de entradas por nivel
+    const userEntries = await db.collection('entradas')
+    .where('userId', '==', user.uid)
+    .where('nivel', '==', nivel)
+    .get();
+
+    const limites = { '1': 50, '2': 10, '3': 4 };
+    if (userEntries.size >= limites[nivel]) {
+    Alert.alert("Límite alcanzado", "Has alcanzado el límite de entradas para este nivel.");
+    return;
+    }
+
     // Verificar si el usuario está autenticado
     if (!user) {
       Alert.alert(
@@ -235,10 +250,13 @@ const ModalEntry = ({ visible, onClose }) => {
 
       // Análisis de emociones utilizando IA
       if (texto) {
-      const response = await axios.get('http://192.168.1.12:3000/api/emotion', {
-        params: { text: texto },
-      });
-      emociones = response.data.emotions;
+        const response = await axios.get(
+          "http://192.168.1.12:3000/api/emotion",
+          {
+            params: { text: texto },
+          }
+        );
+        emociones = response.data.emotions;
       }
 
       const nuevaEntrada = {
@@ -254,6 +272,9 @@ const ModalEntry = ({ visible, onClose }) => {
         fechaCreacion: serverTimestamp(),
         fechaRecuerdo: categoria === "recuerdo" ? selectedDate : null,
         emociones, // Aquí guardamos las emociones detectadas
+        nivel, // Nivel de profundidad
+        isProtected: nivel === '2' || nivel === '3', // Seguridad adicional para niveles 2 y 3
+        
       };
 
       if (cancionData) {
@@ -494,7 +515,20 @@ const ModalEntry = ({ visible, onClose }) => {
               onColorSelect={(color) => setSelectedColor(color)}
             />
           </View>
-
+          {/* Nivel de profundidad */}
+          <RNPickerSelect
+            onValueChange={(value) => setNivel(value)}
+            items={[
+              { label: "Nivel 1 - General", value: "1" },
+              { label: "Nivel 2 - Privado", value: "2" },
+              { label: "Nivel 3 - Profundo", value: "3" },
+            ]}
+            placeholder={{
+              label: "Selecciona el nivel de privacidad",
+              value: null,
+            }}
+            style={pickerSelectStyles}
+          />
           {/* Categoría */}
           <Text style={styles.label}>Categoría:</Text>
           <RNPickerSelect
