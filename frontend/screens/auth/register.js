@@ -51,6 +51,7 @@ export default function Registro({ navigation }) {
         displayName: values.usuario,
         email: values.correo,
         createdAt: new Date(),
+        isVerifed: false
         // Agrega otros campos que quieras guardar
       });
 
@@ -65,6 +66,8 @@ export default function Registro({ navigation }) {
     }
   };
 
+
+  
   return (
     <LinearGradient
       colors={["#2C3E50", "#4B4E6D", "#D1B17D", "#FFD700"]}

@@ -1,83 +1,85 @@
-/* Estilos generales para el contenedor de inicio de sesión */
+LoginPage.css
 .login-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    background-color: #2c2c3a; /* Fondo oscuro */
-  }
-  
-  /* Caja de inicio de sesión */
-  .login-box {
-    background-color: #1e1e2f; /* Fondo más oscuro para el cuadro */
-    padding: 40px;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-    width: 100%;
-    max-width: 400px;
-    text-align: center;
-  }
-  
-  /* Estilos del título */
-  .login-box h2 {
-    color: #f0a500; /* Color dorado */
-    margin-bottom: 20px;
-    font-size: 1.8rem;
-  }
-  
-  /* Grupo de formularios */
-  .form-group {
-    margin-bottom: 20px;
-    text-align: left;
-  }
-  
-  /* Estilos de las etiquetas */
-  .form-group label {
-    color: #f0e6d2; /* Color claro */
-    display: block;
-    margin-bottom: 5px;
-    font-size: 1rem;
-  }
-  
-  /* Estilos para los campos de entrada */
-  .input-field {
-    width: 100%;
-    padding: 10px;
-    border-radius: 5px;
-    border: none;
-    background-color: #3a3a4a; /* Color de fondo más claro */
-    color: #ffffff; /* Texto blanco */
-    font-size: 1rem;
-    outline: none;
-    transition: background-color 0.3s ease;
-  }
-  
-  /* Cambiar color al enfocar */
-  .input-field:focus {
-    background-color: #4a4a5a; /* Un poco más claro al enfocarse */
-  }
-  
-  /* Botón de inicio de sesión */
-  .login-button {
-    width: 100%;
-    padding: 10px;
-    background-color: #f0a500; /* Botón dorado */
-    color: #1e1e2f;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 1.2rem;
-    transition: background-color 0.3s ease;
-  }
-  
-  .login-button:hover {
-    background-color: #d48e00; /* Cambia el color al pasar el mouse */
-  }
-  
-  /* Estilos del mensaje de error */
-  .error-message {
-    color: #ff6b6b; /* Rojo para errores */
-    margin-top: 15px;
-    font-size: 1rem;
-  }
-  
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #2c2c3a;
+  padding: 0 10%;
+}
+
+.login-side {
+  flex: 1;
+  background-color: #2c2c3a;
+}
+
+.center-content {
+  flex: 2;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.login-box {
+  width: 100%;
+  max-width: 450px;
+  background-color: #1e1e2f;
+  padding: 40px;
+  text-align: center;
+}
+
+.login-box h2 {
+  color: #f0a500;
+  margin-bottom: 20px;
+  font-size: 1.8rem;
+}
+
+.form-group {
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.form-group label {
+  color: #f0e6d2;
+  display: block;
+  margin-bottom: 5px;
+  font-size: 1rem;
+}
+
+.input-field {
+  width: 100%;
+  padding: 10px;
+  border-radius: 5px;
+  background-color: #3a3a4a;
+  color: #ffffff;
+  font-size: 1rem;
+  outline: none;
+  transition: background-color 0.3s ease;
+  border: none; /* Elimina el borde del input */
+}
+
+.input-field:focus {
+  background-color: #4a4a5a;
+}
+
+.login-button {
+  width: 100%;
+  padding: 10px;
+  background-color: #f0a500;
+  color: #1e1e2f;
+  border: none; /* Elimina el borde del botón */
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1.2rem;
+  transition: background-color 0.3s ease;
+}
+
+.login-button:hover {
+  background-color: #d48e00;
+}
+
+.error-message {
+  color: #ff6b6b;
+  margin-top: 15px;
+  font-size: 1rem;
+}

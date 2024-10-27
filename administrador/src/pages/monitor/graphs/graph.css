@@ -1,0 +1,78 @@
+/* Contenedor general */
+.dashboard-container {
+  display: flex;
+  flex-direction: column; /* Cambiamos a columna para centrar los gráficos */
+  align-items: center;
+  padding: 20px;
+  background-color: #1e1e2f;
+  color: #f0e6d2;
+  min-height: 100vh; /* Para ocupar toda la altura de la pantalla */
+}
+
+/* Contenedor de los filtros a la izquierda */
+.filters-container {
+  width: 20%;
+  padding: 20px;
+  background-color: #2c2c3a;
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Centramos los botones de filtro */
+}
+
+.filters-container h3 {
+  color: #f0a500;
+  margin-bottom: 10px;
+}
+
+.filter-button {
+  padding: 10px;
+  margin-bottom: 10px;
+  width: 100%; /* Ancho completo de cada botón */
+  border: none;
+  border-radius: 5px;
+  background-color: #f0ad4e;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.filter-button:hover {
+  background-color: #ec971f;
+}
+
+/* Contenedor de los gráficos */
+.chart-wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center; /* Centramos los gráficos */
+  gap: 20px; /* Espacio entre los gráficos */
+  flex-wrap: wrap; /* Para que los gráficos se ajusten si no caben en una sola línea */
+}
+
+/* Estilo para cada gráfico */
+.chart-container {
+  width: 30%; /* Ajustamos para que ocupen un tercio del contenedor */
+  background-color: #2c2c3a;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  text-align: center; /* Centramos el contenido de texto */
+}
+
+/* Estilos del canvas para que se adapten al tamaño del contenedor */
+.chart-container canvas {
+  width: 100% !important;
+  height: 300px !important; /* Tamaño fijo para mejorar la claridad */
+}
+
+h1 {
+  color: #f0a500;
+  font-size: 1.8rem;
+  margin-bottom: 20px;
+}
+
+/* Ajustar el tamaño de los textos en leyenda para mejorar la claridad */
+.chartjs-legend {
+  font-size: 1rem;
+}
