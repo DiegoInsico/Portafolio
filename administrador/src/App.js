@@ -12,6 +12,7 @@ import UsageCharts from "./pages/monitor/graphs/usageCharts";
 import StorageUsage from "./pages/monitor/storage/storageUsage";
 import UserSummary from "./pages/monitor/users/userSummary";
 import Notifications from "./pages/system/notifications";
+import SoulmatePage from "./pages/monitor/soulmatePage";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -71,6 +72,7 @@ const AppRoutes = ({ isAuthenticated, currentUser, handleLogin }) => {
             {/* Usuarios */}
             <Route path="/monitor/users/userActivity" element={<UserActivity />} />
             <Route path="/monitor/users/userSummary/:userId" element={<UserSummary />} />
+            <Route path="/monitor/SoulmatePage" element={<SoulmatePage />} />
           </>
         ) : (
           // Redirige a Login si no está autenticado

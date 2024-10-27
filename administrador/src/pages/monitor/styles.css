@@ -128,3 +128,64 @@ h3 {
   color: #f0e6d2;
   margin-top: 10px;
 }
+
+/* Estilos específicos para SoulmatePage */
+
+.soulmate-container {
+  max-width: 1200px; /* Aumentado para ocupar más espacio */
+  margin: 40px auto; /* Añade margen superior e inferior para centrado */
+  padding: 40px; /* Aumentado para espaciar el contenido */
+  background-color: #1e1e2f; /* Fondo oscuro */
+  color: #f0e6d2; /* Texto claro */
+  border-radius: 10px;
+  box-shadow: 0px 0px 25px rgba(0, 0, 0, 0.6); /* Sombra más fuerte */
+}
+
+.soulmate-container h1 {
+  text-align: center;
+  color: #f0a500; /* Título dorado */
+  margin-bottom: 30px; /* Aumentado */
+  font-size: 2em; /* Título más grande */
+}
+
+.soulmate-list {
+  margin-top: 30px;
+}
+
+.soulmate-item {
+  background-color: #2c2c3a; /* Fondo oscuro para cada tarjeta de coincidencia */
+  margin: 20px 0; /* Mayor separación entre tarjetas */
+  padding: 20px; /* Aumentado */
+  border-radius: 8px;
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.3); /* Sombra más intensa */
+  transition: background-color 0.3s, transform 0.3s; /* Añade un efecto de movimiento */
+}
+
+.soulmate-item:hover {
+  background-color: #3a3a4f; /* Cambio de fondo en hover */
+  transform: translateY(-5px); /* Desplazamiento ligero en hover */
+}
+
+.soulmate-item p {
+  font-size: 1.2em; /* Texto más grande */
+  margin-bottom: 10px; /* Aumentado */
+  color: #f0e6d2;
+}
+
+.emotions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px; /* Más espacio entre emociones */
+  margin-top: 15px;
+}
+
+.emotion-item {
+  background-color: #4b4e6d; /* Fondo de cada emoción */
+  color: #ffd700; /* Color dorado para el texto de emoción */
+  padding: 8px 12px; /* Aumentado */
+  border-radius: 5px;
+  font-size: 1.2em; /* Texto de emociones más grande */
+  display: flex;
+  align-items: center;
+  gap: 8px; /* Más espacio entre icono y texto */
+}

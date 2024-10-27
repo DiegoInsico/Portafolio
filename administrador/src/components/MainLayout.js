@@ -24,6 +24,7 @@ const MainLayout = ({ children, isAuthenticated, currentUser }) => {
             <NavLink to="/monitor/graphics">Ver Gráficos</NavLink>
             <NavLink to="/monitor/storage/StorageUsage">Uso de Almacenamiento</NavLink>
             <NavLink to="/system/notifications">Notificaciones</NavLink>
+            <NavLink to="/monitor/SoulmatePage">Almas gemelas</NavLink>
           </div>
           <div className="content">
             {children}
