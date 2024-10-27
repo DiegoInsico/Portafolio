@@ -1,33 +1,41 @@
-/* TopBar.css */
+@import url('https://fonts.googleapis.com/css2?family=Fairwater+Script&display=swap');
+
+
+
 .topbar {
   display: flex;
   align-items: center;
   background-color: #2e2e2e;
   padding: 10px 20px;
-  position: relative;
+  width: 100%; /* Para que ocupe todo el ancho */
+  position: fixed;
+  top: 0;
+  z-index: 10;
   justify-content: space-between;
 }
 
 .topbar-user {
   color: #ffb74d;
-  font-size: 16px;
+  font-size: 30px; /* Tamaño más grande para administrador */
+  font-family: 'Fairwater Script', cursive;
+  margin-left: 20px;
 }
 
 .topbar-title {
-  font-family: 'Cursive', sans-serif;
-  font-size: 24px;
+  font-family: 'Fairwater Script', cursive;
+  font-size: 28px;
   color: #ffb74d;
-  flex-grow: 1;
   text-align: center;
+  flex-grow: 1;
 }
+
 .logout-button {
   color: #ffb74d;
   background: none;
   border: none;
   cursor: pointer;
   font-size: 16px;
-  width: 10%; /* Define el ancho como el 10% del contenedor */
-  margin-right: 2%; /* Aplica un margen a la derecha */
+  width: 10%;
+  margin-right: 2%;
   text-align: center;
 }
-

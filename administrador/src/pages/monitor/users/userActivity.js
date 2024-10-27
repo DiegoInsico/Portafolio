@@ -90,7 +90,7 @@ const UserActivity = () => {
             <tr>
               <th>Nombre de Usuario</th>
               <th>Email</th>
-              <th>Último Inicio de Sesión</th>
+              <th>Creacion de la cuenta</th>
               <th>Rol</th> {/* Nueva columna de Rol */}
               <th>Acciones</th>
             </tr>

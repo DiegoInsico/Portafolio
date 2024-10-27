@@ -16,6 +16,7 @@ import { Formik } from "formik";
 import * as Yup from "yup";
 import { Ionicons } from "@expo/vector-icons";
 import { signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
+import { getFirestore, collection, addDoc, Timestamp } from "firebase/firestore";
 import { auth } from "../../utils/firebase";
 
 // Definir el esquema de validación con Yup
@@ -29,6 +30,7 @@ const LoginSchema = Yup.object().shape({
 export default function Login({ navigation }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const db = getFirestore();
 
   // Cargar fuentes
   const [fontsLoaded] = useFonts({
@@ -59,13 +61,30 @@ export default function Login({ navigation }) {
     );
   }
 
+  // Función para registrar el inicio de sesión en Firestore
+  const logSession = async (userId) => {
+    try {
+      await addDoc(collection(db, "sessions"), {
+        userId: userId,
+        timestamp: Timestamp.now()
+      });
+      console.log("Sesión registrada exitosamente.");
+    } catch (error) {
+      console.error("Error al registrar la sesión:", error);
+    }
+  };
+
   // Función para manejar el login usando Firebase
   const handleLogin = async (values, actions) => {
     const { correo, contrasena } = values;
     setIsSubmitting(true);
 
     try {
-      await signInWithEmailAndPassword(auth, correo, contrasena);
+      const userCredential = await signInWithEmailAndPassword(auth, correo, contrasena);
+      const userId = userCredential.user.uid;
+
+      // Registro de la sesión
+      await logSession(userId);
 
       // Login exitoso
       Alert.alert("Éxito", "Has iniciado sesión correctamente.");
@@ -194,7 +213,6 @@ export default function Login({ navigation }) {
     </LinearGradient>
   );
 }
-
 const styles = StyleSheet.create({
   loadingContainer: {
     flex: 1,

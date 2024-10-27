@@ -16,6 +16,7 @@ const MainLayout = ({ children, isAuthenticated, currentUser }) => {
     <div className="main-layout">
       {isAuthenticated ? (
         <>
+          <TopBar currentUser={currentUser} handleLogout={handleLogout} />
           <div className="sidebar">
             <NavLink to="/dashboard">Dashboard</NavLink>
             <NavLink to="/entradas">Gestión de Entradas</NavLink>
@@ -25,7 +26,6 @@ const MainLayout = ({ children, isAuthenticated, currentUser }) => {
             <NavLink to="/system/notifications">Notificaciones</NavLink>
           </div>
           <div className="content">
-            <TopBar currentUser={currentUser} handleLogout={handleLogout} />
             {children}
           </div>
         </>

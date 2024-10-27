@@ -1,86 +1,187 @@
-/*******************
- * notifications.css
- *******************/
+.notifications-container {
+  background-color: #1e1e2f;
+  color: #f5f5f5;
+  padding: 20px;
+  border-radius: 10px;
+  width: 95%;
+  max-width: 1400px;
+  margin: 10px auto 5px; /* Reduce el margen superior e inferior */
+  min-height: 80vh; /* Asegura que el contenedor ocupe casi toda la altura de la pantalla */
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
+}
 
- .notifications-container {
-    background-color: #1e1e2f;
-    color: #f5f5f5;
-    padding: 20px;
-    border-radius: 10px;
-    width: 80%;
-    max-width: 700px;
-    margin: 20px auto;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
-  }
-  
-  .notifications-container h2 {
-    text-align: center;
-    font-size: 24px;
-    color: #ffa726;
-    margin-bottom: 20px;
-  }
-  
-  .form-group {
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 15px;
-  }
-  
-  .form-group label {
-    font-weight: bold;
-    color: #ffa726;
-    margin-bottom: 5px;
-  }
-  
-  .form-group select,
-  .form-group input,
-  .form-group textarea {
-    background-color: #282a36;
-    color: #ffffff;
-    border: 1px solid #ffa726;
-    border-radius: 5px;
-    padding: 8px;
-    font-size: 14px;
-    outline: none;
-    transition: border-color 0.3s;
-  }
-  
-  .form-group select:focus,
-  .form-group input:focus,
-  .form-group textarea:focus {
-    border-color: #ffb74d;
-  }
-  
-  .form-group textarea {
-    resize: vertical;
-    height: 100px;
-  }
-  
-  button {
-    background-color: #ffa726;
-    color: #ffffff;
-    border: none;
-    border-radius: 5px;
-    padding: 10px 20px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-    width: 100%;
-  }
-  
-  button:hover {
-    background-color: #ffb74d;
-  }
-  
-  button:disabled {
-    background-color: #b0b0b0;
-    cursor: not-allowed;
-  }
-  
-  p {
-    text-align: center;
-    font-size: 18px;
-    color: #f44336;
-    margin-top: 20px;
-  }
-  
+.notifications-container h2 {
+  text-align: center;
+  font-size: 24px;
+  color: #ffa726;
+  margin-bottom: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  font-weight: bold;
+  color: #ffa726;
+  margin-bottom: 5px;
+}
+
+.form-group select,
+.form-group input,
+.form-group textarea {
+  background-color: #282a36;
+  color: #ffffff;
+  border: 1px solid #ffa726;
+  border-radius: 5px;
+  padding: 8px;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.3s;
+}
+
+.form-group select:focus,
+.form-group input:focus,
+.form-group textarea:focus {
+  border-color: #ffb74d;
+}
+
+.form-group textarea {
+  resize: vertical;
+  height: 100px;
+}
+
+button {
+  background-color: #ffa726;
+  color: #ffffff;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  width: 100%;
+}
+
+button:hover {
+  background-color: #ffb74d;
+}
+
+button:disabled {
+  background-color: #b0b0b0;
+  cursor: not-allowed;
+}
+
+p {
+  text-align: center;
+  font-size: 18px;
+  color: #f44336;
+  margin-top: 20px;
+}
+
+.notifications-table-container h3 {
+  text-align: center;
+  font-size: 24px;
+  color: #ffa726;
+  margin-bottom: 20px;
+  position: sticky;
+  top: 0;
+  background-color: #1e1e2f;
+  z-index: 2;
+  padding: 10px 0;
+}
+.notifications-table thead th {
+  position: sticky;
+  top: 50px; /* Ajusta según el espacio ocupado por el título */
+  background-color: #ffa726;
+  color: #1e1e2f;
+  z-index: 1;
+  padding: 12px;
+}
+
+.notifications-container ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.notifications-container li {
+  background-color: #282a36;
+  color: #ffffff;
+  border: 1px solid #ffa726;
+  border-radius: 5px;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.notifications-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.notifications-table th,
+.notifications-table td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #ffa726;
+  color: #ffffff;
+}
+
+.notifications-table th {
+  background-color: #ffa726;
+  color: #1e1e2f;
+}
+
+.notifications-table td .action-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+button.edit-button,
+button.delete-button {
+  background-color: #ffa726;
+  color: #ffffff;
+  border: none;
+  border-radius: 5px;
+  padding: 5px 10px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+button.edit-button:hover {
+  background-color: #ddcf4c;
+}
+
+button.delete-button:hover {
+  background-color: #f70202;
+}
+
+.notifications-table-container {
+  max-height: 650px;
+  overflow-y: auto;
+  margin-top: 20px;
+  border: 1px solid #ffa726;
+  border-radius: 5px;
+}
+
+/* Estilo oscuro para el scroll */
+.notifications-table-container::-webkit-scrollbar {
+  width: 8px;
+  background-color: #1e1e2f; /* Fondo oscuro del scroll */
+}
+
+.notifications-table-container::-webkit-scrollbar-thumb {
+  background-color: #555555; /* Color de la barra de desplazamiento */
+  border-radius: 4px;
+}
+
+.notifications-table-container::-webkit-scrollbar-thumb:hover {
+  background-color: #777777; /* Hover en el scroll */
+}
+
+.notifications-table-container::-webkit-scrollbar-track {
+  background-color: #282a36; /* Fondo de la pista */
+}

@@ -45,16 +45,15 @@
   color: #ffb74d;
 }
 
-/* mainLayout.css */
 .sidebar {
   width: 250px;
   background-color: #2e2e2e;
   color: #f0b132;
   padding: 20px;
   position: fixed;
-  top: 60px; /* Ajusta la altura de la topbar aquí */
+  top: 90px; /* La altura de la topbar */
   left: 0;
-  height: calc(100% - 60px); /* Resta la altura de la topbar para la altura total de la sidebar */
+  height: calc(100% - 60px); /* Ajuste para la altura de la sidebar */
   overflow: auto;
   transition: transform 0.3s ease;
   font-size: 18px;
@@ -72,13 +71,20 @@
   padding: 15px 20px;
   text-decoration: none;
   font-size: 1rem;
-  transition: background-color 0.2s ease;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.sidebar a:hover {
+  background-color: #ffb74d;
+  color: #2e2e2e;
+  transform: scale(1.05); /* Animación de agrandamiento al pasar el mouse */
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
 }
 
 .content {
   margin-left: 250px;
   padding: 20px;
-  padding-top: 60px;
+  padding-top: 80px; /* Para evitar superposición con topbar */
   background-color: #1d1f27;
   color: #ffffff;
   width: calc(100% - 250px);

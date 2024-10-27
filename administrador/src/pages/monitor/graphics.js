@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { db } from "../../firebase"; // Asegúrate de tener configurado Firebase
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, query, where } from "firebase/firestore";
 import { Timestamp } from "firebase/firestore"; // Importar el tipo de Timestamp
 
 const Graphics = () => {
@@ -10,6 +10,7 @@ const Graphics = () => {
     activeUsers: 0,
     lastActivity: "",
     entriesUploaded: 0,
+    dailyUserActivity: 0, // Nueva métrica para la actividad diaria de inicio de sesión
   });
 
   // Función para convertir el Timestamp de Firestore a una fecha legible
@@ -41,11 +42,24 @@ const Graphics = () => {
         }
       });
 
+      // Obtener el número de usuarios que han iniciado sesión hoy
+      const today = new Date();
+      today.setHours(0, 0, 0, 0); // Establecer la fecha al comienzo del día
+
+      const sessionsQuery = query(
+        collection(db, "sessions"),
+        where("timestamp", ">=", Timestamp.fromDate(today)) // Filtrar sesiones desde el inicio del día actual
+      );
+
+      const sessionsSnapshot = await getDocs(sessionsQuery);
+      const dailyUserActivity = sessionsSnapshot.size; // Número de usuarios que han iniciado sesión hoy
+
       // Actualizar las estadísticas en el estado
       setStats({
         activeUsers,
         lastActivity: formatDate(lastActivity), // Usar la función para formatear el Timestamp
         entriesUploaded,
+        dailyUserActivity, // Actualizar el valor de actividad diaria
       });
     } catch (error) {
       console.error("Error obteniendo datos de Firebase:", error);
@@ -76,6 +90,11 @@ const Graphics = () => {
           <h3>Entradas Subidas</h3>
           <div className="number-display">{stats.entriesUploaded}</div>
           <p className="description">Total de entradas subidas hoy</p>
+        </div>
+        <div className="dashboard-card">
+          <h3>Actividad Diaria de Usuarios</h3>
+          <div className="number-display">{stats.dailyUserActivity}</div>
+          <p className="description">Usuarios que han iniciado sesión hoy</p>
         </div>
       </div>
 
