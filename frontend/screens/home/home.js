@@ -25,6 +25,7 @@ import { db } from "../../utils/firebase";
 import { LinearGradient } from "expo-linear-gradient";
 import { FontAwesome } from "@expo/vector-icons";
 import ModalEntry from "../entrys/modalEntry";
+import { ScrollView } from "react-native-gesture-handler";
 
 const { width: viewportWidth } = Dimensions.get("window");
 
@@ -184,6 +185,7 @@ const Home = ({ navigation }) => {
       end={{ x: 0, y: 1 }}
       style={styles.background}
     >
+      <ScrollView>
       <View style={styles.container}>
         <Animated.View
           style={[{ opacity: fadeAnim, transform: [{ scale: scaleAnim }] }]}
@@ -207,7 +209,7 @@ const Home = ({ navigation }) => {
             onPress={handleOpenModal}
           >
             <FontAwesome name="plus" size={32} color="#FFF" />
-            <Text style={styles.roundButtonText}>Nueva Entrada</Text>
+            <Text style={styles.roundButtonText}>Nuevo Instante</Text>
           </TouchableOpacity>
           {/* ModalEntry */}
           <ModalEntry visible={modalVisible} onClose={handleCloseModal} />
@@ -240,6 +242,7 @@ const Home = ({ navigation }) => {
 
         <View style={styles.navbarSpacing} />
       </View>
+      </ScrollView>
     </LinearGradient>
   );
 };
@@ -289,6 +292,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: "#FFF",
     textAlign: "center",
+    fontWeight: 'bold',
   },
   baulButton: {
     width: "30%",
@@ -345,7 +349,7 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   questionText: {
-    fontSize: 18,
+    fontSize: 12,
     color: "#000",
     textAlign: "center",
   },

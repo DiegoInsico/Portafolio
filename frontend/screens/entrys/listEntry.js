@@ -99,9 +99,9 @@ const ListEntry = () => {
             onValueChange={handleLevelChange}
             style={styles.picker}
           >
-            <Picker.Item label="1. Reflexiones Cotidianas" value="1" />
-            <Picker.Item label="2. Confesiones del Corazon" value="2" />
-            <Picker.Item label="3. Esencia Profunda" value="3" />
+            <Picker.Item style={styles.pickerText} label="1. Reflexiones Cotidianas" value="1" />
+            <Picker.Item style={styles.pickerText} label="2. Confesiones del Corazon" value="2" />
+            <Picker.Item style={styles.pickerText} label="3. Esencia Profunda" value="3" />
           </Picker>
         </View>
 
@@ -193,13 +193,17 @@ const styles = StyleSheet.create({
     borderBottomColor: '#C2A66B',
   },
   label: {
-    fontSize: 16,
+    fontSize: 10,
     fontWeight: 'bold',
     marginRight: 10,
   },
   picker: {
     flex: 1,
-    height: 40,
+    height: 20,
+    fontSize: 10,
+  },
+  pickerText: {
+    fontSize: 10,
   },
   loadingContainer: {
     flex: 1,

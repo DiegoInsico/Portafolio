@@ -336,7 +336,7 @@ const ModalEntry = ({ visible, onClose }) => {
     >
       <ScrollView contentContainerStyle={styles.modalContainer}>
         <View style={styles.modalContent}>
-          <Text style={styles.titulo}>Crear Nueva Entrada</Text>
+          <Text style={styles.titulo}>Crear Nuevo Instante</Text>
 
           {/* Switch para alternar entre Galeria/Video y Spotify */}
           <CustomSwitch
@@ -495,7 +495,7 @@ const ModalEntry = ({ visible, onClose }) => {
                   style={styles.inputTexto}
                   multiline
                   numberOfLines={4}
-                  placeholder="Escribe tu texto aquí"
+                  placeholder="Cuentame algo"
                   value={texto}
                   onChangeText={setTexto}
                 />
@@ -510,12 +510,13 @@ const ModalEntry = ({ visible, onClose }) => {
 
           {/* Selector de Color */}
           <View style={styles.pickerContent}>
-            <ColorPicker
+            <ColorPicker style={styles.recuadroPicker}
               selectedColor={selectedColor}
               onColorSelect={(color) => setSelectedColor(color)}
             />
           </View>
           {/* Nivel de profundidad */}
+          <Text style={styles.label}> Nivel de profundidad </Text>
           <RNPickerSelect
             onValueChange={(value) => setNivel(value)}
             items={[
@@ -530,7 +531,7 @@ const ModalEntry = ({ visible, onClose }) => {
             style={pickerSelectStyles}
           />
           {/* Categoría */}
-          <Text style={styles.label}>Categoría:</Text>
+          <Text style={styles.label}>Categoría</Text>
           <RNPickerSelect
             onValueChange={(value) => {
               setCategoria(value);
@@ -687,27 +688,6 @@ const ModalEntry = ({ visible, onClose }) => {
             value={categoria}
           />
 
-          {/* Mostrar DatePicker si se selecciona "Recuerdo" */}
-          {categoria === "recuerdo" && (
-            <>
-              <Pressable
-                onPress={() => setShowDatePicker(true)}
-                style={styles.datePickerPressable}
-              >
-                <Text style={styles.label}>Seleccionar Fecha del Recuerdo</Text>
-              </Pressable>
-              {showDatePicker && (
-                <DateTimePicker
-                  value={selectedDate}
-                  mode="date"
-                  display="default"
-                  onChange={onChangeDate}
-                  maximumDate={today}
-                />
-              )}
-            </>
-          )}
-
           {/* Botones de Guardar y Cancelar */}
           <View style={styles.botonContainer}>
             <Pressable style={styles.botonGuardar} onPress={handleGuardar}>
@@ -839,7 +819,6 @@ const styles = StyleSheet.create({
     width: "100%",
     marginTop: 10,
     height: 220,
-    marginBottom: 10,
   },
   mediaPreview: {
     width: "100%",
@@ -851,7 +830,7 @@ const styles = StyleSheet.create({
     width: "100%",
     height: 150,
     borderRadius: 10,
-    resizeMode: "cover", // Asegura que la imagen cubra el contenedor
+    resizeMode: "cover",
   },
   eliminarIcono: {
     position: "absolute",
@@ -871,19 +850,19 @@ const styles = StyleSheet.create({
   spotifyContainer: {
     width: "100%",
     marginVertical: 10,
-    position: "relative", // Necesario para posicionar el contenedor de resultados absolutamente
+    position: "relative",
     marginBottom: 10,
   },
   spotifyResultsContainer: {
     position: "absolute",
-    top: 50, // Ajusta según la altura del TextInput
+    top: 50,
     left: 0,
     right: 0,
     backgroundColor: "#fff",
     borderRadius: 10,
     elevation: 5,
-    maxHeight: 200, // Altura máxima para mostrar aproximadamente 5 resultados
-    zIndex: 10, // Asegura que esté por encima de otros componentes
+    maxHeight: 200,
+    zIndex: 10,
   },
   spotifyResults: {
     paddingHorizontal: 10,
@@ -925,12 +904,14 @@ const styles = StyleSheet.create({
 
   /* ====== Color Picker Styles ====== */
   pickerContent: {
-    marginVertical: 10,
-    backgroundColor: "#2C3E50",
     borderRadius: 10,
     alignItems: "center",
-    padding: 10,
     marginBottom: 10,
+    width: "80%",
+  },
+  recuadroPicker: {
+    marginBottom: 10,
+    width: 60,
   },
 
   /* ====== Baúl Switch Styles ====== */

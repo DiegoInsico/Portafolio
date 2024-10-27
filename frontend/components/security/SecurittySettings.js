@@ -3,6 +3,7 @@ import { View, Text, TextInput, Button, Alert, StyleSheet } from 'react-native';
 import { getAuth } from 'firebase/auth';
 import { db } from '../../utils/firebase'; // Configuración de Firebase
 import { doc, updateDoc } from "firebase/firestore";
+import { ScrollView } from 'react-native-gesture-handler';
 
 const SecuritySettings = () => {
     const [level2Password, setLevel2Password] = useState('');
@@ -48,6 +49,7 @@ const SecuritySettings = () => {
 
     return (
         <View style={styles.container}>
+            <ScrollView>
             <Text style={styles.title}>Configuración de Seguridad</Text>
             <Text style={styles.description}>
                 Aquí puedes configurar contraseñas adicionales para proteger tus niveles de acceso. 
@@ -93,6 +95,7 @@ const SecuritySettings = () => {
                 />
                 <Button title="Guardar Nivel 3" onPress={handleSaveLevel3Password} color="#FFD700" />
             </View>
+            </ScrollView>
         </View>
     );
 };

@@ -83,7 +83,7 @@ export default function SideBar({ isVisible, toggleSidebar, navigateToBaul, navi
               size={20}
               color={selected === "Perfil" ? "#FFD700" : "#fff"}
             />
-            <Text style={styles.drawerButtonText}> Perfil</Text>
+            <Text style={styles.drawerButtonText}>Perfil </Text>
           </TouchableOpacity>
 
           {/* Opción del Baúl */}
@@ -103,7 +103,7 @@ export default function SideBar({ isVisible, toggleSidebar, navigateToBaul, navi
               size={20}
               color={selected === "Baul" ? "#FFD700" : "#fff"}
             />
-            <Text style={styles.drawerButtonText}> Baúl</Text>
+            <Text style={styles.drawerButtonText}>Baúl </Text>
           </TouchableOpacity>
 
           {/* Opción de Configuración de Seguridad */}
@@ -123,7 +123,7 @@ export default function SideBar({ isVisible, toggleSidebar, navigateToBaul, navi
               size={20}
               color={selected === "ConfiguracionSeguridad" ? "#FFD700" : "#fff"}
             />
-            <Text style={styles.drawerButtonText}> Configuración de Seguridad</Text>
+            <Text style={styles.drawerButtonText}> Seguridad </Text>
           </TouchableOpacity>
 
           {/* Opción de Cerrar Sesión */}
@@ -147,9 +147,7 @@ export default function SideBar({ isVisible, toggleSidebar, navigateToBaul, navi
                 styles.drawerButtonText,
                 { color: selected === "Cerrar Sesión" ? "#FFD700" : "#fff" },
               ]}
-            >
-              Cerrar Sesión
-            </Text>
+            >Cerrar Sesión </Text>
           </TouchableOpacity>
         </View>
 
