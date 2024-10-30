@@ -8,11 +8,18 @@ import {
   StyleSheet,
   Animated,
 } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 import { signOut } from "firebase/auth";
 import { auth } from "../../utils/firebase";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 
-export default function SideBar({ isVisible, toggleSidebar, navigateToBaul, navigateToProfile }) {
+export default function SideBar({
+  isVisible,
+  toggleSidebar,
+  navigateToBaul,
+  navigateToProfile,
+}) {
+  const navigation = useNavigation(); // Hook de navegación
   const [selected, setSelected] = useState(""); // Estado para la opción seleccionada
   const slideAnim = useRef(new Animated.Value(250)).current;
 
@@ -29,7 +36,6 @@ export default function SideBar({ isVisible, toggleSidebar, navigateToBaul, navi
         duration: 300,
         useNativeDriver: true,
       }).start();
-      // Restablece la selección cuando el sidebar se cierra
       setSelected("");
     }
   }, [isVisible]);
@@ -39,7 +45,7 @@ export default function SideBar({ isVisible, toggleSidebar, navigateToBaul, navi
   const handleSignOut = async () => {
     try {
       await signOut(auth);
-      toggleSidebar(); // Asegúrate de usar toggleSidebar aquí también
+      toggleSidebar();
     } catch (error) {
       console.error("Error al cerrar sesión:", error);
     }
@@ -51,19 +57,20 @@ export default function SideBar({ isVisible, toggleSidebar, navigateToBaul, navi
         <View style={styles.overlay} />
       </TouchableWithoutFeedback>
       <Animated.View
-        style={[styles.sidebarContainer, { transform: [{ translateX: slideAnim }] }]}
+        style={[
+          styles.sidebarContainer,
+          { transform: [{ translateX: slideAnim }] },
+        ]}
       >
         <View style={styles.sidebarContent}>
-          {/* Sección de perfil */}
           <View style={styles.profileContainer}>
             <Image
-              source={{ uri: "https://www.example.com/profile-pic.jpg" }} // Reemplaza con tu imagen
+              source={{ uri: "https://www.example.com/profile-pic.jpg" }}
               style={styles.profileImage}
             />
             <Text style={styles.profileName}>Nombre del Usuario</Text>
           </View>
 
-          {/* Línea divisoria entre perfil y botones */}
           <View style={styles.divider} />
 
           {/* Opción de Perfil */}
@@ -74,8 +81,8 @@ export default function SideBar({ isVisible, toggleSidebar, navigateToBaul, navi
             ]}
             onPress={() => {
               setSelected("Perfil");
-              navigateToProfile(); // Navegar hacia la pantalla de perfil
-              toggleSidebar(); // Cierra el sidebar al navegar
+              navigateToProfile();
+              toggleSidebar();
             }}
           >
             <FontAwesome
@@ -94,8 +101,8 @@ export default function SideBar({ isVisible, toggleSidebar, navigateToBaul, navi
             ]}
             onPress={() => {
               setSelected("Baul");
-              navigateToBaul(); // Navegar hacia la pantalla Baul
-              toggleSidebar(); // Cierra el sidebar al navegar
+              navigateToBaul();
+              toggleSidebar();
             }}
           >
             <FontAwesome
@@ -106,6 +113,22 @@ export default function SideBar({ isVisible, toggleSidebar, navigateToBaul, navi
             <Text style={styles.drawerButtonText}> Baúl</Text>
           </TouchableOpacity>
 
+          {/* Opción de Crear Mensaje */}
+          <TouchableOpacity
+            style={[
+              styles.drawerButton,
+              selected === "CrearMensaje" && styles.selectedButton,
+            ]}
+            onPress={() => {
+              setSelected("CrearMensaje");
+              navigation.navigate("CrearMensaje"); // Navegar directamente
+              toggleSidebar();
+            }}
+          >
+            <FontAwesome name="envelope" size={24} color="#FFFFFF" />
+            <Text style={styles.drawerButtonText}> Crear un mensaje</Text>
+          </TouchableOpacity>
+
           {/* Opción de Configuraciones */}
           <TouchableOpacity
             style={[
@@ -114,7 +137,7 @@ export default function SideBar({ isVisible, toggleSidebar, navigateToBaul, navi
             ]}
             onPress={() => {
               setSelected("Configuraciones");
-              toggleSidebar(); // Usa toggleSidebar en lugar de toggleSideBar
+              toggleSidebar();
             }}
           >
             <FontAwesome
@@ -152,7 +175,6 @@ export default function SideBar({ isVisible, toggleSidebar, navigateToBaul, navi
           </TouchableOpacity>
         </View>
 
-        {/* Footer al final del sidebar */}
         <View style={styles.footer}>
           <Text style={styles.footerText}>Soy - En Desarrollo</Text>
         </View>
@@ -168,7 +190,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: "rgba(0, 0, 0, 0.7)", // Fondo más oscuro para mayor enfoque
+    backgroundColor: "rgba(0, 0, 0, 0.7)",
     zIndex: 998,
   },
   sidebarContainer: {
@@ -176,36 +198,36 @@ const styles = StyleSheet.create({
     right: 0,
     top: 0,
     bottom: 0,
-    width: 280, // Ancho más amplio para mayor espacio
-    backgroundColor: "#2C3E50", // Color de fondo más oscuro y elegante
+    width: 280,
+    backgroundColor: "#2C3E50",
     zIndex: 999,
     paddingTop: 50,
     paddingLeft: 20,
-    paddingRight: 20, // Agrega padding derecho para evitar que el texto quede pegado
+    paddingRight: 20,
     shadowColor: "#000",
     shadowOffset: { width: -2, height: 0 },
     shadowOpacity: 0.8,
-    shadowRadius: 5, // Sombra pronunciada para dar un efecto de flotación
+    shadowRadius: 5,
     elevation: 10,
-    borderTopLeftRadius: 20, // Bordes redondeados
+    borderTopLeftRadius: 20,
     borderBottomLeftRadius: 20,
   },
   profileContainer: {
     alignItems: "center",
-    marginBottom: 10, // Reducido para ajustar el espacio con la línea divisoria
+    marginBottom: 10,
   },
   profileImage: {
     width: 100,
     height: 100,
     borderRadius: 50,
     borderWidth: 3,
-    borderColor: "#FFD700", // Borde dorado alrededor de la imagen
+    borderColor: "#FFD700",
   },
   profileName: {
     fontSize: 18,
     fontWeight: "bold",
     marginTop: 10,
-    color: "#FFD700", // Color dorado para el nombre
+    color: "#FFD700",
     textAlign: "center",
   },
   drawerButton: {
@@ -215,7 +237,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     marginVertical: 5,
     borderRadius: 10,
-    backgroundColor: "#34495E", // Fondo oscuro para los botones
+    backgroundColor: "#34495E",
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
@@ -224,15 +246,15 @@ const styles = StyleSheet.create({
   },
   drawerButtonText: {
     fontSize: 16,
-    color: "#fff", // Blanco para que el texto contraste con el fondo
+    color: "#fff",
     paddingLeft: 15,
   },
   sidebarContent: {
     flex: 1,
   },
   selectedButton: {
-    backgroundColor: "#FFD700", // Color dorado para la selección activa
-    shadowColor: "#FFD700", // Sombra dorada
+    backgroundColor: "#FFD700",
+    shadowColor: "#FFD700",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.8,
     shadowRadius: 6,
@@ -241,20 +263,20 @@ const styles = StyleSheet.create({
   divider: {
     width: "100%",
     height: 1,
-    backgroundColor: "#FFD700", // Color dorado para la línea divisoria
-    marginVertical: 15, // Espacio entre la línea y las secciones
+    backgroundColor: "#FFD700",
+    marginVertical: 15,
   },
   footer: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 20, // Espacio en la parte inferior
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 20,
     paddingTop: 10,
     borderTopWidth: 1,
-    borderTopColor: '#ccc', // Borde superior para separar el footer
+    borderTopColor: "#ccc",
   },
   footerText: {
     fontSize: 14,
-    color: '#FFD700', // Color dorado para el texto del footer
-    fontStyle: 'italic',
+    color: "#FFD700",
+    fontStyle: "italic",
   },
 });

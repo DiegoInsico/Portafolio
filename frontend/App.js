@@ -11,7 +11,6 @@ import { onAuthStateChanged } from "firebase/auth";
 // Importar componentes
 import SplashScreen from "./components/ui/SplashScreen";
 import MainTabs from "./components/navigation/MainTabs";
-
 import SideBar from "./components/navigation/sideBar"; // Importar el componente Sidebar
 
 // Importar pantallas
@@ -20,6 +19,7 @@ import Registro from "./screens/auth/register";
 import RequestPasswordReset from "./screens/auth/resetPass";
 import ModalEntry from "./screens/entrys/modalEntry";
 import Baul from "./screens/chest/baul";
+import CrearMensaje from "./screens/entrys/crear";
 
 const Stack = createStackNavigator();
 
@@ -42,48 +42,62 @@ export default function App() {
     return unsubscribe;
   }, [initializing]);
 
+  const navigateToCrearMensaje = (navigation) => {
+    navigation.navigate("CrearMensaje");
+    toggleSidebar();
+  };
+
   if (initializing) return <SplashScreen />;
 
   return (
     <NavigationContainer>
       <View style={styles.container}>
-        <SideBar visible={sidebarVisible} toggleSidebar={toggleSidebar} />
         <Stack.Navigator
           screenOptions={{
             headerStyle: {
-              backgroundColor: "#4B4E6D", // Fondo de reserva en caso de que la imagen no se cargue
+              backgroundColor: "#4B4E6D",
             },
-            headerTintColor: "#000000", // Color del texto del encabezado
+            headerTintColor: "#000000",
             headerTitleStyle: {
               fontWeight: "bold",
               fontSize: 20,
             },
             headerTitle: () => (
               <Image
-                source={require("./assets/background/florLogo.png")} // Reemplaza con la ruta de tu logo
+                source={require("./assets/background/florLogo.png")}
                 style={{ width: 100, height: 40, resizeMode: "contain" }}
               />
             ),
             headerBackground: () => (
               <Image
-                source={require("./assets/background/navbar.png")} // Reemplaza con la ruta de tu imagen
+                source={require("./assets/background/navbar.png")}
                 style={{ width: "100%", height: "100%" }}
               />
             ),
-            ...TransitionPresets.SlideFromRightIOS, // Animación de transición entre pantallas
+            ...TransitionPresets.SlideFromRightIOS,
           }}
         >
           {user ? (
             <>
               <Stack.Screen name="MainTabs" options={{ headerShown: false }}>
-                {() => <MainTabs toggleSidebar={toggleSidebar} />}
+                {({ navigation }) => (
+                  <MainTabs
+                    toggleSidebar={toggleSidebar}
+                    navigation={navigation}
+                  />
+                )}
               </Stack.Screen>
+              <Stack.Screen
+                name="CrearMensaje"
+                component={CrearMensaje}
+                options={{ headerShown: false }}
+              />
               <Stack.Screen
                 name="ModalEntry"
                 component={ModalEntry}
                 options={{
-                  headerShown: false, // Opción para ocultar el encabezado si deseas que parezca un modal completo
-                  presentation: "modal", // Opción para presentar como modal en iOS
+                  headerShown: false,
+                  presentation: "modal",
                 }}
               />
               <Stack.Screen
@@ -92,12 +106,12 @@ export default function App() {
                 options={{
                   title: "Baúl",
                   headerStyle: {
-                    backgroundColor: "#FFD700", // Color del encabezado
+                    backgroundColor: "#FFD700",
                   },
                   headerTitleStyle: {
                     fontWeight: "bold",
                     fontSize: 20,
-                    color: "#333", // Color del texto del encabezado
+                    color: "#333",
                   },
                 }}
               />
@@ -131,6 +145,15 @@ export default function App() {
             </>
           )}
         </Stack.Navigator>
+
+        {/* SideBar con la función de navegación */}
+        <SideBar
+          isVisible={sidebarVisible}
+          toggleSidebar={toggleSidebar}
+          navigateToBaul={() => navigation.navigate("Baul")}
+          navigateToProfile={() => navigation.navigate("Profile")}
+          navigateToCrearMensaje={() => navigation.navigate("CrearMensaje")}
+        />
       </View>
     </NavigationContainer>
   );
@@ -139,6 +162,6 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#000000", // Cambia el fondo si es necesario
+    backgroundColor: "#000000",
   },
 });
