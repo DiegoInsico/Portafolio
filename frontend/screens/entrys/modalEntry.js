@@ -29,6 +29,9 @@ import {
   updateDoc,
   collection,
   serverTimestamp,
+  query,
+  where,
+  getDocs
 } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import uuid from "react-native-uuid";
@@ -170,10 +173,12 @@ const ModalEntry = ({ visible, onClose }) => {
     const user = auth.currentUser; // Obtener el usuario autenticado
 
     // Comprobamos el límite de entradas por nivel
-    const userEntries = await db.collection('entradas')
-    .where('userId', '==', user.uid)
-    .where('nivel', '==', nivel)
-    .get();
+    const userEntriesQuery = query(
+      collection(db, 'entradas'),
+      where('userId', '==', user.uid),
+      where('nivel', '==', nivel)
+    );
+    const userEntries = await getDocs(userEntriesQuery);
 
     const limites = { '1': 50, '2': 10, '3': 4 };
     if (userEntries.size >= limites[nivel]) {

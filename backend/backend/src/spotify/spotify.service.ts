@@ -13,127 +13,47 @@ export class SpotifyService {
         private readonly httpService: HttpService,
         private readonly configService: ConfigService,
     ) {
+        // Obtén las claves de cliente desde el archivo .env o configuración
         this.clientId = this.configService.get<string>('SPOTIFY_CLIENT_ID');
         this.clientSecret = this.configService.get<string>('SPOTIFY_CLIENT_SECRET');
     }
 
-    // Método para intercambiar el código por tokens
-    async exchangeCodeForTokens(code: string): Promise<any> {
+    // Función para obtener el token de acceso de Spotify
+    private async getAccessToken(): Promise<string> {
         const tokenUrl = 'https://accounts.spotify.com/api/token';
         const authHeader = Buffer.from(`${this.clientId}:${this.clientSecret}`).toString('base64');
-
-        const params = new URLSearchParams();
-        params.append('grant_type', 'authorization_code');
-        params.append('code', code);
-        params.append('redirect_uri', this.configService.get<string>('SPOTIFY_REDIRECT_URI'));
+        const data = 'grant_type=client_credentials';
 
         try {
             const response = await firstValueFrom(
-                this.httpService.post(tokenUrl, params.toString(), {
+                this.httpService.post(tokenUrl, data, {
                     headers: {
                         Authorization: `Basic ${authHeader}`,
                         'Content-Type': 'application/x-www-form-urlencoded',
                     },
                 }),
             );
-            return response.data; // Contiene access_token y refresh_token
+            return response.data.access_token;
         } catch (error) {
-            console.error('Error exchanging code for tokens:', error.response?.data || error.message);
-            throw new HttpException('Error exchanging code for tokens', HttpStatus.BAD_REQUEST);
+            console.error('Error obtaining Spotify token:', error.response?.data || error.message);
+            throw new HttpException('Error obtaining Spotify token', HttpStatus.BAD_REQUEST);
         }
     }
 
-    // Método para refrescar el token de acceso
-    async refreshAccessToken(refreshToken: string): Promise<any> {
-        const tokenUrl = 'https://accounts.spotify.com/api/token';
-        const authHeader = Buffer.from(`${this.clientId}:${this.clientSecret}`).toString('base64');
-
-        const params = new URLSearchParams();
-        params.append('grant_type', 'refresh_token');
-        params.append('refresh_token', refreshToken);
-
-        try {
-            const response = await firstValueFrom(
-                this.httpService.post(tokenUrl, params.toString(), {
-                    headers: {
-                        Authorization: `Basic ${authHeader}`,
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                }),
-            );
-            return response.data; // Contiene el nuevo access_token
-        } catch (error) {
-            console.error('Error refreshing access token:', error.response?.data || error.message);
-            throw new HttpException('Error refreshing access token', HttpStatus.BAD_REQUEST);
-        }
-    }
-
-    // Método para reproducir una canción
-    async playTrack(accessToken: string, deviceId: string, trackUri: string): Promise<void> {
-        const playUrl = `https://api.spotify.com/v1/me/player/play?device_id=${deviceId}`;
-
-        try {
-            await firstValueFrom(
-                this.httpService.put(
-                    playUrl,
-                    {
-                        uris: [trackUri],
-                    },
-                    {
-                        headers: {
-                            Authorization: `Bearer ${accessToken}`,
-                            'Content-Type': 'application/json',
-                        },
-                    },
-                ),
-            );
-        } catch (error) {
-            console.error('Error playing track:', error.response?.data || error.message);
-            throw new HttpException('Error playing track', HttpStatus.BAD_REQUEST);
-        }
-    }
-
-    // Método para obtener dispositivos disponibles
-    async getAvailableDevices(accessToken: string): Promise<any> {
-        const devicesUrl = 'https://api.spotify.com/v1/me/player/devices';
-
-        try {
-            const response = await firstValueFrom(
-                this.httpService.get(devicesUrl, {
-                    headers: {
-                        Authorization: `Bearer ${accessToken}`,
-                    },
-                }),
-            );
-            return response.data.devices; // Retorna la lista de dispositivos
-        } catch (error) {
-            console.error('Error getting devices:', error.response?.data || error.message);
-            throw new HttpException('Error getting devices', HttpStatus.BAD_REQUEST);
-        }
-    }
-
-    // Método para buscar canciones en Spotify utilizando el access_token del usuario
-    async searchTracks(query: string, accessToken: string): Promise<any> {
+    // Función para buscar canciones en Spotify
+    async searchTracks(query: string): Promise<any> {
+        const token = await this.getAccessToken(); // Asegúrate de tener un token válido
         const searchUrl = `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track&limit=10`;
 
         try {
             const response = await firstValueFrom(
                 this.httpService.get(searchUrl, {
                     headers: {
-                        Authorization: `Bearer ${accessToken}`,
+                        Authorization: `Bearer ${token}`,
                     },
                 }),
             );
-
-            // Procesar los resultados para extraer sólo los campos necesarios
-            const tracks = response.data.tracks.items.map((track) => ({
-                name: track.name,
-                artist: track.artists[0].name,
-                albumImage: track.album.images[0]?.url || null,
-                uri: track.uri, // Aquí incluimos el campo 'uri'
-            }));
-
-            return tracks; // Retornamos sólo los campos procesados
+            return response.data.tracks.items; // Retorna solo los items de la búsqueda
         } catch (error) {
             const errorMessage = error.response?.data?.error?.message || 'Error searching tracks on Spotify';
             console.error('Error searching tracks on Spotify:', errorMessage);

@@ -4,41 +4,67 @@ import {
   Text,
   TextInput,
   Image,
-  Button,
-  StyleSheet,
   TouchableOpacity,
   Alert,
+  StyleSheet,
   ScrollView,
+  ActivityIndicator,
 } from "react-native";
 import { getAuth, updateProfile } from "firebase/auth";
-import { db } from "../../utils/firebase"; // Asegúrate de tener configurado Firestore
+import { db, storage } from "../../utils/firebase";
 import * as ImagePicker from "expo-image-picker";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { doc, deleteDoc } from "firebase/firestore"; // Importa deleteDoc para Firestore
-import UserEntries from "../../components/general/userEntries";
-import NotificationPreferences from "../../components/general/notificationPreferences";
+import { doc, updateDoc, getDoc } from "firebase/firestore";
+import { Picker } from "@react-native-picker/picker";
+import DateTimePicker from "@react-native-community/datetimepicker";
 
 const UserProfile = () => {
   const [user, setUser] = useState(null);
   const [username, setUsername] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [countryCode, setCountryCode] = useState("+1");
+  const [bio, setBio] = useState("");
+  const [birthDate, setBirthDate] = useState(new Date());
+  const [showDatePicker, setShowDatePicker] = useState(false);
   const [profileImage, setProfileImage] = useState("");
   const [uploading, setUploading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const auth = getAuth();
+  const userRef = doc(db, "users", auth.currentUser.uid);
 
-  // Obtener la información del usuario
   useEffect(() => {
-    const currentUser = auth.currentUser;
-    if (currentUser) {
-      setUser(currentUser);
-      setUsername(currentUser.displayName || "");
-      setProfileImage(
-        currentUser.photoURL || "https://example.com/default-avatar.png"
-      );
-    }
+    const fetchUserData = async () => {
+      const currentUser = auth.currentUser;
+      if (currentUser) {
+        setUser(currentUser);
+        setUsername(currentUser.displayName || "");
+        setProfileImage(
+          currentUser.photoURL || "https://example.com/default-avatar.png"
+        );
+
+        const userDoc = await getDoc(userRef);
+        if (userDoc.exists()) {
+          const data = userDoc.data();
+          setPhoneNumber(data.phoneNumber || "");
+          setCountryCode(data.countryCode || "+1");
+          setBio(data.bio || "");
+          setBirthDate(data.birthDate ? data.birthDate.toDate() : new Date());
+        }
+      }
+      setLoading(false);
+    };
+
+    fetchUserData();
   }, []);
 
-  // Cambiar foto de perfil
+  const handleDateChange = (event, selectedDate) => {
+    setShowDatePicker(false);
+    if (selectedDate) {
+      setBirthDate(selectedDate);
+    }
+  };
+
   const changeProfilePicture = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -49,7 +75,7 @@ const UserProfile = () => {
 
     if (!result.canceled) {
       setUploading(true);
-      const imageUri = result.uri;
+      const imageUri = result.assets[0].uri;
       const response = await fetch(imageUri);
       const blob = await response.blob();
 
@@ -65,17 +91,21 @@ const UserProfile = () => {
     }
   };
 
-  // Guardar cambios del perfil
   const handleSaveProfile = async () => {
     try {
       await updateProfile(user, { displayName: username });
+      await updateDoc(userRef, {
+        phoneNumber: phoneNumber,
+        countryCode: countryCode,
+        bio: bio,
+        birthDate: birthDate,
+      });
       Alert.alert("Éxito", "Tu perfil ha sido actualizado.");
     } catch (error) {
       Alert.alert("Error", "Hubo un problema actualizando tu perfil.");
     }
   };
 
-  // Función para eliminar cuenta
   const handleDeleteAccount = async () => {
     const user = auth.currentUser;
 
@@ -92,14 +122,8 @@ const UserProfile = () => {
             text: "Eliminar",
             onPress: async () => {
               try {
-                // Eliminar el documento del usuario en Firestore
-                await deleteDoc(doc(db, "users", user.uid));
-                console.log("Documento de usuario eliminado de Firestore");
-
-                // Eliminar el usuario de Firebase Authentication
+                await deleteDoc(userRef);
                 await user.delete();
-                console.log("Usuario eliminado de Firebase Authentication");
-
                 Alert.alert("Éxito", "Tu cuenta ha sido eliminada exitosamente.");
               } catch (error) {
                 console.error("Error al eliminar la cuenta:", error);
@@ -112,11 +136,14 @@ const UserProfile = () => {
     }
   };
 
+  if (loading) {
+    return <ActivityIndicator size="large" color="#FFD700" style={styles.loading} />;
+  }
+
   return (
-    <View style={styles.container}>
+    <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.header}>Perfil de Usuario</Text>
 
-      {/* Imagen de perfil */}
       <TouchableOpacity onPress={changeProfilePicture}>
         <Image source={{ uri: profileImage }} style={styles.profileImage} />
       </TouchableOpacity>
@@ -127,39 +154,78 @@ const UserProfile = () => {
         value={username}
         onChangeText={setUsername}
         placeholder="Ingresa tu nombre de usuario"
+        placeholderTextColor="#A9A9A9"
       />
 
-      {/* Sección de preferencias de notificación */}
-      <NotificationPreferences />
+      <Text style={styles.label}>Correo Electrónico</Text>
+      <Text style={styles.text}>{user?.email}</Text>
 
-      {/* Sección de entradas del usuario */}
-      <UserEntries userId={auth.currentUser.uid} />
+      <Text style={styles.label}>Número de Teléfono</Text>
+      <View style={styles.phoneContainer}>
+        <View style={styles.pickerContainer}>
+          <Picker
+            selectedValue={countryCode}
+            style={styles.picker}
+            onValueChange={(itemValue) => setCountryCode(itemValue)}
+            itemStyle={{ color: "#333" }}
+          >
+            <Picker.Item label="🇺🇸 +1" value="+1" color="#333" />
+            <Picker.Item label="🇲🇽 +52" value="+52" color="#333" />
+            <Picker.Item label="🇨🇱 +56" value="+56" color="#333" />
+            <Picker.Item label="🇪🇸 +34" value="+34" color="#333" />
+          </Picker>
+        </View>
+        <TextInput
+          style={[styles.input, styles.phoneInput]}
+          value={phoneNumber}
+          onChangeText={setPhoneNumber}
+          placeholder="Número de teléfono"
+          placeholderTextColor="#A9A9A9"
+          keyboardType="phone-pad"
+        />
+      </View>
 
-      {/* Botón para guardar cambios */}
-      <Button
-        title="Guardar Cambios"
-        onPress={handleSaveProfile}
-        color="#FFD700"
+      <Text style={styles.label}>Fecha de Nacimiento</Text>
+      <TouchableOpacity onPress={() => setShowDatePicker(true)} style={styles.datePicker}>
+        <Text style={styles.dateText}>{birthDate.toDateString()}</Text>
+      </TouchableOpacity>
+      {showDatePicker && (
+        <DateTimePicker
+          value={birthDate}
+          mode="date"
+          display="default"
+          onChange={handleDateChange}
+          maximumDate={new Date()}
+        />
+      )}
+
+      <Text style={styles.label}>Biografía</Text>
+      <TextInput
+        style={[styles.input, styles.bioInput]}
+        value={bio}
+        onChangeText={setBio}
+        placeholder="Escribe una breve biografía"
+        placeholderTextColor="#A9A9A9"
+        multiline
       />
 
-      {/* Botón para borrar cuenta */}
-      <Button
-        title="Eliminar Cuenta"
-        onPress={handleDeleteAccount}
-        color="red" // Puedes cambiar el color como prefieras
-      />
+      <TouchableOpacity style={[styles.button, styles.saveButton]} onPress={handleSaveProfile}>
+        <Text style={styles.buttonText}>Guardar Cambios</Text>
+      </TouchableOpacity>
 
-      {/* Indicador de carga al subir imagen */}
+      <TouchableOpacity style={[styles.button, styles.deleteButton]} onPress={handleDeleteAccount}>
+        <Text style={styles.buttonText}>Eliminar Cuenta</Text>
+      </TouchableOpacity>
+
       {uploading && <Text style={styles.uploading}>Subiendo imagen...</Text>}
-    </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flexGrow: 1,
     padding: 20,
-    justifyContent: "center",
     backgroundColor: "#2C3E50",
   },
   header: {
@@ -167,7 +233,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     textAlign: "center",
     marginBottom: 20,
-    color: "#FFD700", // Color dorado para el encabezado
+    color: "#FFD700",
   },
   profileImage: {
     width: 150,
@@ -176,25 +242,91 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     marginBottom: 20,
     borderWidth: 3,
-    borderColor: "#FFD700", // Borde dorado
+    borderColor: "#FFD700",
   },
   label: {
     fontSize: 16,
     marginBottom: 10,
-    color: "#FFD700", // Color dorado para la etiqueta
+    color: "#FFD700",
+  },
+  text: {
+    fontSize: 16,
+    marginBottom: 20,
+    color: "#F0E4C2",
   },
   input: {
     borderWidth: 1,
-    borderColor: "#FFD700", // Borde dorado
+    borderColor: "#FFD700",
     borderRadius: 8,
     padding: 10,
+    backgroundColor: "#FFF",
+    width: "100%",
+  },
+  phoneContainer: {
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: 20,
-    backgroundColor: "#fff", // Fondo blanco para el input
+    width: "100%",
+  },
+  pickerContainer: {
+    borderWidth: 1,
+    borderColor: "#FFD700",
+    borderRadius: 8,
+    overflow: "hidden",
+    backgroundColor: "#FFF",
+    marginRight: 10,
+  },
+  picker: {
+    width: 100,
+    color: "#333",
+  },
+  phoneInput: {
+    flex: 1,
+    height: 40,
+  },
+  datePicker: {
+    padding: 10,
+    borderWidth: 1,
+    borderColor: "#FFD700",
+    borderRadius: 8,
+    marginBottom: 20,
+    backgroundColor: "#FFF",
+    width: "100%",
+    alignItems: "center",
+  },
+  dateText: {
+    color: "#333",
+  },
+  bioInput: {
+    height: 100,
+    textAlignVertical: "top",
+    marginBottom: 10,
+  },
+  button: {
+    padding: 15,
+    borderRadius: 8,
+    alignItems: "center",
+    marginBottom: 10,
+    width: "100%",
+  },
+  saveButton: {
+    backgroundColor: "#FFD700",
+  },
+  deleteButton: {
+    backgroundColor: "red",
+  },
+  buttonText: {
+    color: "#FFF",
+    fontWeight: "bold",
   },
   uploading: {
     textAlign: "center",
     marginTop: 20,
-    color: "#FFD700", // Color dorado para el texto de subida
+    color: "#FFD700",
+  },
+  loading: {
+    flex: 1,
+    justifyContent: "center",
   },
 });
 

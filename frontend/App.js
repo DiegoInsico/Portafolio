@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, StyleSheet, Image } from "react-native";
+import { View, StyleSheet, Image, Linking, Alert } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import {
   createStackNavigator,
@@ -20,6 +20,7 @@ import RequestPasswordReset from "./screens/auth/resetPass";
 import ModalEntry from "./screens/entrys/modalEntry";
 import Baul from "./screens/chest/baul";
 import SecuritySettings from "./components/security/SecurittySettings";
+import SettingsScreen from "./screens/settings/SettingsScreen";
 
 const Stack = createStackNavigator();
 
@@ -27,9 +28,18 @@ export default function App() {
   const [user, setUser] = useState(null);
   const [initializing, setInitializing] = useState(true);
   const [sidebarVisible, setSidebarVisible] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
 
   const toggleSidebar = () => {
     setSidebarVisible(!sidebarVisible);
+  };
+
+  const openModalEntry = () => {
+    setModalVisible(true);
+  };
+
+  const closeModalEntry = () => {
+    setModalVisible(false);
   };
 
   useEffect(() => {
@@ -39,6 +49,29 @@ export default function App() {
     });
     return unsubscribe;
   }, [initializing]);
+
+  useEffect(() => {
+    const handleOpenURL = (event) => {
+      const url = event.url || "";
+      if (url.includes("shortcut=crearEntrada")) {
+        openModalEntry();
+      }
+    };
+  
+    Linking.addEventListener("url", handleOpenURL);
+  
+    Linking.getInitialURL().then((url) => {
+      if (url && url.includes("shortcut=crearEntrada")) {
+        openModalEntry();
+      }
+    });
+  
+    // Cambia removeEventListener por remove
+    return () => {
+      Linking.remove("url", handleOpenURL);
+    };
+  }, []);
+  
 
   if (initializing) return <SplashScreen />;
 
@@ -60,13 +93,15 @@ export default function App() {
             toggleSidebar();
             navigation.navigate("Configuración de Seguridad");
           }}
+          navigateToSettings={() => {
+            toggleSidebar();
+            navigation.navigate("Settings");
+          }}
         />
 
         <Stack.Navigator
           screenOptions={{
-            headerStyle: {
-              backgroundColor: "#4B4E6D",
-            },
+            headerStyle: { backgroundColor: "#4B4E6D" },
             headerTintColor: "#000000",
             headerTitleStyle: {
               fontWeight: "bold",
@@ -93,21 +128,11 @@ export default function App() {
                 {() => <MainTabs toggleSidebar={toggleSidebar} />}
               </Stack.Screen>
               <Stack.Screen
-                name="ModalEntry"
-                component={ModalEntry}
-                options={{
-                  headerShown: false,
-                  presentation: "modal",
-                }}
-              />
-              <Stack.Screen
                 name="Baul"
                 component={Baul}
                 options={{
                   title: "Baúl",
-                  headerStyle: {
-                    backgroundColor: "#FFD700",
-                  },
+                  headerStyle: { backgroundColor: "#FFD700" },
                   headerTitleStyle: {
                     fontWeight: "bold",
                     fontSize: 20,
@@ -117,17 +142,25 @@ export default function App() {
               />
               <Stack.Screen
                 name="SecuritySettings"
-                component={SecuritySettings} // Define esta pantalla en tu proyecto
+                component={SecuritySettings}
                 options={{
                   title: "Configuración de Seguridad",
-                  headerStyle: {
-                    backgroundColor: "#4B4E6D",
-                  },
+                  headerStyle: { backgroundColor: "#4B4E6D" },
                   headerTitleStyle: {
                     fontWeight: "bold",
                     fontSize: 20,
                     color: "#FFD700",
                   },
+                }}
+              />
+              <Stack.Screen
+                name="Settings"
+                component={SettingsScreen}
+                options={{
+                  title: "Configuración",
+                  headerStyle: { backgroundColor: "#2C3E50" },
+                  headerTintColor: "#FFD700",
+                  headerTitleStyle: { fontWeight: "bold" },
                 }}
               />
             </>
@@ -136,30 +169,23 @@ export default function App() {
               <Stack.Screen
                 name="Login"
                 component={Login}
-                options={{
-                  headerShown: false,
-                  title: "Iniciar Sesión",
-                }}
+                options={{ headerShown: false, title: "Iniciar Sesión" }}
               />
               <Stack.Screen
                 name="Registro"
                 component={Registro}
-                options={{
-                  headerShown: false,
-                  title: "Registro",
-                }}
+                options={{ headerShown: false, title: "Registro" }}
               />
               <Stack.Screen
                 name="RequestPasswordReset"
                 component={RequestPasswordReset}
-                options={{
-                  headerShown: false,
-                  title: "Restablecer Contraseña",
-                }}
+                options={{ headerShown: false, title: "Restablecer Contraseña" }}
               />
             </>
           )}
         </Stack.Navigator>
+
+        <ModalEntry visible={modalVisible} onClose={closeModalEntry} />
       </View>
     </NavigationContainer>
   );

@@ -12,6 +12,9 @@ import Home from "../../screens/home/home";
 import ListEntry from "../../screens/entrys/listEntry";
 import Baul from "../../screens/chest/baul";
 import UserProfile from "../../screens/user/userProfile";
+import Testigos from "../../screens/user/Testigos"; // Nueva pantalla
+import Beneficiarios from "../../screens/user/Beneficiarios"; // Nueva pantalla
+
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -37,9 +40,17 @@ function MainTabs({ navigation }) {
           handleToggleSidebar();
           navigation.navigate("Profile"); // Navega a la pantalla de perfil
         }}
-        navigateToSecuritySettings={() => {
+        navigateToSettings={() => {
           handleToggleSidebar();
-          navigation.navigate("SecuritySettings"); // Navega a la configuración de seguridad
+          navigation.navigate("Settings");
+        }} // Nueva función
+        navigateToTestigos={() => {
+          handleToggleSidebar();
+          navigation.navigate("Testigos");
+        }}
+        navigateToBeneficiarios={() => {
+          handleToggleSidebar();
+          navigation.navigate("Beneficiarios");
         }}
       />
 
@@ -71,14 +82,27 @@ function MainTabs({ navigation }) {
             fontSize: 12,
             fontWeight: "bold",
             fontFamily: "sans-serif",
+            
           },
         })}
       >
-        <Tab.Screen name="Home" component={Home} />
+        <Tab.Screen name="Home" component={Home}
+         options={{
+          headerShown: false,
+          title: "Tus Entradas",
+          headerStyle: { backgroundColor: "#fff" },
+          headerTitleStyle: {
+            borderBottomColor: "#D4AF37",
+            fontWeight: "bold",
+            fontSize: 20,
+            color: "#333",
+          },
+        }} />
         <Tab.Screen
           name="ListEntry"
           component={ListEntry}
           options={{
+            headerShown: false,
             title: "Tus Entradas",
             headerStyle: { backgroundColor: "#fff" },
             headerTitleStyle: {
@@ -140,6 +164,16 @@ export default function AppNavigator() {
             color: "#333",
           },
         }}
+      />
+      <Stack.Screen
+        name="Testigos"
+        component={Testigos}
+        options={{ title: "Testigos" }}
+      />
+      <Stack.Screen
+        name="Beneficiarios"
+        component={Beneficiarios}
+        options={{ title: "Beneficiarios" }}
       />
     </Stack.Navigator>
   );
