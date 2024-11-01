@@ -26,6 +26,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { FontAwesome } from "@expo/vector-icons";
 import ModalEntry from "../entrys/modalEntry";
 import { ScrollView } from "react-native-gesture-handler";
+import { StatusBar } from "react-native";
 
 const { width: viewportWidth } = Dimensions.get("window");
 
@@ -166,6 +167,8 @@ const Home = ({ navigation }) => {
   };
 
   return (
+    <>
+<StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
     <LinearGradient
       colors={[
         "#2C3E50",
@@ -244,6 +247,7 @@ const Home = ({ navigation }) => {
       </View>
       </ScrollView>
     </LinearGradient>
+    </>
   );
 };
 

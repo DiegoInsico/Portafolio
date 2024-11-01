@@ -12,8 +12,17 @@ import { signOut } from "firebase/auth";
 import { auth } from "../../utils/firebase";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 
-export default function SideBar({ isVisible, toggleSidebar, navigateToBaul, navigateToProfile, navigateToSecuritySettings }) {
-  const [selected, setSelected] = useState(""); // Estado para la opción seleccionada
+export default function SideBar({
+  isVisible,
+  toggleSidebar,
+  navigateToBaul,
+  navigateToProfile,
+  navigateToSecuritySettings,
+  navigateToSettings,
+  navigateToTestigos,  // Nueva función
+  navigateToBeneficiarios,  // Nueva función
+}) {
+  const [selected, setSelected] = useState("");
   const slideAnim = useRef(new Animated.Value(250)).current;
 
   useEffect(() => {
@@ -29,17 +38,16 @@ export default function SideBar({ isVisible, toggleSidebar, navigateToBaul, navi
         duration: 300,
         useNativeDriver: true,
       }).start();
-      // Restablece la selección cuando el sidebar se cierra
       setSelected("");
     }
   }, [isVisible]);
 
-  if (!isVisible) return null; // Si el sidebar no es visible, no renderizar nada
+  if (!isVisible) return null;
 
   const handleSignOut = async () => {
     try {
       await signOut(auth);
-      toggleSidebar(); // Asegúrate de usar toggleSidebar aquí también
+      toggleSidebar();
     } catch (error) {
       console.error("Error al cerrar sesión:", error);
     }
@@ -54,106 +62,77 @@ export default function SideBar({ isVisible, toggleSidebar, navigateToBaul, navi
         style={[styles.sidebarContainer, { transform: [{ translateX: slideAnim }] }]}
       >
         <View style={styles.sidebarContent}>
-          {/* Sección de perfil */}
+          {/* Perfil */}
           <View style={styles.profileContainer}>
             <Image
-              source={{ uri: "https://www.example.com/profile-pic.jpg" }} // Reemplaza con tu imagen
+              source={{ uri: "https://www.example.com/profile-pic.jpg" }}
               style={styles.profileImage}
             />
             <Text style={styles.profileName}>Nombre del Usuario</Text>
           </View>
 
-          {/* Línea divisoria entre perfil y botones */}
           <View style={styles.divider} />
 
-          {/* Opción de Perfil */}
+          {/* Botones de Navegación */}
           <TouchableOpacity
-            style={[
-              styles.drawerButton,
-              selected === "Perfil" && styles.selectedButton,
-            ]}
+            style={[styles.drawerButton, selected === "Perfil" && styles.selectedButton]}
             onPress={() => {
               setSelected("Perfil");
-              navigateToProfile(); // Navegar hacia la pantalla de perfil
-              toggleSidebar(); // Cierra el sidebar al navegar
+              navigateToProfile();
+              toggleSidebar();
             }}
           >
-            <FontAwesome
-              name="user"
-              size={20}
-              color={selected === "Perfil" ? "#FFD700" : "#fff"}
-            />
-            <Text style={styles.drawerButtonText}>Perfil </Text>
+            <FontAwesome name="user" size={20} color={selected === "Perfil" ? "#FFD700" : "#fff"} />
+            <Text style={styles.drawerButtonText}>Perfil</Text>
           </TouchableOpacity>
 
-          {/* Opción del Baúl */}
           <TouchableOpacity
-            style={[
-              styles.drawerButton,
-              selected === "Baul" && styles.selectedButton,
-            ]}
+            style={[styles.drawerButton, selected === "Testigos" && styles.selectedButton]}
             onPress={() => {
-              setSelected("Baul");
-              navigateToBaul(); // Navegar hacia la pantalla Baul
-              toggleSidebar(); // Cierra el sidebar al navegar
+              setSelected("Testigos");
+              navigateToTestigos();
+              toggleSidebar();
             }}
           >
-            <FontAwesome
-              name="archive"
-              size={20}
-              color={selected === "Baul" ? "#FFD700" : "#fff"}
-            />
-            <Text style={styles.drawerButtonText}>Baúl </Text>
+            <FontAwesome name="users" size={20} color={selected === "Testigos" ? "#FFD700" : "#fff"} />
+            <Text style={styles.drawerButtonText}>Testigos</Text>
           </TouchableOpacity>
 
-          {/* Opción de Configuración de Seguridad */}
           <TouchableOpacity
-            style={[
-              styles.drawerButton,
-              selected === "ConfiguracionSeguridad" && styles.selectedButton,
-            ]}
+            style={[styles.drawerButton, selected === "Beneficiarios" && styles.selectedButton]}
             onPress={() => {
-              setSelected("ConfiguracionSeguridad");
-              navigateToSecuritySettings(); // Navegar hacia la configuración de seguridad
-              toggleSidebar(); // Cierra el sidebar al navegar
+              setSelected("Beneficiarios");
+              navigateToBeneficiarios();
+              toggleSidebar();
             }}
           >
-            <FontAwesome
-              name="lock"
-              size={20}
-              color={selected === "ConfiguracionSeguridad" ? "#FFD700" : "#fff"}
-            />
-            <Text style={styles.drawerButtonText}> Seguridad </Text>
+            <FontAwesome name="heart" size={20} color={selected === "Beneficiarios" ? "#FFD700" : "#fff"} />
+            <Text style={styles.drawerButtonText}>Beneficiarios</Text>
           </TouchableOpacity>
 
-          {/* Opción de Cerrar Sesión */}
           <TouchableOpacity
-            style={[
-              styles.drawerButton,
-              selected === "Cerrar Sesión" && styles.selectedButton,
-            ]}
+            style={[styles.drawerButton, selected === "Configuracion" && styles.selectedButton]}
+            onPress={() => {
+              setSelected("Configuracion");
+              navigateToSettings();
+              toggleSidebar();
+            }}
+          >
+            <FontAwesome name="cog" size={20} color={selected === "Configuracion" ? "#FFD700" : "#fff"} />
+            <Text style={styles.drawerButtonText}>Configuración</Text>
+          </TouchableOpacity>
+
+          {/* Cerrar Sesión */}
+          <TouchableOpacity
+            style={[styles.drawerButton, selected === "Cerrar Sesión" && styles.selectedButton]}
             onPress={() => {
               setSelected("Cerrar Sesión");
               handleSignOut();
             }}
           >
-            <FontAwesome
-              name="sign-out"
-              size={20}
-              color={selected === "Cerrar Sesión" ? "#FFD700" : "#fff"}
-            />
-            <Text
-              style={[
-                styles.drawerButtonText,
-                { color: selected === "Cerrar Sesión" ? "#FFD700" : "#fff" },
-              ]}
-            >Cerrar Sesión </Text>
+            <FontAwesome name="sign-out" size={20} color={selected === "Cerrar Sesión" ? "#FFD700" : "#fff"} />
+            <Text style={[styles.drawerButtonText, { color: selected === "Cerrar Sesión" ? "#FFD700" : "#fff" }]}>Cerrar Sesión</Text>
           </TouchableOpacity>
-        </View>
-
-        {/* Footer al final del sidebar */}
-        <View style={styles.footer}>
-          <Text style={styles.footerText}>Soy - En Desarrollo</Text>
         </View>
       </Animated.View>
     </View>
