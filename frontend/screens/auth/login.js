@@ -16,7 +16,8 @@ import { Formik } from "formik";
 import * as Yup from "yup";
 import { Ionicons } from "@expo/vector-icons";
 import { signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
-import { auth } from "../../utils/firebase";
+import { auth, db } from "../../utils/firebase"; // Asegúrate de importar `db` correctamente
+import { doc, setDoc, serverTimestamp } from "firebase/firestore";
 
 // Definir el esquema de validación con Yup
 const LoginSchema = Yup.object().shape({
@@ -59,14 +60,20 @@ export default function Login({ navigation }) {
     );
   }
 
-  // Función para manejar el login usando Firebase
   const handleLogin = async (values, actions) => {
     const { correo, contrasena } = values;
     setIsSubmitting(true);
-
+  
     try {
-      await signInWithEmailAndPassword(auth, correo, contrasena);
-
+      const userCredential = await signInWithEmailAndPassword(auth, correo, contrasena);
+      const user = userCredential.user;
+  
+      // Registro del inicio de sesión en Firestore
+      await setDoc(doc(db, "sessions", `${user.uid}_${Date.now()}`), {
+        userId: user.uid,
+        timestamp: serverTimestamp(),
+      });
+  
       // Login exitoso
       Alert.alert("Éxito", "Has iniciado sesión correctamente.");
       navigation.reset({
