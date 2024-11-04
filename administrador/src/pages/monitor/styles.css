@@ -130,62 +130,79 @@ h3 {
 }
 
 /* Estilos específicos para SoulmatePage */
-
-.soulmate-container {
-  max-width: 1200px; /* Aumentado para ocupar más espacio */
-  margin: 40px auto; /* Añade margen superior e inferior para centrado */
-  padding: 40px; /* Aumentado para espaciar el contenido */
-  background-color: #1e1e2f; /* Fondo oscuro */
-  color: #f0e6d2; /* Texto claro */
+/* Añadido específicamente para EmotionsPage */
+.emotions-container {
+  max-width: 100%; /* Ajusta el ancho para ocupar el 95% del ancho de la pantalla */
+  margin: auto;
+  padding: 10px; /* Aumenta el padding para dar más espacio interno */
+  background-color: #1e1e2f;
+  color: #f0e6d2;
   border-radius: 10px;
-  box-shadow: 0px 0px 25px rgba(0, 0, 0, 0.6); /* Sombra más fuerte */
-}
-
-.soulmate-container h1 {
+  box-shadow: 0px 0px 25px rgba(0, 0, 0, 0.6);
   text-align: center;
-  color: #f0a500; /* Título dorado */
-  margin-bottom: 30px; /* Aumentado */
-  font-size: 2em; /* Título más grande */
 }
 
-.soulmate-list {
+
+.emotions-container h1 {
+  color: #f0a500;
+  font-size: 3em;
+  margin-bottom: 20px;
+  
+}
+
+/* Reutilización de la clase chart-container */
+.chart-container {
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.chart-container canvas {
+  width: 100% !important;
+  height: auto !important;
+}
+
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-gap: 20px;
+  margin-top: 20px;
+}
+
+.grid-item {
+  background-color: rgba(44, 44, 58, 0.7); /* Fondo con opacidad */
+  padding: 10px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+
+.chart-container {
+  width: 100%;
+  height: 300px; /* Ajusta la altura según tus necesidades */
+}
+
+/* Centrar la tabla de Artistas y Canciones */
+.artist-songs-table-container {
+  display: flex;
+  justify-content: center;
   margin-top: 30px;
 }
 
-.soulmate-item {
-  background-color: #2c2c3a; /* Fondo oscuro para cada tarjeta de coincidencia */
-  margin: 20px 0; /* Mayor separación entre tarjetas */
-  padding: 20px; /* Aumentado */
-  border-radius: 8px;
-  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.3); /* Sombra más intensa */
-  transition: background-color 0.3s, transform 0.3s; /* Añade un efecto de movimiento */
+.artist-songs-table {
+  width: 90%; /* Ajusta el ancho según tus necesidades */
+  text-align: left; /* Alinea el contenido de la tabla a la izquierda */
+  border-collapse: collapse;
 }
 
-.soulmate-item:hover {
-  background-color: #3a3a4f; /* Cambio de fondo en hover */
-  transform: translateY(-5px); /* Desplazamiento ligero en hover */
-}
-
-.soulmate-item p {
-  font-size: 1.2em; /* Texto más grande */
-  margin-bottom: 10px; /* Aumentado */
+.artist-songs-table th,
+.artist-songs-table td {
+  padding:10px;
+  border-bottom: 1px solid #444; /* Línea divisoria entre filas */
   color: #f0e6d2;
 }
 
-.emotions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 15px; /* Más espacio entre emociones */
-  margin-top: 15px;
-}
-
-.emotion-item {
-  background-color: #4b4e6d; /* Fondo de cada emoción */
-  color: #ffd700; /* Color dorado para el texto de emoción */
-  padding: 8px 12px; /* Aumentado */
-  border-radius: 5px;
-  font-size: 1.2em; /* Texto de emociones más grande */
-  display: flex;
-  align-items: center;
-  gap: 8px; /* Más espacio entre icono y texto */
+.artist-songs-table th {
+  text-align: left;
+  color: #f0a500; /* Color dorado para los encabezados */
 }

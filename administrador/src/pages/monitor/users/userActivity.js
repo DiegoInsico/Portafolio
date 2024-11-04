@@ -3,6 +3,7 @@ import { db } from "../../../firebase"; // Asegúrate de tener tu configuración
 import { collection, getDocs, query, orderBy } from "firebase/firestore";
 import "./users.css"; // Importar los estilos personalizados
 import { useNavigate } from "react-router-dom";
+import Container from "../../../components/container";
 
 const UserActivity = () => {
   const [userActivity, setUserActivity] = useState([]);
@@ -62,60 +63,62 @@ const UserActivity = () => {
   });
 
   return (
-    <div className="dashboard-container">
-      <h1>Actividad de Usuarios</h1>
+    <Container>
+      <div className="dashboard-container">
+        <h1>Actividad de Usuarios</h1>
 
-      {/* Filtros */}
-      <div className="filters">
-        <input
-          type="text"
-          placeholder="Filtrar por usuario"
-          className="filter-input"
-          value={filterText}
-          onChange={handleFilterChange}
-        />
-        <input
-          type="text"
-          placeholder="Filtrar por correo"
-          className="filter-input"
-          value={filterEmail}
-          onChange={handleEmailFilterChange}
-        />
-      </div>
+        {/* Filtros */}
+        <div className="filters">
+          <input
+            type="text"
+            placeholder="Filtrar por usuario"
+            className="filter-input"
+            value={filterText}
+            onChange={handleFilterChange}
+          />
+          <input
+            type="text"
+            placeholder="Filtrar por correo"
+            className="filter-input"
+            value={filterEmail}
+            onChange={handleEmailFilterChange}
+          />
+        </div>
 
-      <div className="settings-section">
-        <h3>Historial de Inicios de Sesión</h3>
-        <table className="activity-table">
-          <thead>
-            <tr>
-              <th>Nombre de Usuario</th>
-              <th>Email</th>
-              <th>Creacion de la cuenta</th>
-              <th>Rol</th> {/* Nueva columna de Rol */}
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredUsers.map((user, index) => (
-              <tr key={index}>
-                <td>{user.username}</td>
-                <td>{user.email}</td>
-                <td>{user.lastLogin}</td>
-                <td>{user.role}</td> {/* Mostramos el rol del usuario */}
-                <td>
-                  <button
-                    className="view-button"
-                    onClick={() => handleViewUser(user.id)}
-                  >
-                    Ver Usuario
-                  </button>
-                </td>
+        <div className="settings-section">
+          <h3>Historial de Inicios de Sesión</h3>
+          <table className="activity-table">
+            <thead>
+              <tr>
+                <th>Nombre de Usuario</th>
+                <th>Email</th>
+                <th>Creacion de la cuenta</th>
+                <th>Rol</th> {/* Nueva columna de Rol */}
+                <th>Acciones</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {filteredUsers.map((user, index) => (
+                <tr key={index}>
+                  <td>{user.username}</td>
+                  <td>{user.email}</td>
+                  <td>{user.lastLogin}</td>
+                  <td>{user.role}</td> {/* Mostramos el rol del usuario */}
+                  <td>
+                    <button
+                      className="view-button"
+                      onClick={() => handleViewUser(user.id)}
+                    >
+                      Ver Usuario
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
-    </div>
+    </Container>
   );
 };
 

@@ -23,8 +23,10 @@ const MainLayout = ({ children, isAuthenticated, currentUser }) => {
             <NavLink to="/monitor/users/userActivity">Gestión de Usuarios</NavLink>
             <NavLink to="/monitor/graphics">Ver Gráficos</NavLink>
             <NavLink to="/system/notifications">Notificaciones</NavLink>
-            <NavLink to="/monitor/SoulmatePage">Almas gemelas</NavLink>
+            <NavLink to="/monitor/SoulmatePage">Lista de emocionesy canciones</NavLink>
+            <NavLink to="/monitor/Clouster">Clouster de usuarios</NavLink>
             <NavLink to="/system/inbox">Consultas</NavLink>
+            <NavLink to="/test">pagina de testeo</NavLink>
           </div>
           <div className="content">
             {children}

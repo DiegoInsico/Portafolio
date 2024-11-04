@@ -14,6 +14,8 @@ import UserSummary from "./pages/monitor/users/userSummary";
 import Notifications from "./pages/system/notifications";
 import SoulmatePage from "./pages/monitor/soulmatePage";
 import Inbox from "./pages/system/inbox";
+import Test from "./pages/test/test";
+import Clouster from "./pages/monitor/clouster";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -58,6 +60,10 @@ const AppRoutes = ({ isAuthenticated, currentUser, handleLogin }) => {
         {/* Rutas Protegidas */}
         {isAuthenticated ? (
           <>
+            {/* pagina de testeo */}
+            <Route path="/Test" element={<Test />} />
+            <Route path="/monitor/clouster" element={<Clouster />} />
+
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/entradas" element={<Entradas />} />
             <Route path="/gestion-usuarios" element={<GestionUsuarios />} />
