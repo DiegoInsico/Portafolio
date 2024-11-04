@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import "./Dashboard.css"; // Ya tienes un archivo de estilos general
+import "./Dashboard.css"; // Archivo de estilos actualizado
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -11,20 +11,20 @@ const Dashboard = () => {
 
       <div className="dashboard-grid">
         <div className="dashboard-card" onClick={() => navigate("/entradas")}>
-          <h3>Gestión de Entradas</h3>
-          <p className="description">Gestiona las entradas registradas.</p>
+          <span className="initial-text">Gestión de Entradas</span>
+          <span className="hover-text">Gestiona las entradas registradas.</span>
         </div>
         <div className="dashboard-card" onClick={() => navigate("/monitor/users/userActivity")}>
-          <h3>Gestión de Usuarios</h3>
-          <p className="description">Administra los usuarios de la plataforma.</p>
+          <span className="initial-text">Gestión de Usuarios</span>
+          <span className="hover-text">Administra los usuarios de la plataforma.</span>
         </div>
         <div className="dashboard-card" onClick={() => navigate("/monitor/graphics")}>
-          <h3>Ver Gráficos</h3>
-          <p className="description">Revisa las estadísticas de uso.</p>
+          <span className="initial-text">Ver Gráficos</span>
+          <span className="hover-text">Revisa las estadísticas de uso.</span>
         </div>
         <div className="dashboard-card" onClick={() => navigate("/system/notifications")}>
-          <h3>Notificaciones</h3>
-          <p className="description">Sistema de notificaciones y alertas.</p>
+          <span className="initial-text">Notificaciones</span>
+          <span className="hover-text">Sistema de notificaciones y alertas.</span>
         </div>
       </div>
     </div>
@@ -32,4 +32,3 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
-

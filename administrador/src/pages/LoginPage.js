@@ -34,39 +34,34 @@ const LoginPage = ({ onLogin }) => {
 
   return (
     <div className="login-container">
-      <div className="login-side"></div>
-      <div className="center-content">
-        <div className="login-box">
-          <h2>Iniciar Sesión</h2>
-          <form onSubmit={handleLogin}>
-            <div className="form-group">
-              <label>Email:</label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="input-field"
-              />
-            </div>
-            <div className="form-group">
-              <label>Password:</label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="input-field"
-              />
-            </div>
-            <button type="submit" className="login-button">
-              Login
-            </button>
-            {error && <p className="error-message">{error}</p>}
-          </form>
-        </div>
+      <div className="login-box">
+        <h2>Iniciar Sesión</h2>
+        <form onSubmit={handleLogin}>
+          <div className="form-group">
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="input-field"
+              placeholder="E-mail"
+            />
+          </div>
+          <div className="form-group">
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className="input-field"
+              placeholder="Password"
+            />
+          </div>
+          <button type="submit" className="login-button">Enviar</button>
+          {error && <p className="error-message">{error}</p>}
+        </form>
+        <span className="agreement">pagina en desarrollo</span>
       </div>
-      <div className="login-side"></div>
     </div>
   );
 };

@@ -1,4 +1,3 @@
-// TopBar.js
 import React from 'react';
 import './TopBar.css';
 

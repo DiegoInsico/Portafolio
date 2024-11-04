@@ -4,7 +4,7 @@
   flex-direction: column; /* Cambiamos a columna para centrar los gráficos */
   align-items: center;
   padding: 20px;
-  background-color: #1e1e2f;
+  background-color: #a80980;
   color: #f0e6d2;
   min-height: 100vh; /* Para ocupar toda la altura de la pantalla */
 }
