@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { db } from "../../../firebase"; // Asegúrate de tener tu configuración de Firebase
+import { db } from "../../../firebase";
 import { collection, getDocs, query, orderBy } from "firebase/firestore";
-import "./users.css"; // Importar los estilos personalizados
+import "./users.css"; // Importa estilos específicos para UserActivity
 import { useNavigate } from "react-router-dom";
-import Container from "../../../components/container";
+import Container from "../../../components/container"; // Asegúrate de que Container esté configurado correctamente
 
 const UserActivity = () => {
   const [userActivity, setUserActivity] = useState([]);
@@ -15,20 +15,20 @@ const UserActivity = () => {
     const fetchUserActivity = async () => {
       try {
         const activityData = [];
-        const q = query(collection(db, "users"), orderBy("createdAt", "desc")); // Suponiendo que tienes un campo createdAt
+        const q = query(collection(db, "users"), orderBy("createdAt", "desc"));
         const snapshot = await getDocs(q);
 
         snapshot.forEach((doc) => {
           const data = doc.data();
-          const lastLoginTime = data.createdAt.toDate(); // Convertir a objeto Date
-          const formattedTime = lastLoginTime.toLocaleString(); // Formatear la fecha para mostrarla
+          const lastLoginTime = data.createdAt.toDate();
+          const formattedTime = lastLoginTime.toLocaleString();
 
           activityData.push({
-            id: doc.id, // Here we capture the userId (Firebase document ID)
+            id: doc.id,
             username: data.displayName || "Usuario desconocido",
             email: data.email || "Correo desconocido",
             lastLogin: formattedTime,
-            role: data.role || "Sin rol", // Extraemos el rol del usuario
+            role: data.role || "Sin rol",
           });
         });
 
@@ -42,20 +42,17 @@ const UserActivity = () => {
   }, []);
 
   const handleViewUser = (userId) => {
-    navigate(`/monitor/users/userSummary/${userId}`); // Navegar a userSummary con el ID del usuario
+    navigate(`/monitor/users/userSummary/${userId}`);
   };
 
-  // Manejar el filtro de nombre de usuario
   const handleFilterChange = (e) => {
     setFilterText(e.target.value.toLowerCase());
   };
 
-  // Manejar el filtro de email
   const handleEmailFilterChange = (e) => {
     setFilterEmail(e.target.value.toLowerCase());
   };
 
-  // Filtrar los usuarios por nombre y correo electrónico
   const filteredUsers = userActivity.filter((user) => {
     const userName = user.username.toLowerCase();
     const userEmail = user.email.toLowerCase();
@@ -64,10 +61,9 @@ const UserActivity = () => {
 
   return (
     <Container>
-      <div className="dashboard-container">
+      <div className="user-activity-container">
         <h1>Actividad de Usuarios</h1>
 
-        {/* Filtros */}
         <div className="filters">
           <input
             type="text"
@@ -93,7 +89,7 @@ const UserActivity = () => {
                 <th>Nombre de Usuario</th>
                 <th>Email</th>
                 <th>Creacion de la cuenta</th>
-                <th>Rol</th> {/* Nueva columna de Rol */}
+                <th>Rol</th>
                 <th>Acciones</th>
               </tr>
             </thead>
@@ -103,7 +99,7 @@ const UserActivity = () => {
                   <td>{user.username}</td>
                   <td>{user.email}</td>
                   <td>{user.lastLogin}</td>
-                  <td>{user.role}</td> {/* Mostramos el rol del usuario */}
+                  <td>{user.role}</td>
                   <td>
                     <button
                       className="view-button"

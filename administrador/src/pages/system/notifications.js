@@ -12,6 +12,7 @@ import {
 import { getAuth } from "firebase/auth";
 import CustomAlert from "../../components/customAlert";
 import "./notifications.css";
+import Container from "../../components/container";
 
 const Notifications = () => {
   const [users, setUsers] = useState([]);
@@ -151,117 +152,119 @@ const Notifications = () => {
   };
 
   return (
-    <div className="notifications-container">
-      {alertMessage && (
-        <CustomAlert
-          message={alertMessage}
-          onClose={() => setAlertMessage(null)}
-        />
-      )}
-      <h2>Administración de Notificaciones</h2>
-      <div className="button-group">
-        <button onClick={() => setShowCreateForm(!showCreateForm)}>
-          {showCreateForm ? "Ver Historial" : "Crear Notificación"}
-        </button>
-      </div>
-      {isAdmin && showCreateForm && (
-        <>
-          <div className="form-group">
-            <label>Usuario</label>
-            <select
-              value={selectedUser}
-              onChange={(e) => setSelectedUser(e.target.value)}
-            >
-              <option value="">Selecciona un usuario</option>
-              <option value="global">Todos los usuarios</option>
-              {users.map((user) => (
-                <option key={user.id} value={user.id}>
-                  {user.name || user.email}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="form-group">
-            <label>Nombre de Notificación</label>
-            <input
-              type="text"
-              value={activityName}
-              onChange={(e) => setActivityName(e.target.value)}
-            />
-          </div>
-          <div className="form-group">
-            <label>Tipo de Notificación</label>
-            <select
-              value={notificationType}
-              onChange={(e) => setNotificationType(e.target.value)}
-            >
-              <option value="Recordatorio">Recordatorio</option>
-              <option value="Novedades">Novedades</option>
-              <option value="Alerta">Alerta</option>
-            </select>
-          </div>
-          <div className="form-group">
-            <label>Mensaje</label>
-            <textarea
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-            ></textarea>
-          </div>
-          {editingNotification ? (
-            <div style={{ display: "flex", gap: "10px" }}>
-              <button onClick={saveEditedNotification}>Guardar Cambios</button>
-              <button onClick={discardChanges}>Descartar Cambios</button>
-            </div>
-          ) : (
-            <button onClick={sendNotification}>Enviar Notificación</button>
-          )}
-        </>
-      )}
-      {!showCreateForm && (
-        <div className="notifications-table-container">
-          <h3>Historial de Notificaciones</h3>
-          <table className="notifications-table">
-            <thead>
-              <tr>
-                <th>Nombre Notificación</th>
-                <th>Tipo</th>
-                <th>Descripción</th>
-                <th>Usuario ID</th>
-                <th>Enviado por</th>
-                <th>Acción</th>
-              </tr>
-            </thead>
-            <tbody>
-              {notificationsHistory.map((notif) => {
-                return (
-                  <tr key={notif.id}>
-                    <td>{notif.nombreDeNotificacion}</td>
-                    <td>{notif.tipoDeNotificacion}</td>
-                    <td>{notif.descripcion}</td>
-                    <td>{notif.userId}</td>
-                    <td>{notif.enviadoPor}</td>
-                    <td className="action-buttons">
-                      <button
-                        className="edit-button"
-                        onClick={() => startEditingNotification(notif)}
-                      >
-                        Editar
-                      </button>
-                      <button
-                        className="delete-button"
-                        onClick={() => deleteNotification(notif.id)}
-                      >
-                        Eliminar
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+    <Container>
+      <div className="notifications-container">
+        {alertMessage && (
+          <CustomAlert
+            message={alertMessage}
+            onClose={() => setAlertMessage(null)}
+          />
+        )}
+        <h2>Administración de Notificaciones</h2>
+        <div className="button-group">
+          <button onClick={() => setShowCreateForm(!showCreateForm)}>
+            {showCreateForm ? "Ver Historial" : "Crear Notificación"}
+          </button>
         </div>
-      )}
-    </div>
+        {isAdmin && showCreateForm && (
+          <>
+            <div className="form-group">
+              <label>Usuario</label>
+              <select
+                value={selectedUser}
+                onChange={(e) => setSelectedUser(e.target.value)}
+              >
+                <option value="">Selecciona un usuario</option>
+                <option value="global">Todos los usuarios</option>
+                {users.map((user) => (
+                  <option key={user.id} value={user.id}>
+                    {user.name || user.email}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="form-group">
+              <label>Nombre de Notificación</label>
+              <input
+                type="text"
+                value={activityName}
+                onChange={(e) => setActivityName(e.target.value)}
+              />
+            </div>
+            <div className="form-group">
+              <label>Tipo de Notificación</label>
+              <select
+                value={notificationType}
+                onChange={(e) => setNotificationType(e.target.value)}
+              >
+                <option value="Recordatorio">Recordatorio</option>
+                <option value="Novedades">Novedades</option>
+                <option value="Alerta">Alerta</option>
+              </select>
+            </div>
+            <div className="form-group">
+              <label>Mensaje</label>
+              <textarea
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+              ></textarea>
+            </div>
+            {editingNotification ? (
+              <div style={{ display: "flex", gap: "10px" }}>
+                <button onClick={saveEditedNotification}>Guardar Cambios</button>
+                <button onClick={discardChanges}>Descartar Cambios</button>
+              </div>
+            ) : (
+              <button onClick={sendNotification}>Enviar Notificación</button>
+            )}
+          </>
+        )}
+        {!showCreateForm && (
+          <div className="notifications-table-container">
+            <h3>Historial de Notificaciones</h3>
+            <table className="notifications-table">
+              <thead>
+                <tr>
+                  <th>Nombre Notificación</th>
+                  <th>Tipo</th>
+                  <th>Descripción</th>
+                  <th>Usuario ID</th>
+                  <th>Enviado por</th>
+                  <th>Acción</th>
+                </tr>
+              </thead>
+              <tbody>
+                {notificationsHistory.map((notif) => {
+                  return (
+                    <tr key={notif.id}>
+                      <td>{notif.nombreDeNotificacion}</td>
+                      <td>{notif.tipoDeNotificacion}</td>
+                      <td>{notif.descripcion}</td>
+                      <td>{notif.userId}</td>
+                      <td>{notif.enviadoPor}</td>
+                      <td className="action-buttons">
+                        <button
+                          className="edit-button"
+                          onClick={() => startEditingNotification(notif)}
+                        >
+                          Editar
+                        </button>
+                        <button
+                          className="delete-button"
+                          onClick={() => deleteNotification(notif.id)}
+                        >
+                          Eliminar
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+    </Container>
   );
 };
 

@@ -1,28 +1,24 @@
 @import url('https://fonts.googleapis.com/css2?family=Fairwater+Script&display=swap');
-
-
-
 .topbar {
   display: flex;
   align-items: center;
-  background-color: #2e2e2e;
-  padding: 10px 20px;
+  background-color: #00000084;
   width: 100%; /* Para que ocupe todo el ancho */
   position: fixed;
-  top: 0;
   z-index: 10;
+  align-items: center;
   justify-content: space-between;
 }
 
 .topbar-user {
   color: #ffb74d;
   font-size: 30px; /* Tamaño más grande para administrador */
-  font-family: 'Fairwater Script', cursive;
+  font-family: 'sans-serif', cursive;
   margin-left: 20px;
 }
 
 .topbar-title {
-  font-family: 'Fairwater Script', cursive;
+  font-family: 'sans-serif', cursive;
   font-size: 28px;
   color: #ffb74d;
   text-align: center;
@@ -30,8 +26,8 @@
 }
 
 .logout-button {
-  color: #ffb74d;
-  background: none;
+  color: #f8f8f8;
+  background-color: rgb(255, 30, 5);
   border: none;
   cursor: pointer;
   font-size: 16px;

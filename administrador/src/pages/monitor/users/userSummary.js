@@ -11,7 +11,7 @@ import {
   where,
 } from "firebase/firestore";
 import "./users.css";
-import Container from "../../../components/container";
+import Container from "../../../components/container"; // Importa Container para aplicar el scroll
 
 const UserSummary = () => {
   const { userId } = useParams();
@@ -97,7 +97,7 @@ const UserSummary = () => {
   }
 
   return (
-    <Container>
+    <Container> {/* Uso de Container para aplicar el scroll */}
       <div className="user-summary-container">
         <h1>Resumen del Usuario</h1>
 

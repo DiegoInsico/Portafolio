@@ -1,14 +1,3 @@
-/* Contenedor general */
-.dashboard-container {
-  display: flex;
-  flex-direction: column; /* Cambiamos a columna para centrar los gráficos */
-  align-items: center;
-  padding: 20px;
-  background-color: #a80980;
-  color: #f0e6d2;
-  min-height: 100vh; /* Para ocupar toda la altura de la pantalla */
-}
-
 /* Contenedor de los filtros a la izquierda */
 .filters-container {
   width: 20%;
@@ -46,7 +35,6 @@
   width: 100%;
   display: flex;
   justify-content: center; /* Centramos los gráficos */
-  gap: 20px; /* Espacio entre los gráficos */
   flex-wrap: wrap; /* Para que los gráficos se ajusten si no caben en una sola línea */
 }
 
@@ -54,6 +42,15 @@
 .chart-container {
   width: 30%; /* Ajustamos para que ocupen un tercio del contenedor */
   background-color: #2c2c3a;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  text-align: center; /* Centramos el contenido de texto */
+}
+
+.chart-container-t {
+  width: 45%; /* Ajustamos para que ocupen un tercio del contenedor */
+  background-color: #2c2c3a5c;
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);

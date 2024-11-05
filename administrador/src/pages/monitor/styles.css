@@ -61,6 +61,7 @@
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(180deg);
   }
@@ -78,7 +79,8 @@
 .settings-section h3 {
   font-size: 24px;
   margin: 20px 0;
-  color: #FFA500; /* Color de acento */
+  color: #FFA500;
+  /* Color de acento */
 }
 
 .update-button {
@@ -90,6 +92,7 @@
   border-radius: 15px;
   padding: 15px 25px;
   margin: 10px;
+  width: 40%;
   cursor: pointer;
   transition: background-color 0.3s, transform 0.3s;
 }
@@ -97,4 +100,39 @@
 .update-button:hover {
   background-color: #FF30FF;
   transform: scale(1.05);
+}
+
+.artist-songs-table-container{
+  background-color: rgba(0, 0, 0, 0.511);
+  border-radius: 2%;
+}
+.emotions-container {
+  background-color: #07182e54;
+  padding: 30px;
+}
+
+.artist-songs-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.artist-songs-table th,
+.artist-songs-table td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.artist-songs-table th {
+  background-color: #ff0000;
+  color: #fff;
+}
+
+.artist-songs-table tr:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.artist-songs-table img {
+  border-radius: 5px;
 }

@@ -167,6 +167,9 @@ const UsageCharts = () => {
             <h1>Categorías Usadas</h1>
             <Pie data={categoryData} />
           </div>
+          <div className="chart-container-t">
+            <h1>Texto si</h1>
+          </div>
         </div>
       </div>
     </Container>
