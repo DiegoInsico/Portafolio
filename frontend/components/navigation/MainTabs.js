@@ -1,25 +1,19 @@
 // MainTabs.js
+
 import React, { useState } from "react";
 import { View, StyleSheet } from "react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { createStackNavigator } from "@react-navigation/stack";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 
-import Sidebar from "./sideBar"; // Importar el componente Sidebar
+import SideBar from "./SideBar";
 
 // Importar pantallas
 import Home from "../../screens/home/home";
-import ListEntry from "../../screens/entrys/listEntry";
-import Baul from "../../screens/chest/baul";
-import UserProfile from "../../screens/user/userProfile";
-import Testigos from "../../screens/user/Testigos"; // Nueva pantalla
-import Beneficiarios from "../../screens/user/Beneficiarios"; // Nueva pantalla
-
+import ListEntry from "../../screens/entrys/ListEntry";
 
 const Tab = createBottomTabNavigator();
-const Stack = createStackNavigator();
 
-function MainTabs({ navigation }) {
+function MainTabs({ navigation, user }) {
   const [sidebarVisible, setSidebarVisible] = useState(false);
 
   const handleToggleSidebar = () => {
@@ -28,22 +22,18 @@ function MainTabs({ navigation }) {
 
   return (
     <View style={styles.container}>
-      {/* Renderizar el Sidebar y pasar la función de navegación */}
-      <Sidebar
+      {/* Renderizar el SideBar con el objeto 'user' */}
+      <SideBar
         isVisible={sidebarVisible}
-        toggleSidebar={handleToggleSidebar} // Función para abrir/cerrar sidebar
-        navigateToBaul={() => {
-          handleToggleSidebar(); // Cierra el sidebar después de navegar
-          navigation.navigate("Baul"); // Navega a la pantalla Baul
-        }}
+        toggleSidebar={handleToggleSidebar}
         navigateToProfile={() => {
           handleToggleSidebar();
-          navigation.navigate("Profile"); // Navega a la pantalla de perfil
+          navigation.navigate("Profile");
         }}
         navigateToSettings={() => {
           handleToggleSidebar();
           navigation.navigate("Settings");
-        }} // Nueva función
+        }}
         navigateToTestigos={() => {
           handleToggleSidebar();
           navigation.navigate("Testigos");
@@ -52,6 +42,11 @@ function MainTabs({ navigation }) {
           handleToggleSidebar();
           navigation.navigate("Beneficiarios");
         }}
+        navigateToProgramarMensaje={() => {
+          handleToggleSidebar();
+          navigation.navigate("ProgramarMensaje")
+        }}
+        user={user} // Pasar 'user' como prop
       />
 
       <Tab.Navigator
@@ -59,6 +54,7 @@ function MainTabs({ navigation }) {
         screenOptions={({ route }) => ({
           tabBarIcon: ({ color, size }) => {
             let iconName;
+
             if (route.name === "Home") {
               iconName = "home";
             } else if (route.name === "ListEntry") {
@@ -66,53 +62,43 @@ function MainTabs({ navigation }) {
             } else if (route.name === "SideBarButton") {
               iconName = "bars";
             }
+
             return <FontAwesome name={iconName} size={size} color={color} />;
           },
-          tabBarActiveTintColor: "#FFD700",
+          tabBarActiveTintColor: "#dbcd0f",
           tabBarInactiveTintColor: "#A9A9A9",
           tabBarStyle: {
             backgroundColor: "#2C3E50",
-            borderTopWidth: 2,
-            borderTopColor: "#D4AF37",
-            height: 80,
+            height: 70,
+            borderTopLeftRadius: 20,
+            borderTopRightRadius: 20,
+            borderTopWidth: 0,
+            position: "absolute",
             paddingBottom: 10,
-            paddingTop: 5,
+            paddingTop: 10,
           },
           tabBarLabelStyle: {
-            fontSize: 12,
+            fontSize: 10,
             fontWeight: "bold",
-            fontFamily: "sans-serif",
-            
           },
+          headerShown: false,
         })}
       >
-        <Tab.Screen name="Home" component={Home}
-         options={{
-          headerShown: false,
-          title: "Tus Entradas",
-          headerStyle: { backgroundColor: "#fff" },
-          headerTitleStyle: {
-            borderBottomColor: "#D4AF37",
-            fontWeight: "bold",
-            fontSize: 20,
-            color: "#333",
-          },
-        }} />
         <Tab.Screen
-          name="ListEntry"
-          component={ListEntry}
+          name="Home"
+          component={Home}
           options={{
-            headerShown: false,
-            title: "Tus Entradas",
-            headerStyle: { backgroundColor: "#fff" },
-            headerTitleStyle: {
-              borderBottomColor: "#D4AF37",
-              fontWeight: "bold",
-              fontSize: 20,
-              color: "#333",
-            },
+            title: "Home",
           }}
         />
+        <Tab.Screen
+          name="ListEntry"
+          options={{
+            title: "Entradas",
+          }}
+        >
+          {() => <ListEntry user={user} />}
+        </Tab.Screen>
         <Tab.Screen
           name="SideBarButton"
           options={{ title: "Menú" }}
@@ -130,58 +116,12 @@ function MainTabs({ navigation }) {
   );
 }
 
-export default function AppNavigator() {
-  return (
-    <Stack.Navigator>
-      <Stack.Screen
-        name="Main"
-        component={MainTabs}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="Baul"
-        component={Baul}
-        options={{
-          title: "Baúl",
-          headerStyle: { backgroundColor: "#fff" },
-          headerTitleStyle: {
-            fontWeight: "bold",
-            fontSize: 20,
-            color: "#333",
-          },
-        }}
-      />
-      {/* Agregar la ruta para el perfil */}
-      <Stack.Screen
-        name="Profile"
-        component={UserProfile} // Asegúrate de tener una pantalla de perfil
-        options={{
-          title: "Perfil",
-          headerStyle: { backgroundColor: "#fff" },
-          headerTitleStyle: {
-            fontWeight: "bold",
-            fontSize: 20,
-            color: "#333",
-          },
-        }}
-      />
-      <Stack.Screen
-        name="Testigos"
-        component={Testigos}
-        options={{ title: "Testigos" }}
-      />
-      <Stack.Screen
-        name="Beneficiarios"
-        component={Beneficiarios}
-        options={{ title: "Beneficiarios" }}
-      />
-    </Stack.Navigator>
-  );
-}
+export default MainTabs;
 
 const styles = StyleSheet.create({
   container: {
-    flex: 2,
+    flex: 1,
     backgroundColor: "transparent",
+    position: "relative",
   },
 });

@@ -140,5 +140,17 @@ export const listenToEntries = (callback) => {
   return () => unsubscribe();
 };
 
+export const listenToBeneficiaries = (userId, callback) => {
+  const beneficiariesRef = collection(db, "beneficiarios");
+  const q = query(beneficiariesRef, where("userId", "==", userId));
+
+  return onSnapshot(q, (querySnapshot) => {
+    const beneficiaries = [];
+    querySnapshot.forEach((doc) => {
+      beneficiaries.push({ id: doc.id, ...doc.data() });
+    });
+    callback(beneficiaries);
+  });
+};
 
 export { auth, db, storage };

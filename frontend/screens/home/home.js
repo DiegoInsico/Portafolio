@@ -1,4 +1,6 @@
-import React, { useEffect, useRef, useState } from "react";
+// Home.js
+
+import React, { useEffect, useRef, useState, useContext } from "react";
 import {
   View,
   Text,
@@ -7,13 +9,12 @@ import {
   Alert,
   Dimensions,
   Animated,
-  Easing,
   TouchableOpacity,
   Image,
   RefreshControl,
+  ImageBackground,
 } from "react-native";
 import axios from "axios";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
 import {
   collection,
   query,
@@ -22,18 +23,17 @@ import {
   orderBy,
 } from "firebase/firestore";
 import { db } from "../../utils/firebase";
-import { LinearGradient } from "expo-linear-gradient";
 import { FontAwesome } from "@expo/vector-icons";
 import ModalEntry from "../entrys/modalEntry";
 import { ScrollView } from "react-native-gesture-handler";
 import { StatusBar } from "react-native";
+import { AuthContext } from "../../context/AuthContext";
 
 const { width: viewportWidth } = Dimensions.get("window");
 
 const Home = ({ navigation }) => {
   const [question, setQuestion] = useState("");
   const [loading, setLoading] = useState(true);
-  const [userId, setUserId] = useState(null);
   const [entries, setEntries] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
@@ -41,7 +41,27 @@ const Home = ({ navigation }) => {
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(0.5)).current;
 
-  //Abrir y cerrar el Modal
+  const { user, userData, loading: authLoading } = useContext(AuthContext);
+  const [userName, setUserName] = useState("");
+  const today = new Date();
+  const formattedDate = today.toLocaleDateString("es-ES", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+
+  const getGreeting = () => {
+    const hour = today.getHours();
+    if (hour < 12) {
+      return "Buenos días";
+    } else if (hour < 18) {
+      return "Buenas tardes";
+    } else {
+      return "Buenas noches";
+    }
+  };
+
   const handleOpenModal = () => {
     setModalVisible(true);
   };
@@ -50,7 +70,6 @@ const Home = ({ navigation }) => {
     setModalVisible(false);
   };
 
-  // Animaciones
   useEffect(() => {
     Animated.parallel([
       Animated.timing(fadeAnim, {
@@ -67,26 +86,17 @@ const Home = ({ navigation }) => {
     ]).start();
   }, [fadeAnim, scaleAnim]);
 
-  // Detectar si hay una sesión activa al iniciar la app
   useEffect(() => {
-    const auth = getAuth();
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        setUserId(user.uid);
-        setLoading(false);
-      } else {
-        Alert.alert(
-          "Sesión no iniciada",
-          "Por favor inicia sesión para continuar."
-        );
-        navigation.navigate("Login");
-      }
-    });
+    if (user) {
+      setUserName(user.displayName || "Usuario");
+      fetchEntries();
+      fetchQuestion(user.uid);
+    } else {
+      Alert.alert("Sesión no iniciada", "Por favor inicia sesión para continuar.");
+      navigation.navigate("Login");
+    }
+  }, [user]);
 
-    return () => unsubscribe();
-  }, [navigation]);
-
-  // Función para obtener la pregunta de la IA
   const fetchQuestion = async (userId) => {
     try {
       const response = await axios.get(
@@ -95,26 +105,16 @@ const Home = ({ navigation }) => {
       setQuestion(response.data.question);
     } catch (error) {
       console.error("Error al obtener la pregunta:", error);
-      Alert.alert(
-        "Error",
-        "Ocurrió un error al obtener la pregunta de reflexión."
-      );
+      Alert.alert("Error", "Ocurrió un error al obtener la pregunta de reflexión.");
     }
   };
 
-  useEffect(() => {
-    if (userId) {
-      fetchEntries();
-      fetchQuestion(userId); // Llamada a la IA para obtener la pregunta
-    }
-  }, [userId]);
-
   const fetchEntries = () => {
-    if (!userId) return;
+    if (!user) return;
 
     const q = query(
       collection(db, "entries"),
-      where("userId", "==", userId),
+      where("userId", "==", user.uid),
       orderBy("createdAt", "desc")
     );
 
@@ -149,7 +149,7 @@ const Home = ({ navigation }) => {
     return () => unsubscribe();
   };
 
-  if (loading) {
+  if (authLoading || loading) {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#4B4E6D" />
@@ -159,94 +159,58 @@ const Home = ({ navigation }) => {
   }
 
   const onRefresh = () => {
-
     setRefreshing(true);
     fetchEntries();
-    fetchQuestion(userId); // Volver a obtener la pregunta al refrescar
+    fetchQuestion(user.uid);
     setRefreshing(false);
   };
 
   return (
     <>
-<StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
-    <LinearGradient
-      colors={[
-        "#2C3E50",
-        "#4B4E6D",
-        "#C2A66B",
-        "#D1B17D",
-        "#E6C47F",
-        "#F0E4C2",
-        "#F0E4C2",
-        "#E6C47F",
-        "#D1B17D",
-        "#C2A66B",
-        "#4B4E6D",
-        "#2C3E50",
-      ]}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 0, y: 1 }}
-      style={styles.background}
-    >
-      <ScrollView>
-      <View style={styles.container}>
-        <Animated.View
-          style={[{ opacity: fadeAnim, transform: [{ scale: scaleAnim }] }]}
-        >
-          <Text style={styles.welcomeText}>¡Bienvenido!</Text>
-        </Animated.View>
+      <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
 
-        {/* Mostrar la pregunta de reflexión */}
-        {question ? (
-          <View style={styles.questionContainer}>
-            <Text style={styles.questionText}>{question}</Text>
+      <ImageBackground
+        source={require("../../assets/background/barco.jpg")}
+        style={styles.background}
+        resizeMode="cover"
+      >
+        <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+          <View style={styles.container}>
+            <Animated.View
+              style={[{ opacity: fadeAnim, transform: [{ scale: scaleAnim }] }]}
+            >
+              <View style={styles.headerContainer}>
+                <Text style={styles.greetingText}>
+                  {getGreeting()}, {userName}
+                </Text>
+                <Text style={styles.dateText}>{formattedDate}</Text>
+              </View>
+            </Animated.View>
           </View>
-        ) : null}
+        </ScrollView>
 
-        {/* Contenedor de los botones */}
-        <View style={styles.containerBoton}>
-          
-          {/* Botón circular "Nueva Entrada" */}
+        <View style={styles.translucentBackground}>
+          {question ? (
+            <View style={styles.questionContainer}>
+              <View style={styles.questionBackground}>
+                <Text style={styles.generatedQuestionText}>{question}</Text>
+              </View>
+            </View>
+          ) : null}
+
           <TouchableOpacity
-            style={styles.roundButton}
+            style={styles.roundButtonContainer}
             onPress={handleOpenModal}
           >
-            <FontAwesome name="plus" size={32} color="#FFF" />
-            <Text style={styles.roundButtonText}>Nuevo Instante</Text>
+            <View style={styles.roundButton}>
+              <FontAwesome name="plus" size={24} color="#000" />
+              <Text style={styles.roundButtonText}>Nuevo Instante</Text>
+            </View>
           </TouchableOpacity>
-          {/* ModalEntry */}
+
           <ModalEntry visible={modalVisible} onClose={handleCloseModal} />
-
-          <TouchableOpacity
-            style={styles.baulButton}
-            onPress={() => navigation.navigate("Baul")} // Aquí redirige a la pantalla 'Baul'
-          >
-            <FontAwesome name="archive" size={24} color="#FFF" />
-            <Text style={styles.baulText}>Baúl</Text>
-          </TouchableOpacity>
-
-          {/* Contenedor de los botones pequeños (Configuración y Perfil) */}
-          <View style={styles.smallButtonsContainer}>
-            <TouchableOpacity
-              style={styles.smallButton}
-              onPress={() => alert("Perfil")}
-            >
-              <FontAwesome name="user" size={24} color="#FFF" />
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.smallButton}
-              onPress={() => alert("Configuración")}
-            >
-              <FontAwesome name="cog" size={24} color="#FFF" />
-            </TouchableOpacity>
-          </View>
         </View>
-
-        <View style={styles.navbarSpacing} />
-      </View>
-      </ScrollView>
-    </LinearGradient>
+      </ImageBackground>
     </>
   );
 };
@@ -257,152 +221,73 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    paddingTop: 20,
+    alignItems: 'center',
     paddingHorizontal: 20,
   },
-  welcomeText: {
-    fontSize: 24,
+  headerContainer: {
+    marginTop: 50,
+  },
+  greetingText: {
+    fontSize: 28,
     fontWeight: "bold",
-    color: "#fff",
-    textAlign: "center",
-    width: 200,
-    padding: 7,
-    borderRadius: 10,
+    color: "#333",
   },
-  // Estilo del contenedor de botones
-  containerBoton: {
-    flexDirection: "row",
+  dateText: {
+    fontSize: 16,
+    color: "#333",
+    marginTop: 5,
+  },
+  translucentBackground: {
+    position: "absolute",
+    bottom: 100,
+    padding: 20,
+    borderRadius: 20,
     alignItems: "center",
-    justifyContent: "space-around",
+  },
+  questionContainer: {
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  questionBackground: {
+    backgroundColor: "rgba(0, 0, 0, 0.7)", // Fondo oscuro y translúcido
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderRadius: 10,
+    alignItems: "center",
+  },
+  generatedQuestionText: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#FFF",
+    textAlign: "center",
+  },
+  roundButtonContainer: {
     width: "100%",
-    paddingHorizontal: 20,
+    alignItems: "center",
   },
   roundButton: {
-    width: "45%",
-    height: 100,
-    borderRadius: 15,
-    backgroundColor: "#FF6F61",
+    width: "95%",
+    height: 60,
+    borderRadius: 30,
     alignItems: "center",
     justifyContent: "center",
-    elevation: 8,
+    flexDirection: "row",
+    backgroundColor: "#FFD700",
     shadowColor: "#000",
     shadowOffset: { width: 2, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 4,
   },
   roundButtonText: {
-    fontSize: 12,
-    color: "#FFF",
-    textAlign: "center",
-    fontWeight: 'bold',
-  },
-  baulButton: {
-    width: "30%",
-    height: 100,
-    backgroundColor: "#007ACC",
-    borderRadius: 15,
-    alignItems: "center",
-    justifyContent: "center",
-    elevation: 8,
-    shadowColor: "#000",
-    shadowOffset: { width: 2, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    marginLeft: 10,
-  },
-  baulText: {
-    color: "#FFF",
-    fontSize: 12,
-    fontWeight: "bold",
-  },
-  smallButtonsContainer: {
-    flexDirection: "column",
-    justifyContent: "space-between",
-    alignItems: "center",
-    height: 120, // Ajuste para el espacio entre los botones
-    marginTop: 12,
-    margin: 5,
-  },
-  smallButton: {
-    width: 50,
-    height: 50,
-    backgroundColor: "#28A745",
-    borderRadius: 10,
-    alignItems: "center",
-    justifyContent: "center",
-    elevation: 8,
-    shadowColor: "#000",
-    shadowOffset: { width: 2, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    marginBottom: 10,
-    marginLeft: 10,
-  },
-  // Question con IA
-  questionContainer: {
-    backgroundColor: "#fff",
-    padding: 10,
-    borderRadius: 10,
-    marginVertical: 5,
-    shadowColor: "#000",
-    shadowOffset: { width: 2, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  questionText: {
-    fontSize: 12,
-    color: "#000",
-    textAlign: "center",
-  },
-  // Carrusel
-  carouselTitle: {
     fontSize: 18,
+    color: "#000",
     fontWeight: "bold",
-    color: "#fff",
-    marginBottom: 10,
+    marginLeft: 10,
   },
-  carouselContainer: {
-    paddingHorizontal: 10,
-    height: 300,
-  },
-  entryContainer: {
-    backgroundColor: "#fff",
-    borderRadius: 10,
-    padding: 10,
-    margin: 5,
-    width: viewportWidth * 0.8,
-    elevation: 3,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
+  loadingContainer: {
+    flex: 1,
     justifyContent: "center",
     alignItems: "center",
-  },
-  media: {
-    width: "100%",
-    height: 200,
-    borderRadius: 10,
-    marginBottom: 10,
-  },
-  textContainer: {
-    padding: 10,
-  },
-  entryText: {
-    fontSize: 16,
-    color: "#333",
-    textAlign: "center",
-  },
-  createdAt: {
-    fontSize: 12,
-    color: "#777",
-    marginTop: 10,
-  },
-  navbarSpacing: {
-    height: 85,
   },
 });
 

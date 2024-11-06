@@ -1,6 +1,8 @@
+// Registro.js
+
 import React, { useState } from 'react';
 import {
-  Image, View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ActivityIndicator,
+  View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert, ActivityIndicator, ImageBackground, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth'; 
@@ -51,7 +53,6 @@ export default function Registro({ navigation }) {
         displayName: values.usuario,
         email: values.correo,
         createdAt: new Date(),
-        // Agrega otros campos que quieras guardar
       });
 
       Alert.alert('Registro exitoso', 'Cuenta creada correctamente. Ahora puedes iniciar sesión.');
@@ -66,226 +67,246 @@ export default function Registro({ navigation }) {
   };
 
   return (
-    <LinearGradient
-      colors={["#2C3E50", "#4B4E6D", "#D1B17D", "#FFD700"]}
-      style={styles.background}
-    >
-      <View style={styles.container}>
-        <Image
-          source={require("../../assets/background/florLogo.png")} // Reemplaza con la ruta de tu imagen
-          style={styles.logo}
-          resizeMode="cover"
-        />
-        <Text style={styles.title}>Regístrate</Text>
-
-        <Formik
-          initialValues={{
-            usuario: '', correo: '', contrasena: '', confirmarContrasena: '',
-          }}
-          validationSchema={RegisterSchema}
-          onSubmit={handleRegister}
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <ImageBackground
+        source={require("../../assets/background/login.jpg")}
+        style={styles.background}
+        resizeMode="cover"
+      >
+        <View style={styles.overlay} />
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          style={styles.container}
         >
-          {({
-            handleChange, handleBlur, handleSubmit, values, errors, touched, isValid, dirty,
-          }) => (
-            <View style={styles.formContainer}>
-              {/* Nombre de Usuario */}
-              <View style={styles.inputContainer}>
-                <Ionicons name="person" size={20} color="#000" style={styles.iconStyle} />
-                <TextInput
-                  style={styles.input}
-                  placeholder="Nombre de Usuario"
-                  placeholderTextColor="#aaa"
-                  onChangeText={handleChange('usuario')}
-                  onBlur={handleBlur('usuario')}
-                  value={values.usuario}
-                  autoCapitalize="none"
-                />
-              </View>
-              {touched.usuario && errors.usuario && (
-                <Text style={styles.errorText}>{errors.usuario}</Text>
-              )}
+          <View style={styles.logoContainer}>
+            <Image
+              source={require("../../assets/background/florLogo.png")}
+              style={styles.logo}
+              resizeMode="contain"
+            />
+            <Text style={styles.title}>Regístrate</Text>
+          </View>
 
-              {/* Correo Electrónico */}
-              <View style={styles.inputContainer}>
-                <Ionicons name="mail" size={20} color="#000" style={styles.iconStyle} />
-                <TextInput
-                  style={styles.input}
-                  placeholder="Correo Electrónico"
-                  placeholderTextColor="#aaa"
-                  onChangeText={handleChange('correo')}
-                  onBlur={handleBlur('correo')}
-                  value={values.correo}
-                  keyboardType="email-address"
-                  autoCapitalize="none"
-                />
-              </View>
-              {touched.correo && errors.correo && (
-                <Text style={styles.errorText}>{errors.correo}</Text>
-              )}
-
-              {/* Contraseña */}
-              <View style={styles.inputContainer}>
-                <Ionicons name="lock-closed" size={20} color="#000" style={styles.iconStyle} />
-                <TextInput
-                  style={styles.input}
-                  placeholder="Contraseña"
-                  placeholderTextColor="#aaa"
-                  onChangeText={handleChange('contrasena')}
-                  onBlur={handleBlur('contrasena')}
-                  value={values.contrasena}
-                  secureTextEntry={!showPassword}
-                  autoCapitalize="none"
-                />
-                <TouchableOpacity
-                  onPress={() => setShowPassword(!showPassword)}
-                  style={styles.toggleButton}
-                >
-                  <Ionicons name={showPassword ? 'eye' : 'eye-off'} size={20} color="#000" />
-                </TouchableOpacity>
-              </View>
-              {touched.contrasena && errors.contrasena && (
-                <Text style={styles.errorText}>{errors.contrasena}</Text>
-              )}
-
-              {/* Confirmar Contraseña */}
-              <View style={styles.inputContainer}>
-                <Ionicons name="lock-open" size={20} color="#000" style={styles.iconStyle} />
-                <TextInput
-                  style={styles.input}
-                  placeholder="Confirmar Contraseña"
-                  placeholderTextColor="#aaa"
-                  onChangeText={handleChange('confirmarContrasena')}
-                  onBlur={handleBlur('confirmarContrasena')}
-                  value={values.confirmarContrasena}
-                  secureTextEntry={!showConfirmPassword}
-                  autoCapitalize="none"
-                />
-                <TouchableOpacity
-                  onPress={() => setShowConfirmPassword(!showConfirmPassword)}
-                  style={styles.toggleButton}
-                >
-                  <Ionicons name={showConfirmPassword ? 'eye' : 'eye-off'} size={20} color="#000" />
-                </TouchableOpacity>
-              </View>
-              {touched.confirmarContrasena && errors.confirmarContrasena && (
-                <Text style={styles.errorText}>{errors.confirmarContrasena}</Text>
-              )}
-
-              {/* Botón de Registro */}
-              <TouchableOpacity
-                style={[styles.button, !(isValid && dirty) && styles.buttonDisabled]}
-                onPress={handleSubmit}
-                disabled={!(isValid && dirty) || isSubmitting}
-              >
-                {isSubmitting ? (
-                  <ActivityIndicator color="#fff" />
-                ) : (
-                  <Text style={styles.buttonText}>Registrar</Text>
+          <Formik
+            initialValues={{
+              usuario: '', correo: '', contrasena: '', confirmarContrasena: '',
+            }}
+            validationSchema={RegisterSchema}
+            onSubmit={handleRegister}
+          >
+            {({
+              handleChange, handleBlur, handleSubmit, values, errors, touched, isValid, dirty,
+            }) => (
+              <View style={styles.formContainer}>
+                {/* Nombre de Usuario */}
+                <View style={styles.inputContainer}>
+                  <Ionicons name="person" size={20} color="#FFD700" style={styles.iconStyle} />
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Nombre de Usuario"
+                    placeholderTextColor="#FFD700AA"
+                    onChangeText={handleChange('usuario')}
+                    onBlur={handleBlur('usuario')}
+                    value={values.usuario}
+                    autoCapitalize="none"
+                  />
+                </View>
+                {touched.usuario && errors.usuario && (
+                  <Text style={styles.errorText}>{errors.usuario}</Text>
                 )}
-              </TouchableOpacity>
-            </View>
-          )}
-        </Formik>
 
-        <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-          <Text style={styles.footerLink}>¿Ya tienes una cuenta? Inicia sesión</Text>
-        </TouchableOpacity>
-      </View>
-    </LinearGradient>
+                {/* Correo Electrónico */}
+                <View style={styles.inputContainer}>
+                  <Ionicons name="mail" size={20} color="#FFD700" style={styles.iconStyle} />
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Correo Electrónico"
+                    placeholderTextColor="#FFD700AA"
+                    onChangeText={handleChange('correo')}
+                    onBlur={handleBlur('correo')}
+                    value={values.correo}
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                  />
+                </View>
+                {touched.correo && errors.correo && (
+                  <Text style={styles.errorText}>{errors.correo}</Text>
+                )}
+
+                {/* Contraseña */}
+                <View style={styles.inputContainer}>
+                  <Ionicons name="lock-closed" size={20} color="#FFD700" style={styles.iconStyle} />
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Contraseña"
+                    placeholderTextColor="#FFD700AA"
+                    onChangeText={handleChange('contrasena')}
+                    onBlur={handleBlur('contrasena')}
+                    value={values.contrasena}
+                    secureTextEntry={!showPassword}
+                    autoCapitalize="none"
+                  />
+                  <TouchableOpacity
+                    onPress={() => setShowPassword(!showPassword)}
+                    style={styles.toggleButton}
+                  >
+                    <Ionicons name={showPassword ? 'eye' : 'eye-off'} size={20} color="#FFD700" />
+                  </TouchableOpacity>
+                </View>
+                {touched.contrasena && errors.contrasena && (
+                  <Text style={styles.errorText}>{errors.contrasena}</Text>
+                )}
+
+                {/* Confirmar Contraseña */}
+                <View style={styles.inputContainer}>
+                  <Ionicons name="lock-open" size={20} color="#FFD700" style={styles.iconStyle} />
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Confirmar Contraseña"
+                    placeholderTextColor="#FFD700AA"
+                    onChangeText={handleChange('confirmarContrasena')}
+                    onBlur={handleBlur('confirmarContrasena')}
+                    value={values.confirmarContrasena}
+                    secureTextEntry={!showConfirmPassword}
+                    autoCapitalize="none"
+                  />
+                  <TouchableOpacity
+                    onPress={() => setShowConfirmPassword(!showConfirmPassword)}
+                    style={styles.toggleButton}
+                  >
+                    <Ionicons name={showConfirmPassword ? 'eye' : 'eye-off'} size={20} color="#FFD700" />
+                  </TouchableOpacity>
+                </View>
+                {touched.confirmarContrasena && errors.confirmarContrasena && (
+                  <Text style={styles.errorText}>{errors.confirmarContrasena}</Text>
+                )}
+
+                {/* Botón de Registro */}
+                <TouchableOpacity
+                  style={[styles.button, !(isValid && dirty) && styles.buttonDisabled]}
+                  onPress={handleSubmit}
+                  disabled={!(isValid && dirty) || isSubmitting}
+                >
+                  {isSubmitting ? (
+                    <ActivityIndicator color="#2C3E50" />
+                  ) : (
+                    <Text style={styles.buttonText}>Registrar</Text>
+                  )}
+                </TouchableOpacity>
+              </View>
+            )}
+          </Formik>
+
+          <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+            <Text style={styles.footerLink}>¿Ya tienes una cuenta? Inicia sesión</Text>
+          </TouchableOpacity>
+        </KeyboardAvoidingView>
+      </ImageBackground>
+    </TouchableWithoutFeedback>
   );
 }
 
 const styles = StyleSheet.create({
-  formContainer: {
-    width: '100%',
-    padding: 20, // Espaciado interno
-    borderRadius: 10,
-    backgroundColor: '#4B4E6D',
-    shadowColor: "#000",
-    shadowOffset: { width: 5, height: 5 },
-    shadowOpacity: 0.4,
-    shadowRadius: 10,
-    elevation: 10, // Sombra para Android
-    marginBottom: 30,
-    alignItems: 'center',
-  },
   background: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    width: "100%",
+    height: "100%",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  overlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(44, 62, 80, 0.7)", // Superposición semi-transparente
   },
   container: {
-    width: '100%', // Ajustamos el ancho del contenedor para que se centre
-    justifyContent: 'center',
-    alignItems: 'center',
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    width: "100%",
     paddingHorizontal: 20,
   },
+  logoContainer: {
+    alignItems: "center",
+    marginBottom: 20,
+  },
   logo: {
-    width: 150, // Ajusta el ancho de la imagen
-    height: 150, // Ajusta la altura de la imagen
-    marginTop: 50,
-    shadowColor: "#000000", // Color de la sombra
-    shadowOffset: { width: 5, height: 5 }, // Desplazamiento de la sombra (horizonte/vertical)
-    shadowOpacity: 0.4, // Opacidad de la sombra
-    shadowRadius: 0, // Radio de difuminado de la sombra (IOS)
-    elevation: 0, // Elevación para sombra en Android
+    width: 150,
+    height: 150,
   },
   title: {
     fontSize: 28,
-    fontWeight: 'bold',
-    color: '#000',
-    marginBottom: 20,
-    alignSelf: 'center',
+    fontWeight: "700",
+    color: "#FFD700",
+    marginTop: 10,
+    fontFamily: "Poppins_700Bold",
+  },
+  formContainer: {
+    width: "100%",
+    padding: 20,
+    borderRadius: 10,
+    backgroundColor: "rgba(75, 78, 109, 0.9)", // Fondo semi-transparente para el formulario
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 5,
   },
   inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderColor: '#ff9999',
+    flexDirection: "row",
+    alignItems: "center",
+    borderColor: "#FFD700",
     borderWidth: 1,
     borderRadius: 8,
-    paddingHorizontal: 8,
-    marginBottom: 8,
-    width: '100%', // Los inputs cubren el 100% del contenedor del formulario
-    backgroundColor: '#f9f9f9',
+    paddingHorizontal: 10,
+    marginBottom: 10,
+    backgroundColor: "rgba(255, 255, 255, 0.1)",
   },
   iconStyle: {
     marginRight: 5,
   },
   input: {
-    height: 45, 
-    width: '85%', 
-    paddingHorizontal: 10,
-    backgroundColor: '#f9f9f9',
+    flex: 1,
+    height: 50,
+    color: "#FFD700",
+    fontFamily: "Poppins_400Regular",
   },
   toggleButton: {
     padding: 5,
   },
   errorText: {
-    color: 'red',
+    color: "#FF6F61",
     marginBottom: 5,
     marginLeft: 10,
+    fontSize: 12,
+    fontFamily: "Poppins_400Regular",
   },
   button: {
-    backgroundColor: '#FFD700',
-    paddingVertical: 12,
+    backgroundColor: "#FFD700",
+    paddingVertical: 15,
     borderRadius: 8,
-    alignItems: 'center',
+    alignItems: "center",
     marginTop: 10,
-    width: '85%', 
   },
   buttonDisabled: {
-    opacity: 0.5, // Reduce la opacidad si está deshabilitado
+    backgroundColor: "#FFD700AA",
   },
   buttonText: {
-    color: '#000000',
+    color: "#2C3E50",
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "700",
+    fontFamily: "Poppins_700Bold",
   },
   footerLink: {
-    color: '#fff',
-    fontWeight: 'bold',
+    color: "#FFD700",
+    fontWeight: "700",
     fontSize: 14,
-    marginTop: 6,
+    marginTop: 10,
+    textAlign: "center",
+    fontFamily: "Poppins_700Bold",
   },
 });
+

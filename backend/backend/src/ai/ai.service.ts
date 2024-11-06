@@ -1,26 +1,29 @@
-import { Injectable } from '@nestjs/common';
+// src/ai/ai.service.ts
+import { Injectable, Inject } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import OpenAI from 'openai';
 import * as admin from 'firebase-admin';
-
 
 @Injectable()
 export class AiService {
   private openai: OpenAI;
 
-  constructor(private configService: ConfigService) {
+  constructor(
+    private configService: ConfigService,
+    @Inject('FIREBASE_ADMIN') private firebaseAdmin: typeof admin, // Inyecta FIREBASE_ADMIN
+  ) {
     this.openai = new OpenAI({
       apiKey: this.configService.get<string>('OPENAI_API_KEY'),
     });
 
-    // Inicializar Firebase Admin SDK
-    admin.initializeApp({
-      credential: admin.credential.applicationDefault(),
-    });
+    // Elimina la inicialización redundante de Firebase
+    // admin.initializeApp({
+    //   credential: admin.credential.applicationDefault(),
+    // });
   }
 
   async getUserNameFromFirebase(userId: string): Promise<string> {
-    const userRecord = await admin.auth().getUser(userId);
+    const userRecord = await this.firebaseAdmin.auth().getUser(userId);
     return userRecord.displayName || 'Usuario';  // Retorna el nombre o "Usuario" si no tiene uno
   }
 

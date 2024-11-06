@@ -14,6 +14,7 @@
     "@expo/metro-runtime": "~3.2.3",
     "@expo/vector-icons": "^14.0.3",
     "@react-native-async-storage/async-storage": "^2.0.0",
+    "@react-native-community/datetimepicker": "8.0.1",
     "@react-native-community/slider": "^4.5.4",
     "@react-native-firebase/app": "^21.0.0",
     "@react-native-firebase/auth": "^21.0.0",
@@ -34,6 +35,8 @@
     "expo-font": "~12.0.10",
     "expo-image-picker": "^15.0.7",
     "expo-linear-gradient": "^13.0.2",
+    "expo-local-authentication": "~14.0.1",
+    "expo-notifications": "~0.28.19",
     "expo-status-bar": "~1.12.1",
     "firebase": "^10.14.1",
     "formik": "^2.4.6",
@@ -57,10 +60,9 @@
     "react-native-super-grid": "^6.0.1",
     "react-native-uuid": "^2.0.2",
     "react-native-vector-icons": "^10.2.0",
+    "react-native-video": "^6.7.0",
     "react-native-web": "~0.19.10",
-    "yup": "^1.4.0",
-    "expo-local-authentication": "~14.0.1",
-    "expo-notifications": "~0.28.19"
+    "yup": "^1.4.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"

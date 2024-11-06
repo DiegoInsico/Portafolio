@@ -1,6 +1,8 @@
-import React, { useState, useEffect } from "react";
+// Login.js
+
+import React, { useState, useEffect, useContext } from "react";
 import { useFonts } from 'expo-font';
-import { Poppins_400Regular } from '@expo-google-fonts/poppins';
+import { Poppins_400Regular, Poppins_700Bold } from '@expo-google-fonts/poppins';
 import {
   View,
   Text,
@@ -10,13 +12,19 @@ import {
   Image,
   Alert,
   ActivityIndicator,
+  ImageBackground,
+  KeyboardAvoidingView,
+  Platform,
+  TouchableWithoutFeedback,
+  Keyboard,
+  Dimensions,
 } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
+import { Ionicons } from "@expo/vector-icons";
 import { Formik } from "formik";
 import * as Yup from "yup";
-import { Ionicons } from "@expo/vector-icons";
-import { signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
+import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../../utils/firebase";
+import { AuthContext } from "../../context/AuthContext"; // Importar el contexto
 
 // Definir el esquema de validación con Yup
 const LoginSchema = Yup.object().shape({
@@ -33,28 +41,26 @@ export default function Login({ navigation }) {
   // Cargar fuentes
   const [fontsLoaded] = useFonts({
     Poppins_400Regular,
+    Poppins_700Bold,
   });
 
+  const { user, loading } = useContext(AuthContext);
+
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        // Si el usuario ya está autenticado, redirigir a Home
-        navigation.reset({
-          index: 0,
-          routes: [{ name: "Home" }],
-        });
-      }
-    });
+    if (user) {
+      // Si el usuario ya está autenticado, redirigir a MainTabs
+      navigation.reset({
+        index: 0,
+        routes: [{ name: "MainTabs" }],
+      });
+    }
+  }, [user, navigation]);
 
-    // Limpia el listener al desmontar el componente
-    return () => unsubscribe();
-  }, [navigation]);
-
-  // Mostrar indicador de carga mientras se cargan las fuentes
-  if (!fontsLoaded) {
+  // Mostrar indicador de carga mientras se cargan las fuentes o el estado de autenticación
+  if (!fontsLoaded || loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#0000ff" />
+        <ActivityIndicator size="large" color="#FFD700" />
       </View>
     );
   }
@@ -69,10 +75,7 @@ export default function Login({ navigation }) {
 
       // Login exitoso
       Alert.alert("Éxito", "Has iniciado sesión correctamente.");
-      navigation.reset({
-        index: 0,
-        routes: [{ name: "Home" }],
-      });
+      // La redirección se manejará automáticamente a través del contexto
     } catch (error) {
       let errorMessage = "Ocurrió un error al iniciar sesión.";
       if (error.code === "auth/user-not-found") {
@@ -90,165 +93,194 @@ export default function Login({ navigation }) {
   };
 
   return (
-    <LinearGradient
-      colors={[
-        "#2C3E50", "#4B4E6D", "#C2A66B", "#D1B17D", "#E6C47F", "#F0E4C2",
-        "#F0E4C2", "#E6C47F", "#D1B17D", "#C2A66B", "#4B4E6D", "#2C3E50",
-      ]}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 0, y: 1 }}
-      style={styles.background}
-    >
-      <View style={styles.container}>
-        <Image
-          source={require("../../assets/background/florLogo.png")}
-          style={styles.logo}
-          resizeMode="cover"
-        />
-        <Text style={styles.titleSoul}>" Soy "</Text>
-      </View>
-
-      <View style={styles.container}>
-        <Text style={styles.title}>Inicia Sesión</Text>
-
-        <Formik
-          initialValues={{ correo: "", contrasena: "" }}
-          validationSchema={LoginSchema}
-          onSubmit={handleLogin}
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <ImageBackground
+        source={require("../../assets/background/login.jpg")} // Ruta a tu imagen de fondo
+        style={styles.background}
+        resizeMode="cover"
+      >
+        <View style={styles.overlay} />
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          style={styles.container}
         >
-          {({
-            handleChange,
-            handleBlur,
-            handleSubmit,
-            values,
-            errors,
-            touched,
-            isValid,
-            dirty,
-          }) => (
-            <View style={styles.formContainer}>
-              {/* Correo Electrónico */}
-              <View style={styles.inputContainer}>
-                <Ionicons name="mail" size={20} color="#000000" style={styles.iconStyle} />
-                <TextInput
-                  style={styles.input}
-                  placeholder="Correo Electrónico"
-                  placeholderTextColor="#aaa"
-                  onChangeText={handleChange("correo")}
-                  onBlur={handleBlur("correo")}
-                  value={values.correo}
-                  keyboardType="email-address"
-                  autoCapitalize="none"
-                />
-              </View>
-              {touched.correo && errors.correo && (
-                <Text style={styles.errorText}>{errors.correo}</Text>
+          <View style={styles.logoContainer}>
+            <Image
+              source={require("../../assets/background/florLogo.png")}
+              style={styles.logo}
+              resizeMode="contain"
+            />
+            <Text style={styles.titleSoul}>" Soy "</Text>
+          </View>
+
+          <View style={styles.formContainer}>
+            <Text style={styles.title}>Inicia Sesión</Text>
+
+            <Formik
+              initialValues={{ correo: "", contrasena: "" }}
+              validationSchema={LoginSchema}
+              onSubmit={handleLogin}
+            >
+              {({
+                handleChange,
+                handleBlur,
+                handleSubmit,
+                values,
+                errors,
+                touched,
+                isValid,
+                dirty,
+              }) => (
+                <View style={styles.form}>
+                  {/* Correo Electrónico */}
+                  <View style={styles.inputContainer}>
+                    <Ionicons name="mail" size={20} color="#FFD700" style={styles.iconStyle} />
+                    <TextInput
+                      style={styles.input}
+                      placeholder="Correo Electrónico"
+                      placeholderTextColor="#FFD700AA"
+                      onChangeText={handleChange("correo")}
+                      onBlur={handleBlur("correo")}
+                      value={values.correo}
+                      keyboardType="email-address"
+                      autoCapitalize="none"
+                    />
+                  </View>
+                  {touched.correo && errors.correo && (
+                    <Text style={styles.errorText}>{errors.correo}</Text>
+                  )}
+
+                  {/* Contraseña */}
+                  <View style={styles.inputContainer}>
+                    <Ionicons name="lock-closed" size={20} color="#FFD700" style={styles.iconStyle} />
+                    <TextInput
+                      style={styles.input}
+                      placeholder="Contraseña"
+                      placeholderTextColor="#FFD700AA"
+                      onChangeText={handleChange("contrasena")}
+                      onBlur={handleBlur("contrasena")}
+                      value={values.contrasena}
+                      secureTextEntry={!showPassword}
+                      autoCapitalize="none"
+                    />
+                    <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.toggleButton}>
+                      <Ionicons name={showPassword ? "eye" : "eye-off"} size={20} color="#FFD700" />
+                    </TouchableOpacity>
+                  </View>
+                  {touched.contrasena && errors.contrasena && (
+                    <Text style={styles.errorText}>{errors.contrasena}</Text>
+                  )}
+
+                  {/* Botón de Login */}
+                  <TouchableOpacity
+                    style={[styles.button, !(isValid && dirty) && styles.buttonDisabled]}
+                    onPress={handleSubmit}
+                    disabled={!(isValid && dirty) || isSubmitting}
+                  >
+                    {isSubmitting ? (
+                      <ActivityIndicator color="#2C3E50" />
+                    ) : (
+                      <Text style={styles.buttonText}>Iniciar Sesión</Text>
+                    )}
+                  </TouchableOpacity>
+
+                  {/* Enlaces adicionales */}
+                  <View style={styles.linksContainer}>
+                    <TouchableOpacity onPress={() => navigation.navigate("RequestPasswordReset")}>
+                      <Text style={styles.linkText}>¿Has olvidado tu contraseña?</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity onPress={() => navigation.navigate("Registro")}>
+                      <Text style={styles.linkText}>¿No tienes una cuenta? Regístrate</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
               )}
-
-              {/* Contraseña */}
-              <View style={styles.inputContainer}>
-                <Ionicons name="lock-closed" size={20} color="#000000" style={styles.iconStyle} />
-                <TextInput
-                  style={styles.input}
-                  placeholder="Contraseña"
-                  placeholderTextColor="#aaa"
-                  onChangeText={handleChange("contrasena")}
-                  onBlur={handleBlur("contrasena")}
-                  value={values.contrasena}
-                  secureTextEntry={!showPassword}
-                  autoCapitalize="none"
-                />
-                <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.toggleButton}>
-                  <Ionicons name={showPassword ? "eye" : "eye-off"} size={20} color="#000000" />
-                </TouchableOpacity>
-              </View>
-              {touched.contrasena && errors.contrasena && (
-                <Text style={styles.errorText}>{errors.contrasena}</Text>
-              )}
-
-              {/* Botón de Login */}
-              <TouchableOpacity
-                style={[styles.button, !(isValid && dirty) && styles.buttonDisabled]}
-                onPress={handleSubmit}
-                disabled={!(isValid && dirty) || isSubmitting}
-              >
-                {isSubmitting ? (
-                  <ActivityIndicator color="#fff" />
-                ) : (
-                  <Text style={styles.buttonText}>Iniciar Sesión</Text>
-                )}
-              </TouchableOpacity>
-
-              {/* Enlaces adicionales */}
-              <TouchableOpacity onPress={() => navigation.navigate("RequestPasswordReset")}>
-                <Text style={styles.linkText}>¿Has olvidado tu contraseña?</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity onPress={() => navigation.navigate("Registro")}>
-                <Text style={styles.linkText}>¿No tienes una cuenta? Regístrate</Text>
-              </TouchableOpacity>
-            </View>
-          )}
-        </Formik>
-      </View>
-    </LinearGradient>
+            </Formik>
+          </View>
+        </KeyboardAvoidingView>
+      </ImageBackground>
+    </TouchableWithoutFeedback>
   );
 }
+
+const { width, height } = Dimensions.get('window');
 
 const styles = StyleSheet.create({
   loadingContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: "#2C3E50",
   },
   background: {
     flex: 1,
+    width: "100%",
+    height: "100%",
     justifyContent: "center",
     alignItems: "center",
   },
+  overlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(44, 62, 80, 0.7)", // Superposición semi-transparente
+  },
   container: {
-    width: "90%",
+    flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    paddingHorizontal: 5,
+    width: "100%",
+    paddingHorizontal: 20,
+  },
+  logoContainer: {
+    alignItems: "center",
+    marginBottom: 20,
   },
   logo: {
     width: 150,
     height: 150,
-    marginTop: 50,
   },
   titleSoul: {
     fontSize: 28,
-    fontWeight: "bold",
-    color: "#000000",
-    alignSelf: "center",
-    fontFamily: "Poppins_400Regular",
+    fontWeight: "700",
+    color: "#FFD700",
+    marginTop: 10,
+    fontFamily: "Poppins_700Bold",
+  },
+  formContainer: {
+    width: "100%",
   },
   title: {
     fontSize: 28,
-    fontWeight: "bold",
-    color: "#000000",
+    fontWeight: "700",
+    color: "#FFD700",
     marginBottom: 15,
     alignSelf: "center",
-    fontFamily: "Poppins_400Regular",
+    fontFamily: "Poppins_700Bold",
   },
-  formContainer: {
-    width: '100%',
+  form: {
+    width: "100%",
     padding: 20,
     borderRadius: 10,
-    backgroundColor: '#4B4E6D',
-    marginBottom: 30,
-    alignItems: 'center',
+    backgroundColor: "rgba(75, 78, 109, 0.9)", // Fondo semi-transparente para el formulario
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 5,
   },
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
-    borderColor: "#ff9999",
+    borderColor: "#FFD700",
     borderWidth: 1,
     borderRadius: 8,
     paddingHorizontal: 10,
     marginBottom: 10,
-    backgroundColor: "#f9f9f9",
+    backgroundColor: "rgba(255, 255, 255, 0.1)",
   },
   iconStyle: {
     marginRight: 5,
@@ -256,37 +288,45 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     height: 50,
-    color: "#333",
+    color: "#FFD700",
+    fontFamily: "Poppins_400Regular",
   },
   toggleButton: {
     padding: 5,
   },
   errorText: {
-    color: "red",
+    color: "#FF6F61",
     marginBottom: 5,
     marginLeft: 10,
+    fontSize: 12,
+    fontFamily: "Poppins_400Regular",
   },
   button: {
     backgroundColor: "#FFD700",
     paddingVertical: 15,
     borderRadius: 8,
     alignItems: "center",
-    marginTop: 20,
-    width: '90%'
+    marginTop: 10,
   },
   buttonDisabled: {
-    backgroundColor: "#BFA500",
+    backgroundColor: "#FFD700AA",
   },
   buttonText: {
-    color: "#000000",
+    color: "#2C3E50",
     fontSize: 16,
-    fontWeight: "bold",
+    fontWeight: "700",
+    fontFamily: "Poppins_700Bold",
+  },
+  linksContainer: {
+    marginTop: 20,
+    alignItems: "center",
   },
   linkText: {
-    color: "#fff",
-    marginTop: 20,
+    color: "#FFD700",
+    marginTop: 10,
     textAlign: "center",
     fontSize: 14,
-    fontWeight: "bold",
+    fontWeight: "600",
+    fontFamily: "Poppins_700Bold",
   },
 });

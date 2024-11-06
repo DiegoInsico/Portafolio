@@ -1,0 +1,45 @@
+// utils/emotionUtils.js
+
+export const emotionToEmoji = (emotion) => {
+    const emotionMap = {
+        'alegría': '😊',
+        'tristeza': '😢',
+        'amor': '❤️',
+        'nostalgia': '😌',
+        'gratitud': '🙏',
+        'enfado': '😡',
+        'sorpresa': '😲',
+        'miedo': '😨',
+        'orgullo': '😏',
+        'vergüenza': '😳',
+        'ansiedad': '😰',
+        'esperanza': '🌈',
+        'confusión': '😕',
+        'inspiración': '💡',
+        'determinación': '💪',
+        'calma': '😌',
+        'euforia': '🤩',
+        'melancolía': '😔',
+        'arrepentimiento': '😞',
+        'frustración': '😤',
+        'diversión': '😄',
+        'satisfacción': '😌',
+        'culpa': '😓',
+        'alivio': '😅',
+        'curiosidad': '🤔',
+        'solidaridad': '🤝',
+        'fascinación': '😍',
+        'empatía': '🤗',
+        'cansancio': '😩',
+        'paz': '🕊️',
+        'resignación': '😞',
+        'admiración': '👏',
+        'ansia': '🥺',
+        'compasión': '💞',
+        'motivación': '🔥',
+        'soledad': '😔',
+        'ternura': '🥰',
+    };
+
+    return emotionMap[emotion.toLowerCase()] || '🙂'; // Emoji por defecto si no se reconoce la emoción
+};

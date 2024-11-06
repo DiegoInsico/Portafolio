@@ -1,4 +1,3 @@
-// Testigos.js
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -11,12 +10,12 @@ import {
   TouchableOpacity,
   Image,
   ActivityIndicator,
+  ImageBackground,
 } from 'react-native';
 import { db, storage } from "../../utils/firebase";
 import { collection, addDoc, getDocs, doc, updateDoc, deleteDoc } from "firebase/firestore";
 import * as ImagePicker from "expo-image-picker";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-
 
 const Testigos = () => {
   const [testigos, setTestigos] = useState([]);
@@ -116,50 +115,57 @@ const Testigos = () => {
   if (loading) return <ActivityIndicator size="large" color="#FFD700" style={styles.loading} />;
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.header}>Gestión de Testigos</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Buscar por nombre"
-        value={searchQuery}
-        onChangeText={setSearchQuery}
-      />
-      <View style={styles.form}>
-        <Text style={styles.label}>Nombre</Text>
-        <TextInput style={styles.input} value={name} onChangeText={setName} placeholder="Nombre del testigo" />
-        <Text style={styles.label}>Correo Electrónico</Text>
-        <TextInput style={styles.input} value={email} onChangeText={setEmail} placeholder="Correo electrónico" keyboardType="email-address" />
-        <Text style={styles.label}>Teléfono (opcional)</Text>
-        <TextInput style={styles.input} value={phone} onChangeText={setPhone} placeholder="Número de teléfono" keyboardType="phone-pad" />
-        <TouchableOpacity onPress={pickImage} style={styles.imagePicker}>
-          <Text style={styles.imagePickerText}>Seleccionar imagen (opcional)</Text>
-          {image && <Image source={{ uri: image }} style={styles.imagePreview} />}
-        </TouchableOpacity>
-        <Button title={editingId ? "Actualizar Testigo" : "Agregar Testigo"} onPress={handleAddOrUpdateTestigo} />
-      </View>
-
-      <Text style={styles.subheader}>Lista de Testigos</Text>
-      {filteredTestigos.map((testigo) => (
-        <View key={testigo.id} style={styles.card}>
-          <Text style={styles.name}>{testigo.name}</Text>
-          <Text style={styles.email}>{testigo.email}</Text>
-          {testigo.phone && <Text style={styles.phone}>Teléfono: {testigo.phone}</Text>}
-          {testigo.imageUrl && <Image source={{ uri: testigo.imageUrl }} style={styles.imagePreview} />}
-          <View style={styles.buttonGroup}>
-            <Button title="Editar" onPress={() => handleEditTestigo(testigo)} color="#4CAF50" />
-            <Button title="Eliminar" color="red" onPress={() => handleDeleteTestigo(testigo.id)} />
-          </View>
+    <ImageBackground source={require("../../assets/background/config.jpg")} style={styles.backgroundImage}>
+      <ScrollView contentContainerStyle={styles.container}>
+        <Text style={styles.header}>Gestión de Testigos</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Buscar por nombre"
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+        />
+        <View style={styles.form}>
+          <Text style={styles.label}>Nombre</Text>
+          <TextInput style={styles.input} value={name} onChangeText={setName} placeholder="Nombre del testigo" />
+          <Text style={styles.label}>Correo Electrónico</Text>
+          <TextInput style={styles.input} value={email} onChangeText={setEmail} placeholder="Correo electrónico" keyboardType="email-address" />
+          <Text style={styles.label}>Teléfono (opcional)</Text>
+          <TextInput style={styles.input} value={phone} onChangeText={setPhone} placeholder="Número de teléfono" keyboardType="phone-pad" />
+          <TouchableOpacity onPress={pickImage} style={styles.imagePicker}>
+            <Text style={styles.imagePickerText}>Seleccionar imagen (opcional)</Text>
+            {image && <Image source={{ uri: image }} style={styles.imagePreview} />}
+          </TouchableOpacity>
+          <Button title={editingId ? "Actualizar Testigo" : "Agregar Testigo"} onPress={handleAddOrUpdateTestigo} />
         </View>
-      ))}
-    </ScrollView>
+
+        <Text style={styles.subheader}>Lista de Testigos</Text>
+        {filteredTestigos.map((testigo) => (
+          <View key={testigo.id} style={styles.card}>
+            <Text style={styles.name}>{testigo.name}</Text>
+            <Text style={styles.email}>{testigo.email}</Text>
+            {testigo.phone && <Text style={styles.phone}>Teléfono: {testigo.phone}</Text>}
+            {testigo.imageUrl && <Image source={{ uri: testigo.imageUrl }} style={styles.imagePreview} />}
+            <View style={styles.buttonGroup}>
+              <Button title="Editar" onPress={() => handleEditTestigo(testigo)} color="#4CAF50" />
+              <Button title="Eliminar" color="red" onPress={() => handleDeleteTestigo(testigo.id)} />
+            </View>
+          </View>
+        ))}
+      </ScrollView>
+    </ImageBackground>
   );
 };
 
 const styles = StyleSheet.create({
+  backgroundImage: {
+    flex: 1,
+    resizeMode: "cover",
+  },
   container: {
     flexGrow: 1,
+    paddingTop: 60,
     padding: 20,
-    backgroundColor: "#2C3E50",
+    backgroundColor: "rgba(44, 62, 80, 0.5)", // Overlay oscuro para mejorar la legibilidad
   },
   header: {
     fontSize: 24,
@@ -213,6 +219,10 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 8,
     marginBottom: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
   },
   name: {
     fontSize: 18,

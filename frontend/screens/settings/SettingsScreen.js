@@ -1,3 +1,5 @@
+// SettingsScreen.js
+
 import React, { useEffect, useState } from "react";
 import { View, Text, Switch, TouchableOpacity, StyleSheet, ScrollView, Alert, Platform } from "react-native";
 import { useNavigation } from "@react-navigation/native";
@@ -17,7 +19,6 @@ const SettingsScreen = () => {
   const [biometricEnabled, setBiometricEnabled] = useState(false);
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
 
-  // Configuración de permisos de notificación y canal para Android
   useEffect(() => {
     const configureNotifications = async () => {
       const { status } = await Notifications.requestPermissionsAsync();
@@ -26,7 +27,6 @@ const SettingsScreen = () => {
       }
       
       if (Platform.OS === 'android') {
-        // Crear un canal de notificación en Android
         await Notifications.setNotificationChannelAsync("default", {
           name: "default",
           importance: Notifications.AndroidImportance.MAX,
@@ -39,7 +39,6 @@ const SettingsScreen = () => {
     configureNotifications();
   }, []);
 
-  // Activar o desactivar autenticación biométrica
   const toggleBiometricAuth = async () => {
     const compatible = await LocalAuthentication.hasHardwareAsync();
     if (!compatible) {
@@ -53,7 +52,6 @@ const SettingsScreen = () => {
     }
   };
 
-  // Programar o cancelar notificaciones
   const toggleNotifications = async () => {
     if (!notificationsEnabled) {
       const { status } = await Notifications.getPermissionsAsync();
@@ -61,9 +59,9 @@ const SettingsScreen = () => {
         Alert.alert("Permiso requerido", "Las notificaciones no están habilitadas");
         return;
       }
-      await scheduleDailyReminder(); // Programa el recordatorio diario al activar notificaciones
+      await scheduleDailyReminder();
     } else {
-      await Notifications.cancelAllScheduledNotificationsAsync(); // Cancela las notificaciones
+      await Notifications.cancelAllScheduledNotificationsAsync();
     }
 
     setNotificationsEnabled(!notificationsEnabled);
@@ -73,30 +71,27 @@ const SettingsScreen = () => {
     );
   };
 
-  // Programar recordatorio diario
   const scheduleDailyReminder = async () => {
     await Notifications.scheduleNotificationAsync({
       content: {
         title: "Recordatorio Diario",
         body: "¡No olvides registrar tu entrada del día!",
-        sound: "default", // Activa el sonido en la notificación
+        sound: "default",
       },
-      trigger: { hour: 20, minute: 0, repeats: true }, // A las 8 PM todos los días
+      trigger: { hour: 20, minute: 0, repeats: true },
     });
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      {/* Seguridad */}
+    <ScrollView contentContainerStyle={styles.contentContainer} style={styles.scrollView}>
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Seguridad</Text>
         <TouchableOpacity
-          style={styles.option}
+          style={styles.optionButton}
           onPress={() => navigation.navigate("SecuritySettings")}
         >
           <Text style={styles.optionText}>Configurar Contraseñas</Text>
         </TouchableOpacity>
-        {/* Toggle de Biometría */}
         <View style={styles.settingItem}>
           <Text style={styles.label}>Habilitar Autenticación Biométrica</Text>
           <Switch
@@ -108,11 +103,10 @@ const SettingsScreen = () => {
         </View>
       </View>
 
-      {/* Notificaciones */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Notificaciones</Text>
-        <View style={styles.option}>
-          <Text style={styles.optionText}>Activar Recordatorios</Text>
+        <View style={styles.settingItem}>
+          <Text style={styles.label}>Activar Recordatorios</Text>
           <Switch
             value={notificationsEnabled}
             onValueChange={toggleNotifications}
@@ -122,27 +116,25 @@ const SettingsScreen = () => {
         </View>
       </View>
 
-      {/* Apariencia */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Apariencia</Text>
-        <View style={styles.option}>
+        <View style={styles.optionRow}>
           <Text style={styles.optionText}>Tema de Color</Text>
-          <Text>Oscuro</Text>
+          <Text style={styles.optionDetail}>Oscuro</Text>
         </View>
-        <View style={styles.option}>
+        <View style={styles.optionRow}>
           <Text style={styles.optionText}>Tamaño de Fuente</Text>
-          <Text>Mediano</Text>
+          <Text style={styles.optionDetail}>Mediano</Text>
         </View>
       </View>
 
-      {/* Privacidad y Datos */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Privacidad y Datos</Text>
-        <TouchableOpacity style={styles.option}>
+        <TouchableOpacity style={styles.optionButton}>
           <Text style={styles.optionText}>Copia de Seguridad de Datos</Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={styles.option}
+          style={styles.optionButton}
           onPress={() => Alert.alert("Eliminar cuenta", "¿Estás seguro?")}
         >
           <Text style={styles.optionText}>Eliminar Cuenta y Datos</Text>
@@ -153,9 +145,15 @@ const SettingsScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    padding: 20,
+  scrollView: {
+    flex: 1,
     backgroundColor: "#2C3E50",
+  },
+  contentContainer: {
+    paddingTop: 60,
+    paddingBottom: 20,
+    paddingHorizontal: 20,
+    flexGrow: 1,
   },
   section: {
     marginBottom: 30,
@@ -166,7 +164,23 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 10,
   },
-  option: {
+  optionButton: {
+    backgroundColor: "#4B4E6D",
+    padding: 15,
+    borderRadius: 8,
+    marginBottom: 10,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 2,
+    elevation: 3,
+  },
+  optionText: {
+    fontSize: 16,
+    color: "#F0E4C2",
+  },
+  settingItem: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
@@ -175,9 +189,23 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginBottom: 8,
   },
-  optionText: {
+  label: {
     fontSize: 16,
     color: "#F0E4C2",
+  },
+  optionRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    backgroundColor: "#4B4E6D",
+    padding: 15,
+    borderRadius: 8,
+    marginBottom: 8,
+  },
+  optionDetail: {
+    fontSize: 16,
+    color: "#F0E4C2",
+    fontWeight: "600",
   },
 });
 

@@ -25,7 +25,8 @@
     },
     "plugins": [
       "expo-font",
-      "./config/shortcutPlugin.js"
+      "./config/shortcutPlugin.js",
+      "react-native-video"
     ]
   }
 }

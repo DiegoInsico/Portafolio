@@ -8,13 +8,16 @@ import {
   Image,
   Alert,
   ActivityIndicator,
+  ImageBackground,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import { Ionicons } from "@expo/vector-icons";
-import { sendPasswordResetEmail } from "firebase/auth"; // Importa la función de Firebase
-import { auth } from "../../utils/firebase"; // Importa la configuración de Firebase
+import { sendPasswordResetEmail } from "firebase/auth";
+import { auth } from "../../utils/firebase";
 
 // Definir el esquema de validación con Yup
 const ResetPasswordSchema = Yup.object().shape({
@@ -26,24 +29,17 @@ const ResetPasswordSchema = Yup.object().shape({
 export default function RequestPasswordReset({ navigation }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Función para manejar la solicitud de reseteo de contraseña con Firebase
   const handleRequestReset = async (values, actions) => {
     const { correo } = values;
-    console.log("Correo a enviar:", correo);
     setIsSubmitting(true);
     try {
-      // Utiliza Firebase para enviar el enlace de restablecimiento de contraseña
       await sendPasswordResetEmail(auth, correo);
-      
       Alert.alert(
         "Éxito",
         "Si el correo está registrado, recibirás un enlace para restablecer tu contraseña."
       );
-      
-      // Navegar de regreso a la pantalla de Login
       navigation.goBack();
     } catch (error) {
-      console.error("Error al solicitar reseteo de contraseña:", error.message);
       Alert.alert(
         "Error",
         error.message || "Ocurrió un error al solicitar el reseteo de contraseña."
@@ -55,190 +51,168 @@ export default function RequestPasswordReset({ navigation }) {
   };
 
   return (
-    <LinearGradient
-      colors={[
-        "#2C3E50", // Negro grisáceo oscuro en la parte superior
-        "#4B4E6D", // Azul grisáceo oscuro
-        "#C2A66B", // Dorado oscuro más neutro
-        "#D1B17D", // Dorado intermedio
-        "#E6C47F", // Melocotón suave/dorado claro
-        "#F0E4C2", // Tono crema (suave luz)
-        "#F0E4C2", // Tono crema (suave luz) en el centro
-        "#E6C47F", // Melocotón suave/dorado claro
-        "#D1B17D", // Dorado intermedio
-        "#C2A66B", // Dorado oscuro más neutro
-        "#4B4E6D", // Azul grisáceo oscuro
-        "#2C3E50", // Negro grisáceo oscuro en la parte inferior
-      ]}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 0, y: 1 }}
-      style={styles.background}
-    >
-      <View style={styles.container}>
-        <Image
-          source={require("../../assets/background/florLogo.png")} // Reemplaza con la ruta de tu imagen
-          style={styles.logo}
-          resizeMode="cover"
-        />
-        <Text style={styles.title}>Restablecer Contraseña</Text>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <ImageBackground
+        source={require("../../assets/background/login.jpg")}
+        style={styles.background}
+        resizeMode="cover"
+      >
+        <View style={styles.overlay} />
+        <View style={styles.container}>
+          <Image
+            source={require("../../assets/background/florLogo.png")}
+            style={styles.logo}
+            resizeMode="contain"
+          />
+          <Text style={styles.title}>Restablecer Contraseña</Text>
 
-        <Formik
-          initialValues={{
-            correo: "",
-          }}
-          validationSchema={ResetPasswordSchema}
-          onSubmit={handleRequestReset}
-        >
-          {({
-            handleChange,
-            handleBlur,
-            handleSubmit,
-            values,
-            errors,
-            touched,
-            isValid,
-            dirty,
-          }) => (
-            <View style={styles.formContainer}>
-              {/* Correo Electrónico */}
-              <View style={styles.inputContainer}>
-                <Ionicons
-                  name="mail"
-                  size={20}
-                  color="#000000"
-                  style={styles.iconStyle}
-                />
-                <TextInput
-                  style={styles.input}
-                  placeholder="Correo Electrónico"
-                  placeholderTextColor="#aaa"
-                  onChangeText={handleChange("correo")}
-                  onBlur={handleBlur("correo")}
-                  value={values.correo}
-                  keyboardType="email-address"
-                  autoCapitalize="none"
-                />
-              </View>
-              {touched.correo && errors.correo && (
-                <Text style={styles.errorText}>{errors.correo}</Text>
-              )}
-
-              {/* Botón para solicitar reseteo */}
-              <TouchableOpacity
-                style={[styles.button, !(isValid && dirty) && styles.buttonDisabled]}
-                onPress={handleSubmit}
-                disabled={!(isValid && dirty) || isSubmitting}
-              >
-                {isSubmitting ? (
-                  <ActivityIndicator color="#fff" />
-                ) : (
-                  <Text style={styles.buttonText}>Enviar Solicitud</Text>
+          <Formik
+            initialValues={{
+              correo: "",
+            }}
+            validationSchema={ResetPasswordSchema}
+            onSubmit={handleRequestReset}
+          >
+            {({
+              handleChange,
+              handleBlur,
+              handleSubmit,
+              values,
+              errors,
+              touched,
+              isValid,
+              dirty,
+            }) => (
+              <View style={styles.formContainer}>
+                <View style={styles.inputContainer}>
+                  <Ionicons name="mail" size={20} color="#FFD700" style={styles.iconStyle} />
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Correo Electrónico"
+                    placeholderTextColor="#FFD700AA"
+                    onChangeText={handleChange("correo")}
+                    onBlur={handleBlur("correo")}
+                    value={values.correo}
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                  />
+                </View>
+                {touched.correo && errors.correo && (
+                  <Text style={styles.errorText}>{errors.correo}</Text>
                 )}
-              </TouchableOpacity>
-            </View>
-          )}
-        </Formik>
 
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Text style={styles.footerLink}>Volver a Iniciar Sesión</Text>
-        </TouchableOpacity>
-      </View>
-    </LinearGradient>
+                <TouchableOpacity
+                  style={[styles.button, !(isValid && dirty) && styles.buttonDisabled]}
+                  onPress={handleSubmit}
+                  disabled={!(isValid && dirty) || isSubmitting}
+                >
+                  {isSubmitting ? (
+                    <ActivityIndicator color="#2C3E50" />
+                  ) : (
+                    <Text style={styles.buttonText}>Enviar Solicitud</Text>
+                  )}
+                </TouchableOpacity>
+              </View>
+            )}
+          </Formik>
+
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <Text style={styles.footerLink}>Volver a Iniciar Sesión</Text>
+          </TouchableOpacity>
+        </View>
+      </ImageBackground>
+    </TouchableWithoutFeedback>
   );
 }
 
 const styles = StyleSheet.create({
-  formContainer: {
-    width: '100%',
-    padding: 20, // Espaciado interno
-    borderRadius: 10,
-    backgroundColor: '#4B4E6D',
-    shadowColor: "#000",
-    shadowOffset: { width: 5, height: 5 },
-    shadowOpacity: 0.4,
-    shadowRadius: 10,
-    elevation: 10, // Sombra para Android
-    marginBottom: 30,
-    alignItems: 'center',
-  },
   background: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    width: "100%",
+    height: "100%",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  overlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(44, 62, 80, 0.7)", // Superposición semi-transparente
   },
   container: {
-    width: '100%', // Ajustamos el ancho del contenedor para que se centre
-    justifyContent: 'center',
-    alignItems: 'center',
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    width: "100%",
     paddingHorizontal: 20,
   },
   logo: {
-    width: 150, // Ajusta el ancho de la imagen
-    height: 150, // Ajusta la altura de la imagen
-    marginTop: 50,
-    shadowColor: "#000000", // Color de la sombra
-    shadowOffset: { width: 5, height: 5 }, // Desplazamiento de la sombra (horizonte/vertical)
-    shadowOpacity: 0.4, // Opacidad de la sombra
-    shadowRadius: 0, // Radio de difuminado de la sombra (IOS)
-    elevation: 0, // Elevación para sombra en Android
+    width: 150,
+    height: 150,
+    marginBottom: 20,
   },
   title: {
     fontSize: 28,
-    fontWeight: 'bold',
-    color: '#000000',
+    fontWeight: "700",
+    color: "#FFD700",
     marginBottom: 20,
-    alignSelf: 'center',
+  },
+  formContainer: {
+    width: "100%",
+    padding: 20,
+    borderRadius: 10,
+    backgroundColor: "rgba(75, 78, 109, 0.9)", // Fondo semi-transparente para el formulario
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 5,
   },
   inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderColor: '#ff9999',
+    flexDirection: "row",
+    alignItems: "center",
+    borderColor: "#FFD700",
     borderWidth: 1,
     borderRadius: 8,
-    paddingHorizontal: 8,
-    marginBottom: 8,
-    width: '100%', // Los inputs cubren el 100% del contenedor del formulario
-    backgroundColor: '#f9f9f9',
+    paddingHorizontal: 10,
+    marginBottom: 10,
+    backgroundColor: "rgba(255, 255, 255, 0.1)",
   },
   iconStyle: {
     marginRight: 5,
   },
   input: {
-    height: 45,
-    width: '85%',
-    paddingHorizontal: 10,
-    backgroundColor: '#f9f9f9',
+    flex: 1,
+    height: 50,
+    color: "#FFD700",
   },
   errorText: {
-    color: 'red',
+    color: "#FF6F61",
     marginBottom: 5,
     marginLeft: 10,
+    fontSize: 12,
   },
   button: {
-    backgroundColor: '#ff9999',
-    paddingVertical: 12,
+    backgroundColor: "#FFD700",
+    paddingVertical: 15,
     borderRadius: 8,
-    alignItems: 'center',
+    alignItems: "center",
     marginTop: 10,
-    width: '85%', // Ajusta el ancho del botón
   },
   buttonDisabled: {
-    backgroundColor: "#BFA500",
-    shadowColor: "#000000", // Color de la sombra
-    shadowOffset: { width: 5, height: 5 }, // Desplazamiento de la sombra (horizonte/vertical)
-    shadowOpacity: 0.4, // Opacidad de la sombra
-    shadowRadius: 10, // Radio de difuminado de la sombra (IOS)
-    elevation: 10, // Elevación para sombra en Android
+    backgroundColor: "#FFD700AA",
   },
   buttonText: {
-    color: '#fff',
+    color: "#2C3E50",
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "700",
   },
   footerLink: {
-    color: '#fff',
-    fontWeight: 'bold',
+    color: "#FFD700",
+    fontWeight: "700",
     fontSize: 14,
-    marginTop: 6,
+    marginTop: 20,
   },
 });
