@@ -1,191 +1,138 @@
-/* Estilos generales */
-body,
-html {
-  background-color: #1e1e2f; /* Fondo oscuro para todo el cuerpo de la página */
-  margin: 0;
-  padding: 0;
-  height: 100%; /* Asegura que el fondo oscuro cubra toda la página */
-  font-family: "Arial", sans-serif;
-  color: #f0e6d2; /* Texto dorado claro por defecto */
-}
-
-.dashboard-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px;
-  font-family: Arial, sans-serif;
-  background-color: #1e1e2f; /* Fondo oscuro */
-  color: #f0e6d2; /* Texto dorado claro */
-}
-
-h1 {
+.graph-container {
   text-align: center;
-  color: #f0e6d2; /* Texto dorado */
-  margin-bottom: 20px;
+  font-family: Arial, sans-serif;
 }
 
-/* Estilos para la cuadrícula de tarjetas */
-.dashboard-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
+.graph-grid {
+  display: flex;
   gap: 20px;
+  justify-content: center;
+  margin-top: 20px;
+  flex-wrap: wrap;
 }
 
-/* Estilos para cada tarjeta */
-.dashboard-card {
-  background-color: #2c2c3a; /* Fondo oscuro de las tarjetas */
-  border-radius: 10px;
-  padding: 20px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Sombra más oscura */
-  transition: transform 0.3s, background-color 0.3s;
-  cursor: pointer;
+.graph-card {
+  width: 190px;
+  height: 200px;
+  background: #07182E;
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.graph-card:hover {
+  transform: scale(1.05);
+}
+
+.graph-card h3 {
+  z-index: 1;
+  color: white;
+  font-size: 1.2em;
   text-align: center;
+  margin: 0;
 }
 
-.dashboard-card:hover {
-  transform: translateY(-5px);
-  background-color: #3a3a4f; /* Cambia ligeramente el fondo en hover */
-}
-
-h3 {
-  color: #f0a500; /* Títulos dorados */
-}
-
-/* Estilo para mostrar el número en grande */
-.number-display {
-  font-size: 48px; /* Tamaño grande para los números */
-  color: #f0e6d2; /* Color dorado claro */
-  margin: 10px 0;
-}
-
-.description {
-  font-size: 14px;
-  color: #f0e6d2;
+.graph-card .graph-value {
+  z-index: 1;
+  color: #00B7FF;
+  font-size: 1.8em;
+  font-weight: bold;
   margin-top: 10px;
 }
 
-/* Estilos del gráfico */
-.chart-container {
-  width: 100%;
-  max-width: 250px;
-  margin: 0 auto;
+/* Gradiente de fondo giratorio */
+.graph-card::before {
+  content: '';
+  position: absolute;
+  width: 120px;
+  height: 130%;
+  background-image: linear-gradient(180deg, rgb(0, 183, 255), rgb(255, 48, 255));
+  animation: rotBGimg 3s linear infinite;
+  transition: all 0.2s linear;
 }
 
-.chart-container canvas {
-  width: 100% !important;
-  height: auto !important;
+@keyframes rotBGimg {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(180deg);
+  }
 }
 
-.settings-section {
-  background-color: #2c2c3a;
-  padding: 20px;
-  margin-top: 30px;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+.graph-card::after {
+  content: '';
+  position: absolute;
+  background: #07182E;
+  inset: 5px;
+  border-radius: 15px;
 }
 
+/* Estilo para el título de la sección de monitoreo */
 .settings-section h3 {
-  color: #f0a500;
-}
-
-.form-group {
-  margin-bottom: 15px;
-}
-
-.form-group label {
-  color: #f0e6d2;
-  display: block;
-  margin-bottom: 5px;
-}
-
-.form-group input {
-  width: 100%;
-  padding: 10px;
-  border-radius: 5px;
-  border: none;
-  background-color: #1e1e2f;
-  color: #f0e6d2;
+  font-size: 24px;
+  margin: 20px 0;
+  color: #FFA500;
+  /* Color de acento */
 }
 
 .update-button {
-  background-color: #f0a500;
-  color: #1e1e2f;
-  padding: 10px 15px;
+  background-color: #00B7FF;
+  color: #fff;
+  font-size: 18px;
+  font-weight: bold;
   border: none;
-  border-radius: 5px;
+  border-radius: 15px;
+  padding: 15px 25px;
+  margin: 10px;
+  width: 40%;
   cursor: pointer;
+  transition: background-color 0.3s, transform 0.3s;
 }
 
 .update-button:hover {
-  background-color: #d48e00;
+  background-color: #FF30FF;
+  transform: scale(1.05);
 }
 
-.message {
-  color: #f0e6d2;
-  margin-top: 10px;
+.artist-songs-table-container{
+  background-color: rgba(0, 0, 0, 0.511);
+  border-radius: 2%;
+}
+.emotions-container {
+  background-color: #07182e54;
+  padding: 30px;
 }
 
-/* Estilos específicos para SoulmatePage */
-
-.soulmate-container {
-  max-width: 1200px; /* Aumentado para ocupar más espacio */
-  margin: 40px auto; /* Añade margen superior e inferior para centrado */
-  padding: 40px; /* Aumentado para espaciar el contenido */
-  background-color: #1e1e2f; /* Fondo oscuro */
-  color: #f0e6d2; /* Texto claro */
-  border-radius: 10px;
-  box-shadow: 0px 0px 25px rgba(0, 0, 0, 0.6); /* Sombra más fuerte */
+.artist-songs-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
 }
 
-.soulmate-container h1 {
-  text-align: center;
-  color: #f0a500; /* Título dorado */
-  margin-bottom: 30px; /* Aumentado */
-  font-size: 2em; /* Título más grande */
+.artist-songs-table th,
+.artist-songs-table td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
 }
 
-.soulmate-list {
-  margin-top: 30px;
+.artist-songs-table th {
+  background-color: #ff0000;
+  color: #fff;
 }
 
-.soulmate-item {
-  background-color: #2c2c3a; /* Fondo oscuro para cada tarjeta de coincidencia */
-  margin: 20px 0; /* Mayor separación entre tarjetas */
-  padding: 20px; /* Aumentado */
-  border-radius: 8px;
-  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.3); /* Sombra más intensa */
-  transition: background-color 0.3s, transform 0.3s; /* Añade un efecto de movimiento */
+.artist-songs-table tr:hover {
+  background-color: rgba(0, 0, 0, 0.1);
 }
 
-.soulmate-item:hover {
-  background-color: #3a3a4f; /* Cambio de fondo en hover */
-  transform: translateY(-5px); /* Desplazamiento ligero en hover */
-}
-
-.soulmate-item p {
-  font-size: 1.2em; /* Texto más grande */
-  margin-bottom: 10px; /* Aumentado */
-  color: #f0e6d2;
-}
-
-.emotions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 15px; /* Más espacio entre emociones */
-  margin-top: 15px;
-}
-
-.emotion-item {
-  background-color: #4b4e6d; /* Fondo de cada emoción */
-  color: #ffd700; /* Color dorado para el texto de emoción */
-  padding: 8px 12px; /* Aumentado */
+.artist-songs-table img {
   border-radius: 5px;
-  font-size: 1.2em; /* Texto de emociones más grande */
-  display: flex;
-  align-items: center;
-  gap: 8px; /* Más espacio entre icono y texto */
 }

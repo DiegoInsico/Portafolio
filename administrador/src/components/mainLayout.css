@@ -1,99 +1,70 @@
-/* mainLayout.css */
-
 .main-layout {
   display: flex;
   height: 100vh;
   overflow: hidden;
 }
 
-.topbar {
-  background-color: #1d1f27;
-  color: #ffb74d;
-  padding: 10px 20px;
-  font-size: 1.5rem;
-  position: fixed;
-  width: 100%;
-  top: 0;
-  z-index: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-
-.topbar .toggle-btn {
-  position: absolute;
-  left: 20px;
-  font-size: 1.5rem;
-  background: none;
-  border: none;
-  color: #ffb74d;
-  cursor: pointer;
-  padding: 0 10px;
-}
-
-.topbar .title {
-  font-family: 'Cursive', sans-serif;
-  font-weight: bold;
-  text-align: center;
-}
-
-.topbar .user-info {
-  position: absolute;
-  right: 20px;
-  font-size: 1rem;
-  color: #ffb74d;
-}
-
+/* Sidebar oculta */
 .sidebar {
-  width: 250px;
+  width: 40px; /* Tamaño reducido para el estado colapsado */
   background-color: #2e2e2e;
-  color: #f0b132;
-  padding: 20px;
+  color: #ffffff;
+  padding: 20px 10px; /* Padding ajustado */
   position: fixed;
-  top: 90px; /* La altura de la topbar */
+  top: 77.2px; /* Altura de la topbar */
   left: 0;
-  height: calc(100% - 60px); /* Ajuste para la altura de la sidebar */
-  overflow: auto;
-  transition: transform 0.3s ease;
+  height: calc(100% - 60px);
+  overflow: hidden;
+  transition: width 0.3s ease;
   font-size: 18px;
-  z-index: 2;
+  z-index: 3;
 }
 
-
-.sidebar.hidden {
-  transform: translateX(-100%);
+.sidebar:hover {
+  width: 300px; /* Tamaño expandido al hacer hover */
 }
 
 .sidebar a {
-  display: block;
+  display: flex;
+  align-items: center;
   color: #ffb74d;
-  padding: 15px 20px;
+  padding: 15px 10px;
   text-decoration: none;
   font-size: 1rem;
   transition: background-color 0.2s ease, transform 0.2s ease;
+  white-space: nowrap;
 }
 
 .sidebar a:hover {
   background-color: #ffb74d;
   color: #2e2e2e;
-  transform: scale(1.05); /* Animación de agrandamiento al pasar el mouse */
+  transform: scale(1.05);
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
 }
 
-.content {
-  margin-left: 250px;
-  padding: 20px;
-  padding-top: 80px; /* Para evitar superposición con topbar */
-  background-color: #1d1f27;
+/* Estilo para los números de la sidebar */
+.sidebar-number {
+  display: inline-block;
+  width: 25px;
+  margin-right: 10px;
+  text-align: center;
+  font-weight: bold;
   color: #ffffff;
-  width: calc(100% - 250px);
+  opacity: 0.7;
 }
 
-.content.sidebar-hidden {
-  margin-left: 0;
-  width: 100%;
+.content {
+  padding-top: 77.2px;
+  background-image: url('../img/arbol.svg');
+  background-size: cover;
+  background-color: #0099ffc0;
+  background-position: center;
+  color: #ffffff;
+  width: calc(100% );
+  transition: margin-left 0.3s ease;
 }
+
+
 .login-content {
   display: flex;
   justify-content: center;

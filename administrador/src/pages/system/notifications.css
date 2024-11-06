@@ -3,7 +3,7 @@
   color: #f5f5f5;
   padding: 20px;
   border-radius: 10px;
-  width: 95%;
+  width: 60%;
   max-width: 1400px;
   margin: 10px auto 5px; /* Reduce el margen superior e inferior */
   min-height: 80vh; /* Asegura que el contenedor ocupe casi toda la altura de la pantalla */
@@ -94,7 +94,7 @@ p {
 }
 .notifications-table thead th {
   position: sticky;
-  top: 50px; /* Ajusta según el espacio ocupado por el título */
+  top: 40px; /* Ajusta según el espacio ocupado por el título */
   background-color: #ffa726;
   color: #1e1e2f;
   z-index: 1;
@@ -160,31 +160,14 @@ button.delete-button:hover {
 }
 
 .notifications-table-container {
-  max-height: 650px;
+  max-height: 80%;
   overflow-y: auto;
-  margin-top: 20px;
+  margin-top: 10px;
+
   border: 1px solid #ffa726;
   border-radius: 5px;
 }
 
-/* Estilo oscuro para el scroll */
-.notifications-table-container::-webkit-scrollbar {
-  width: 8px;
-  background-color: #1e1e2f; /* Fondo oscuro del scroll */
-}
-
-.notifications-table-container::-webkit-scrollbar-thumb {
-  background-color: #555555; /* Color de la barra de desplazamiento */
-  border-radius: 4px;
-}
-
-.notifications-table-container::-webkit-scrollbar-thumb:hover {
-  background-color: #777777; /* Hover en el scroll */
-}
-
-.notifications-table-container::-webkit-scrollbar-track {
-  background-color: #282a36; /* Fondo de la pista */
-}
 .notifications-container__header {
   text-align: center;
   font-size: 24px;
@@ -340,7 +323,7 @@ button.delete-button:hover {
 }
 
 .notifications-list::-webkit-scrollbar-thumb {
-  background-color: #555555;
+  background-color: #040404;
   border-radius: 4px;
 }
 

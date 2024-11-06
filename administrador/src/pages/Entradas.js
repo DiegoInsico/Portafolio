@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { db } from "../firebase";
 import { collection, getDocs } from "firebase/firestore";
 import "./Entradas.css"; // Archivo de estilos
+import Container from "../components/container";
 
 const Entradas = () => {
   const [entries, setEntries] = useState([]);
@@ -22,26 +23,32 @@ const Entradas = () => {
   }, []);
 
   return (
-    <div className="entradas-container">
-      <h1>Lista de Entradas</h1>
-      <ul className="entries-list">
-        {entries.length > 0 ? (
-          entries.map((entry) => (
-            <li key={entry.id} className="entry-item">
-              <div className="entry-header">
-                <strong>{entry.texto || "Sin título"}</strong>
-                <span>
-                  {new Date(entry.fechaCreacion.seconds * 1000).toLocaleString()}
-                </span>
-              </div>
-              <p className="entry-category">Categoría: {entry.categoria || "Sin categoría"}</p>
-            </li>
-          ))
-        ) : (
-          <p>No hay entradas disponibles.</p>
-        )}
-      </ul>
-    </div>
+    <Container>
+      <div className="entradas-container">
+        <h1>Lista de Entradas</h1>
+        <ul className="entries-list">
+          {entries.length > 0 ? (
+            entries.map((entry) => (
+              <li key={entry.id} className="entry-item">
+                <div className="entry-header">
+                  <strong>{entry.texto || "Sin título"}</strong>
+                  <span>
+                    {new Date(
+                      entry.fechaCreacion.seconds * 1000
+                    ).toLocaleString()}
+                  </span>
+                </div>
+                <p className="entry-category">
+                  Categoría: {entry.categoria || "Sin categoría"}
+                </p>
+              </li>
+            ))
+          ) : (
+            <p>No hay entradas disponibles.</p>
+          )}
+        </ul>
+      </div>
+    </Container>
   );
 };
 

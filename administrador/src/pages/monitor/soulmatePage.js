@@ -1,179 +1,179 @@
 import React, { useState, useEffect } from "react";
 import { db } from "../../firebase";
 import { collection, getDocs } from "firebase/firestore";
-import './styles.css';
+import "./styles.css";
+import Container from "../../components/container";
+import { Bar, Pie } from 'react-chartjs-2';
 
-const emotionToEmoji = (emotion) => {
-    switch (emotion.toLowerCase()) {
-        case 'alegría':
-            return '😊';
-        case 'tristeza':
-            return '😢';
-        case 'amor':
-            return '❤️';
-        case 'nostalgia':
-            return '😌';
-        case 'gratitud':
-            return '🙏';
-        case 'enfado':
-            return '😡';
-        case 'sorpresa':
-            return '😲';
-        case 'miedo':
-            return '😨';
-        case 'orgullo':
-            return '😏';
-        case 'vergüenza':
-            return '😳';
-        case 'ansiedad':
-            return '😰';
-        case 'esperanza':
-            return '🌈';
-        case 'confusión':
-            return '😕';
-        case 'inspiración':
-            return '💡';
-        case 'determinación':
-            return '💪';
-        case 'calma':
-            return '😌';
-        case 'euforia':
-            return '🤩';
-        case 'melancolía':
-            return '😔';
-        case 'arrepentimiento':
-            return '😞';
-        case 'frustración':
-            return '😤';
-        case 'diversión':
-            return '😄';
-        case 'satisfacción':
-            return '😌';
-        case 'culpa':
-            return '😓';
-        case 'alivio':
-            return '😅';
-        case 'curiosidad':
-            return '🤔';
-        case 'solidaridad':
-            return '🤝';
-        case 'fascinación':
-            return '😍';
-        case 'empatía':
-            return '🤗';
-        case 'cansancio':
-            return '😩';
-        case 'paz':
-            return '🕊️';
-        case 'resignación':
-            return '😞';
-        case 'admiración':
-            return '👏';
-        case 'ansia':
-            return '🥺';
-        case 'compasión':
-            return '💞';
-        case 'motivación':
-            return '🔥';
-        case 'soledad':
-            return '😔';
-        case 'ternura':
-            return '🥰';
-        default:
-            return '🙂'; // Emoji por defecto si no se reconoce la emoción
-    }
-};
-
-const SoulmatePage = () => {
-  const [userEmotions, setUserEmotions] = useState([]);
-  const [soulmates, setSoulmates] = useState([]);
+const EmotionsPage = () => {
+  const [totalUsers, setTotalUsers] = useState(0);
+  const [emotionCounts, setEmotionCounts] = useState({});
+  const [musicUsers, setMusicUsers] = useState([]);
+  const [noMusicUsersCount, setNoMusicUsersCount] = useState(0);
+  const [userLevelsSummary, setUserLevelsSummary] = useState({});
+  const [artistSongs, setArtistSongs] = useState([]);
 
   useEffect(() => {
-    const fetchEmotions = async () => {
+    const fetchData = async () => {
       try {
+        const usersSet = new Set();
         const emotionsMap = {};
+        const musicUsersSet = new Set();
+        const noMusicUsersSet = new Set();
+        const artistSongsArray = [];
+        const levelsCount = {};
+
         const snapshot = await getDocs(collection(db, "entradas"));
-        
+
         snapshot.forEach((doc) => {
           const data = doc.data();
-          const { userId, emociones } = data;
+          const { userId, emociones, cancion, nivel } = data;
 
-          if (!emociones || emociones.length === 0) return;
+          if (userId) usersSet.add(userId);
 
-          if (!emotionsMap[userId]) {
-            emotionsMap[userId] = new Set();
+          if (emociones && emociones.length > 0) {
+            emociones.forEach((emotion) => {
+              if (!emotionsMap[emotion]) {
+                emotionsMap[emotion] = 0;
+              }
+              emotionsMap[emotion] += 1;
+            });
           }
 
-          emociones.forEach(emotion => {
-            emotionsMap[userId].add(emotion);
-          });
+          if (cancion) {
+            musicUsersSet.add(userId);
+            artistSongsArray.push({
+              artist: cancion.artist,
+              song: cancion.name,
+              albumImage: cancion.albumImage,
+            });
+          } else {
+            noMusicUsersSet.add(userId);
+          }
+
+          if (userId && nivel) {
+            if (!levelsCount[nivel]) {
+              levelsCount[nivel] = 0;
+            }
+            levelsCount[nivel] += 1;
+          }
         });
 
-        const emotionData = [];
-        for (const userId in emotionsMap) {
-          emotionData.push({
-            userId,
-            emotions: Array.from(emotionsMap[userId]),
-          });
-        }
-
-        setUserEmotions(emotionData);
-        findSoulmates(emotionData);
+        setTotalUsers(usersSet.size);
+        setEmotionCounts(emotionsMap);
+        setMusicUsers(Array.from(musicUsersSet));
+        setNoMusicUsersCount(noMusicUsersSet.size);
+        setArtistSongs(artistSongsArray);
+        setUserLevelsSummary(levelsCount);
       } catch (error) {
-        console.error("Error fetching emotions:", error);
+        console.error("Error fetching data:", error);
       }
     };
 
-    fetchEmotions();
+    fetchData();
   }, []);
 
-  const findSoulmates = (emotionData) => {
-    const matches = [];
+  const chartData = {
+    labels: Object.keys(emotionCounts),
+    datasets: [
+      {
+        label: "Emociones utilizadas",
+        data: Object.values(emotionCounts),
+        backgroundColor: 'rgba(75,192,192,0.6)',
+        borderColor: 'rgba(75,192,192,1)',
+        borderWidth: 1,
+      },
+    ],
+  };
 
-    emotionData.forEach((user1, index) => {
-      for (let j = index + 1; j < emotionData.length; j++) {
-        const user2 = emotionData[j];
-        const commonEmotions = user1.emotions.filter(emotion =>
-          user2.emotions.includes(emotion)
-        );
-
-        if (commonEmotions.length > 0) {
-          matches.push({
-            user1: user1.userId,
-            user2: user2.userId,
-            commonEmotions,
-          });
-        }
-      }
-    });
-
-    setSoulmates(matches);
+  const pieData = {
+    labels: ["Han compartido música", "No han compartido música"],
+    datasets: [
+      {
+        data: [musicUsers.length, noMusicUsersCount],
+        backgroundColor: ["#4CAF50", "#F44336"],
+        hoverBackgroundColor: ["#66BB6A", "#E57373"],
+      },
+    ],
   };
 
   return (
-    <div className="soulmate-container">
-      <h1>Similitudes de Emociones entre Usuarios</h1>
-      
-      {soulmates.length > 0 ? (
-        <div className="soulmate-list">
-          {soulmates.map((match, index) => (
-            <div key={index} className="soulmate-item">
-              <p><strong>Usuario {match.user1}</strong> y <strong>Usuario {match.user2}</strong> comparten estas emociones:</p>
-              <div className="emotions">
-                {match.commonEmotions.map((emotion, i) => (
-                  <span key={i} className="emotion-item">
-                    {emotionToEmoji(emotion)} {emotion}
-                  </span>
-                ))}
-              </div>
+    <Container>
+      <div className="emotions-container">
+        <h1>Mundo de emociones</h1>
+        <p>Total de usuarios en la plataforma: {totalUsers}</p>
+        
+        {/* Contenedor en cuadrícula 2x2 */}
+        <div className="grid-container">
+          {/* Gráfico de emociones */}
+          <div className="grid-item">
+            <h2>Gráfico de Emociones</h2>
+            <div className="chart-container">
+              <Bar data={chartData} options={{ responsive: true, maintainAspectRatio: false }} />
             </div>
-          ))}
+          </div>
+
+          {/* Gráfico circular para conteo de usuarios con y sin música */}
+          <div className="grid-item">
+            <h2>Usuarios con y sin Música</h2>
+            <div className="chart-container">
+              <Pie data={pieData} options={{ responsive: true, maintainAspectRatio: false }} />
+            </div>
+          </div>
+
+          {/* Gráfico de usuarios por nivel de entrada */}
+          <div className="grid-item">
+            <h2>Usuarios por Nivel de Entrada</h2>
+            <div className="chart-container">
+              <Bar
+                data={{
+                  labels: Object.keys(userLevelsSummary),
+                  datasets: [
+                    {
+                      label: "Usuarios por Nivel de Entrada",
+                      data: Object.values(userLevelsSummary),
+                      backgroundColor: 'rgba(75,192,192,0.6)',
+                      borderColor: 'rgba(75,192,192,1)',
+                      borderWidth: 1,
+                    },
+                  ],
+                }}
+                options={{
+                  responsive: true,
+                  maintainAspectRatio: false,
+                }}
+              />
+            </div>
+          </div>
         </div>
-      ) : (
-        <p>No hay similitudes de emociones entre usuarios en este momento.</p>
-      )}
-    </div>
+
+        {/* Tabla de artistas y canciones */}
+        <h2>Artistas y Canciones</h2>
+        <div className="artist-songs-table-container">
+          <table className="artist-songs-table">
+            <thead>
+              <tr>
+                <th>Imagen del Álbum</th>
+                <th>Artista</th>
+                <th>Canción</th>
+              </tr>
+            </thead>
+            <tbody>
+              {artistSongs.map((entry, index) => (
+                <tr key={index}>
+                  <td>
+                    <img src={entry.albumImage} alt={entry.song} width="50" height="50" />
+                  </td>
+                  <td>{entry.artist}</td>
+                  <td>{entry.song}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </Container>
   );
 };
 
-export default SoulmatePage;
+export default EmotionsPage;

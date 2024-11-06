@@ -1,8 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { db } from "../../../firebase";
-import { doc, getDoc, updateDoc, collection, query, getDocs, where } from "firebase/firestore";
-import './users.css';
+import {
+  doc,
+  getDoc,
+  updateDoc,
+  collection,
+  query,
+  getDocs,
+  where,
+} from "firebase/firestore";
+import "./users.css";
+import Container from "../../../components/container"; // Importa Container para aplicar el scroll
 
 const UserSummary = () => {
   const { userId } = useParams();
@@ -29,9 +38,14 @@ const UserSummary = () => {
 
     const fetchSessionHistory = async () => {
       try {
-        const sessionsQuery = query(collection(db, "sessions"), where("userId", "==", userId));
+        const sessionsQuery = query(
+          collection(db, "sessions"),
+          where("userId", "==", userId)
+        );
         const sessionsSnapshot = await getDocs(sessionsQuery);
-        const history = sessionsSnapshot.docs.map(doc => doc.data().timestamp);
+        const history = sessionsSnapshot.docs.map(
+          (doc) => doc.data().timestamp
+        );
         setSessionHistory(history);
       } catch (error) {
         console.error("Error obteniendo el historial de sesiones:", error);
@@ -40,7 +54,10 @@ const UserSummary = () => {
 
     const fetchCategories = async () => {
       try {
-        const entriesQuery = query(collection(db, "entradas"), where("userId", "==", userId));
+        const entriesQuery = query(
+          collection(db, "entradas"),
+          where("userId", "==", userId)
+        );
         const entriesSnapshot = await getDocs(entriesQuery);
 
         const categoryCount = {};
@@ -80,76 +97,107 @@ const UserSummary = () => {
   }
 
   return (
-    <div className="user-summary-container">
-      <h1>Resumen del Usuario</h1>
-      
-      <div className="user-summary-content">
-        <div className="user-info-column">
-          <ul className="user-info">
-            <li><span className="label">Nombre:</span> <span className="data">{userData.displayName}</span></li>
-            <li><span className="label">Email:</span> <span className="data">{userData.email}</span></li>
-            <li><span className="label">Rol:</span> <span className="data">{userData.role}</span></li>
-            <li><span className="label">Fecha de creación:</span> <span className="data">{new Date(userData.createdAt.seconds * 1000).toLocaleDateString()}</span></li>
-            <li><span className="label">Inicios de sesión:</span> <span className="data">{sessionHistory.length}</span></li>
-            <li><span className="label">Categorías usadas:</span>
-              <span className="data">
-                {categories.length > 0 ? (
-                  <ul>
-                    {categories.map(([category, count]) => (
-                      <li key={category}>
-                        {category}: {count}
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  "No hay categorías registradas"
-                )}
-              </span>
-            </li>
-          </ul>
+    <Container> {/* Uso de Container para aplicar el scroll */}
+      <div className="user-summary-container">
+        <h1>Resumen del Usuario</h1>
+
+        <div className="user-summary-content">
+          <div className="user-info-column">
+            <ul className="user-info">
+              <li>
+                <span className="label">Nombre:</span>{" "}
+                <span className="data">{userData.displayName}</span>
+              </li>
+              <li>
+                <span className="label">Email:</span>{" "}
+                <span className="data">{userData.email}</span>
+              </li>
+              <li>
+                <span className="label">Rol:</span>{" "}
+                <span className="data">{userData.role}</span>
+              </li>
+              <li>
+                <span className="label">Fecha de creación:</span>{" "}
+                <span className="data">
+                  {new Date(
+                    userData.createdAt.seconds * 1000
+                  ).toLocaleDateString()}
+                </span>
+              </li>
+              <li>
+                <span className="label">Inicios de sesión:</span>{" "}
+                <span className="data">{sessionHistory.length}</span>
+              </li>
+              <li>
+                <span className="label">Categorías usadas:</span>
+                <span className="data">
+                  {categories.length > 0 ? (
+                    <ul>
+                      {categories.map(([category, count]) => (
+                        <li key={category}>
+                          {category}: {count}
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    "No hay categorías registradas"
+                  )}
+                </span>
+              </li>
+            </ul>
+          </div>
+
+          <div className="profile-image-column">
+            <img
+              src={
+                userData.photoURL ||
+                "https://via.placeholder.com/150?text=Avatar"
+              }
+              alt="Imagen de perfil"
+              className="profile-image-rounded"
+            />
+            <div className="account-created">
+              <p>Fecha de creación:</p>
+              <p>
+                {new Date(
+                  userData.createdAt.seconds * 1000
+                ).toLocaleDateString()}
+              </p>
+            </div>
+
+            <div className="verification-section">
+              {isVerified ? (
+                <p className="verified-label">Usuario Verificado ✅</p>
+              ) : (
+                <button className="verify-button" onClick={handleVerification}>
+                  Verificar Usuario
+                </button>
+              )}
+            </div>
+
+            {/* Historial de sesiones */}
+            <div className="session-history">
+              <h3>Historial de Inicios de Sesión</h3>
+              {sessionHistory.length > 0 ? (
+                <ul>
+                  {sessionHistory.map((timestamp, index) => (
+                    <li key={index}>
+                      {new Date(timestamp.seconds * 1000).toLocaleString()}
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p>No hay sesiones registradas</p>
+              )}
+            </div>
+          </div>
         </div>
 
-        <div className="profile-image-column">
-          <img
-            src={userData.photoURL || "https://via.placeholder.com/150?text=Avatar"}
-            alt="Imagen de perfil"
-            className="profile-image-rounded"
-          />
-          <div className="account-created">
-            <p>Fecha de creación:</p>
-            <p>{new Date(userData.createdAt.seconds * 1000).toLocaleDateString()}</p>
-          </div>
-
-          <div className="verification-section">
-            {isVerified ? (
-              <p className="verified-label">Usuario Verificado ✅</p>
-            ) : (
-              <button className="verify-button" onClick={handleVerification}>
-                Verificar Usuario
-              </button>
-            )}
-          </div>
-
-          {/* Historial de sesiones */}
-          <div className="session-history">
-            <h3>Historial de Inicios de Sesión</h3>
-            {sessionHistory.length > 0 ? (
-              <ul>
-                {sessionHistory.map((timestamp, index) => (
-                  <li key={index}>{new Date(timestamp.seconds * 1000).toLocaleString()}</li>
-                ))}
-              </ul>
-            ) : (
-              <p>No hay sesiones registradas</p>
-            )}
-          </div>
-        </div>
+        <Link to="/monitor/users/userActivity" className="back-button">
+          Regresar
+        </Link>
       </div>
-
-      <Link to="/monitor/users/userActivity" className="back-button">
-        Regresar
-      </Link>
-    </div>
+    </Container>
   );
 };
 

@@ -2,13 +2,14 @@ import React, { useState, useEffect } from "react";
 import { db } from "../../../firebase";
 import { collection, getDocs, query, orderBy } from "firebase/firestore";
 import { Line, Pie } from "react-chartjs-2";
-import 'chart.js/auto';
-import './graph.css'; 
+import "chart.js/auto";
+import "./graph.css";
+import Container from "../../../components/container";
 
 const UsageCharts = () => {
   const [chartData, setChartData] = useState(null);
-  const [dailyData, setDailyData] = useState(null); 
-  const [categoryData, setCategoryData] = useState(null); 
+  const [dailyData, setDailyData] = useState(null);
+  const [categoryData, setCategoryData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [theme, setTheme] = useState("dark");
 
@@ -20,7 +21,7 @@ const UsageCharts = () => {
     try {
       const usageData = [];
       const dailyUsage = {};
-      const categoryCount = {}; 
+      const categoryCount = {};
       const q = query(collection(db, "entradas"), orderBy("fechaCreacion"));
       const snapshot = await getDocs(q);
 
@@ -28,8 +29,8 @@ const UsageCharts = () => {
         const data = doc.data();
         const fechaCreacion = data.fechaCreacion.toDate();
         const hora = fechaCreacion.getHours();
-        const dia = fechaCreacion.toLocaleDateString(); 
-        const categoria = data.categoria || "Sin categoría"; 
+        const dia = fechaCreacion.toLocaleDateString();
+        const categoria = data.categoria || "Sin categoría";
 
         if (categoryCount[categoria]) {
           categoryCount[categoria]++;
@@ -77,14 +78,13 @@ const UsageCharts = () => {
           },
         ],
       });
-      
 
       setDailyData({
-        labels: Object.keys(dailyUsage), 
+        labels: Object.keys(dailyUsage),
         datasets: [
           {
             label: "Uso diario de usuarios",
-            data: Object.values(dailyUsage), 
+            data: Object.values(dailyUsage),
             borderColor: "rgba(54, 162, 235, 1)",
             backgroundColor: "rgba(54, 162, 235, 0.2)",
             fill: true,
@@ -93,11 +93,11 @@ const UsageCharts = () => {
       });
 
       setCategoryData({
-        labels: categoryLabels, 
+        labels: categoryLabels,
         datasets: [
           {
             label: "Porcentaje de Categorías Usadas",
-            data: categoryValues, 
+            data: categoryValues,
             backgroundColor: [
               "#FF6384",
               "#36A2EB",
@@ -105,7 +105,7 @@ const UsageCharts = () => {
               "#4BC0C0",
               "#9966FF",
               "#FF9F40",
-            ], 
+            ],
             hoverBackgroundColor: [
               "#FF6384",
               "#36A2EB",
@@ -138,8 +138,9 @@ const UsageCharts = () => {
   }
 
   return (
-    <div className={`dashboard-container`}>
-      {/* Contenedor para los filtros
+    <Container>
+      <div className={`dashboard-container`}>
+        {/* Contenedor para los filtros
       <div className="filters-container">
         <button onClick={toggleTheme} className="theme-button">Cambiar Tema</button>
         <button className="filter-button">Filtro por Hora</button>
@@ -147,27 +148,31 @@ const UsageCharts = () => {
         <button className="filter-button">Filtro por Uso Diario</button>
       </div> */}
 
-      {/* Contenedor para los gráficos */}
-      <div className="chart-wrapper">
-        {/* Gráfico de líneas de uso de usuarios por hora */}
-        <div className="chart-container">
-          <h1>Uso de Usuarios por Hora</h1>
-          <Line data={chartData} />
-        </div>
+        {/* Contenedor para los gráficos */}
+        <div className="chart-wrapper">
+          {/* Gráfico de líneas de uso de usuarios por hora */}
+          <div className="chart-container">
+            <h1>Uso de Usuarios por Hora</h1>
+            <Line data={chartData} />
+          </div>
 
-        {/* Gráfico de uso diario */}
-        <div className="chart-container">
-          <h1>Uso Diario de Usuarios</h1>
-          <Line data={dailyData} />
-        </div>
+          {/* Gráfico de uso diario */}
+          <div className="chart-container">
+            <h1>Uso Diario de Usuarios</h1>
+            <Line data={dailyData} />
+          </div>
 
-        {/* Gráfico de torta para categorías */}
-        <div className="chart-container">
-          <h1>Categorías Usadas</h1>
-          <Pie data={categoryData} />
+          {/* Gráfico de torta para categorías */}
+          <div className="chart-container">
+            <h1>Categorías Usadas</h1>
+            <Pie data={categoryData} />
+          </div>
+          <div className="chart-container-t">
+            <h1>Texto si</h1>
+          </div>
         </div>
       </div>
-    </div>
+    </Container>
   );
 };
 
