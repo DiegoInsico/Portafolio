@@ -1,0 +1,41 @@
+.libros-container {
+  display: flex;
+  justify-content: center;
+  /* Centra los libros en el contenedor */
+  align-items: center;
+  gap: 15px;
+  /* Espacio entre los libros, puedes ajustarlo según prefieras */
+  margin: 20px 0;
+}
+
+.libro {
+  text-decoration: none;
+  color: inherit;
+  text-align: center;
+  width: 400;
+  /* Tamaño más grande para cada libro */
+  height: 600;
+  /* Ajuste de altura */
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.libro img {
+  width: 400;
+  height: 600;
+  object-fit: cover;
+  /* Asegura que la imagen ocupe todo el espacio sin deformarse */
+  border-radius: 8px;
+  /* Redondeo de bordes */
+}
+
+.libro h3 {
+  margin-top: 10px;
+  font-size: 1em;
+  color: #333;
+}
+
+.libro:hover {
+  transform: scale(1.05);
+  /* Aumenta el tamaño ligeramente al pasar el cursor */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
