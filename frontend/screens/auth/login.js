@@ -23,11 +23,8 @@ import { Ionicons } from "@expo/vector-icons";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../../utils/firebase";
+import { auth, db } from "../../utils/firebase";
 import { AuthContext } from "../../context/AuthContext"; // Importar el contexto
-import { Ionicons } from "@expo/vector-icons";
-import { signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
-import { auth, db } from "../../utils/firebase"; // Asegúrate de importar `db` correctamente
 import { doc, setDoc, serverTimestamp } from "firebase/firestore";
 
 // Definir el esquema de validación con Yup
