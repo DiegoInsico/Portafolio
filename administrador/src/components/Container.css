@@ -13,6 +13,18 @@
     padding-left: 70px;
   }
   
+  
+.content {
+  padding-top: 77.2px;
+  background-image: url('../img/arbol.svg');
+  background-size: cover;
+  background-color: #00000088;
+  background-position: center;
+  color: #ffffff;
+  width: calc(100% );
+  transition: margin-left 0.3s ease;
+}
+
   /* Estilos para la barra de desplazamiento */
   .container::-webkit-scrollbar {
     width: 10px;
