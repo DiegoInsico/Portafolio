@@ -2,12 +2,12 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Dashboard.css"; // Archivo de estilos actualizado
 import Container from "../components/container";
-import { collection, getDocs, query, where } from "firebase/firestore";
+import { collection, getDocs, query, where, orderBy } from "firebase/firestore";
 import { db } from "../firebase";
 import { Timestamp } from "firebase/firestore";
+import { Line, Pie, Bar } from "react-chartjs-2";
 
 const Dashboard = () => {
-  
   const navigate = useNavigate();
   const [stats, setStats] = useState({
     activeUsers: 0,
@@ -15,6 +15,11 @@ const Dashboard = () => {
     entriesUploaded: 0,
     dailyUserActivity: 0,
   });
+
+  const [unverifiedUsersData, setUnverifiedUsersData] = useState(null);
+  const [categoryData, setCategoryData] = useState(null);
+  const [creationPeakData, setCreationPeakData] = useState(null);
+  const [selectedChart, setSelectedChart] = useState("none"); // Control de gráficos visibles
 
   const formatDate = (timestamp) => {
     if (timestamp instanceof Timestamp) {
@@ -63,9 +68,106 @@ const Dashboard = () => {
     }
   };
 
+  const fetchChartData = async () => {
+    try {
+      // 1. Usuarios sin verificar
+      const unverifiedUsersQuery = query(
+        collection(db, "users"),
+        where("isVerified", "==", false)
+      );
+      const unverifiedSnapshot = await getDocs(unverifiedUsersQuery);
+      const unverifiedCount = unverifiedSnapshot.size;
+
+      setUnverifiedUsersData({
+        labels: ["Usuarios sin verificar"],
+        datasets: [
+          {
+            label: "Usuarios sin verificar",
+            data: [unverifiedCount],
+            backgroundColor: "rgba(255, 99, 132, 0.6)",
+            borderColor: "rgba(255, 99, 132, 1)",
+            borderWidth: 1,
+          },
+        ],
+      });
+
+      // 2. Categoría más usada
+      const categoryCount = {};
+      const entriesSnapshot = await getDocs(collection(db, "entradas"));
+
+      entriesSnapshot.forEach((doc) => {
+        const data = doc.data();
+        const categoria = data.categoria || "Sin categoría";
+        if (categoryCount[categoria]) {
+          categoryCount[categoria]++;
+        } else {
+          categoryCount[categoria] = 1;
+        }
+      });
+
+      setCategoryData({
+        labels: Object.keys(categoryCount),
+        datasets: [
+          {
+            label: "Categorías Usadas",
+            data: Object.values(categoryCount),
+            backgroundColor: [
+              "#FF6384",
+              "#36A2EB",
+              "#FFCE56",
+              "#4BC0C0",
+              "#9966FF",
+              "#FF9F40",
+            ],
+            hoverBackgroundColor: [
+              "#FF6384",
+              "#36A2EB",
+              "#FFCE56",
+              "#4BC0C0",
+              "#9966FF",
+              "#FF9F40",
+            ],
+          },
+        ],
+      });
+
+      // 3. Pico de creaciones (por día)
+      const dailyCreations = {};
+      entriesSnapshot.forEach((doc) => {
+        const fechaCreacion = doc.data().fechaCreacion.toDate();
+        const dia = fechaCreacion.toLocaleDateString();
+        if (dailyCreations[dia]) {
+          dailyCreations[dia]++;
+        } else {
+          dailyCreations[dia] = 1;
+        }
+      });
+
+      setCreationPeakData({
+        labels: Object.keys(dailyCreations),
+        datasets: [
+          {
+            label: "Pico de Creaciones por Día",
+            data: Object.values(dailyCreations),
+            backgroundColor: "rgba(75,192,192,0.4)",
+            borderColor: "rgba(75,192,192,1)",
+            borderWidth: 1,
+          },
+        ],
+      });
+    } catch (error) {
+      console.error("Error obteniendo datos de los gráficos:", error);
+    }
+  };
+
   useEffect(() => {
     fetchData();
+    fetchChartData();
   }, []);
+
+  const handleButtonClick = (chartType) => {
+    setSelectedChart(chartType);
+  };
 
   return (
     <Container>
@@ -74,15 +176,11 @@ const Dashboard = () => {
         <div className="dashboard-content">
           <div className="notifi-area">
             <h1>notificaciones por responder</h1>
-            <p>soy un usuario molesto</p>
-            <p>soy un usuario molesto</p>
-            <p>soy un usuario molesto</p>
-            <p>soy un usuario molesto</p> 
-            <p>soy un usuario molesto</p> 
-            <p>soy un usuario molesto</p> 
+            <p>soy un usuario molesto1</p>
+            <p>soy un usuario molesto2</p>
           </div>
           <div className="dash-music">
-            <h1>seria el artista mas escuhcado segun los usuarios</h1>
+            <h1>seria el artista mas escuchado segun los usuarios</h1>
           </div>
           <div className="dashboard-grid">
             <div className="simple-card">
@@ -102,12 +200,32 @@ const Dashboard = () => {
               <p className="simple-value">{stats.dailyUserActivity}</p>
             </div>
           </div>
-          <div className="dash-col">
+          <div className="dash-chart-container">
             <h1>Información Adicional</h1>
-            <p>En este punto debemos introducir estadísticas operativas.</p>
-            <p>Artista más escuchado, según información de usuarios.</p>
-            <p>Emoción más fuerte del mes.</p>
-            <p>Separación lateral: | Gestión de usuarios y consultorías | Gráficos y estadísticas.</p>
+            {selectedChart === "unverifiedUsers" && unverifiedUsersData && (
+              <div className="chart-content chart-unverified-users">
+                <h2>Usuarios sin Verificar</h2>
+                <Bar data={unverifiedUsersData} />
+              </div>
+            )}
+            {selectedChart === "categoryUsage" && categoryData && (
+              <div className="chart-content chart-category-usage">
+                <h2>Categoría Más Usada</h2>
+                <Pie data={categoryData} />
+              </div>
+            )}
+            {selectedChart === "creationPeak" && creationPeakData && (
+              <div className="chart-content chart-creation-peak">
+                <h2>Pico de Creaciones</h2>
+                <Line data={creationPeakData} />
+              </div>
+            )}
+          </div>
+          <div className="btn-functions">
+            <h1>Seleccione un gráfico para ver a la izquierda</h1>
+            <button className="btn-perso" onClick={() => handleButtonClick("unverifiedUsers")}>Usuarios sin verificar</button>
+            <button className="btn-perso" onClick={() => handleButtonClick("categoryUsage")}>Categoría más usada</button>
+            <button className="btn-perso" onClick={() => handleButtonClick("creationPeak")}>Pico de creaciones</button>
           </div>
         </div>
       </div>

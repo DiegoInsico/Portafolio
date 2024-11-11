@@ -18,7 +18,8 @@
   padding-top: 77.2px;
   background-image: url('../img/arbol.svg');
   background-size: cover;
-  background-color: #00000088;
+  /* background-color: #00000088; */
+  background-color: rgb(241, 240, 238);
   background-position: center;
   color: #ffffff;
   width: calc(100% );

@@ -1,10 +1,12 @@
 .dashboard-container {
   text-align: center;
-  background-color: rgba(255, 255, 255, 0.397);
+  background-color: rgba(255, 255, 255, 0.1); 
   padding: 10px;
   width: 98%;
+  height: 100vh;
   border-radius: 10px;
   font-family: Arial, sans-serif;
+  color: #fff;
 }
 
 .dashboard-content {
@@ -12,37 +14,56 @@
   grid-template-areas:
     "notifi main right"
     "dash-music main right";
-  /* Ajusta las proporciones de las columnas para darle más espacio a notifi y dash-music */
-  grid-template-columns: 1.5fr 1.5fr 1.4fr;
+  grid-template-columns: 1.5fr 1.5fr 1.5fr 1fr;
   gap: 20px;
   width: 100%;
+  padding: 10px;
+  border-radius: 10px;
 }
 
 .notifi-area {
   grid-area: notifi;
-  max-height: 70%;
-  overflow-y: auto;
-  background-color: red;
-  border: 1px solid #ffa726;
-  border-radius: 5px;
-  padding: 10px;
+  max-height: 30vh; 
+  overflow-y: auto; 
+  background-color: #ffffffdc;
+  backdrop-filter: blur(5px);
+  color: #ffffff;
+  border: 1px solid #ffa82691;
+  border-radius: 25px;
+
+  position: relative;
 }
 
-.notifi-area h3{
-  text-align: center;
-  font-size: 24px;
-  color: #ffa726;
-  margin-bottom: 20px;
+.notifi-area h1 {
   position: sticky;
   top: 0;
-  background-color: #1e1e2f;
+  background-color: #f7f7f7; 
+  color: #ffa726;
+  padding: 20px 0;
+  margin: 0;
   z-index: 2;
-  padding: 10px 0;
+  border-bottom: 1px solid #ff9900; 
 }
 
 .notifi-area p {
-  font-size: 10px;
-  color: black;
+  font-size: 12px;
+  margin-top: 10px;
+  color: #ff9900; /* Texto blanco */
+}
+
+/* Scroll personalizado para el área de notificaciones */
+.notifi-area::-webkit-scrollbar {
+  width: 15px;
+  background-color: #1e1e2f; /* Fondo oscuro del scroll */
+}
+
+.notifi-area::-webkit-scrollbar-thumb {
+  background-color: #ffffff; /* Pulgar del scroll */
+  border-radius: 4px;
+}
+
+.notifi-area::-webkit-scrollbar-thumb:hover {
+  background-color: #777777;
 }
 
 .dash-music {
@@ -62,7 +83,7 @@
   flex-wrap: wrap;
   gap: 20px;
   align-items: center;
-  background-color: rgba(239, 8, 8, 0.923);
+  /* background-color: rgba(239, 8, 8, 0.923); */
   border-radius: 30px;
   padding-left: 30px;
 }
@@ -81,11 +102,11 @@
 .simple-card h3{
   margin-top: 10px;
   font-size: 30px;
-  color: black;
+  color: #ff9900;
 }
 
 .simple-value{
-  color: black;
+  color: #ff9900;
   font-size: 25px;
 }
 
@@ -95,4 +116,96 @@
   border-radius: 20px;
   padding: 20px;
   text-align: left;
+}
+
+
+/* boton personalizado */
+/* From Uiverse.io by barisdogansutcu */ 
+.btn-funtions{
+  background-color: rgba(255, 245, 245, 0.582);
+  display: flex;
+  gap: 17px;
+  flex-direction: column;
+}
+
+
+.btn-perso {
+  padding: 17px 40px;
+  border-radius: 50px;
+  cursor: pointer;
+  border: 0;
+  background-color: rgb(0, 0, 0);
+  box-shadow: rgb(0 0 0 / 5%) 0 0 8px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  font-size: 15px;
+  transition: all 0.5s ease;
+}
+
+.btn-perso:hover {
+  letter-spacing: 3px;
+  background-color: hsl(261deg 80% 48%);
+  color: hsl(0, 0%, 100%);
+  box-shadow: rgb(93 24 220) 0px 7px 29px 0px;
+}
+
+.btn-perso:active {
+  letter-spacing: 3px;
+  background-color: hsl(261deg 80% 48%);
+  color: hsl(0, 0%, 100%);
+  box-shadow: rgb(93 24 220) 0px 0px 0px 0px;
+  transform: translateY(10px);
+  transition: 100ms;
+}
+
+
+/* graficos */
+.dash-chart-container {
+  grid-area: right;
+  background-color: #282c3448;
+  border-radius: 20px;
+  padding: 20px;
+  text-align: center;
+  color: #ffffff;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.9);
+    backdrop-filter: blur(5px);
+}
+
+.chart-content {
+  margin-top: 20px;
+  padding: 15px;
+  border-radius: 10px;
+  background-color: #333842;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.chart-unverified-users h2,
+.chart-category-usage h2,
+.chart-creation-peak h2 {
+  color: #ffa726;
+  font-size: 20px;
+  margin-bottom: 15px;
+}
+
+.btn-functions {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  padding: 20px;
+}
+
+.btn-perso {
+  padding: 12px 30px;
+  border-radius: 50px;
+  cursor: pointer;
+  border: 0;
+  background-color: #ffa726;
+  color: #ffffff;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.btn-perso:hover {
+  background-color: #ff9900;
+  box-shadow: 0px 4px 10px rgba(255, 153, 0, 0.6);
 }
