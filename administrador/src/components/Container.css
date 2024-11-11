@@ -10,18 +10,18 @@
     padding-bottom: 100px;  
     overflow-y: auto;
     box-sizing: border-box;
-    padding-left: 70px;
+    padding-left: 50px;
+    padding-right: 65px;
   }
   
   
 .content {
   padding-top: 77.2px;
-  background-image: url('../img/arbol.svg');
+  background-image: url('../img/otroarbol.webp');
   background-size: cover;
   /* background-color: #00000088; */
-  background-color: rgb(241, 240, 238);
+  background-color: rgb(190, 190, 190);
   background-position: center;
-  color: #ffffff;
   width: calc(100% );
   transition: margin-left 0.3s ease;
 }

@@ -16,6 +16,7 @@ import SoulmatePage from "./pages/monitor/soulmatePage";
 import Inbox from "./pages/system/inbox";
 import Test from "./pages/test/test";
 import Clouster from "./pages/monitor/clouster";
+import RightBar from "./components/rightBar";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -53,6 +54,7 @@ function App() {
 const AppRoutes = ({ isAuthenticated, currentUser, handleLogin }) => {
   return (
     <MainLayout isAuthenticated={isAuthenticated} currentUser={currentUser}>
+      {isAuthenticated && <RightBar />}  {/* Añade esta línea */}
       <Routes>
         {/* Ruta de Login */}
         <Route path="/login" element={<LoginPage onLogin={handleLogin} />} />

@@ -35,10 +35,6 @@ const MainLayout = ({ children, isAuthenticated, currentUser }) => {
               <ListAltIcon className="icon" />
               <span className="sidebar-number">|</span> Gestión de Entradas
             </NavLink>
-            <NavLink to="/monitor/users/userActivity">
-              <PeopleIcon className="icon" />
-              <span className="sidebar-number">|</span> Gestión de Usuarios
-            </NavLink>
             <NavLink to="/monitor/graphics">
               <BarChartIcon className="icon" />
               <span className="sidebar-number">|</span> Ver Gráficos
@@ -50,14 +46,6 @@ const MainLayout = ({ children, isAuthenticated, currentUser }) => {
             <NavLink to="/monitor/SoulmatePage">
               <MusicNoteIcon className="icon" />
               <span className="sidebar-number">|</span> Lista de Emociones y Canciones
-            </NavLink>
-            <NavLink to="/monitor/Clouster">
-              <GroupIcon className="icon" />
-              <span className="sidebar-number">|</span> Clúster de Usuarios
-            </NavLink>
-            <NavLink to="/system/inbox">
-              <InboxIcon className="icon" />
-              <span className="sidebar-number">|</span> Consultas
             </NavLink>
             <NavLink to="/test">
               <BugReportIcon className="icon" />

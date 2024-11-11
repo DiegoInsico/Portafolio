@@ -1,37 +1,103 @@
-@import url('https://fonts.googleapis.com/css2?family=Fairwater+Script&display=swap');
+@import url('https://fonts.googleapis.com/css?family=Tangerine');
+
+/* Configuración general del TopBar */
 .topbar {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr; /* Distribuye en tres columnas */
+  align-items: center;
+  background-color: #eeecec00;
+  backdrop-filter: blur(5px);
+  width: 100%;
+  position: fixed;
+  z-index: 5;
+  padding: 10px;
+}
+
+/* Columna de usuario */
+.topbar-user {
+  color: #1f1c17;
+  font-size: 40px;
+  font-family: 'Tangerine', serif;
+  margin-left: 20px;
+  justify-self: start; /* Alinea al inicio de la columna izquierda */
+}
+
+/* Columna de título */
+.topbar-title {
+  font-family: 'Tangerine', serif;
+  font-size: 58px;
+  margin: 0;
+  color: #000000;
+  text-align: center;
+  justify-self: center; /* Centra el título en la columna */
+}
+
+/* Columna de botón (Logout) */
+.Btn {
   display: flex;
   align-items: center;
-  background-color: #00000084;
-  width: 100%; /* Para que ocupe todo el ancho */
-  position: fixed;
-  z-index: 10;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.topbar-user {
-  color: #ffb74d;
-  font-size: 30px; /* Tamaño más grande para administrador */
-  font-family: 'sans-serif', cursive;
-  margin-left: 20px;
-}
-
-.topbar-title {
-  font-family: 'sans-serif', cursive;
-  font-size: 28px;
-  color: #ffb74d;
-  text-align: center;
-  flex-grow: 1;
-}
-
-.logout-button {
-  color: #f8f8f8;
-  background-color: rgb(255, 30, 5);
+  justify-content: flex-start;
+  width: 90px;
+  height: 50px;
   border: none;
+  border-radius: 40%;
   cursor: pointer;
-  font-size: 16px;
-  width: 10%;
-  margin-right: 2%;
-  text-align: center;
+  position: relative;
+  overflow: hidden;
+  transition-duration: .3s;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.199);
+  background-color: rgb(255, 65, 65);
+  justify-self: end;
+  margin-right: 50px;
+}
+
+/* Plus sign */
+.sign {
+  width: 100px;
+  transition-duration: .3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sign svg {
+  width: 17px;
+}
+
+.sign svg path {
+  fill: white;
+}
+
+/* Text */
+.text {
+  right: 0;
+  width: 0;
+  opacity: 0;
+  color: white;
+  font-size: 1.2em;
+  font-weight: 600;
+  transition-duration: .3s;
+}
+
+/* Hover effect on button width */
+.Btn:hover {
+  width: 125px;
+  border-radius: 40px;
+}
+
+/* Hover effect button's text */
+.Btn:hover .sign {
+  width: 30%;
+  padding-left: 5px;
+}
+
+.Btn:hover .text {
+  opacity: 1;
+  width: 70%;
+  padding-right: 10px;
+}
+
+/* Button click effect */
+.Btn:active {
+  transform: translate(2px, 2px);
 }

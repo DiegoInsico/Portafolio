@@ -15,11 +15,46 @@ const Dashboard = () => {
     entriesUploaded: 0,
     dailyUserActivity: 0,
   });
+  const [mostPlayedSongs, setMostPlayedSongs] = useState([]);
 
+  useEffect(() => {
+    const fetchMostPlayedSongs = async () => {
+      try {
+        const snapshot = await getDocs(collection(db, "entradas"));
+        const songCounts = {};
+
+        snapshot.forEach((doc) => {
+          const data = doc.data();
+          if (data.cancion) {
+            const songId = `${data.cancion.artist}-${data.cancion.name}`;
+            if (!songCounts[songId]) {
+              songCounts[songId] = {
+                artist: data.cancion.artist,
+                name: data.cancion.name,
+                albumImage: data.cancion.albumImage,
+                count: 0,
+              };
+            }
+            songCounts[songId].count += 1;
+          }
+        });
+
+        // Get top 2 most played songs
+        const sortedSongs = Object.values(songCounts).sort((a, b) => b.count - a.count);
+        setMostPlayedSongs(sortedSongs.slice(0, 2));
+      } catch (error) {
+        console.error("Error fetching most played songs:", error);
+      }
+    };
+
+    fetchMostPlayedSongs();
+  }, []);
   const [unverifiedUsersData, setUnverifiedUsersData] = useState(null);
   const [categoryData, setCategoryData] = useState(null);
   const [creationPeakData, setCreationPeakData] = useState(null);
-  const [selectedChart, setSelectedChart] = useState("none"); // Control de gráficos visibles
+  const [selectedChart, setSelectedChart] = useState("creationPeak");
+
+
 
   const formatDate = (timestamp) => {
     if (timestamp instanceof Timestamp) {
@@ -172,16 +207,48 @@ const Dashboard = () => {
   return (
     <Container>
       <div className="dashboard-container">
-        <h1>Dashboard</h1>
         <div className="dashboard-content">
+          <h1 className="dash-tittle">Dashboard</h1>
           <div className="notifi-area">
             <h1>notificaciones por responder</h1>
-            <p>soy un usuario molesto1</p>
+            <p>soy un usuario molesto primero</p>
             <p>soy un usuario molesto2</p>
+            <p>soy un usuario molesto2</p>
+            <p>soy un usuario molesto2</p>
+            <p>soy un usuario molesto2</p>
+            <p>soy un usuario molesto2</p>
+            <p>soy un usuario molesto2</p>
+            <p>soy un usuario molesto2</p>
+            <p>soy un usuario molesto ultimo</p>
           </div>
+
           <div className="dash-music">
-            <h1>seria el artista mas escuchado segun los usuarios</h1>
+            <h1>Artistas más escuchados:</h1>
+            {mostPlayedSongs.length > 0 ? (
+              mostPlayedSongs.map((song, index) => (
+                <div className="loader" key={index}>
+                  <div className="song">
+                    <p className="name">{song.name}</p>
+                    <p className="artist">{song.artist}</p>
+                  </div>
+                  <div className="albumcover">
+                    {song.albumImage && (
+                      <img src={song.albumImage} alt={song.name} className="album-img" />
+                    )}
+                  </div>
+                  <div className="loading">
+                    <div className="load"></div>
+                    <div className="load"></div>
+                    <div className="load"></div>
+                    <div className="load"></div>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <p>Cargando artistas más escuchados...</p>
+            )}
           </div>
+
           <div className="dashboard-grid">
             <div className="simple-card">
               <h3>Usuarios Activos</h3>
