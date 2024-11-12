@@ -16,9 +16,6 @@ web-build/
 *.key
 *.mobileprovision
 
-package.json
-package-lock.json
-
 # Metro
 .metro-health-check*
 
@@ -31,9 +28,8 @@ yarn-error.*
 .DS_Store
 *.pem
 
+# local env files
+.env*.local
 
 # typescript
 *.tsbuildinfo
-
-# local env files
-.env*.local

@@ -25,7 +25,8 @@ export default function SideBar({
   navigateToSettings,
   navigateToTestigos,
   navigateToBeneficiarios,
-  navigateToProgramarMensaje
+  navigateToProgramarMensaje,
+  navigateToSoporte, // Nueva función de navegación
 }) {
   const { user, userData, loading } = useContext(AuthContext);
   const [selected, setSelected] = useState("");
@@ -232,6 +233,26 @@ export default function SideBar({
             <Text style={styles.drawerButtonText}>Configuración</Text>
           </TouchableOpacity>
 
+          {/* Soporte */}
+          <TouchableOpacity
+            style={[
+              styles.drawerButton,
+              selected === "Soporte" && styles.selectedButton,
+            ]}
+            onPress={() => {
+              setSelected("Soporte");
+              navigateToSoporte(); // Función de navegación a Soporte
+              toggleSidebar();
+            }}
+          >
+            <FontAwesome
+              name="ticket"
+              size={20}
+              color={selected === "Soporte" ? "#FFD700" : "#fff"}
+            />
+            <Text style={styles.drawerButtonText}>Soporte</Text>
+          </TouchableOpacity>
+
           {/* Cerrar Sesión */}
           <TouchableOpacity
             style={[
@@ -273,6 +294,7 @@ SideBar.propTypes = {
   navigateToTestigos: PropTypes.func.isRequired,
   navigateToBeneficiarios: PropTypes.func.isRequired,
   navigateToProgramarMensaje: PropTypes.func.isRequired,
+  navigateToSoporte: PropTypes.func.isRequired, // Añadir PropType para Soporte
 };
 
 const styles = StyleSheet.create({

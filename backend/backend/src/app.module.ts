@@ -9,6 +9,7 @@ import { ProgramarMensajeModule } from './programar-mensaje/programar-mensaje.mo
 import { EmailModule } from './services/email/email.module';
 import { FirestoreModule } from './services/firestore/firestore.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { PaymentModule } from './payment/payment.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     ProgramarMensajeModule,
     EmailModule,
     FirestoreModule,
+    PaymentModule,
   ],
   controllers: [AppController],
   providers: [AppService],

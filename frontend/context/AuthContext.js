@@ -10,6 +10,7 @@ export const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [userData, setUserData] = useState(null);
+  const [isPremium, setIsPremium] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -21,16 +22,20 @@ export const AuthProvider = ({ children }) => {
           const userDoc = await getDoc(userDocRef);
           if (userDoc.exists()) {
             setUserData(userDoc.data());
+            setIsPremium(userDoc.data().isPremium); // Asegúrate de tener este campo
           } else {
             setUserData(null);
+            setIsPremium(false);
           }
         } catch (error) {
           console.error("Error obteniendo datos del usuario:", error);
           setUserData(null);
+          setIsPremium(false);
         }
       } else {
         setUser(null);
         setUserData(null);
+        setIsPremium(false);
       }
       setLoading(false);
     });
@@ -38,8 +43,9 @@ export const AuthProvider = ({ children }) => {
     return () => unsubscribe();
   }, []);
 
+
   return (
-    <AuthContext.Provider value={{ user, userData, loading }}>
+    <AuthContext.Provider value={{ user, userData, isPremium, setIsPremium, loading }}>
       {children}
     </AuthContext.Provider>
   );

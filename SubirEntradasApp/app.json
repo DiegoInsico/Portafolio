@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "frontend",
-    "slug": "frontend",
+    "name": "SubirEntradasApp",
+    "slug": "SubirEntradasApp",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -22,14 +22,6 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    },
-    "extra": {
-      "BACKEND_URL": "http://192.168.1.12:3000"
-    },
-    "plugins": [
-      "expo-font",
-      "./config/shortcutPlugin.js",
-      "react-native-video"
-    ]
+    }
   }
 }

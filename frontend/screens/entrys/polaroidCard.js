@@ -55,7 +55,6 @@ PolaroidCard.propTypes = {
         color: PropTypes.string,
         emociones: PropTypes.arrayOf(PropTypes.string),
     }).isRequired,
-    onPress: PropTypes.func.isRequired,
 };
 
 const styles = StyleSheet.create({

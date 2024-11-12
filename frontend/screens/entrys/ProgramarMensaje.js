@@ -1,9 +1,9 @@
 // ProgramarMensaje.js
-import React, { useState, useEffect } from 'react';
+
+import React, { useState, useEffect, useContext } from 'react';
 import {
   View,
   Text,
-  TextInput,
   TouchableOpacity,
   StyleSheet,
   Alert,
@@ -12,36 +12,67 @@ import {
   ImageBackground,
   Platform,
   SafeAreaView,
+  ActivityIndicator,
+  TextInput,
 } from 'react-native';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { Picker } from '@react-native-picker/picker';
 import * as ImagePicker from "expo-image-picker";
-import { db } from '../../utils/firebase'; // Asegúrate de que la ruta sea correcta
-import { collection, addDoc, getDocs, Timestamp  } from 'firebase/firestore';
-import CustomSwitch from "../../components/ui/SwitchButton"; // Asegúrate de que la ruta sea correcta
+import { db } from '../../utils/firebase';
+import { collection, addDoc, getDocs, Timestamp } from 'firebase/firestore';
+import CustomSwitch from "../../components/ui/SwitchButton";
 import { MaterialIcons } from "@expo/vector-icons";
 import axios from "axios";
 import PropTypes from 'prop-types';
-import { Audio, Video } from 'expo-av'; // Importa Video junto con Audio
+import { Audio, Video } from 'expo-av';
+import { AuthContext } from '../../context/AuthContext';
+import PremiumMessage from './../suscripcion/PremiumMessage'; 
+import { commonStyles } from '../../styles/commonStyles.js'; // Asegúrate de ajustar la ruta según tu estructura
 
-const ProgramarMensaje = ({ navigation }) => { // Recibe navigation como prop
+const ProgramarMensaje = ({ navigation }) => {
+  const { user, isPremium, loading } = useContext(AuthContext);
+
   const [beneficiarios, setBeneficiarios] = useState([]);
   const [selectedBeneficiary, setSelectedBeneficiary] = useState('');
   const [date, setDate] = useState(new Date());
   const [isDatePickerVisible, setIsDatePickerVisible] = useState(false);
   const [messageText, setMessageText] = useState('');
   const [isAudioMode, setIsAudioMode] = useState(false);
-  const [isSpotifyMode, setIsSpotifyMode] = useState(false);
   const [media, setMedia] = useState(null);
   const [mediaType, setMediaType] = useState(null);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [spotifyResults, setSpotifyResults] = useState([]);
-  
-  // Estados para grabación de audio
-  const [recording, setRecording] = useState(null);
   const [audioUri, setAudioUri] = useState(null);
+  const [recording, setRecording] = useState(null);
   const [isRecording, setIsRecording] = useState(false);
 
+  // Mostrar indicador de carga mientras se verifica el estado premium
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#FFD700" />
+      </View>
+    );
+  }
+
+  // Verificar si el usuario está autenticado
+  if (!user) {
+    return (
+      <View style={styles.centerContainer}>
+        <Text style={styles.messageText}>
+          Debes iniciar sesión para acceder a esta funcionalidad.
+        </Text>
+        <TouchableOpacity onPress={() => navigation.navigate('Login')} style={styles.button}>
+          <Text style={styles.buttonText}>Ir a Iniciar Sesión</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
+  // Verificar si el usuario es premium
+  if (!isPremium) {
+    return <PremiumMessage navigation={navigation} />;
+  }
+
+  // Continuar con la funcionalidad si es premium
   useEffect(() => {
     const fetchBeneficiarios = async () => {
       try {
@@ -63,14 +94,12 @@ const ProgramarMensaje = ({ navigation }) => { // Recibe navigation como prop
   // Funciones para grabar audio
   const startRecording = async () => {
     try {
-      console.log('Solicitando permisos de audio...');
       const { status } = await Audio.requestPermissionsAsync();
       if (status !== 'granted') {
         Alert.alert('Permiso necesario', 'Se necesitan permisos para grabar audio.');
         return;
       }
 
-      console.log('Iniciando grabación...');
       await Audio.setAudioModeAsync({
         allowsRecordingIOS: true,
         playsInSilentModeIOS: true,
@@ -81,7 +110,6 @@ const ProgramarMensaje = ({ navigation }) => { // Recibe navigation como prop
       );
       setRecording(recording);
       setIsRecording(true);
-      console.log('Grabación iniciada');
     } catch (err) {
       console.error('Fallo al iniciar la grabación', err);
       Alert.alert('Error', 'No se pudo iniciar la grabación.');
@@ -90,14 +118,11 @@ const ProgramarMensaje = ({ navigation }) => { // Recibe navigation como prop
 
   const stopRecording = async () => {
     try {
-      console.log('Deteniendo grabación...');
-      setRecording(undefined);
-      setIsRecording(false);
       await recording.stopAndUnloadAsync();
-      
       const uri = recording.getURI(); 
       setAudioUri(uri);
-      console.log('Grabación detenida y almacenada en', uri);
+      setRecording(null);
+      setIsRecording(false);
     } catch (error) {
       console.error('Error al detener la grabación', error);
       Alert.alert('Error', 'No se pudo detener la grabación.');
@@ -110,7 +135,6 @@ const ProgramarMensaje = ({ navigation }) => { // Recibe navigation como prop
       return;
     }
 
-    // Encontrar el beneficiario seleccionado para obtener su email
     const selectedBeneficiaryData = beneficiarios.find(b => b.id === selectedBeneficiary);
     const email = selectedBeneficiaryData?.email;
 
@@ -122,16 +146,16 @@ const ProgramarMensaje = ({ navigation }) => { // Recibe navigation como prop
     try {
       await addDoc(collection(db, 'mensajesProgramados'), {
         beneficiarioId: selectedBeneficiary,
-        email: email, // Añadir el campo email
+        email: email,
         mensaje: messageText,
-        fechaEnvio: Timestamp.fromDate(date), // Convertir 'date' a Timestamp
+        fechaEnvio: Timestamp.fromDate(date),
         media: media || audioUri,
         mediaType: mediaType || (audioUri ? 'audio' : null),
-        enviado: false, // Inicialmente, el mensaje no está enviado
+        enviado: false,
       });
       Alert.alert('Éxito', 'Mensaje programado correctamente.');
       resetStates();
-      navigation.goBack(); // Navega de vuelta a la pantalla anterior
+      navigation.goBack();
     } catch (error) {
       console.error('Error al programar el mensaje:', error);
       Alert.alert('Error', 'No se pudo programar el mensaje.');
@@ -143,14 +167,11 @@ const ProgramarMensaje = ({ navigation }) => { // Recibe navigation como prop
     setDate(new Date());
     setMessageText('');
     setIsAudioMode(false);
-    setIsSpotifyMode(false);
     setMedia(null);
     setMediaType(null);
     setAudioUri(null);
     setRecording(null);
     setIsRecording(false);
-    setSearchQuery('');
-    setSpotifyResults([]);
   };
 
   const seleccionarMedia = async () => {
@@ -183,15 +204,13 @@ const ProgramarMensaje = ({ navigation }) => { // Recibe navigation como prop
     }
   };
 
-  const buscarCancionesSpotify = async (query) => {
+  const handlePlayAudio = async () => {
     try {
-      const response = await axios.get(`http://192.168.1.12:3000/spotify/search`, {
-        params: { query },
-      });
-      setSpotifyResults(response.data);
+      const { sound } = await Audio.Sound.createAsync({ uri: audioUri });
+      await sound.playAsync();
     } catch (error) {
-      console.error("Error al buscar canciones en Spotify:", error);
-      Alert.alert("Error", "No se pudo buscar canciones en Spotify.");
+      console.error("Error al reproducir el audio:", error);
+      Alert.alert("Error", "No se pudo reproducir el audio.");
     }
   };
 
@@ -228,8 +247,7 @@ const ProgramarMensaje = ({ navigation }) => { // Recibe navigation como prop
                 selectedValue={selectedBeneficiary}
                 onValueChange={(itemValue) => setSelectedBeneficiary(itemValue)}
                 style={styles.picker}
-                itemStyle={styles.pickerItem} // Para Android
-                dropdownIconColor="#FFD700" // Icono del Picker en dorado
+                dropdownIconColor="#FFD700"
               >
                 <Picker.Item label="Selecciona un beneficiario" value="" />
                 {beneficiarios.map(beneficiary => (
@@ -258,18 +276,18 @@ const ProgramarMensaje = ({ navigation }) => { // Recibe navigation como prop
               style={styles.switchItem}
               option1="Texto"
               option2="Audio"
-              color1="#FFD700" // Color dorado para opción 1
-              color2="#FFD700" // Color dorado para opción 2
+              color1="#FFD700"
+              color2="#FFD700"
               value={isAudioMode}
               onSwitch={(value) => {
                 setIsAudioMode(value);
                 setMessageText('');
-                eliminarMedia(); // Limpia media y audio al cambiar
+                eliminarMedia();
               }}
             />
 
             {/* Selector de Media */}
-            {!isAudioMode && !isSpotifyMode && (
+            {!isAudioMode && (
               <TouchableOpacity style={styles.iconButton} onPress={seleccionarMedia}>
                 <MaterialIcons name="add-photo-alternate" size={40} color="#FFD700" />
                 <Text style={styles.iconButtonText}>Añadir Imagen / Video</Text>
@@ -319,78 +337,11 @@ const ProgramarMensaje = ({ navigation }) => { // Recibe navigation como prop
                 {audioUri && (
                   <View style={styles.audioPreview}>
                     <Text style={styles.audioText}>Audio grabado:</Text>
-                    <TouchableOpacity 
-                      onPress={() => {
-                        Audio.Sound.createAsync({ uri: audioUri })
-                          .then(({ sound }) => {
-                            sound.playAsync();
-                          })
-                          .catch(error => {
-                            console.error("Error al reproducir el audio:", error);
-                            Alert.alert("Error", "No se pudo reproducir el audio.");
-                          });
-                      }}
-                    >
+                    <TouchableOpacity onPress={handlePlayAudio}>
                       <Text style={styles.audioPlayText}>Reproducir Audio</Text>
                     </TouchableOpacity>
                   </View>
                 )}
-              </View>
-            )}
-
-            {/* Switch entre Galería/Video y Spotify */}
-            <CustomSwitch
-              style={styles.switchItem}
-              option1="Galería"
-              option2="Spotify"
-              color1="#FFD700" // Color dorado para opción 1
-              color2="#FFD700" // Color dorado para opción 2
-              value={isSpotifyMode}
-              onSwitch={(value) => {
-                setIsSpotifyMode(value);
-                if (value) {
-                  eliminarMedia(); // Limpia cualquier media seleccionada
-                  setMessageText(''); // Limpia mensaje de texto si es necesario
-                }
-              }}
-            />
-
-            {/* Campo de búsqueda para Spotify */}
-            {isSpotifyMode && (
-              <TextInput
-                style={styles.input}
-                placeholder="Buscar canción en Spotify"
-                placeholderTextColor="#888"
-                value={searchQuery}
-                onChangeText={(text) => {
-                  setSearchQuery(text);
-                  if (text.length > 2) {
-                    buscarCancionesSpotify(text);
-                  } else {
-                    setSpotifyResults([]);
-                  }
-                }}
-              />
-            )}
-
-            {/* Mostrar resultados de Spotify */}
-            {isSpotifyMode && spotifyResults.length > 0 && (
-              <View style={styles.spotifyResultsContainer}>
-                <ScrollView style={styles.spotifyResults}>
-                  {spotifyResults.map((track) => (
-                    <TouchableOpacity
-                      key={track.id}
-                      style={styles.spotifyItem}
-                      onPress={() => {
-                        setMessageText(`🎵 ${track.name} - ${track.artist}`);
-                        setSpotifyResults([]);
-                        setIsSpotifyMode(false); // Opcional: cerrar Spotify mode
-                      }}
-                    >
-                      <Text style={styles.spotifyText}>{track.name} - {track.artist}</Text>
-                    </TouchableOpacity>
-                  ))}
-                </ScrollView>
               </View>
             )}
 
@@ -419,7 +370,7 @@ const ProgramarMensaje = ({ navigation }) => { // Recibe navigation como prop
               <TouchableOpacity style={styles.saveButton} onPress={handleSaveMessage}>
                 <Text style={styles.buttonText}>Guardar</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.cancelButton} onPress={() => navigation.goBack()}>
+              <TouchableOpacity style={styles.cancelButtonMain} onPress={() => navigation.goBack()}>
                 <Text style={styles.buttonText}>Cancelar</Text>
               </TouchableOpacity>
             </View>
@@ -432,10 +383,10 @@ const ProgramarMensaje = ({ navigation }) => { // Recibe navigation como prop
 
 // Validación de Props usando PropTypes
 ProgramarMensaje.propTypes = {
-  navigation: PropTypes.object.isRequired, // Asegura que navigation es un objeto
+  navigation: PropTypes.object.isRequired,
 };
 
-// Definición de estilos
+// Definición de estilos específicos para ProgramarMensaje
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
@@ -459,6 +410,67 @@ const styles = StyleSheet.create({
     padding: 20,
     alignItems: "center",
     width: '100%',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  centerContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  messageText: {
+    fontSize: 18,
+    textAlign: 'center',
+    color: '#FFD700',
+    marginBottom: 20,
+  },
+  button: {
+    backgroundColor: '#FFD700',
+    padding: 15,
+    borderRadius: 8,
+    width: '80%',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  saveButton: {
+    backgroundColor: "#FFD700", // Fondo dorado
+    padding: 10,
+    borderRadius: 8,
+    flex: 1,
+    marginRight: 5,
+    alignItems: 'center',
+  },
+  cancelButtonMain: {
+    backgroundColor: "#E74C3C", // Fondo rojo para contraste
+    padding: 10,
+    borderRadius: 8,
+    flex: 1,
+    marginLeft: 5,
+    alignItems: 'center',
+  },
+  subscribeButton: {
+    // Este estilo ahora se maneja en commonStyles
+  },
+  subscribeButtonText: {
+    // Este estilo ahora se maneja en commonStyles
+  },
+  cancelButton: {
+    // Este estilo ahora se maneja en commonStyles
+  },
+  cancelButtonText: {
+    // Este estilo ahora se maneja en commonStyles
+  },
+  buttonText: {
+    color: '#1E1E1E',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  premiumIcon: {
+    // Este estilo ahora se maneja en commonStyles
   },
   title: {
     fontSize: 24,
@@ -618,25 +630,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     marginTop: 10,
     width: "100%",
-  },
-  saveButton: {
-    backgroundColor: "#FFD700", // Fondo dorado
-    padding: 10,
-    borderRadius: 8,
-    flex: 1,
-    marginRight: 5,
-  },
-  cancelButton: {
-    backgroundColor: "#E74C3C", // Fondo rojo para contraste
-    padding: 10,
-    borderRadius: 8,
-    flex: 1,
-    marginLeft: 5,
-  },
-  buttonText: {
-    color: "#1E1E1E", // Texto oscuro para contraste
-    textAlign: "center",
-    fontWeight: "600",
   },
 });
 

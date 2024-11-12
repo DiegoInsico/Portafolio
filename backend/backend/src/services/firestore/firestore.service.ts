@@ -44,4 +44,17 @@ export class FirestoreService {
       throw error;
     }
   }
+
+  // **Nuevo Método**: Actualiza el estado Premium de un usuario
+  async updateUserPremiumStatus(userId: string, isPremium: boolean): Promise<void> {
+    try {
+      await this.db.collection('users').doc(userId).update({
+        isPremium,
+      });
+      this.logger.log(`Usuario ${userId} actualizado: isPremium = ${isPremium}`);
+    } catch (error) {
+      this.logger.error(`Error al actualizar isPremium para usuario ${userId}:`, error);
+      throw error;
+    }
+  }
 }
