@@ -1,0 +1,76 @@
+.graphics-container {
+  display: grid;
+  grid-template-areas:
+    "filter-buttons"
+    "chart-section"
+    "description-section";
+  gap: 20px;
+  padding: 20px;
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+}
+
+.filter-buttons {
+  grid-area: filter-buttons;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.btn-filter {
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  border: none;
+  background-color: #ffa726;
+  color: white;
+  font-size: 14px;
+  transition: background-color 0.3s;
+}
+
+.btn-filter:hover {
+  background-color: #ff7043;
+}
+
+.chart-section {
+  grid-area: chart-section;
+  display: grid;
+  background-color: black;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.chart-item {
+  background-color: #e0e0e0;
+  padding: 20px;
+  background-color: #ffa726;
+  border-radius: 10px;
+  text-align: center;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+  width: 90%;
+  height: 80%;
+  overflow: hidden;
+}
+
+.chart-item h2 {
+  font-size: 18px;
+  color: #333;
+  margin: 0;
+}
+
+.description-section {
+  grid-area: description-section;
+  display: flex;
+  justify-content: space-around;
+  padding-top: 10px;
+}
+
+.description-section p {
+  font-size: 14px;
+  color: #555;
+  background-color: #fafafa;
+  padding: 10px;
+  border-radius: 5px;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+}

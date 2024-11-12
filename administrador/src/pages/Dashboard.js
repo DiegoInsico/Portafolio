@@ -208,7 +208,7 @@ const Dashboard = () => {
     <Container>
       <div className="dashboard-container">
         <div className="dashboard-content">
-          <h1 className="dash-tittle">Dashboard</h1>
+          {/* <h1 className="dash-tittle">Dashboard</h1> */}
           <div className="notifi-area">
             <h1>notificaciones por responder</h1>
             <p>soy un usuario molesto primero</p>

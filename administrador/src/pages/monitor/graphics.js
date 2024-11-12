@@ -1,111 +1,154 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { db } from "../../firebase";
-import { collection, getDocs, query, where } from "firebase/firestore";
-import { Timestamp } from "firebase/firestore";
+import { collection, getDocs, query, orderBy } from "firebase/firestore";
+import { Line, Pie, Bar } from "react-chartjs-2";
+import "chart.js/auto";
+import "./graphs.css";
 import Container from "../../components/container";
-import "./styles.css"; // Importa el archivo de estilos
 
 const Graphics = () => {
-  const navigate = useNavigate();
-  const [stats, setStats] = useState({
-    activeUsers: 0,
-    lastActivity: "",
-    entriesUploaded: 0,
-    dailyUserActivity: 0,
-  });
+  const [monthlyCategoryData, setMonthlyCategoryData] = useState(null);
+  const [monthlyEmotionData, setMonthlyEmotionData] = useState(null);
+  const [chartData, setChartData] = useState(null);
+  const [dailyData, setDailyData] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  const formatDate = (timestamp) => {
-    if (timestamp instanceof Timestamp) {
-      const date = timestamp.toDate();
-      return date.toLocaleString();
-    }
-    return "Fecha no disponible";
-  };
-
-  const fetchData = async () => {
+  const fetchUsageData = async () => {
     try {
-      const usersSnapshot = await getDocs(collection(db, "users"));
-      const activeUsers = usersSnapshot.size;
+      const monthlyCategories = {};
+      const monthlyEmotions = {};
+      const usageData = [];
+      const dailyUsage = {};
+      const q = query(collection(db, "entradas"), orderBy("fechaCreacion"));
+      const snapshot = await getDocs(q);
 
-      const entriesSnapshot = await getDocs(collection(db, "entradas"));
-      let lastActivity = "";
-      let entriesUploaded = 0;
-
-      entriesSnapshot.forEach((doc) => {
+      snapshot.forEach((doc) => {
         const data = doc.data();
-        entriesUploaded++;
-        if (!lastActivity || data.fechaCreacion > lastActivity) {
-          lastActivity = data.fechaCreacion;
+        const fechaCreacion = data.fechaCreacion.toDate();
+        const hora = fechaCreacion.getHours();
+        const dia = fechaCreacion.toLocaleDateString();
+        const categoria = data.categoria || "Sin categoría";
+        const emociones = data.emociones || [];
+        const month = fechaCreacion.toLocaleDateString("default", { month: "long", year: "numeric" });
+
+        if (!monthlyCategories[month]) monthlyCategories[month] = {};
+        monthlyCategories[month][categoria] = (monthlyCategories[month][categoria] || 0) + 1;
+
+        emociones.forEach((emotion) => {
+          if (!monthlyEmotions[month]) monthlyEmotions[month] = {};
+          monthlyEmotions[month][emotion] = (monthlyEmotions[month][emotion] || 0) + 1;
+        });
+
+        if (dailyUsage[dia]) {
+          dailyUsage[dia]++;
+        } else {
+          dailyUsage[dia] = 1;
         }
+        usageData.push({ hora, fechaCreacion });
       });
 
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-
-      const sessionsQuery = query(
-        collection(db, "sessions"),
-        where("timestamp", ">=", Timestamp.fromDate(today))
-      );
-
-      const sessionsSnapshot = await getDocs(sessionsQuery);
-      const dailyUserActivity = sessionsSnapshot.size;
-
-      setStats({
-        activeUsers,
-        lastActivity: formatDate(lastActivity),
-        entriesUploaded,
-        dailyUserActivity,
+      const usagePerHour = Array(24).fill(0);
+      usageData.forEach((entry) => {
+        usagePerHour[entry.hora]++;
       });
+
+      const categoryLabels = Object.keys(monthlyCategories);
+      const categoryDatasets = Object.keys(monthlyCategories[categoryLabels[0]]).map((cat) => ({
+        label: cat,
+        data: categoryLabels.map((month) => monthlyCategories[month][cat] || 0),
+        backgroundColor: `#${Math.floor(Math.random() * 16777215).toString(16)}`,
+      }));
+
+      const emotionLabels = Object.keys(monthlyEmotions);
+      const emotionDatasets = Object.keys(monthlyEmotions[emotionLabels[0]]).map((emo) => ({
+        label: emo,
+        data: emotionLabels.map((month) => monthlyEmotions[month][emo] || 0),
+        backgroundColor: `#${Math.floor(Math.random() * 16777215).toString(16)}`,
+      }));
+
+      setChartData({
+        labels: [...Array(24).keys()],
+        datasets: [
+          {
+            label: "Uso de usuarios por hora",
+            data: usagePerHour,
+            borderColor: "rgba(75,192,192,1)",
+            backgroundColor: "rgba(75,192,192,0.2)",
+            fill: true,
+          },
+        ],
+      });
+
+      setDailyData({
+        labels: Object.keys(dailyUsage),
+        datasets: [
+          {
+            label: "Uso diario de usuarios",
+            data: Object.values(dailyUsage),
+            borderColor: "rgba(54, 162, 235, 1)",
+            backgroundColor: "rgba(54, 162, 235, 0.2)",
+            fill: true,
+          },
+        ],
+      });
+
+      setMonthlyCategoryData({
+        labels: categoryLabels,
+        datasets: categoryDatasets,
+      });
+
+      setMonthlyEmotionData({
+        labels: emotionLabels,
+        datasets: emotionDatasets,
+      });
+
+      setLoading(false);
     } catch (error) {
-      console.error("Error obteniendo datos de Firebase:", error);
+      console.error("Error obteniendo datos de uso:", error);
+      setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchData();
+    fetchUsageData();
   }, []);
+
+  if (loading) return <p>Cargando datos...</p>;
 
   return (
     <Container>
-      <div className="graph-container">
-        <h1>Estadísticas y Gráficos</h1>
+      <div className="graphics-container">
+        <div className="filter-buttons">
+          <button className="btn-filter">Mostrar Categorías</button>
+          <button className="btn-filter">Mostrar Emociones</button>
+          <button className="btn-filter">Mostrar Uso por Hora</button>
+          <button className="btn-filter">Mostrar Uso Diario</button>
+        </div>
 
-        <div className="graph-grid">
-          <div className="graph-card">
-            <h3>Usuarios Activos</h3>
-            <p className="graph-value">{stats.activeUsers}</p>
+        <div className="chart-section">
+          <div className="chart-item">
+            <h2>Uso de Usuarios por Hora</h2>
+            <Line data={chartData} options={{ maintainAspectRatio: true }} />
           </div>
-          <div className="graph-card">
-            <h3>Última Actividad</h3>
-            <p className="graph-value">{stats.lastActivity}</p>
+          <div className="chart-item">
+            <h2>Uso Diario de Usuarios</h2>
+            <Line data={dailyData} options={{ maintainAspectRatio: true }} />
           </div>
-          <div className="graph-card">
-            <h3>Entradas Subidas</h3>
-            <p className="graph-value">{stats.entriesUploaded}</p>
+          <div className="chart-item">
+            <h2>Categorías por Mes</h2>
+            <Bar data={monthlyCategoryData} options={{ maintainAspectRatio: true }} />
           </div>
-          <div className="graph-card">
-            <h3>Actividad Diaria</h3>
-            <p className="graph-value">{stats.dailyUserActivity}</p>
+          <div className="chart-item">
+            <h2>Emociones por Mes</h2>
+            <Bar data={monthlyEmotionData} options={{ maintainAspectRatio: true }} />
           </div>
         </div>
 
-        <div className="settings-section">
-          <h3>Monitor de Sistema</h3>
-          <div className="graph-grid">
-            <button
-              className="update-button"
-              onClick={() => navigate("/monitor/graphs/usageCharts")}
-            >
-              Ver Gráficos de Uso
-            </button>
-            <button
-              className="update-button"
-              onClick={() => navigate("/monitor/storage/storageUsage")}
-            >
-              Ver Uso de Almacenamiento
-            </button>
-          </div>
+        <div className="description-section">
+          <p>Descripción: Frecuencia de uso de la aplicación por hora.</p>
+          <p>Descripción: Actividad diaria de los usuarios en el sistema.</p>
+          <p>Descripción: Categorías más utilizadas cada mes.</p>
+          <p>Descripción: Emociones más registradas cada mes.</p>
         </div>
       </div>
     </Container>

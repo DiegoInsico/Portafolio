@@ -1,67 +1,133 @@
-/* Estilos generales para el contenedor de entradas */
 .entradas-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px;
-  background-color: #2c2c3a; /* Fondo oscuro */
-  border-radius: 8px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-}
-
-/* Estilos para el título principal */
-h1 {
-  text-align: center;
-  color: #f0a500; /* Color dorado */
-  margin-bottom: 20px;
-  font-size: 2rem;
-}
-
-/* Estilos para la lista de entradas */
-.entries-list {
-  list-style-type: none;
-  padding: 0;
-}
-
-/* Estilos para cada entrada */
-.entry-item {
-  background-color: #1e1e2f; /* Fondo oscuro */
-  color: #f0e6d2; /* Texto claro */
-  margin-bottom: 15px;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  transition: transform 0.3s ease-in-out;
-}
-
-.entry-item:hover {
-  transform: translateY(-5px); /* Efecto al pasar el mouse */
-}
-
-/* Encabezado de la entrada */
-.entry-header {
+  height: 100%;
+  width: 100%;
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
+  padding: 20px;
+}
+
+.entradas-content {
+  display: grid;
+  grid-template-areas: 
+    "tables chart";
+  gap: 30px;
   align-items: center;
-  font-size: 1.2rem;
-  margin-bottom: 10px;
+  grid-template-columns: 1fr 1fr;
+  width: 100%;
+  padding: 20px;
+  border-radius: 8px;
 }
 
-/* Estilo para la categoría de la entrada */
-.entry-category {
-  color: #ffce56; /* Color amarillo claro */
-  font-style: italic;
+.table-container, .category-table-container, .emotion-chart-container, .monthly-entries-chart-container {
+  padding: 10px;
+  border-radius: 20px;
+  background-color: rgba(252, 252, 252, 0.473);
+  backdrop-filter: blur(3px);
 }
 
-/* Mejoras en la tipografía */
-p {
-  margin: 5px 0;
-  font-size: 1rem;
-  color: #f0e6d2;
+.table-container h2,
+.category-table-container h2,
+.emotion-chart-container h2,
+.monthly-entries-chart-container h2 {
+  color: black;
+  margin: auto;
+  font-size: 25px;
 }
 
-/* Estilo para el mensaje de carga de entradas */
-p {
-  text-align: center;
-  font-size: 1.2rem;
-  color: #ffce56; /* Color dorado */
+.stats-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+}
+
+.stats-table th,
+.stats-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+.stats-table th {
+  background-color: #f4f4f4;
+  font-weight: bold;
+}
+
+/* Contenedor del gráfico de entradas por mes */
+.monthly-entries-chart-container {
+  grid-area: chart;
+  height: 35%;
+  width: 50%;
+  margin-left: auto;
+  margin-bottom: auto;
+
+
+}
+
+
+/* Contenedor de la tabla de estadísticas generales */
+.table-container {
+  grid-area: tables;
+  padding-top: 10px;
+  padding: 10px;
+  margin-bottom: auto;
+  border-radius: 20px;
+  background-color: rgba(252, 252, 252, 0.473);
+  backdrop-filter: blur(3px);
+}
+
+.table-container h2{
+  color: black;
+  font-size: 25px;
+}
+
+/* Contenedor de la tabla de entradas por categoría */
+.category-table-container {
+  grid-area: tables;
+  margin-top: 20px;
+  background-color: blue;
+  margin-top: auto;
+  border-radius: 20px;
+  background-color: rgba(252, 252, 252, 0.473);
+  backdrop-filter: blur(3px);
+}
+
+.category-table-container h2{
+  color: black;
+  font-size: 25px;
+}
+
+/* Contenedor del gráfico de emociones */
+.emotion-chart-container {
+  grid-area: chart;
+  margin-top: auto;
+  height: 54%;
+  width: 90%;
+  margin-left: auto;
+  border-radius: 20px;
+  background-color: rgba(252, 252, 252, 0.473);
+  backdrop-filter: blur(3px);
+}
+
+.emotion-chart-container h2{
+  color: black;
+  font-size: 25px;
+  margin: 0;
+}
+
+.stats-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+}
+
+.stats-table th,
+.stats-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+.stats-table th {
+  background-color: #f4f4f4;
+  font-weight: bold;
 }
