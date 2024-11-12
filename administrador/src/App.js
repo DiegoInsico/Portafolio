@@ -1,5 +1,6 @@
+// src/App.js
 import React, { useState, useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import Dashboard from "./pages/Dashboard";
 import Entradas from "./pages/Entradas";
 import GestionUsuarios from "./pages/GestionUsuarios";
@@ -17,6 +18,7 @@ import Inbox from "./pages/system/inbox";
 import Test from "./pages/test/test";
 import Clouster from "./pages/monitor/clouster";
 import RightBar from "./components/rightBar";
+import PrivateRoute from "./components/PrivateRoute";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -62,7 +64,7 @@ const AppRoutes = ({ isAuthenticated, currentUser, handleLogin }) => {
         {/* Rutas Protegidas */}
         {isAuthenticated ? (
           <>
-            {/* pagina de testeo */}
+            {/* Página de Testeo */}
             <Route path="/Test" element={<Test />} />
             <Route path="/monitor/clouster" element={<Clouster />} />
 
@@ -77,8 +79,17 @@ const AppRoutes = ({ isAuthenticated, currentUser, handleLogin }) => {
             {/* Almacenamiento y Sistema */}
             <Route path="/monitor/storage/storageUsage" element={<StorageUsage />} />
             <Route path="/system/notifications" element={<Notifications />} />
-            <Route path="/system/inbox" element={<Inbox />} />
-            
+
+            {/* Ruta Protegida con PrivateRoute para Soporte */}
+            <Route 
+              path="/system/inbox" 
+              element={
+                <PrivateRoute>
+                  <Inbox />
+                </PrivateRoute>
+              } 
+            />
+
             {/* Usuarios */}
             <Route path="/monitor/users/userActivity" element={<UserActivity />} />
             <Route path="/monitor/users/userSummary/:userId" element={<UserSummary />} />
@@ -86,11 +97,11 @@ const AppRoutes = ({ isAuthenticated, currentUser, handleLogin }) => {
           </>
         ) : (
           // Redirige a Login si no está autenticado
-          <Route path="*" element={<LoginPage onLogin={handleLogin} />} />
+          <Route path="*" element={<Navigate to="/login" />} />
         )}
         
         {/* Redirigir al login en caso de que la ruta principal no esté autenticado */}
-        <Route path="/" element={isAuthenticated ? <Dashboard /> : <LoginPage onLogin={handleLogin} />} />
+        <Route path="/" element={isAuthenticated ? <Navigate to="/dashboard" /> : <Navigate to="/login" />} />
       </Routes>
     </MainLayout>
   );

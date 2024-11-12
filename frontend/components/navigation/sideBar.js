@@ -26,7 +26,7 @@ export default function SideBar({
   navigateToTestigos,
   navigateToBeneficiarios,
   navigateToProgramarMensaje,
-  navigateToSoporte, // Nueva función de navegación
+  navigateToSoporte, // Nueva función de navegación para Soporte
 }) {
   const { user, userData, loading } = useContext(AuthContext);
   const [selected, setSelected] = useState("");
@@ -137,7 +137,7 @@ export default function SideBar({
 
           <View style={styles.divider} />
 
-          {/* Botones de Navegación */}
+          {/* Botones de Navegación Principales */}
           <TouchableOpacity
             style={[
               styles.drawerButton,
@@ -233,7 +233,10 @@ export default function SideBar({
             <Text style={styles.drawerButtonText}>Configuración</Text>
           </TouchableOpacity>
 
-          {/* Soporte */}
+          {/* Espaciador Flexible */}
+          <View style={{ flex: 1 }} />
+
+          {/* Soporte (Posicionado al Final) */}
           <TouchableOpacity
             style={[
               styles.drawerButton,
@@ -333,9 +336,13 @@ const styles = StyleSheet.create({
     elevation: 10,
     borderTopLeftRadius: 20,
     borderBottomLeftRadius: 20,
+    display: "flex",
+    flexDirection: "column",
   },
   sidebarContent: {
     flex: 1,
+    display: "flex",
+    flexDirection: "column",
   },
   profileContainer: {
     alignItems: "center",

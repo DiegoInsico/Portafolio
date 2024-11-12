@@ -4,7 +4,14 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="2137b152-a29a-4d26-8781-e8af1c953a9c" name="Changes" comment="" />
+    <list default="true" id="2137b152-a29a-4d26-8781-e8af1c953a9c" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/administrador/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/administrador/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/administrador/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/administrador/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/administrador/src/App.js" beforeDir="false" afterPath="$PROJECT_DIR$/administrador/src/App.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/administrador/src/pages/system/inbox.js" beforeDir="false" afterPath="$PROJECT_DIR$/administrador/src/pages/system/inbox.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/components/navigation/MainTabs.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/components/navigation/MainTabs.js" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />

@@ -46,6 +46,10 @@ function MainTabs({ navigation, user }) {
           handleToggleSidebar();
           navigation.navigate("ProgramarMensaje")
         }}
+        navigateToSoporte={() => {
+          handleToggleSidebar();
+          navigation.navigate("Soporte")
+        }}
         user={user} // Pasar 'user' como prop
       />
 
