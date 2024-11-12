@@ -14,14 +14,17 @@ import SecuritySettings from "../../components/security/SecurittySettings";
 import Login from "../../screens/auth/login";
 import Registro from "../../screens/auth/register";
 import RequestPasswordReset from "../../screens/auth/resetPass";
-import ProgramarMensaje from "../../screens/entrys/ProgramarMensaje"
-
+import ProgramarMensaje from "../../screens/entrys/ProgramarMensaje";
+import Suscripcion from "../../screens/suscripcion/Suscripcion";
+import Soporte from "../../screens/soporte/Soporte"; // Importar la nueva pantalla
+import CrearTicket from "../../screens/soporte/CrearTicket";
+import ListaTickets from "../../screens/soporte/ListaTickets";
 import { AuthContext } from "../../context/AuthContext";
 
 const Stack = createStackNavigator();
 
 export default function AppNavigator() {
-  const { user, loading } = useContext(AuthContext);
+  const { user, loading, userData } = useContext(AuthContext);
 
   if (loading) {
     // Opcional: Retornar un SplashScreen o ActivityIndicator aquí
@@ -47,7 +50,7 @@ export default function AppNavigator() {
         headerTintColor: "#FFD700", // Color de iconos (flecha de retroceso, etc.)
         headerTitleAlign: "center", // Alinear el título al centro
         headerStyle: {
-          height: 60, // Reducir altura del header
+          height: 70, // Reducir altura del header
           backgroundColor: "transparent",
           shadowColor: "transparent", // Eliminar sombra en iOS
           elevation: 0, // Eliminar sombra en Android
@@ -95,6 +98,26 @@ export default function AppNavigator() {
             component={ProgramarMensaje} // Agrega SecuritySettings aquí
             options={{ title: "Programar un Mensaje" }}
           />
+          <Stack.Screen
+            name="Suscripcion"
+            component={Suscripcion}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="Soporte"
+            component={Soporte}
+            options={{ title: "Soporte" }}
+          />
+          <Stack.Screen
+            name="CrearTicket"
+            component={CrearTicket}
+            options={{ title: "Crear Ticket" }}
+          />
+          <Stack.Screen
+            name="ListaTickets"
+            component={ListaTickets}
+            options={{ title: "Mis Tickets" }}
+          />
         </>
       ) : (
         <>
@@ -122,6 +145,6 @@ export default function AppNavigator() {
 const styles = StyleSheet.create({
   headerBackground: {
     width: "100%",
-    height: 60, // Igual que headerStyle.height
+    height: 70, // Igual que headerStyle.height
   },
 });

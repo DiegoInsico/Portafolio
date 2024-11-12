@@ -1,45 +1,81 @@
 // Registro.js
 
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
-  View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert, ActivityIndicator, ImageBackground, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard,
-} from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth'; 
-import { auth, db } from '../../utils/firebase'; 
-import { Formik } from 'formik';
-import * as Yup from 'yup';
-import { Ionicons } from '@expo/vector-icons';
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  Image,
+  Alert,
+  ActivityIndicator,
+  ImageBackground,
+  KeyboardAvoidingView,
+  Platform,
+  TouchableWithoutFeedback,
+  Keyboard,
+} from "react-native";
+import { createUserWithEmailAndPassword, updateProfile, signOut } from "firebase/auth"; // <--- Importa signOut
+import { auth, db } from "../../utils/firebase";
+import { Formik } from "formik";
+import * as Yup from "yup";
+import { Ionicons } from "@expo/vector-icons";
 import { doc, setDoc } from "firebase/firestore"; // Importa setDoc para Firestore
+import DateTimePicker from "@react-native-community/datetimepicker";
+
+// Función para mapear códigos de error a mensajes amigables
+const getErrorMessage = (error) => {
+  switch (error.code) {
+    case 'auth/email-already-in-use':
+      return 'El correo electrónico ya está en uso. Por favor, inicia sesión o utiliza otro correo.';
+    case 'auth/invalid-email':
+      return 'El correo electrónico ingresado no es válido.';
+    case 'auth/operation-not-allowed':
+      return 'El registro de usuarios está deshabilitado. Por favor, contacta al soporte.';
+    case 'auth/weak-password':
+      return 'La contraseña es demasiado débil. Debe tener al menos 6 caracteres, incluyendo una letra y un número.';
+    case 'auth/network-request-failed':
+      return 'Fallo en la conexión de red. Por favor, verifica tu conexión e intenta nuevamente.';
+    default:
+      return 'Ocurrió un error inesperado. Por favor, intenta nuevamente.';
+  }
+};
 
 // Definir el esquema de validación con Yup
 const RegisterSchema = Yup.object().shape({
   usuario: Yup.string()
-    .min(4, 'El nombre de usuario debe tener al menos 4 caracteres')
-    .required('El nombre de usuario es obligatorio'),
+    .min(4, "El nombre de usuario debe tener al menos 4 caracteres")
+    .required("El nombre de usuario es obligatorio"),
   correo: Yup.string()
-    .email('Ingresa un correo electrónico válido')
-    .required('El correo electrónico es obligatorio'),
+    .email("Ingresa un correo electrónico válido")
+    .required("El correo electrónico es obligatorio"),
   contrasena: Yup.string()
-    .min(6, 'La contraseña debe tener al menos 6 caracteres')
-    .matches(/[a-zA-Z]/, 'La contraseña debe contener al menos una letra')
-    .matches(/\d/, 'La contraseña debe contener al menos un número')
-    .required('La contraseña es obligatoria'),
+    .min(6, "La contraseña debe tener al menos 6 caracteres")
+    .matches(/[a-zA-Z]/, "La contraseña debe contener al menos una letra")
+    .matches(/\d/, "La contraseña debe contener al menos un número")
+    .required("La contraseña es obligatoria"),
   confirmarContrasena: Yup.string()
-    .oneOf([Yup.ref('contrasena'), null], 'Las contraseñas deben coincidir')
-    .required('Confirma tu contraseña'),
+    .oneOf([Yup.ref("contrasena"), null], "Las contraseñas deben coincidir")
+    .required("Confirma tu contraseña"),
+  fechaNacimiento: Yup.date()
+    .max(new Date(), "La fecha de nacimiento no puede ser futura")
+    .required("La fecha de nacimiento es obligatoria"),
 });
 
 export default function Registro({ navigation }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [showDatePicker, setShowDatePicker] = useState(false);
 
   const handleRegister = async (values, actions) => {
     setIsSubmitting(true);
     try {
       const userCredential = await createUserWithEmailAndPassword(
-        auth, values.correo, values.contrasena
+        auth,
+        values.correo,
+        values.contrasena
       );
       const user = userCredential.user;
 
@@ -52,14 +88,30 @@ export default function Registro({ navigation }) {
       await setDoc(doc(db, "users", user.uid), {
         displayName: values.usuario,
         email: values.correo,
+        isPremium: false,
         createdAt: new Date(),
+        birthDate: values.fechaNacimiento, // Añadimos la fecha de nacimiento
       });
 
-      Alert.alert('Registro exitoso', 'Cuenta creada correctamente. Ahora puedes iniciar sesión.');
-      navigation.navigate('Login'); 
+      // Cerrar la sesión del usuario recién registrado
+      await signOut(auth);
+
+      // Mostrar alerta y navegar a Login
+      Alert.alert(
+        "Registro exitoso",
+        "Cuenta creada correctamente. Ahora puedes iniciar sesión.",
+        [
+          {
+            text: "OK",
+            onPress: () => navigation.navigate("Login"),
+          },
+        ],
+        { cancelable: false }
+      );
     } catch (error) {
-      console.error('Error al registrar:', error.message);
-      Alert.alert('Error', error.message || 'Ocurrió un error al registrar.');
+      console.error("Error al registrar:", error.message);
+      const errorMessage = getErrorMessage(error);
+      Alert.alert("Error de Registro", errorMessage);
     } finally {
       setIsSubmitting(false);
       actions.setSubmitting(false);
@@ -89,24 +141,42 @@ export default function Registro({ navigation }) {
 
           <Formik
             initialValues={{
-              usuario: '', correo: '', contrasena: '', confirmarContrasena: '',
+              usuario: "",
+              correo: "",
+              contrasena: "",
+              confirmarContrasena: "",
+              fechaNacimiento: new Date(), // Valor inicial válido
             }}
             validationSchema={RegisterSchema}
             onSubmit={handleRegister}
+            validateOnMount={true} // Opcional: valida al montar el formulario
           >
             {({
-              handleChange, handleBlur, handleSubmit, values, errors, touched, isValid, dirty,
+              handleChange,
+              handleBlur,
+              handleSubmit,
+              setFieldValue,
+              values,
+              errors,
+              touched,
+              isValid,
+              dirty,
             }) => (
               <View style={styles.formContainer}>
                 {/* Nombre de Usuario */}
                 <View style={styles.inputContainer}>
-                  <Ionicons name="person" size={20} color="#FFD700" style={styles.iconStyle} />
+                  <Ionicons
+                    name="person"
+                    size={20}
+                    color="#FFD700"
+                    style={styles.iconStyle}
+                  />
                   <TextInput
                     style={styles.input}
                     placeholder="Nombre de Usuario"
                     placeholderTextColor="#FFD700AA"
-                    onChangeText={handleChange('usuario')}
-                    onBlur={handleBlur('usuario')}
+                    onChangeText={handleChange("usuario")}
+                    onBlur={handleBlur("usuario")}
                     value={values.usuario}
                     autoCapitalize="none"
                   />
@@ -117,13 +187,18 @@ export default function Registro({ navigation }) {
 
                 {/* Correo Electrónico */}
                 <View style={styles.inputContainer}>
-                  <Ionicons name="mail" size={20} color="#FFD700" style={styles.iconStyle} />
+                  <Ionicons
+                    name="mail"
+                    size={20}
+                    color="#FFD700"
+                    style={styles.iconStyle}
+                  />
                   <TextInput
                     style={styles.input}
                     placeholder="Correo Electrónico"
                     placeholderTextColor="#FFD700AA"
-                    onChangeText={handleChange('correo')}
-                    onBlur={handleBlur('correo')}
+                    onChangeText={handleChange("correo")}
+                    onBlur={handleBlur("correo")}
                     value={values.correo}
                     keyboardType="email-address"
                     autoCapitalize="none"
@@ -135,13 +210,18 @@ export default function Registro({ navigation }) {
 
                 {/* Contraseña */}
                 <View style={styles.inputContainer}>
-                  <Ionicons name="lock-closed" size={20} color="#FFD700" style={styles.iconStyle} />
+                  <Ionicons
+                    name="lock-closed"
+                    size={20}
+                    color="#FFD700"
+                    style={styles.iconStyle}
+                  />
                   <TextInput
                     style={styles.input}
                     placeholder="Contraseña"
                     placeholderTextColor="#FFD700AA"
-                    onChangeText={handleChange('contrasena')}
-                    onBlur={handleBlur('contrasena')}
+                    onChangeText={handleChange("contrasena")}
+                    onBlur={handleBlur("contrasena")}
                     value={values.contrasena}
                     secureTextEntry={!showPassword}
                     autoCapitalize="none"
@@ -150,7 +230,11 @@ export default function Registro({ navigation }) {
                     onPress={() => setShowPassword(!showPassword)}
                     style={styles.toggleButton}
                   >
-                    <Ionicons name={showPassword ? 'eye' : 'eye-off'} size={20} color="#FFD700" />
+                    <Ionicons
+                      name={showPassword ? "eye" : "eye-off"}
+                      size={20}
+                      color="#FFD700"
+                    />
                   </TouchableOpacity>
                 </View>
                 {touched.contrasena && errors.contrasena && (
@@ -159,13 +243,18 @@ export default function Registro({ navigation }) {
 
                 {/* Confirmar Contraseña */}
                 <View style={styles.inputContainer}>
-                  <Ionicons name="lock-open" size={20} color="#FFD700" style={styles.iconStyle} />
+                  <Ionicons
+                    name="lock-open"
+                    size={20}
+                    color="#FFD700"
+                    style={styles.iconStyle}
+                  />
                   <TextInput
                     style={styles.input}
                     placeholder="Confirmar Contraseña"
                     placeholderTextColor="#FFD700AA"
-                    onChangeText={handleChange('confirmarContrasena')}
-                    onBlur={handleBlur('confirmarContrasena')}
+                    onChangeText={handleChange("confirmarContrasena")}
+                    onBlur={handleBlur("confirmarContrasena")}
                     value={values.confirmarContrasena}
                     secureTextEntry={!showConfirmPassword}
                     autoCapitalize="none"
@@ -174,16 +263,63 @@ export default function Registro({ navigation }) {
                     onPress={() => setShowConfirmPassword(!showConfirmPassword)}
                     style={styles.toggleButton}
                   >
-                    <Ionicons name={showConfirmPassword ? 'eye' : 'eye-off'} size={20} color="#FFD700" />
+                    <Ionicons
+                      name={showConfirmPassword ? "eye" : "eye-off"}
+                      size={20}
+                      color="#FFD700"
+                    />
                   </TouchableOpacity>
                 </View>
                 {touched.confirmarContrasena && errors.confirmarContrasena && (
-                  <Text style={styles.errorText}>{errors.confirmarContrasena}</Text>
+                  <Text style={styles.errorText}>
+                    {errors.confirmarContrasena}
+                  </Text>
+                )}
+
+                {/* Fecha de Nacimiento */}
+                <View style={styles.inputContainer}>
+                  <Ionicons
+                    name="calendar"
+                    size={20}
+                    color="#FFD700"
+                    style={styles.iconStyle}
+                  />
+                  <TouchableOpacity
+                    style={styles.datePickerButton}
+                    onPress={() => setShowDatePicker(true)}
+                  >
+                    <Text style={styles.datePickerText}>
+                      {values.fechaNacimiento
+                        ? values.fechaNacimiento.toDateString()
+                        : "Selecciona una fecha"}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+                {touched.fechaNacimiento && errors.fechaNacimiento && (
+                  <Text style={styles.errorText}>{errors.fechaNacimiento}</Text>
+                )}
+
+                {showDatePicker && (
+                  <DateTimePicker
+                    value={values.fechaNacimiento}
+                    mode="date"
+                    display="default"
+                    onChange={(event, selectedDate) => {
+                      setShowDatePicker(false);
+                      if (selectedDate) {
+                        setFieldValue("fechaNacimiento", selectedDate);
+                      }
+                    }}
+                    maximumDate={new Date()}
+                  />
                 )}
 
                 {/* Botón de Registro */}
                 <TouchableOpacity
-                  style={[styles.button, !(isValid && dirty) && styles.buttonDisabled]}
+                  style={[
+                    styles.button,
+                    !(isValid && dirty) && styles.buttonDisabled,
+                  ]}
                   onPress={handleSubmit}
                   disabled={!(isValid && dirty) || isSubmitting}
                 >
@@ -197,8 +333,10 @@ export default function Registro({ navigation }) {
             )}
           </Formik>
 
-          <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-            <Text style={styles.footerLink}>¿Ya tienes una cuenta? Inicia sesión</Text>
+          <TouchableOpacity onPress={() => navigation.navigate("Login")}>
+            <Text style={styles.footerLink}>
+              ¿Ya tienes una cuenta? Inicia sesión
+            </Text>
           </TouchableOpacity>
         </KeyboardAvoidingView>
       </ImageBackground>
@@ -308,5 +446,13 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontFamily: "Poppins_700Bold",
   },
+  datePickerButton: {
+    flex: 1,
+    justifyContent: "center",
+    paddingVertical: 12,
+  },
+  datePickerText: {
+    color: "#FFD700",
+    fontSize: 16,
+  },
 });
-
