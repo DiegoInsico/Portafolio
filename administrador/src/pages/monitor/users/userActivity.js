@@ -64,26 +64,26 @@ const UserActivity = () => {
       <div className="user-activity-container">
         <h1>Actividad de Usuarios</h1>
 
-        <div className="filters">
+        <div className="user-filters">
           <input
             type="text"
             placeholder="Filtrar por usuario"
-            className="filter-input"
+            className="user-filter-input"
             value={filterText}
             onChange={handleFilterChange}
           />
           <input
             type="text"
             placeholder="Filtrar por correo"
-            className="filter-input"
+            className="user-filter-input"
             value={filterEmail}
             onChange={handleEmailFilterChange}
           />
         </div>
 
-        <div className="settings-section">
+        <div className="user-settings-section">
           <h3>Historial de Inicios de Sesión</h3>
-          <table className="activity-table">
+          <table className="user-activity-table">
             <thead>
               <tr>
                 <th>Nombre de Usuario</th>

@@ -10,16 +10,18 @@
   display: grid;
   grid-template-areas: 
     "tables chart";
-  gap: 30px;
-  align-items: center;
+  gap: 10px;
+  align-items: end;
+  justify-content: space-between;
   grid-template-columns: 1fr 1fr;
   width: 100%;
-  padding: 20px;
+  height: 100%;
+  padding: 10px;
   border-radius: 8px;
 }
 
-.table-container, .category-table-container, .emotion-chart-container, .monthly-entries-chart-container {
-  padding: 10px;
+.table-container, .emotion-chart-container, .monthly-entries-chart-container {
+  padding: 15px;
   border-radius: 20px;
   background-color: rgba(252, 252, 252, 0.473);
   backdrop-filter: blur(3px);
@@ -30,20 +32,21 @@
 .emotion-chart-container h2,
 .monthly-entries-chart-container h2 {
   color: black;
-  margin: auto;
-  font-size: 25px;
+  margin: 0;
+  font-size: 20px;
 }
 
 .stats-table {
   width: 100%;
   border-collapse: collapse;
   margin: 20px 0;
+  /* height: 10%; */
 }
 
 .stats-table th,
 .stats-table td {
   border: 1px solid #ddd;
-  padding: 8px;
+  padding: 5px;
   text-align: left;
 }
 
@@ -55,39 +58,40 @@
 /* Contenedor del gráfico de entradas por mes */
 .monthly-entries-chart-container {
   grid-area: chart;
-  height: 35%;
+  height: 25vh;
   width: 50%;
   margin-left: auto;
   margin-bottom: auto;
-
-
 }
-
 
 /* Contenedor de la tabla de estadísticas generales */
 .table-container {
   grid-area: tables;
   padding-top: 10px;
   padding: 10px;
+  height: 30%;
   margin-bottom: auto;
   border-radius: 20px;
   background-color: rgba(252, 252, 252, 0.473);
+  /* background-color: red; */
   backdrop-filter: blur(3px);
 }
 
 .table-container h2{
   color: black;
-  font-size: 25px;
+  font-size: 20px;
+  margin: 0;
 }
+
 
 /* Contenedor de la tabla de entradas por categoría */
 .category-table-container {
   grid-area: tables;
-  margin-top: 20px;
-  background-color: blue;
-  margin-top: auto;
   border-radius: 20px;
+  height: 65%;
+  /* margin-top: 100px; */
   background-color: rgba(252, 252, 252, 0.473);
+  /* background-color: black; */
   backdrop-filter: blur(3px);
 }
 
@@ -115,8 +119,11 @@
 }
 
 .stats-table {
+  grid-area: tables;
   width: 100%;
   border-collapse: collapse;
+  height: 30%;
+  padding: 10px;
   margin: 20px 0;
 }
 
@@ -124,10 +131,6 @@
 .stats-table td {
   border: 1px solid #ddd;
   padding: 8px;
+  font-size: 10px;
   text-align: left;
-}
-
-.stats-table th {
-  background-color: #f4f4f4;
-  font-weight: bold;
 }

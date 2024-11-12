@@ -283,7 +283,7 @@ const Dashboard = () => {
             )}
             {selectedChart === "creationPeak" && creationPeakData && (
               <div className="chart-content chart-creation-peak">
-                <h2>Pico de Creaciones</h2>
+                <h2>Creaciones maximas</h2>
                 <Line data={creationPeakData} />
               </div>
             )}
@@ -292,7 +292,7 @@ const Dashboard = () => {
             <h1>Seleccione un gráfico para ver a la izquierda</h1>
             <button className="btn-perso" onClick={() => handleButtonClick("unverifiedUsers")}>Usuarios sin verificar</button>
             <button className="btn-perso" onClick={() => handleButtonClick("categoryUsage")}>Categoría más usada</button>
-            <button className="btn-perso" onClick={() => handleButtonClick("creationPeak")}>Pico de creaciones</button>
+            <button className="btn-perso" onClick={() => handleButtonClick("creationPeak")}>Creaciones maximas</button>
           </div>
         </div>
       </div>

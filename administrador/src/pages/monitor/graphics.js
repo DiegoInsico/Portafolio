@@ -7,6 +7,7 @@ import "./graphs.css";
 import Container from "../../components/container";
 
 const Graphics = () => {
+  const [selectedChart, setSelectedChart] = useState("usagePerHour");
   const [monthlyCategoryData, setMonthlyCategoryData] = useState(null);
   const [monthlyEmotionData, setMonthlyEmotionData] = useState(null);
   const [chartData, setChartData] = useState(null);
@@ -113,42 +114,64 @@ const Graphics = () => {
     fetchUsageData();
   }, []);
 
+  const handleButtonClick = (chartType) => {
+    setSelectedChart(chartType);
+  };
+
   if (loading) return <p>Cargando datos...</p>;
 
   return (
     <Container>
       <div className="graphics-container">
-        <div className="filter-buttons">
-          <button className="btn-filter">Mostrar Categorías</button>
-          <button className="btn-filter">Mostrar Emociones</button>
-          <button className="btn-filter">Mostrar Uso por Hora</button>
-          <button className="btn-filter">Mostrar Uso Diario</button>
-        </div>
-
-        <div className="chart-section">
-          <div className="chart-item">
-            <h2>Uso de Usuarios por Hora</h2>
-            <Line data={chartData} options={{ maintainAspectRatio: true }} />
-          </div>
-          <div className="chart-item">
-            <h2>Uso Diario de Usuarios</h2>
-            <Line data={dailyData} options={{ maintainAspectRatio: true }} />
-          </div>
-          <div className="chart-item">
-            <h2>Categorías por Mes</h2>
-            <Bar data={monthlyCategoryData} options={{ maintainAspectRatio: true }} />
-          </div>
-          <div className="chart-item">
-            <h2>Emociones por Mes</h2>
-            <Bar data={monthlyEmotionData} options={{ maintainAspectRatio: true }} />
+        <div className="graphics-filter-buttons">
+          <button className="graphics-btn-filter" onClick={() => handleButtonClick("usagePerHour")}>Uso por Hora</button>
+          <button className="graphics-btn-filter" onClick={() => handleButtonClick("dailyUsage")}>Uso Diario</button>
+          <button className="graphics-btn-filter" onClick={() => handleButtonClick("categoryUsage")}>Categoría por Mes</button>
+          <button className="graphics-btn-filter" onClick={() => handleButtonClick("emotionUsage")}>Emociones por Mes</button>
+          <div className="graphics-data">
+            <button className="graphics-btn-function-a" onClick={()=> window.alert("Exportar a PDF")}>Exportar a PDF</button>
+            <button className="graphics-btn-function-b" onClick={() => window.alert("Exportar como exel")}>Exportar Xls</button>
           </div>
         </div>
 
-        <div className="description-section">
-          <p>Descripción: Frecuencia de uso de la aplicación por hora.</p>
-          <p>Descripción: Actividad diaria de los usuarios en el sistema.</p>
-          <p>Descripción: Categorías más utilizadas cada mes.</p>
-          <p>Descripción: Emociones más registradas cada mes.</p>
+
+        <div className="graphics-chart-section">
+          {selectedChart === "usagePerHour" && chartData && (
+            <div className="graphics-chart-item">
+              <h2>Uso de Usuarios por Hora</h2>
+              <Line data={chartData} options={{ maintainAspectRatio: true }} />
+              <p className="graphics-description">
+                Este gráfico muestra el uso de la aplicación por hora. Puedes ver en qué horas del día los usuarios interactúan más con la aplicación.
+              </p>
+            </div>
+          )}
+          {selectedChart === "dailyUsage" && dailyData && (
+            <div className="graphics-chart-item">
+              <h2>Uso Diario de Usuarios</h2>
+              <Line data={dailyData} options={{ maintainAspectRatio: true }} />
+              <p className="graphics-description">
+                Este gráfico presenta el uso diario de la aplicación. Permite observar los días de mayor actividad en la plataforma.
+              </p>
+            </div>
+          )}
+          {selectedChart === "categoryUsage" && monthlyCategoryData && (
+            <div className="graphics-chart-item">
+              <h2>Categorías por Mes</h2>
+              <Bar data={monthlyCategoryData} options={{ maintainAspectRatio: true }} />
+              <p className="graphics-description">
+                Muestra las categorías más utilizadas en la aplicación cada mes. Es útil para entender las preferencias de los usuarios.
+              </p>
+            </div>
+          )}
+          {selectedChart === "emotionUsage" && monthlyEmotionData && (
+            <div className="graphics-chart-item">
+              <h2>Emociones por Mes</h2>
+              <Bar data={monthlyEmotionData} options={{ maintainAspectRatio: true }} />
+              <p className="graphics-description">
+                Este gráfico refleja las emociones registradas cada mes, proporcionando una visión de los sentimientos predominantes entre los usuarios.
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </Container>
