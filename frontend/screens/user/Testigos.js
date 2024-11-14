@@ -163,7 +163,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flexGrow: 1,
-    paddingTop: 60,
+    paddingTop: 70, // Igual que headerStyle.height
     padding: 20,
     backgroundColor: "rgba(44, 62, 80, 0.5)", // Overlay oscuro para mejorar la legibilidad
   },

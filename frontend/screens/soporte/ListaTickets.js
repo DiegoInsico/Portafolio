@@ -1,12 +1,12 @@
 // screens/Soporte/ListaTickets.js
 
 import React, { useState, useEffect, useContext } from "react";
-import { View, Text, FlatList, StyleSheet, ActivityIndicator, Alert } from "react-native";
+import { View, Text, FlatList, StyleSheet, ActivityIndicator, Alert, TouchableOpacity } from "react-native";
 import { AuthContext } from "../../context/AuthContext";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import { db } from "../../utils/firebase";
 
-export default function ListaTickets() {
+export default function ListaTickets({ navigation }) { // Añadimos 'navigation' como prop
   const { user } = useContext(AuthContext);
   const [tickets, setTickets] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -33,14 +33,17 @@ export default function ListaTickets() {
   };
 
   const renderTicket = ({ item }) => (
-    <View style={styles.ticketItem}>
+    <TouchableOpacity 
+      style={styles.ticketItem} 
+      onPress={() => navigation.navigate('DetalleTicket', { ticketId: item.id })}
+    >
       <Text style={styles.ticketSubject}>{item.subject}</Text>
       <Text style={styles.ticketStatus}>Estado: {item.status}</Text>
       <Text style={styles.ticketPriority}>Prioridad: {item.priority}</Text>
       <Text style={styles.ticketDate}>
         Creado: {item.createdAt?.toDate().toLocaleString()}
       </Text>
-    </View>
+    </TouchableOpacity>
   );
 
   return (

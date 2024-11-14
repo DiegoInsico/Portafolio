@@ -19,6 +19,7 @@ import Suscripcion from "../../screens/suscripcion/Suscripcion";
 import Soporte from "../../screens/soporte/Soporte"; // Importar la nueva pantalla
 import CrearTicket from "../../screens/soporte/CrearTicket";
 import ListaTickets from "../../screens/soporte/ListaTickets";
+import DetalleTicket from "../../screens/soporte/DetalleTicket";
 import { AuthContext } from "../../context/AuthContext";
 
 const Stack = createStackNavigator();
@@ -117,6 +118,11 @@ export default function AppNavigator() {
             name="ListaTickets"
             component={ListaTickets}
             options={{ title: "Mis Tickets" }}
+          />
+          <Stack.Screen
+            name="DetalleTicket"
+            component={DetalleTicket}
+            options={{ title: "Detalle del Ticket" }}
           />
         </>
       ) : (

@@ -1,0 +1,118 @@
+/* src/pages/system/TicketDetails.css */
+
+.ticket-details-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    padding: 20px;
+    box-sizing: border-box;
+    background-color: #f0f2f5;
+    font-family: 'Roboto', sans-serif;
+  }
+  
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #1976d2;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 8px 8px 0 0;
+  }
+  
+  .assignment-section {
+    display: flex;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #ffffff;
+    border-bottom: 1px solid #ccc;
+  }
+  
+  .assign-select {
+    min-width: 200px;
+  }
+  
+  .assign-button {
+    padding: 6px 12px;
+  }
+  
+  .description-section {
+    padding: 20px;
+    background-color: #ffffff;
+    border-bottom: 1px solid #ccc;
+  }
+  
+  .chat-section {
+    flex-grow: 1;
+    padding: 20px;
+    overflow-y: auto;
+    background-color: #f5f5f5;
+  }
+  
+  .send-message-bar {
+    display: flex;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #ffffff;
+    border-top: 1px solid #ccc;
+  }
+  
+  .send-message-bar .MuiTextField-root {
+    margin-right: 10px;
+  }
+  
+  .mark-solved-section {
+    padding: 10px 20px;
+    background-color: #ffffff;
+    border-top: 1px solid #ccc;
+    text-align: right;
+  }
+  
+  .message-item {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 10px;
+  }
+  
+  .user-message {
+    justify-content: flex-start;
+  }
+  
+  .admin-message {
+    justify-content: flex-end;
+  }
+  
+  .message-bubble {
+    padding: 10px 15px;
+    border-radius: 15px;
+    max-width: 70%;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  }
+  
+  .user-message .message-bubble {
+    background-color: #e0f7fa;
+  }
+  
+  .admin-message .message-bubble {
+    background-color: #c5cae9;
+  }
+  
+  @media (max-width: 768px) {
+    .assignment-section, .description-section, .chat-section, .send-message-bar, .mark-solved-section {
+      padding: 10px;
+    }
+  
+    .assign-select {
+      min-width: 150px;
+    }
+  
+    .assign-button {
+      padding: 4px 8px;
+      font-size: 0.875rem;
+    }
+  
+    .send-message-bar .MuiTextField-root {
+      margin-right: 5px;
+    }
+  }
+  

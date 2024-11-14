@@ -1,4 +1,5 @@
 // src/App.js
+
 import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import Dashboard from "./pages/Dashboard";
@@ -19,6 +20,7 @@ import Test from "./pages/test/test";
 import Clouster from "./pages/monitor/clouster";
 import RightBar from "./components/rightBar";
 import PrivateRoute from "./components/PrivateRoute";
+import TicketDetails from "./pages/system/TicketDetails"; // Importar el nuevo componente
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -86,6 +88,16 @@ const AppRoutes = ({ isAuthenticated, currentUser, handleLogin }) => {
               element={
                 <PrivateRoute>
                   <Inbox />
+                </PrivateRoute>
+              } 
+            />
+
+            {/* Nueva Ruta para Detalles del Ticket */}
+            <Route 
+              path="/tickets/:id" 
+              element={
+                <PrivateRoute>
+                  <TicketDetails />
                 </PrivateRoute>
               } 
             />

@@ -289,7 +289,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flexGrow: 1,
-    paddingTop: 60, // Igual que headerStyle.height
+    paddingTop: 70, // Igual que headerStyle.height
     padding: 30,
     backgroundColor: "rgba(28, 40, 51, 0.8)", // Fondo semi-transparente oscuro
     paddingBottom: 40,

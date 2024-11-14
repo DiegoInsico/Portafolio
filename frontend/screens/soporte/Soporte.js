@@ -10,12 +10,13 @@ import {
   FlatList,
   Alert,
   ActivityIndicator,
+  TouchableOpacity,
 } from "react-native";
 import { AuthContext } from "../../context/AuthContext";
 import { collection, addDoc, query, where, getDocs, serverTimestamp } from "firebase/firestore";
 import { db } from "../../utils/firebase";
 
-export default function Soporte() {
+export default function Soporte({ navigation }) {
   const { user } = useContext(AuthContext);
   const [subject, setSubject] = useState("");
   const [description, setDescription] = useState("");
@@ -57,7 +58,6 @@ export default function Soporte() {
         subject,
         description,
         status: "abierto",
-        priority: "media", // Puedes añadir un selector para prioridad
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
         assignedTo: null,
@@ -73,14 +73,16 @@ export default function Soporte() {
   };
 
   const renderTicket = ({ item }) => (
-    <View style={styles.ticketItem}>
+    <TouchableOpacity
+      style={styles.ticketItem}
+      onPress={() => navigation.navigate('DetalleTicket', { ticketId: item.id })}
+    >
       <Text style={styles.ticketSubject}>{item.subject}</Text>
       <Text style={styles.ticketStatus}>Estado: {item.status}</Text>
-      <Text style={styles.ticketPriority}>Prioridad: {item.priority}</Text>
       <Text style={styles.ticketDate}>
         Creado: {item.createdAt?.toDate().toLocaleString()}
       </Text>
-    </View>
+    </TouchableOpacity>
   );
 
   return (
@@ -126,6 +128,7 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
     backgroundColor: "#fff",
+    paddingTop: 70, // Ajusta según tu diseño
   },
   title: {
     fontSize: 20,
@@ -172,10 +175,6 @@ const styles = StyleSheet.create({
     color: "#2C3E50",
   },
   ticketStatus: {
-    fontSize: 14,
-    color: "#7F8C8D",
-  },
-  ticketPriority: {
     fontSize: 14,
     color: "#7F8C8D",
   },

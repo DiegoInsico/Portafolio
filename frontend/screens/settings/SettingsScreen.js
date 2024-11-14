@@ -150,7 +150,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#2C3E50",
   },
   contentContainer: {
-    paddingTop: 60,
+    paddingTop: 70, // Igual que headerStyle.height
     paddingBottom: 20,
     paddingHorizontal: 20,
     flexGrow: 1,
