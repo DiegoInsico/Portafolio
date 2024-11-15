@@ -20,6 +20,7 @@ import Soporte from "../../screens/soporte/Soporte"; // Importar la nueva pantal
 import CrearTicket from "../../screens/soporte/CrearTicket";
 import ListaTickets from "../../screens/soporte/ListaTickets";
 import DetalleTicket from "../../screens/soporte/DetalleTicket";
+import SubirCertificado from "../../screens/user/SubirCertificado";
 import { AuthContext } from "../../context/AuthContext";
 
 const Stack = createStackNavigator();
@@ -123,6 +124,11 @@ export default function AppNavigator() {
             name="DetalleTicket"
             component={DetalleTicket}
             options={{ title: "Detalle del Ticket" }}
+          />
+          <Stack.Screen
+            name="SubirCertificado"
+            component={SubirCertificado}
+            options={{ title: "Subir Certificado" }}
           />
         </>
       ) : (

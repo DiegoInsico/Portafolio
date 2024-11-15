@@ -5,6 +5,7 @@ import { View, StyleSheet } from "react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 
+
 import SideBar from "./SideBar";
 
 // Importar pantallas
@@ -49,6 +50,10 @@ function MainTabs({ navigation, user }) {
         navigateToSoporte={() => {
           handleToggleSidebar();
           navigation.navigate("Soporte")
+        }}
+        navigateToSubirCertificado={() => {
+          handleToggleSidebar();
+          navigation.navigate("SubirCertificado");
         }}
         user={user} // Pasar 'user' como prop
       />

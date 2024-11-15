@@ -29,7 +29,7 @@ import { ScrollView } from "react-native-gesture-handler";
 import { StatusBar } from "react-native";
 import { AuthContext } from "../../context/AuthContext";
 
-const { width: viewportWidth } = Dimensions.get("window");
+const { width: viewportWidth, height: viewportHeight } = Dimensions.get("window");
 
 const Home = ({ navigation }) => {
   const [question, setQuestion] = useState("");
@@ -168,7 +168,6 @@ const Home = ({ navigation }) => {
   return (
     <>
       <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
-
       <ImageBackground
         source={require("../../assets/background/barco.jpg")}
         style={styles.background}
@@ -189,6 +188,7 @@ const Home = ({ navigation }) => {
           </View>
         </ScrollView>
 
+        {/* Sección Inferior Translucida */}
         <View style={styles.translucentBackground}>
           {question ? (
             <View style={styles.questionContainer}>
@@ -216,12 +216,13 @@ const Home = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
+  /* Estilos generales */
   background: {
     flex: 1,
   },
   container: {
     flex: 1,
-    alignItems: 'center',
+    alignItems: "center",
     paddingHorizontal: 20,
   },
   headerContainer: {
@@ -237,16 +238,22 @@ const styles = StyleSheet.create({
     color: "#333",
     marginTop: 5,
   },
+  /* Sección Inferior Translucida */
   translucentBackground: {
     position: "absolute",
-    bottom: 100,
+    bottom: 60, // Ajusta según necesidad
+    left: 0,
+    right: 0,
     padding: 20,
-    borderRadius: 20,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
     alignItems: "center",
+    justifyContent: "center",
   },
   questionContainer: {
-    alignItems: "center",
+    width: "100%",
     marginBottom: 20,
+    alignItems: "center",
   },
   questionBackground: {
     backgroundColor: "rgba(0, 0, 0, 0.7)", // Fondo oscuro y translúcido
@@ -261,12 +268,13 @@ const styles = StyleSheet.create({
     color: "#FFF",
     textAlign: "center",
   },
+  /* Botón Redondo "Nuevo Instante" */
   roundButtonContainer: {
     width: "100%",
     alignItems: "center",
   },
   roundButton: {
-    width: "95%",
+    width: viewportWidth * 0.8, // 80% del ancho de la pantalla
     height: 60,
     borderRadius: 30,
     alignItems: "center",
@@ -277,6 +285,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 2, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 4,
+    elevation: 5,
   },
   roundButtonText: {
     fontSize: 18,
@@ -284,6 +293,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginLeft: 10,
   },
+  /* Estilos de carga */
   loadingContainer: {
     flex: 1,
     justifyContent: "center",

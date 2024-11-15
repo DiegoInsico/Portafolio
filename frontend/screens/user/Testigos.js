@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from "react";
 import {
   View,
   Text,
@@ -11,13 +11,26 @@ import {
   Image,
   ActivityIndicator,
   ImageBackground,
-} from 'react-native';
+} from "react-native";
 import { db, storage } from "../../utils/firebase";
-import { collection, addDoc, getDocs, doc, updateDoc, deleteDoc } from "firebase/firestore";
+import {
+  collection,
+  addDoc,
+  getDocs,
+  doc,
+  updateDoc,
+  deleteDoc,
+  query,
+  where,
+} from "firebase/firestore";
 import * as ImagePicker from "expo-image-picker";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { AuthContext } from "../../context/AuthContext";
+import { useNavigation } from "@react-navigation/native"; // Importar useNavigation
 
 const Testigos = () => {
+  const navigation = useNavigation(); // Obtener navigation
+
   const [testigos, setTestigos] = useState([]);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -27,21 +40,34 @@ const Testigos = () => {
   const [editingId, setEditingId] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const { user } = useContext(AuthContext);
+
   const testigosRef = collection(db, "testigos");
 
   useEffect(() => {
     const fetchTestigos = async () => {
+      if (!user || !user.uid) {
+        setLoading(false);
+        return;
+      }
       try {
-        const snapshot = await getDocs(testigosRef);
-        const testigosList = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+        // Crear una consulta para obtener solo los testigos del usuario actual
+        const q = query(testigosRef, where("userId", "==", user.uid));
+        const snapshot = await getDocs(q);
+        const testigosList = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
         setTestigos(testigosList);
         setLoading(false);
       } catch (error) {
         console.error("Error al obtener los testigos:", error);
+        Alert.alert("Error", "No se pudieron cargar los testigos.");
+        setLoading(false);
       }
     };
     fetchTestigos();
-  }, []);
+  }, [user]);
 
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -55,23 +81,33 @@ const Testigos = () => {
 
   const handleAddOrUpdateTestigo = async () => {
     if (!name || !email) {
-      Alert.alert("Error", "El nombre y el correo electrónico son obligatorios.");
+      Alert.alert(
+        "Error",
+        "El nombre y el correo electrónico son obligatorios."
+      );
       return;
     }
     try {
       let imageUrl = null;
-      if (image) {
+      if (image && !image.startsWith("https://")) { // Solo subir si es una URI local
         const response = await fetch(image);
         const blob = await response.blob();
         const storageRef = ref(storage, `testigos/${Date.now()}_${name}`);
         await uploadBytes(storageRef, blob);
         imageUrl = await getDownloadURL(storageRef);
+      } else if (image && image.startsWith("https://")) {
+        imageUrl = image; // Imagen ya subida
       }
-      const newTestigo = { name, email, phone, imageUrl };
+
+      const newTestigo = { userId: user.uid, name, email, phone, imageUrl };
       if (editingId) {
         const testigoRef = doc(db, "testigos", editingId);
         await updateDoc(testigoRef, newTestigo);
-        setTestigos(testigos.map((testigo) => testigo.id === editingId ? { ...testigo, ...newTestigo } : testigo));
+        setTestigos(
+          testigos.map((testigo) =>
+            testigo.id === editingId ? { ...testigo, ...newTestigo } : testigo
+          )
+        );
         Alert.alert("Éxito", "Testigo actualizado correctamente.");
       } else {
         const docRef = await addDoc(testigosRef, newTestigo);
@@ -112,10 +148,16 @@ const Testigos = () => {
     testigo.name?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  if (loading) return <ActivityIndicator size="large" color="#FFD700" style={styles.loading} />;
+  if (loading)
+    return (
+      <ActivityIndicator size="large" color="#FFD700" style={styles.loading} />
+    );
 
   return (
-    <ImageBackground source={require("../../assets/background/config.jpg")} style={styles.backgroundImage}>
+    <ImageBackground
+      source={require("../../assets/background/config.jpg")}
+      style={styles.backgroundImage}
+    >
       <ScrollView contentContainerStyle={styles.container}>
         <Text style={styles.header}>Gestión de Testigos</Text>
         <TextInput
@@ -126,28 +168,76 @@ const Testigos = () => {
         />
         <View style={styles.form}>
           <Text style={styles.label}>Nombre</Text>
-          <TextInput style={styles.input} value={name} onChangeText={setName} placeholder="Nombre del testigo" />
+          <TextInput
+            style={styles.input}
+            value={name}
+            onChangeText={setName}
+            placeholder="Nombre del testigo"
+          />
           <Text style={styles.label}>Correo Electrónico</Text>
-          <TextInput style={styles.input} value={email} onChangeText={setEmail} placeholder="Correo electrónico" keyboardType="email-address" />
+          <TextInput
+            style={styles.input}
+            value={email}
+            onChangeText={setEmail}
+            placeholder="Correo electrónico"
+            keyboardType="email-address"
+          />
           <Text style={styles.label}>Teléfono (opcional)</Text>
-          <TextInput style={styles.input} value={phone} onChangeText={setPhone} placeholder="Número de teléfono" keyboardType="phone-pad" />
+          <TextInput
+            style={styles.input}
+            value={phone}
+            onChangeText={setPhone}
+            placeholder="Número de teléfono"
+            keyboardType="phone-pad"
+          />
           <TouchableOpacity onPress={pickImage} style={styles.imagePicker}>
-            <Text style={styles.imagePickerText}>Seleccionar imagen (opcional)</Text>
-            {image && <Image source={{ uri: image }} style={styles.imagePreview} />}
+            <Text style={styles.imagePickerText}>
+              Seleccionar imagen (opcional)
+            </Text>
+            {image && (
+              <Image source={{ uri: image }} style={styles.imagePreview} />
+            )}
           </TouchableOpacity>
-          <Button title={editingId ? "Actualizar Testigo" : "Agregar Testigo"} onPress={handleAddOrUpdateTestigo} />
+          <Button
+            title={editingId ? "Actualizar Testigo" : "Agregar Testigo"}
+            onPress={handleAddOrUpdateTestigo}
+          />
         </View>
+
+        <TouchableOpacity
+          style={styles.uploadCertificateButton}
+          onPress={() => navigation.navigate("SubirCertificado")}
+        >
+          <Text style={styles.uploadCertificateButtonText}>
+            Subir Certificado de Defunción
+          </Text>
+        </TouchableOpacity>
 
         <Text style={styles.subheader}>Lista de Testigos</Text>
         {filteredTestigos.map((testigo) => (
           <View key={testigo.id} style={styles.card}>
             <Text style={styles.name}>{testigo.name}</Text>
             <Text style={styles.email}>{testigo.email}</Text>
-            {testigo.phone && <Text style={styles.phone}>Teléfono: {testigo.phone}</Text>}
-            {testigo.imageUrl && <Image source={{ uri: testigo.imageUrl }} style={styles.imagePreview} />}
+            {testigo.phone && (
+              <Text style={styles.phone}>Teléfono: {testigo.phone}</Text>
+            )}
+            {testigo.imageUrl && (
+              <Image
+                source={{ uri: testigo.imageUrl }}
+                style={styles.imagePreview}
+              />
+            )}
             <View style={styles.buttonGroup}>
-              <Button title="Editar" onPress={() => handleEditTestigo(testigo)} color="#4CAF50" />
-              <Button title="Eliminar" color="red" onPress={() => handleDeleteTestigo(testigo.id)} />
+              <Button
+                title="Editar"
+                onPress={() => handleEditTestigo(testigo)}
+                color="#4CAF50"
+              />
+              <Button
+                title="Eliminar"
+                color="red"
+                onPress={() => handleDeleteTestigo(testigo.id)}
+              />
             </View>
           </View>
         ))}
@@ -245,6 +335,19 @@ const styles = StyleSheet.create({
   loading: {
     flex: 1,
     justifyContent: "center",
+  },
+  uploadCertificateButton: {
+    backgroundColor: "#1E90FF",
+    padding: 15,
+    borderRadius: 8,
+    marginBottom: 20,
+    width: '100%',
+    alignItems: 'center',
+  },
+  uploadCertificateButtonText: {
+    color: '#FFF',
+    fontWeight: 'bold',
+    fontSize: 16,
   },
 });
 

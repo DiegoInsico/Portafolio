@@ -11,6 +11,7 @@ import {
   Animated,
   Alert,
   ActivityIndicator,
+  SafeAreaView, // Importar SafeAreaView
 } from "react-native";
 import { signOut } from "firebase/auth";
 import { auth, db } from "../../utils/firebase"; // Asegúrate de que la ruta sea correcta
@@ -113,177 +114,182 @@ export default function SideBar({
           { transform: [{ translateX: slideAnim }] },
         ]}
       >
-        <View style={styles.sidebarContent}>
-          {/* Perfil */}
-          <View style={styles.profileContainer}>
-            <Image
-              source={
-                user && user.photoURL
-                  ? { uri: user.photoURL }
-                  : userData && userData.photoURL
-                  ? { uri: userData.photoURL }
-                  : require("../../assets/default-profile.png") // Asegúrate de que la ruta sea correcta
-              }
-              style={styles.profileImage}
-            />
-            <Text style={styles.profileName}>
-              {user && user.displayName
-                ? user.displayName
-                : user && user.email
-                ? user.email
-                : "Nombre del Usuario"}
-            </Text>
-          </View>
+        <SafeAreaView style={styles.safeArea}>
+          <View style={styles.sidebarContent}>
+            {/* Perfil */}
+            <View style={styles.profileContainer}>
+              <Image
+                source={
+                  user && user.photoURL
+                    ? { uri: user.photoURL }
+                    : userData && userData.photoURL
+                    ? { uri: userData.photoURL }
+                    : require("../../assets/default-profile.png") // Asegúrate de que la ruta sea correcta
+                }
+                style={styles.profileImage}
+              />
+              <Text style={styles.profileName}>
+                {user && user.displayName
+                  ? user.displayName
+                  : user && user.email
+                  ? user.email
+                  : "Nombre del Usuario"}
+              </Text>
+            </View>
 
-          <View style={styles.divider} />
+            <View style={styles.divider} />
 
-          {/* Botones de Navegación Principales */}
-          <TouchableOpacity
-            style={[
-              styles.drawerButton,
-              selected === "Perfil" && styles.selectedButton,
-            ]}
-            onPress={() => {
-              setSelected("Perfil");
-              navigateToProfile();
-              toggleSidebar();
-            }}
-          >
-            <FontAwesome
-              name="user"
-              size={20}
-              color={selected === "Perfil" ? "#FFD700" : "#fff"}
-            />
-            <Text style={styles.drawerButtonText}>Perfil</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[
-              styles.drawerButton,
-              selected === "Testigos" && styles.selectedButton,
-            ]}
-            onPress={() => {
-              setSelected("Testigos");
-              navigateToTestigos();
-              toggleSidebar();
-            }}
-          >
-            <FontAwesome
-              name="users"
-              size={20}
-              color={selected === "Testigos" ? "#FFD700" : "#fff"}
-            />
-            <Text style={styles.drawerButtonText}>Testigos</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[
-              styles.drawerButton,
-              selected === "ProgramarMensaje" && styles.selectedButton,
-            ]}
-            onPress={() => {
-              setSelected("ProgramarMensaje");
-              navigateToProgramarMensaje();
-              toggleSidebar();
-            }}
-          >
-            <FontAwesome
-              name="clock-o"
-              size={20}
-              color={selected === "ProgramarMensaje" ? "#FFD700" : "#fff"}
-            />
-            <Text style={styles.drawerButtonText}>Programar Mensaje</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[
-              styles.drawerButton,
-              selected === "Beneficiarios" && styles.selectedButton,
-            ]}
-            onPress={() => {
-              setSelected("Beneficiarios");
-              navigateToBeneficiarios();
-              toggleSidebar();
-            }}
-          >
-            <FontAwesome
-              name="heart"
-              size={20}
-              color={selected === "Beneficiarios" ? "#FFD700" : "#fff"}
-            />
-            <Text style={styles.drawerButtonText}>Beneficiarios</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[
-              styles.drawerButton,
-              selected === "Configuracion" && styles.selectedButton,
-            ]}
-            onPress={() => {
-              setSelected("Configuracion");
-              navigateToSettings();
-              toggleSidebar();
-            }}
-          >
-            <FontAwesome
-              name="cog"
-              size={20}
-              color={selected === "Configuracion" ? "#FFD700" : "#fff"}
-            />
-            <Text style={styles.drawerButtonText}>Configuración</Text>
-          </TouchableOpacity>
-
-          {/* Espaciador Flexible */}
-          <View style={{ flex: 1 }} />
-
-          {/* Soporte (Posicionado al Final) */}
-          <TouchableOpacity
-            style={[
-              styles.drawerButton,
-              selected === "Soporte" && styles.selectedButton,
-            ]}
-            onPress={() => {
-              setSelected("Soporte");
-              navigateToSoporte(); // Función de navegación a Soporte
-              toggleSidebar();
-            }}
-          >
-            <FontAwesome
-              name="ticket"
-              size={20}
-              color={selected === "Soporte" ? "#FFD700" : "#fff"}
-            />
-            <Text style={styles.drawerButtonText}>Soporte</Text>
-          </TouchableOpacity>
-
-          {/* Cerrar Sesión */}
-          <TouchableOpacity
-            style={[
-              styles.drawerButton,
-              selected === "Cerrar Sesión" && styles.selectedButton,
-            ]}
-            onPress={() => {
-              setSelected("Cerrar Sesión");
-              handleSignOut();
-            }}
-          >
-            <FontAwesome
-              name="sign-out"
-              size={20}
-              color={selected === "Cerrar Sesión" ? "#FFD700" : "#fff"}
-            />
-            <Text
+            {/* Botones de Navegación Principales */}
+            <TouchableOpacity
               style={[
-                styles.drawerButtonText,
-                {
-                  color: selected === "Cerrar Sesión" ? "#FFD700" : "#fff",
-                },
+                styles.drawerButton,
+                selected === "Perfil" && styles.selectedButton,
               ]}
+              onPress={() => {
+                setSelected("Perfil");
+                navigateToProfile();
+                toggleSidebar();
+              }}
             >
-              Cerrar Sesión
-            </Text>
-          </TouchableOpacity>
-        </View>
+              <FontAwesome
+                name="user"
+                size={20}
+                color={selected === "Perfil" ? "#FFD700" : "#fff"}
+              />
+              <Text style={styles.drawerButtonText}>Perfil</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[
+                styles.drawerButton,
+                selected === "Testigos" && styles.selectedButton,
+              ]}
+              onPress={() => {
+                setSelected("Testigos");
+                navigateToTestigos();
+                toggleSidebar();
+              }}
+            >
+              <FontAwesome
+                name="users"
+                size={20}
+                color={selected === "Testigos" ? "#FFD700" : "#fff"}
+              />
+              <Text style={styles.drawerButtonText}>Testigos</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[
+                styles.drawerButton,
+                selected === "ProgramarMensaje" && styles.selectedButton,
+              ]}
+              onPress={() => {
+                setSelected("ProgramarMensaje");
+                navigateToProgramarMensaje();
+                toggleSidebar();
+              }}
+            >
+              <FontAwesome
+                name="clock-o"
+                size={20}
+                color={selected === "ProgramarMensaje" ? "#FFD700" : "#fff"}
+              />
+              <Text style={styles.drawerButtonText}>Programar Mensaje</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[
+                styles.drawerButton,
+                selected === "Beneficiarios" && styles.selectedButton,
+              ]}
+              onPress={() => {
+                setSelected("Beneficiarios");
+                navigateToBeneficiarios();
+                toggleSidebar();
+              }}
+            >
+              <FontAwesome
+                name="heart"
+                size={20}
+                color={selected === "Beneficiarios" ? "#FFD700" : "#fff"}
+              />
+              <Text style={styles.drawerButtonText}>Beneficiarios</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[
+                styles.drawerButton,
+                selected === "Configuracion" && styles.selectedButton,
+              ]}
+              onPress={() => {
+                setSelected("Configuracion");
+                navigateToSettings();
+                toggleSidebar();
+              }}
+            >
+              <FontAwesome
+                name="cog"
+                size={20}
+                color={selected === "Configuracion" ? "#FFD700" : "#fff"}
+              />
+              <Text style={styles.drawerButtonText}>Configuración</Text>
+            </TouchableOpacity>
+
+            {/* Espaciador Flexible */}
+            <View style={{ flex: 1 }} />
+
+            {/* Línea de Separación Antes de los Elementos Inferiores */}
+            <View style={styles.divider} />
+
+            {/* Soporte (Posicionado al Final) */}
+            <TouchableOpacity
+              style={[
+                styles.drawerButton,
+                selected === "Soporte" && styles.selectedButton,
+              ]}
+              onPress={() => {
+                setSelected("Soporte");
+                navigateToSoporte(); // Función de navegación a Soporte
+                toggleSidebar();
+              }}
+            >
+              <FontAwesome
+                name="ticket"
+                size={20}
+                color={selected === "Soporte" ? "#FFD700" : "#fff"}
+              />
+              <Text style={styles.drawerButtonText}>Soporte</Text>
+            </TouchableOpacity>
+
+            {/* Cerrar Sesión */}
+            <TouchableOpacity
+              style={[
+                styles.drawerButton,
+                selected === "Cerrar Sesión" && styles.selectedButton,
+              ]}
+              onPress={() => {
+                setSelected("Cerrar Sesión");
+                handleSignOut();
+              }}
+            >
+              <FontAwesome
+                name="sign-out"
+                size={20}
+                color={selected === "Cerrar Sesión" ? "#FFD700" : "#fff"}
+              />
+              <Text
+                style={[
+                  styles.drawerButtonText,
+                  {
+                    color: selected === "Cerrar Sesión" ? "#FFD700" : "#fff",
+                  },
+                ]}
+              >
+                Cerrar Sesión
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </SafeAreaView>
       </Animated.View>
     </Animated.View>
   );
@@ -326,7 +332,7 @@ const styles = StyleSheet.create({
     width: 280,
     backgroundColor: "#2C3E50",
     zIndex: 999,
-    paddingTop: 50,
+    paddingTop: 50, // Mantener según diseño
     paddingLeft: 20,
     paddingRight: 20,
     shadowColor: "#000",
@@ -400,5 +406,9 @@ const styles = StyleSheet.create({
     height: 1,
     backgroundColor: "#FFD700",
     marginVertical: 15,
+  },
+  safeArea: {
+    flex: 1,
+    backgroundColor: "transparent", // Mantener transparente para superposición
   },
 });

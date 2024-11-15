@@ -1,5 +1,5 @@
 // src/ai/ai.service.ts
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable, Inject, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import OpenAI from 'openai';
 import * as admin from 'firebase-admin';
@@ -7,6 +7,7 @@ import * as admin from 'firebase-admin';
 @Injectable()
 export class AiService {
   private openai: OpenAI;
+  private readonly logger = new Logger(AiService.name);
 
   constructor(
     private configService: ConfigService,
@@ -97,4 +98,34 @@ Ejemplos de Preguntas:
       throw new Error('Error generating emotions from OpenAI');
     }
   }
+
+  /**
+   * Analiza el texto del certificado para determinar su validez.
+   * @param text Texto extraído del certificado.
+   * @returns Booleano indicando si es válido.
+   */
+  async analyzeCertificate(text: string): Promise<boolean> {
+    try {
+      const prompt = `
+        Determina si el siguiente texto corresponde a un certificado de defunción válido. Responde únicamente con "válido" o "inválido".
+
+        Texto: "${text}"
+      `;
+
+      const response = await this.openai.chat.completions.create({
+        model: 'gpt-3.5-turbo',
+        messages: [{ role: 'system', content: prompt }],
+      });
+
+      const result = response.choices[0].message.content.trim().toLowerCase();
+      this.logger.log(`Resultado del análisis de certificado: ${result}`);
+
+      return result === 'válido';
+    } catch (error) {
+      this.logger.error('Error al analizar el certificado con OpenAI:', error);
+      throw new Error('No se pudo analizar el certificado.');
+    }
+  }
+
+  
 }
