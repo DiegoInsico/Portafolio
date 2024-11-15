@@ -89,7 +89,8 @@
 .dashboard-grid {
   grid-area: main;
   display: flex;
-  flex-direction: row;
+  align-items: center;
+  justify-content: center;
   align-content: center;
   flex-wrap: wrap;
   gap: 10px;
@@ -184,31 +185,40 @@
 /* graficos */
 .dash-chart-container {
   grid-area: right;
-  /* background-color: #0055ff48; */
+  background-color: #fdfeff7e;
   margin-top: 50px;
   max-height: 90%;
   border-radius: 20px;
-  padding: 20px;
+  /* padding: 20px; */
   text-align: center;
   color: #ffffff;
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
   backdrop-filter: blur(3px);
 }
 
-.dash-chart-container h1{
-  margin: 0;
-  font-size: 30px;
+.dash-chart-container h1, h2,
+.btn-functions h1{
+  position: sticky;
+  top: 0;
+  background-color: #ffffff7c; 
   color: black;
+  border-radius: 30px;
+  backdrop-filter: blur(5px);
+  padding: 20px 0;
+  margin: 0;
+  width: 100%;
+  z-index: 2;
+  border-bottom: 1px solid #ff9900; 
 }
 
 .chart-content {
   margin-top: 20px;
   padding: 15px;
   border-radius: 10px;
-  background-color: #d9d9d9b2;
+  /* background-color: #d9d9d909; */
   width: 30   0px;
   height: 350px;
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+  /* box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); */
 }
 
 .chart-unverified-users h2,
@@ -226,19 +236,14 @@
   flex-direction: column;
   gap: 25px;
   width: 100%;
-  padding: 10px;
+  /* padding: 10px; */
+  background-color: #fdfeff7e;
   margin-top: 50px;
   backdrop-filter: blur(5px);
   border-radius: 25px;
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-
-.btn-functions h1{
-  font-size: 20px;
-  margin: 0;
-  color: black;
-}
 
 .btn-perso {
   padding: 12px 35px;

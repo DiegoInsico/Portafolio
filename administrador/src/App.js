@@ -20,7 +20,8 @@ import Test from "./pages/test/test";
 import Clouster from "./pages/monitor/clouster";
 import RightBar from "./components/rightBar";
 import PrivateRoute from "./components/PrivateRoute";
-import TicketDetails from "./pages/system/TicketDetails"; // Importar el nuevo componente
+import TicketDetails from "./pages/system/TicketDetails";
+import RolManagment from "./pages/rol/rolManagment";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -81,6 +82,7 @@ const AppRoutes = ({ isAuthenticated, currentUser, handleLogin }) => {
             {/* Almacenamiento y Sistema */}
             <Route path="/monitor/storage/storageUsage" element={<StorageUsage />} />
             <Route path="/system/notifications" element={<Notifications />} />
+            <Route path="/rol/RolManagment" element={<RolManagment />} />
 
             {/* Ruta Protegida con PrivateRoute para Soporte */}
             <Route 

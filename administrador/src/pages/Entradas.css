@@ -21,8 +21,8 @@
 }
 
 .table-container, .emotion-chart-container, .monthly-entries-chart-container {
-  padding: 15px;
-  border-radius: 20px;
+  /* padding: 15px; */
+  border-radius: 30px;
   background-color: rgba(252, 252, 252, 0.473);
   backdrop-filter: blur(3px);
 }
@@ -60,6 +60,7 @@
   grid-area: chart;
   height: 25vh;
   width: 50%;
+  height: 40%;
   margin-left: auto;
   margin-bottom: auto;
 }
@@ -67,11 +68,9 @@
 /* Contenedor de la tabla de estadísticas generales */
 .table-container {
   grid-area: tables;
-  padding-top: 10px;
-  padding: 10px;
   height: 30%;
   margin-bottom: auto;
-  border-radius: 20px;
+  border-radius: 30px;
   background-color: rgba(252, 252, 252, 0.473);
   /* background-color: red; */
   backdrop-filter: blur(3px);

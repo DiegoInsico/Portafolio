@@ -29,6 +29,7 @@ import {
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate } from 'react-router-dom';
+import Container from '../../components/container';
 
 const Inbox = () => {
   const [tickets, setTickets] = useState([]);
@@ -209,6 +210,7 @@ const Inbox = () => {
     : tickets;
 
   return (
+    <Container>
     <div className="inbox-container">
       <Typography variant="h4" align="center" gutterBottom>
         Bandeja de Entrada - Tickets de Soporte
@@ -254,6 +256,7 @@ const Inbox = () => {
       {/* Contenedor de Notificaciones */}
       <ToastContainer />
     </div>
+    </Container>
   );
 };
 

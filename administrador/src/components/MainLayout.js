@@ -39,10 +39,10 @@ const MainLayout = ({ children, isAuthenticated, currentUser }) => {
               <BarChartIcon className="icon" />
               <span className="sidebar-number">|</span> Ver Gráficos
             </NavLink>
-            <NavLink to="/system/notifications">
+            {/* <NavLink to="/system/notifications">
               <NotificationsIcon className="icon" />
               <span className="sidebar-number">|</span> Notificaciones
-            </NavLink>
+            </NavLink> */}
             <NavLink to="/monitor/SoulmatePage">
               <MusicNoteIcon className="icon" />
               <span className="sidebar-number">|</span> Lista de Emociones y Canciones
