@@ -3,13 +3,18 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AiModule } from './ai/ai.module';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { SpotifyModule } from './spotify/spotify.module';
 import { ProgramarMensajeModule } from './programar-mensaje/programar-mensaje.module';
 import { EmailModule } from './services/email/email.module';
 import { FirestoreModule } from './services/firestore/firestore.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { PaymentModule } from './payment/payment.module';
+import { NotificationService } from './services/notification/notification.service';
+import { OcrService } from './services/ocr/ocr.service';
+import { CertificadoService } from './services/certificado/certificado.service';
+import * as admin from 'firebase-admin';
+import { AiService } from './ai/ai.service';
 
 @Module({
   imports: [
@@ -23,8 +28,27 @@ import { PaymentModule } from './payment/payment.module';
     EmailModule,
     FirestoreModule,
     PaymentModule,
+    // Nota: No debes incluir servicios directamente en `imports`
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    OcrService,
+    CertificadoService,
+    {
+      provide: 'FIREBASE_ADMIN',
+      useFactory: (configService: ConfigService) => {
+        if (!admin.apps.length) {
+          admin.initializeApp({
+            credential: admin.credential.cert(configService.get<string>('GOOGLE_CLOUD_KEYFILE')),
+          });
+        }
+        return admin;
+      },
+      inject: [ConfigService],
+    },
+    NotificationService,
+    AiService
+  ],
 })
 export class AppModule {}

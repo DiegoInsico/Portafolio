@@ -169,9 +169,9 @@ const ListEntry = ({ user }) => {
                 style={styles.picker}
                 dropdownIconColor="#4B4E6D"
               >
-                <Picker.Item label="R. Cotidiano" value="1" />
-                <Picker.Item label="C. Corazón" value="2" />
-                <Picker.Item label="E. Esencia" value="3" />
+                <Picker.Item label="Diario" value="1" />
+                <Picker.Item label="Personal" value="2" />
+                <Picker.Item label="Intimo" value="3" />
               </Picker>
             </View>
           </View>

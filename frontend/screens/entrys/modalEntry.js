@@ -1,3 +1,5 @@
+// ModalEntry.js
+
 import React, { useState, useEffect } from "react";
 import {
   Modal,
@@ -31,7 +33,7 @@ import {
   serverTimestamp,
   query,
   where,
-  getDocs
+  getDocs,
 } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import uuid from "react-native-uuid";
@@ -50,12 +52,11 @@ const ModalEntry = ({ visible, onClose }) => {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedColor, setSelectedColor] = useState("#fff");
-  const [baul, setBaul] = useState(false); // Nuevo estado para "baul"
-  const [cancion, setCancion] = useState(null); // Estado para canción de Spotify
-  // Añadimos un estado para el nivel seleccionado
-  const [nivel, setNivel] = useState("1"); // Nivel predeterminado es 1
+  const [baul, setBaul] = useState(false);
+  const [cancion, setCancion] = useState(null);
+  const [nivel, setNivel] = useState("Básico");
+  const [enableRecuerdoDate, setEnableRecuerdoDate] = useState(false);
   const today = new Date();
-
 
   useEffect(() => {
     (async () => {
@@ -90,7 +91,6 @@ const ModalEntry = ({ visible, onClose }) => {
 
   const manejarGrabacionCompleta = (audio) => {
     setAudioUri(audio.uri);
-    // Aquí puedes manejar el URI del audio grabado, por ejemplo, enviarlo a un servidor
   };
 
   const seleccionarMedia = async () => {
@@ -115,17 +115,15 @@ const ModalEntry = ({ visible, onClose }) => {
         if (type === "image") {
           setMediaType("image");
           setMedia(selectedMedia);
-          // Al seleccionar una imagen, limpiamos Spotify y audio/texto si es necesario
           setIsSpotifyMode(false);
-          setCancion(null); // Limpia cualquier canción seleccionada
+          setCancion(null);
           setAudioUri(null);
           setTexto("");
         } else if (type === "video") {
           setMediaType("video");
           setMedia(selectedMedia);
-          // Al seleccionar un video, limpiamos Spotify y audio/texto si es necesario
           setIsSpotifyMode(false);
-          setCancion(null); // Limpia cualquier canción seleccionada
+          setCancion(null);
           setAudioUri(null);
           setTexto("");
         } else {
@@ -150,7 +148,6 @@ const ModalEntry = ({ visible, onClose }) => {
     setCancion(null);
   };
 
-  // Función para buscar canciones en Spotify usando Axios
   const buscarCancionesSpotify = async (query) => {
     try {
       const response = await axios.get(
@@ -161,32 +158,32 @@ const ModalEntry = ({ visible, onClose }) => {
           },
         }
       );
-      setSpotifyResults(response.data); // Guardar los resultados de Spotify
+      setSpotifyResults(response.data);
     } catch (error) {
       console.error("Error al buscar canciones en Spotify:", error);
     }
   };
 
   const handleGuardar = async () => {
-    // Obtener la instancia de autenticación
     const auth = getAuth();
-    const user = auth.currentUser; // Obtener el usuario autenticado
+    const user = auth.currentUser;
 
-    // Comprobamos el límite de entradas por nivel
     const userEntriesQuery = query(
-      collection(db, 'entradas'),
-      where('userId', '==', user.uid),
-      where('nivel', '==', nivel)
+      collection(db, "entradas"),
+      where("userId", "==", user.uid),
+      where("nivel", "==", nivel)
     );
     const userEntries = await getDocs(userEntriesQuery);
 
-    const limites = { '1': 50, '2': 10, '3': 4 };
+    const limites = { Básico: 50, Privado: 10, Profundo: 4 };
     if (userEntries.size >= limites[nivel]) {
-    Alert.alert("Límite alcanzado", "Has alcanzado el límite de entradas para este nivel.");
-    return;
+      Alert.alert(
+        "Límite alcanzado",
+        `Has alcanzado el límite de entradas para el nivel ${nivel}.`
+      );
+      return;
     }
 
-    // Verificar si el usuario está autenticado
     if (!user) {
       Alert.alert(
         "Error",
@@ -195,7 +192,6 @@ const ModalEntry = ({ visible, onClose }) => {
       return;
     }
 
-    // Validaciones iniciales
     if (!categoria) {
       Alert.alert("Error", "Por favor, selecciona una categoría.");
       return;
@@ -209,13 +205,22 @@ const ModalEntry = ({ visible, onClose }) => {
       return;
     }
 
+    if (enableRecuerdoDate) {
+      if (!selectedDate) {
+        Alert.alert(
+          "Error",
+          "Por favor, selecciona una fecha para el recuerdo."
+        );
+        return;
+      }
+    }
+
     try {
       let mediaURL = null;
       let audioURL = null;
       let cancionData = null;
       let emociones = [];
 
-      // Subir media (imagen o video) si existe y no es Spotify
       if (media && media.type !== "spotify") {
         const mediaRef = ref(
           storage,
@@ -229,7 +234,6 @@ const ModalEntry = ({ visible, onClose }) => {
         mediaURL = await getDownloadURL(mediaRef);
       }
 
-      // Subir audio si existe
       if (audioUri) {
         const audioRef = ref(
           storage,
@@ -243,7 +247,6 @@ const ModalEntry = ({ visible, onClose }) => {
         audioURL = await getDownloadURL(audioRef);
       }
 
-      // Si hay una canción de Spotify seleccionada
       if (cancion) {
         cancionData = {
           id: cancion.id,
@@ -253,7 +256,6 @@ const ModalEntry = ({ visible, onClose }) => {
         };
       }
 
-      // Análisis de emociones utilizando IA
       if (texto) {
         const response = await axios.get(
           "http://192.168.1.12:3000/api/emotion",
@@ -265,7 +267,7 @@ const ModalEntry = ({ visible, onClose }) => {
       }
 
       const nuevaEntrada = {
-        userId: user.uid, // Añadir el ID del usuario autenticado
+        userId: user.uid,
         categoria,
         texto: null,
         audio: null,
@@ -275,11 +277,10 @@ const ModalEntry = ({ visible, onClose }) => {
         color: selectedColor,
         baul,
         fechaCreacion: serverTimestamp(),
-        fechaRecuerdo: categoria === "recuerdo" ? selectedDate : null,
-        emociones, // Aquí guardamos las emociones detectadas
-        nivel, // Nivel de profundidad
-        isProtected: nivel === '2' || nivel === '3', // Seguridad adicional para niveles 2 y 3
-        
+        fechaRecuerdo: enableRecuerdoDate ? selectedDate : null,
+        emociones,
+        nivel,
+        isProtected: nivel === "Privado" || nivel === "Profundo",
       };
 
       if (cancionData) {
@@ -301,7 +302,6 @@ const ModalEntry = ({ visible, onClose }) => {
 
       console.log("Documento escrito con ID: ", docRef.id);
 
-      // Resetear el formulario
       setCategoria("");
       setTexto("");
       setAudioUri(null);
@@ -312,6 +312,7 @@ const ModalEntry = ({ visible, onClose }) => {
       setSelectedDate(new Date());
       setBaul(false);
       setSelectedColor("#ffffff");
+      setEnableRecuerdoDate(false);
       onClose();
     } catch (error) {
       console.error("Error al guardar la entrada: ", error);
@@ -322,8 +323,8 @@ const ModalEntry = ({ visible, onClose }) => {
     }
   };
 
-  const onChangeDate = (event, selectedDate) => {
-    const currentDate = selectedDate || new Date();
+  const onChangeDateHandler = (event, selectedDateValue) => {
+    const currentDate = selectedDateValue || new Date();
     setShowDatePicker(false);
     if (currentDate < today) {
       setSelectedDate(currentDate);
@@ -343,357 +344,310 @@ const ModalEntry = ({ visible, onClose }) => {
         <View style={styles.modalContent}>
           <Text style={styles.titulo}>Crear Nuevo Instante</Text>
 
-          {/* Switch para alternar entre Galeria/Video y Spotify */}
-          <CustomSwitch
-            style={styles.switchItem}
-            option1="Galeria"
-            option2="Spotify"
-            color1="#4CAF50" // Color cuando está en ON (Galeria/Video)
-            color2="#007BFF" // Color cuando está en OFF (Spotify)
-            value={isSpotifyMode}
-            onSwitch={(value) => {
-              setIsSpotifyMode(value);
-              if (value) {
-                eliminarMedia(); // Limpia cualquier media seleccionada
-                eliminarCancion(); // Limpia cualquier canción seleccionada
-                setAudioUri(null); // Limpia audio si es necesario
-                setTexto(""); // Limpia texto si es necesario
-              } else {
-                setSpotifyResults([]); // Limpia los resultados de Spotify
-              }
-            }}
-          />
+          {/* Sección de Categoría y Nivel */}
+          <View style={styles.section}>
+            <Text style={styles.label}>Categoría</Text>
+            <RNPickerSelect
+              onValueChange={(value) => {
+                setCategoria(value);
+              }}
+              items={[
+                { label: "Viaje", value: "Viaje" },
+                { label: "Evento", value: "Evento" },
+                // ... (resto de las categorías)
+              ]}
+              placeholder={{
+                label: "Selecciona una categoría",
+                value: "",
+                color: "#9EA0A4",
+              }}
+              style={pickerSelectStyles}
+              value={categoria}
+            />
 
-          {/* Campo de búsqueda para Spotify */}
-          {isSpotifyMode && !cancion && (
-            <View style={styles.spotifyContainer}>
-              <TextInput
-                style={styles.input}
-                placeholder="Buscar canción en Spotify"
-                value={searchQuery}
-                onChangeText={(text) => {
-                  setSearchQuery(text);
-                  if (text.length > 2) {
-                    buscarCancionesSpotify(text);
+            <Text style={styles.label}>Nivel de profundidad</Text>
+            <RNPickerSelect
+              onValueChange={(value) => setNivel(value)}
+              items={[
+                { label: "Intimo", value: "1" },
+                { label: "Personal", value: "2" },
+                { label: "Intimo", value: "3" },
+              ]}
+              placeholder={{
+                label: "Selecciona el nivel de privacidad",
+                value: null,
+              }}
+              style={pickerSelectStyles}
+            />
+          </View>
+
+          {/* Sección de Tipo de Contenido, Contenido y Agregar */}
+          <View style={styles.rowSection}>
+            {/* Mitad Izquierda: Tipo de Contenido y Contenido */}
+            <View style={styles.leftHalf}>
+              <Text style={styles.label}>Tipo de Contenido</Text>
+              <CustomSwitch
+                style={styles.switchItem}
+                option1="Galería/Video"
+                option2="Spotify"
+                color1="#4CAF50"
+                color2="#007BFF"
+                value={isSpotifyMode}
+                onSwitch={(value) => {
+                  setIsSpotifyMode(value);
+                  if (value) {
+                    eliminarMedia();
+                    eliminarCancion();
+                    setAudioUri(null);
+                    setTexto("");
                   } else {
-                    setSpotifyResults([]); // Limpiar resultados si el texto es menor o igual a 2
+                    setSpotifyResults([]);
                   }
                 }}
               />
 
-              {/* Mostrar resultados de Spotify solo si hay resultados y el campo de búsqueda no está vacío */}
-              {searchQuery.length > 2 && spotifyResults.length > 0 && (
-                <View style={styles.spotifyResultsContainer}>
-                  <ScrollView style={styles.spotifyResults}>
-                    {spotifyResults.map((track) => (
-                      <Pressable
-                        key={track.id}
-                        onPress={() => {
-                          setCancion({
-                            id: track.id,
-                            name: track.name,
-                            artist: track.artists[0].name,
-                            albumImage: track.album.images[0].url,
-                          });
-                          setSearchQuery(""); // Limpiar el campo de búsqueda
-                          setSpotifyResults([]); // Limpiar los resultados de búsqueda
-                          // setIsSpotifyMode(false); // Eliminado para mantener el switch en Spotify
-                          setMedia(null); // Limpia cualquier media seleccionada
-                          setMediaType(null);
-                          setAudioUri(null); // Opcional: limpiar audio si es necesario
-                          setTexto(""); // Opcional: limpiar texto si es necesario
-                        }}
-                      >
-                        <View style={styles.trackContainer}>
+              <Text style={[styles.label, { marginTop: 10 }]}>Contenido</Text>
+              <CustomSwitch
+                style={styles.switchItem}
+                option1="Texto"
+                option2="Audio"
+                color1="#007BFF"
+                color2="#4CAF50"
+                value={isAudioMode}
+                onSwitch={(value) => {
+                  setIsAudioMode(value);
+                  if (value) {
+                    setTexto("");
+                  } else {
+                    setAudioUri(null);
+                    setSound(null);
+                  }
+                }}
+              />
+            </View>
+
+            {/* Mitad Derecha: Botón Agregar Imagen o Video */}
+            <View style={styles.rightHalf}>
+              {!isSpotifyMode && (
+                <View style={styles.agregarContainer}>
+                  {!media ? (
+                    <Pressable
+                      style={styles.iconoGaleria}
+                      onPress={seleccionarMedia}
+                    >
+                      <Entypo name="image" size={40} color="#007BFF" />
+                      <Text style={styles.iconoGaleriaTexto}>Agregar</Text>
+                    </Pressable>
+                  ) : (
+                    <View>
+                      {mediaType === "image" && (
+                        <View style={styles.mediaContainer}>
                           <Image
-                            source={{ uri: track.album.images[0].url }}
-                            style={styles.trackImage}
+                            source={{ uri: media.uri }}
+                            style={styles.mediaPreview}
                           />
-                          <View>
-                            <Text style={styles.trackName}>{track.name}</Text>
-                            <Text style={styles.trackArtist}>
-                              {track.artists[0].name}
-                            </Text>
-                          </View>
+                          <Pressable
+                            style={styles.eliminarIcono}
+                            onPress={eliminarMedia}
+                          >
+                            <MaterialIcons name="close" size={24} color="red" />
+                          </Pressable>
                         </View>
+                      )}
+                      {mediaType === "video" && (
+                        <View style={styles.mediaContainer}>
+                          <Video
+                            source={{ uri: media.uri }}
+                            rate={1.0}
+                            volume={1.0}
+                            isMuted={false}
+                            resizeMode="cover"
+                            shouldPlay={false}
+                            isLooping
+                            style={styles.mediaPreview}
+                            useNativeControls
+                          />
+                          <Pressable
+                            style={styles.eliminarIcono}
+                            onPress={eliminarMedia}
+                          >
+                            <MaterialIcons name="close" size={24} color="red" />
+                          </Pressable>
+                        </View>
+                      )}
+                    </View>
+                  )}
+                </View>
+              )}
+
+              {/* Si está en modo Spotify */}
+              {isSpotifyMode && (
+                <View style={styles.agregarContainer}>
+                  {!cancion ? (
+                    <View style={styles.spotifyContainer}>
+                      <TextInput
+                        style={styles.inputSmall}
+                        placeholder="Buscar canción"
+                        value={searchQuery}
+                        onChangeText={(text) => {
+                          setSearchQuery(text);
+                          if (text.length > 2) {
+                            buscarCancionesSpotify(text);
+                          } else {
+                            setSpotifyResults([]);
+                          }
+                        }}
+                      />
+
+                      {searchQuery.length > 2 && spotifyResults.length > 0 && (
+                        <View style={styles.spotifyResultsContainer}>
+                          <ScrollView style={styles.spotifyResults}>
+                            {spotifyResults.map((track) => (
+                              <Pressable
+                                key={track.id}
+                                onPress={() => {
+                                  setCancion({
+                                    id: track.id,
+                                    name: track.name,
+                                    artist: track.artists[0].name,
+                                    albumImage: track.album.images[0].url,
+                                  });
+                                  setSearchQuery("");
+                                  setSpotifyResults([]);
+                                  setMedia(null);
+                                  setMediaType(null);
+                                  setAudioUri(null);
+                                  setTexto("");
+                                }}
+                              >
+                                <View style={styles.trackContainer}>
+                                  <Image
+                                    source={{
+                                      uri: track.album.images[0].url,
+                                    }}
+                                    style={styles.trackImage}
+                                  />
+                                  <View>
+                                    <Text style={styles.trackName}>
+                                      {track.name}
+                                    </Text>
+                                    <Text style={styles.trackArtist}>
+                                      {track.artists[0].name}
+                                    </Text>
+                                  </View>
+                                </View>
+                              </Pressable>
+                            ))}
+                          </ScrollView>
+                        </View>
+                      )}
+                    </View>
+                  ) : (
+                    <View style={styles.mediaContainer}>
+                      <Image
+                        source={{ uri: cancion.albumImage }}
+                        style={styles.trackImageSelect}
+                      />
+                      <Text style={styles.trackNameSelect}>{cancion.name}</Text>
+                      <Text style={styles.trackArtistSelect}>
+                        {cancion.artist}
+                      </Text>
+                      <Pressable
+                        style={styles.eliminarIcono}
+                        onPress={eliminarCancion}
+                      >
+                        <MaterialIcons name="close" size={24} color="red" />
                       </Pressable>
-                    ))}
-                  </ScrollView>
+                    </View>
+                  )}
                 </View>
               )}
             </View>
-          )}
+          </View>
 
-          {/* Vista Previa de Canción de Spotify */}
-          {cancion && (
-            <View style={styles.mediaContainer}>
-              <Image
-                source={{ uri: cancion.albumImage }}
-                style={styles.trackImageSelect}
+          {/* Sección de Texto o Audio */}
+          <View style={styles.section}>
+            <View style={styles.switchContentContainer}>
+              {!isAudioMode ? (
+                <View style={styles.textoContainer}>
+                  <TextInput
+                    style={styles.inputSmall}
+                    multiline
+                    numberOfLines={3}
+                    placeholder="Cuéntame algo"
+                    value={texto}
+                    onChangeText={setTexto}
+                    scrollEnabled={true}
+                  />
+                </View>
+              ) : (
+                <View style={styles.audioModeContainer}>
+                  <AudioRecorder
+                    onRecordingComplete={manejarGrabacionCompleta}
+                  />
+                  {audioUri && (
+                    <View style={styles.audioPreview}>
+                      <Text style={styles.audioText}>Audio Grabado</Text>
+                      <Pressable onPress={() => setAudioUri(null)}>
+                        <MaterialIcons name="close" size={20} color="red" />
+                      </Pressable>
+                    </View>
+                  )}
+                </View>
+              )}
+            </View>
+          </View>
+
+          {/* Opciones Adicionales */}
+          <View style={styles.section}>
+            {/* Selector de Color */}
+            <Text style={styles.label}>Selecciona un Color</Text>
+            <View style={styles.pickerContent}>
+              <ColorPicker
+                style={styles.recuadroPicker}
+                selectedColor={selectedColor}
+                onColorSelect={(color) => setSelectedColor(color)}
               />
-              <Text style={styles.trackNameSelect}>{cancion.name}</Text>
-              <Text style={styles.trackArtistSelect}>{cancion.artist}</Text>
-              <Pressable style={styles.eliminarIcono} onPress={eliminarCancion}>
-                <MaterialIcons name="close" size={24} color="red" />
-              </Pressable>
             </View>
-          )}
 
-          {/* Vista Previa de Media */}
-          {media && mediaType === "image" && (
-            <View style={styles.mediaContainer}>
-              <Image source={{ uri: media.uri }} style={styles.mediaPreview} />
-              <Pressable style={styles.eliminarIcono} onPress={eliminarMedia}>
-                <MaterialIcons name="close" size={24} color="red" />
-              </Pressable>
-            </View>
-          )}
-          {media && mediaType === "video" && (
-            <View style={styles.mediaContainer}>
-              <Video
-                source={{ uri: media.uri }}
-                rate={1.0}
-                volume={1.0}
-                isMuted={false}
-                resizeMode="cover"
-                shouldPlay={false}
-                isLooping
-                style={styles.mediaPreview}
-                useNativeControls
+            {/* Switch para Activar Fecha del Recuerdo */}
+            <View style={styles.switchRecuerdoContainer}>
+              <Text style={styles.label}>Fecha del Recuerdo</Text>
+              <Switch
+                value={enableRecuerdoDate}
+                onValueChange={setEnableRecuerdoDate}
+                trackColor={{ false: "#767577", true: "#81b0ff" }}
+                thumbColor={enableRecuerdoDate ? "#f5dd4b" : "#f4f3f4"}
               />
-              <Pressable style={styles.eliminarIcono} onPress={eliminarMedia}>
-                <MaterialIcons name="close" size={24} color="red" />
-              </Pressable>
             </View>
-          )}
-          {!media && !isSpotifyMode && (
-            <Pressable style={styles.iconoGaleria} onPress={seleccionarMedia}>
-              <Entypo name="image" size={50} color="#007BFF" />
-            </Pressable>
-          )}
 
-          {/* Switch entre Texto y Audio */}
-          <CustomSwitch
-            style={styles.switchItem}
-            option1="Texto"
-            option2="Audio"
-            color1="#007BFF" // Color cuando está en OFF (Texto)
-            color2="#4CAF50" // Color cuando está en ON (Audio)
-            value={isAudioMode}
-            onSwitch={(value) => {
-              setIsAudioMode(value);
-              if (value) {
-                setTexto(""); // Limpia el texto si se activa el modo Audio
-              } else {
-                setAudioUri(null);
-                setSound(null);
-              }
-            }}
-          />
-
-          {/* Campo de Texto o Modo de Audio */}
-          <View style={styles.switchContentContainer}>
-            {!isAudioMode ? (
-              // Modo de Texto
-              <View style={styles.textoContainer}>
-                <TextInput
-                  style={styles.inputTexto}
-                  multiline
-                  numberOfLines={4}
-                  placeholder="Cuentame algo"
-                  value={texto}
-                  onChangeText={setTexto}
-                />
-              </View>
-            ) : (
-              // Modo de Audio
-              <View style={styles.audioModeContainer}>
-                <AudioRecorder onRecordingComplete={manejarGrabacionCompleta} />
+            {/* Fecha del Recuerdo */}
+            {enableRecuerdoDate && (
+              <View style={styles.datePickerContainer}>
+                <Pressable
+                  onPress={() => setShowDatePicker(true)}
+                  style={styles.datePickerPressable}
+                >
+                  <Text style={styles.datePickerText}>
+                    {selectedDate
+                      ? selectedDate.toLocaleDateString("es-ES")
+                      : "Selecciona una fecha"}
+                  </Text>
+                </Pressable>
+                {showDatePicker && (
+                  <DateTimePicker
+                    value={selectedDate}
+                    mode="date"
+                    display="default"
+                    onChange={onChangeDateHandler}
+                    maximumDate={today}
+                  />
+                )}
               </View>
             )}
           </View>
 
-          {/* Selector de Color */}
-          <View style={styles.pickerContent}>
-            <ColorPicker style={styles.recuadroPicker}
-              selectedColor={selectedColor}
-              onColorSelect={(color) => setSelectedColor(color)}
-            />
-          </View>
-          {/* Nivel de profundidad */}
-          <Text style={styles.label}> Nivel de profundidad </Text>
-          <RNPickerSelect
-            onValueChange={(value) => setNivel(value)}
-            items={[
-              { label: "Nivel 1 - General", value: "1" },
-              { label: "Nivel 2 - Privado", value: "2" },
-              { label: "Nivel 3 - Profundo", value: "3" },
-            ]}
-            placeholder={{
-              label: "Selecciona el nivel de privacidad",
-              value: null,
-            }}
-            style={pickerSelectStyles}
-          />
-          {/* Categoría */}
-          <Text style={styles.label}>Categoría</Text>
-          <RNPickerSelect
-            onValueChange={(value) => {
-              setCategoria(value);
-              if (value === "recuerdo") {
-                setShowDatePicker(true);
-              } else {
-                setShowDatePicker(false);
-              }
-            }}
-            items={[
-              {
-                label: "Viaje",
-                value: "Viaje",
-              },
-              {
-                label: "Evento",
-                value: "Evento",
-              },
-              {
-                label: "Personal",
-                value: "Personal",
-              },
-              {
-                label: "Recuerdo",
-                value: "Recuerdo",
-              },
-              {
-                label: "Reflexión",
-                value: "Reflexión",
-              },
-              {
-                label: "Meta Alcanzada",
-                value: "Meta Alcanzada",
-              },
-              {
-                label: "Consejo",
-                value: "Consejo",
-              },
-              {
-                label: "Secreto",
-                value: "Secreto",
-              },
-              {
-                label: "Gratitud",
-                value: "Gratitud",
-              },
-              {
-                label: "Sueño",
-                value: "Sueño",
-              },
-              {
-                label: "Amistad",
-                value: "Amistad",
-              },
-              {
-                label: "Amor",
-                value: "Amor",
-              },
-              {
-                label: "Logro",
-                value: "Logro",
-              },
-              {
-                label: "Inspiración",
-                value: "Inspiración",
-              },
-              {
-                label: "Música",
-                value: "Música",
-              },
-              {
-                label: "Fotografía",
-                value: "Fotografía",
-              },
-              {
-                label: "Anécdota",
-                value: "Anécdota",
-              },
-              {
-                label: "Cumpleaños",
-                value: "Cumpleaños",
-              },
-              {
-                label: "Aprendizaje",
-                value: "Aprendizaje",
-              },
-              {
-                label: "Meditación",
-                value: "Meditación",
-              },
-              {
-                label: "Pensamiento",
-                value: "Pensamiento",
-              },
-              {
-                label: "Familia",
-                value: "Familia",
-              },
-              {
-                label: "Desafío",
-                value: "Desafío",
-              },
-              {
-                label: "Sueño Cumplido",
-                value: "Sueño Cumplido",
-              },
-              {
-                label: "Aventura",
-                value: "Aventura",
-              },
-              {
-                label: "Relación",
-                value: "Relación",
-              },
-              {
-                label: "Filosofía de Vida",
-                value: "Filosofía de Vida",
-              },
-              {
-                label: "Oración",
-                value: "Oración",
-              },
-              {
-                label: "Propuesta",
-                value: "Propuesta",
-              },
-              {
-                label: "Pérdida",
-                value: "Pérdida",
-              },
-              {
-                label: "Milagro",
-                value: "Milagro",
-              },
-              {
-                label: "Salud",
-                value: "Salud",
-              },
-              {
-                label: "Reconciliación",
-                value: "Reconciliación",
-              },
-              {
-                label: "Celebración",
-                value: "Celebración",
-              },
-            ]}
-            placeholder={{
-              label: "Selecciona una categoría",
-              value: "",
-              color: "#9EA0A4",
-            }}
-            style={pickerSelectStyles}
-            value={categoria}
-          />
-
-          {/* Botones de Guardar y Cancelar */}
+          {/* Botones de Acción */}
           <View style={styles.botonContainer}>
             <Pressable style={styles.botonGuardar} onPress={handleGuardar}>
               <Text style={styles.botonTexto}>Guardar</Text>
@@ -709,72 +663,166 @@ const ModalEntry = ({ visible, onClose }) => {
 };
 
 const styles = StyleSheet.create({
-  /* ====== Modal Styles ====== */
+  /* Estilos generales */
   modalContainer: {
     flexGrow: 1,
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "rgba(0,0,0,0.8)",
-    padding: 20,
+    padding: 10,
   },
   modalContent: {
-    width: "90%",
+    width: "95%",
     backgroundColor: "#4B4E6D",
     borderRadius: 15,
-    padding: 20,
+    padding: 15,
     elevation: 5,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    alignItems: "center",
   },
-  /* ====== Text Styles ====== */
   titulo: {
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: "bold",
     marginBottom: 10,
     textAlign: "center",
     color: "#FFD700",
   },
   label: {
-    marginTop: 10,
-    marginBottom: 5,
+    marginTop: 5,
+    marginBottom: 3,
     fontWeight: "600",
     color: "#FFD700",
+    fontSize: 14,
   },
-
-  /* ====== Input Styles ====== */
-  input: {
-    borderWidth: 1,
-    borderColor: "#FFD700",
-    borderRadius: 10,
-    padding: 10,
-    textAlignVertical: "top",
-    backgroundColor: "#2C3E50",
-    color: "#FFF",
-    width: "100%",
+  section: {
     marginBottom: 10,
   },
-  inputTexto: {
+  /* Estilos de la sección horizontal */
+  rowSection: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 10,
+  },
+  leftHalf: {
+    width: "48%",
+  },
+  rightHalf: {
+    width: "48%",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  agregarContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  iconoGaleria: {
+    alignItems: "center",
+    justifyContent: "center",
+    marginVertical: 5,
+  },
+  iconoGaleriaTexto: {
+    color: "#FFD700",
+    marginTop: 3,
+    fontSize: 14,
+  },
+  /* Estilos de media */
+  mediaContainer: {
+    alignItems: "center",
+    position: "relative",
+    width: "100%",
+    marginTop: 5,
+    height: 150,
+  },
+  mediaPreview: {
+    width: "100%",
+    height: "100%",
+    borderRadius: 8,
+    resizeMode: "cover",
+  },
+  eliminarIcono: {
+    position: "absolute",
+    top: 5,
+    right: 5,
+    backgroundColor: "rgba(0, 0, 0, 0.6)",
+    padding: 4,
+    borderRadius: 12,
+  },
+  /* Estilos para Spotify */
+  spotifyContainer: {
+    width: "100%",
+    position: "relative",
+    marginBottom: 5,
+  },
+  spotifyResultsContainer: {
+    position: "absolute",
+    top: 40,
+    left: 0,
+    right: 0,
+    backgroundColor: "#fff",
+    borderRadius: 8,
+    elevation: 5,
+    maxHeight: 150,
+    zIndex: 10,
+  },
+  spotifyResults: {
+    paddingHorizontal: 10,
+  },
+  trackContainer: {
+    flexDirection: "row",
+    marginVertical: 3,
+    alignItems: "center",
+    backgroundColor: "#f1f1f1",
+    padding: 8,
+    borderRadius: 8,
+  },
+  trackImage: {
+    width: 40,
+    height: 40,
+    marginRight: 8,
+    borderRadius: 4,
+  },
+  trackName: {
+    fontWeight: "bold",
+    fontSize: 14,
+    color: "#333",
+  },
+  trackArtist: {
+    color: "gray",
+    fontSize: 12,
+  },
+  trackImageSelect: {
+    width: "100%",
+    height: 120,
+    borderRadius: 8,
+    resizeMode: "cover",
+  },
+  trackNameSelect: {
+    fontWeight: "bold",
+    marginTop: 3,
+    fontSize: 14,
+    color: "#333",
+  },
+  trackArtistSelect: {
+    color: "gray",
+    fontSize: 12,
+  },
+  /* Estilos de entrada de texto */
+  inputSmall: {
     borderWidth: 1,
     borderColor: "#FFD700",
-    borderRadius: 10,
-    padding: 10,
+    borderRadius: 8,
+    padding: 8,
     textAlignVertical: "top",
     backgroundColor: "#fff",
-    height: 100,
-    marginTop: 5,
+    height: 80,
+    marginTop: 3,
     width: "100%",
-    marginBottom: 10,
+    marginBottom: 5,
+    fontSize: 14,
   },
-
-  /* ====== Switch Content Container ====== */
+  /* Estilos de audio */
   switchContentContainer: {
-    height: 150,
     justifyContent: "center",
     alignItems: "center",
-    marginVertical: 10,
+    marginVertical: 5,
     width: "100%",
   },
   textoContainer: {
@@ -786,185 +834,119 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-
-  /* ====== Botón Styles ====== */
+  audioPreview: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 5,
+  },
+  audioText: {
+    flex: 1,
+    color: "#FFD700",
+    fontSize: 14,
+  },
+  /* Estilos de botones */
   botonContainer: {
     flexDirection: "row",
-    marginTop: 10,
+    justifyContent: "space-between",
+    marginTop: 5,
+    width: "100%",
   },
   botonGuardar: {
     backgroundColor: "#FFD700",
-    padding: 12,
-    borderRadius: 10,
+    padding: 10,
+    borderRadius: 8,
     flex: 1,
     marginRight: 5,
     elevation: 3,
-    marginBottom: 10,
   },
   botonCancelar: {
     backgroundColor: "#6c757d",
-    padding: 12,
-    borderRadius: 10,
+    padding: 10,
+    borderRadius: 8,
     flex: 1,
     marginLeft: 5,
     elevation: 3,
-    marginBottom: 10,
   },
   botonTexto: {
     color: "#000000",
     textAlign: "center",
     fontWeight: "600",
-    fontSize: 16,
-  },
-
-  /* ====== Media Styles ====== */
-  mediaContainer: {
-    alignItems: "center",
-    position: "relative",
-    width: "100%",
-    marginTop: 10,
-    height: 220,
-  },
-  mediaPreview: {
-    width: "100%",
-    height: "100%",
-    borderRadius: 10,
-    resizeMode: "cover",
-  },
-  trackImageSelect: {
-    width: "100%",
-    height: 150,
-    borderRadius: 10,
-    resizeMode: "cover",
-  },
-  eliminarIcono: {
-    position: "absolute",
-    top: 10,
-    right: 10,
-    backgroundColor: "rgba(0, 0, 0, 0.6)",
-    padding: 5,
-    borderRadius: 15,
-  },
-
-  /* ====== Galería y Spotify Styles ====== */
-  iconoGaleria: {
-    alignSelf: "center",
-    marginVertical: 15,
-    marginBottom: 10,
-  },
-  spotifyContainer: {
-    width: "100%",
-    marginVertical: 10,
-    position: "relative",
-    marginBottom: 10,
-  },
-  spotifyResultsContainer: {
-    position: "absolute",
-    top: 50,
-    left: 0,
-    right: 0,
-    backgroundColor: "#fff",
-    borderRadius: 10,
-    elevation: 5,
-    maxHeight: 200,
-    zIndex: 10,
-  },
-  spotifyResults: {
-    paddingHorizontal: 10,
-  },
-  trackContainer: {
-    flexDirection: "row",
-    marginVertical: 5,
-    alignItems: "center",
-    backgroundColor: "#f1f1f1",
-    padding: 10,
-    borderRadius: 10,
-    marginBottom: 10,
-  },
-  trackImage: {
-    width: 50,
-    height: 50,
-    marginRight: 10,
-    borderRadius: 5,
-  },
-  trackName: {
-    fontWeight: "bold",
-    fontSize: 14,
-    color: "#333",
-  },
-  trackArtist: {
-    color: "gray",
-    fontSize: 12,
-  },
-  trackNameSelect: {
-    fontWeight: "bold",
-    marginTop: 5,
-    fontSize: 16,
-    color: "#333",
-  },
-  trackArtistSelect: {
-    color: "gray",
     fontSize: 14,
   },
-
-  /* ====== Color Picker Styles ====== */
+  /* Otros estilos */
+  switchItem: {
+    marginBottom: 5,
+  },
   pickerContent: {
-    borderRadius: 10,
+    borderRadius: 8,
     alignItems: "center",
-    marginBottom: 10,
-    width: "80%",
+    marginBottom: 5,
+    width: "60%",
+    alignSelf: "center",
   },
   recuadroPicker: {
-    marginBottom: 10,
-    width: 60,
+    marginBottom: 8,
+    width: 35,
+    height: 35,
   },
-
-  /* ====== Baúl Switch Styles ====== */
-  switchBaulContainer: {
+  switchRecuerdoContainer: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginVertical: 10,
-    marginBottom: 10,
+    width: "100%",
+    marginVertical: 5,
   },
-
-  /* ====== Additional Styles ====== */
-  switchItem: {
-    marginBottom: 10,
+  datePickerContainer: {
+    width: "100%",
+    alignItems: "center",
+    marginTop: 5,
   },
   datePickerPressable: {
-    marginBottom: 10,
+    padding: 8,
+    borderWidth: 1,
+    borderColor: "#FFD700",
+    borderRadius: 8,
+    backgroundColor: "#2C3E50",
+    width: "100%",
+    alignItems: "center",
+  },
+  datePickerText: {
+    color: "#FFF",
+    fontSize: 14,
   },
 });
 
-// Estilos para react-native-picker-select
-const pickerSelectStyles = StyleSheet.create({
+const stylesPickerSelect = StyleSheet.create({
   inputIOS: {
-    fontSize: 16,
-    paddingVertical: 12,
-    paddingHorizontal: 10,
+    fontSize: 14,
+    paddingVertical: 8,
+    paddingHorizontal: 8,
     borderWidth: 1,
     borderColor: "#FFD700",
     borderRadius: 5,
     color: "white",
-    paddingRight: 30,
+    paddingRight: 20,
     backgroundColor: "#2C3E50",
-    width: "80%",
-    marginBottom: 10,
+    width: "100%",
+    marginBottom: 5,
   },
   inputAndroid: {
-    fontSize: 16,
-    paddingHorizontal: 10,
-    paddingVertical: 8,
+    fontSize: 14,
+    paddingHorizontal: 8,
+    paddingVertical: 6,
     borderWidth: 0.5,
     borderColor: "#FFD700",
     borderRadius: 5,
     color: "white",
-    paddingRight: 30,
+    paddingRight: 20,
     backgroundColor: "#2C3E50",
     width: "100%",
-    marginBottom: 10,
+    marginBottom: 5,
   },
 });
+
+const pickerSelectStyles = {
+  ...stylesPickerSelect,
+};
 
 export default ModalEntry;

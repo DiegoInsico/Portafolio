@@ -8,26 +8,22 @@ import {
   StyleSheet,
   Alert,
   ScrollView,
-  Image,
   ImageBackground,
   Platform,
   SafeAreaView,
   ActivityIndicator,
-  TextInput,
 } from 'react-native';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { Picker } from '@react-native-picker/picker';
 import * as ImagePicker from "expo-image-picker";
 import { db } from '../../utils/firebase';
 import { collection, addDoc, getDocs, Timestamp } from 'firebase/firestore';
-import CustomSwitch from "../../components/ui/SwitchButton";
 import { MaterialIcons } from "@expo/vector-icons";
-import axios from "axios";
-import PropTypes from 'prop-types';
-import { Audio, Video } from 'expo-av';
+import { Video } from 'expo-av';
 import { AuthContext } from '../../context/AuthContext';
 import PremiumMessage from './../suscripcion/PremiumMessage'; 
 import { commonStyles } from '../../styles/commonStyles.js'; // Asegúrate de ajustar la ruta según tu estructura
+import PropTypes from 'prop-types'; // Asegúrate de importar PropTypes
 
 const ProgramarMensaje = ({ navigation }) => {
   const { user, isPremium, loading } = useContext(AuthContext);
@@ -36,13 +32,8 @@ const ProgramarMensaje = ({ navigation }) => {
   const [selectedBeneficiary, setSelectedBeneficiary] = useState('');
   const [date, setDate] = useState(new Date());
   const [isDatePickerVisible, setIsDatePickerVisible] = useState(false);
-  const [messageText, setMessageText] = useState('');
-  const [isAudioMode, setIsAudioMode] = useState(false);
   const [media, setMedia] = useState(null);
   const [mediaType, setMediaType] = useState(null);
-  const [audioUri, setAudioUri] = useState(null);
-  const [recording, setRecording] = useState(null);
-  const [isRecording, setIsRecording] = useState(false);
 
   // Mostrar indicador de carga mientras se verifica el estado premium
   if (loading) {
@@ -91,46 +82,57 @@ const ProgramarMensaje = ({ navigation }) => {
     fetchBeneficiarios();
   }, []);
 
-  // Funciones para grabar audio
-  const startRecording = async () => {
+  // Funciones para seleccionar video
+  const seleccionarVideo = async () => {
     try {
-      const { status } = await Audio.requestPermissionsAsync();
+      let result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Videos,
+        quality: 1,
+      });
+
+      if (!result.canceled) {
+        const selectedAsset = result.assets[0];
+        setMedia(selectedAsset.uri);
+        setMediaType(selectedAsset.type); // 'video'
+      }
+    } catch (error) {
+      console.log("Error al seleccionar video:", error);
+      Alert.alert("Error", "Hubo un problema al seleccionar el video.");
+    }
+  };
+
+  // Funciones para grabar video
+  const grabarVideo = async () => {
+    try {
+      const { status } = await ImagePicker.requestCameraPermissionsAsync();
       if (status !== 'granted') {
-        Alert.alert('Permiso necesario', 'Se necesitan permisos para grabar audio.');
+        Alert.alert('Permiso necesario', 'Se necesitan permisos para grabar video.');
         return;
       }
 
-      await Audio.setAudioModeAsync({
-        allowsRecordingIOS: true,
-        playsInSilentModeIOS: true,
+      let result = await ImagePicker.launchCameraAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Videos,
+        quality: 1,
       });
 
-      const { recording } = await Audio.Recording.createAsync(
-        Audio.RECORDING_OPTIONS_PRESET_HIGH_QUALITY
-      );
-      setRecording(recording);
-      setIsRecording(true);
-    } catch (err) {
-      console.error('Fallo al iniciar la grabación', err);
-      Alert.alert('Error', 'No se pudo iniciar la grabación.');
+      if (!result.canceled) {
+        const recordedVideo = result.assets[0];
+        setMedia(recordedVideo.uri);
+        setMediaType(recordedVideo.type); // 'video'
+      }
+    } catch (error) {
+      console.log("Error al grabar video:", error);
+      Alert.alert("Error", "Hubo un problema al grabar el video.");
     }
   };
 
-  const stopRecording = async () => {
-    try {
-      await recording.stopAndUnloadAsync();
-      const uri = recording.getURI(); 
-      setAudioUri(uri);
-      setRecording(null);
-      setIsRecording(false);
-    } catch (error) {
-      console.error('Error al detener la grabación', error);
-      Alert.alert('Error', 'No se pudo detener la grabación.');
-    }
+  const eliminarMedia = () => {
+    setMedia(null);
+    setMediaType(null);
   };
 
   const handleSaveMessage = async () => {
-    if (!selectedBeneficiary || (!messageText && !media && !audioUri)) {
+    if (!selectedBeneficiary || !media) {
       Alert.alert('Error', 'Por favor completa todos los campos.');
       return;
     }
@@ -145,12 +147,12 @@ const ProgramarMensaje = ({ navigation }) => {
 
     try {
       await addDoc(collection(db, 'mensajesProgramados'), {
+        userId: user.uid,
         beneficiarioId: selectedBeneficiary,
         email: email,
-        mensaje: messageText,
         fechaEnvio: Timestamp.fromDate(date),
-        media: media || audioUri,
-        mediaType: mediaType || (audioUri ? 'audio' : null),
+        media: media,
+        mediaType: mediaType, // 'video'
         enviado: false,
       });
       Alert.alert('Éxito', 'Mensaje programado correctamente.');
@@ -165,53 +167,8 @@ const ProgramarMensaje = ({ navigation }) => {
   const resetStates = () => {
     setSelectedBeneficiary('');
     setDate(new Date());
-    setMessageText('');
-    setIsAudioMode(false);
     setMedia(null);
     setMediaType(null);
-    setAudioUri(null);
-    setRecording(null);
-    setIsRecording(false);
-  };
-
-  const seleccionarMedia = async () => {
-    try {
-      let result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.All,
-        quality: 1,
-      });
-
-      if (!result.canceled) {
-        const selectedAsset = result.assets[0];
-        setMedia(selectedAsset.uri);
-        setMediaType(selectedAsset.type); // 'image' o 'video'
-        setMessageText('');
-      }
-    } catch (error) {
-      console.log("Error al seleccionar media:", error);
-      Alert.alert("Error", "Hubo un problema al seleccionar el medio.");
-    }
-  };
-
-  const eliminarMedia = () => {
-    setMedia(null);
-    setMediaType(null);
-    setAudioUri(null);
-    setIsRecording(false);
-    if (recording) {
-      recording.stopAndUnloadAsync();
-      setRecording(null);
-    }
-  };
-
-  const handlePlayAudio = async () => {
-    try {
-      const { sound } = await Audio.Sound.createAsync({ uri: audioUri });
-      await sound.playAsync();
-    } catch (error) {
-      console.error("Error al reproducir el audio:", error);
-      Alert.alert("Error", "No se pudo reproducir el audio.");
-    }
   };
 
   const handleConfirm = (selectedDate) => {
@@ -238,7 +195,7 @@ const ProgramarMensaje = ({ navigation }) => {
           {/* Superposición para mejorar la legibilidad */}
           <View style={styles.overlay} />
           <View style={styles.content}>
-            <Text style={styles.title}>Programar Mensaje</Text>
+            <Text style={styles.title}>Programar Mensaje de Video</Text>
 
             {/* Seleccionar Beneficiario */}
             <Text style={styles.label}>Selecciona un beneficiario:</Text>
@@ -260,88 +217,36 @@ const ProgramarMensaje = ({ navigation }) => {
               </Picker>
             </View>
 
-            {/* Escribir el Mensaje */}
-            <Text style={styles.label}>Escribe tu mensaje:</Text>
-            <TextInput
-              style={styles.messageInput}
-              value={messageText}
-              onChangeText={setMessageText}
-              placeholder="Escribe tu mensaje aquí"
-              placeholderTextColor="#888"
-              multiline
-            />
-
-            {/* Switch entre Texto y Audio */}
-            <CustomSwitch
-              style={styles.switchItem}
-              option1="Texto"
-              option2="Audio"
-              color1="#FFD700"
-              color2="#FFD700"
-              value={isAudioMode}
-              onSwitch={(value) => {
-                setIsAudioMode(value);
-                setMessageText('');
-                eliminarMedia();
-              }}
-            />
-
-            {/* Selector de Media */}
-            {!isAudioMode && (
-              <TouchableOpacity style={styles.iconButton} onPress={seleccionarMedia}>
-                <MaterialIcons name="add-photo-alternate" size={40} color="#FFD700" />
-                <Text style={styles.iconButtonText}>Añadir Imagen / Video</Text>
+            {/* Seleccionar o Grabar Video */}
+            <Text style={styles.label}>Selecciona o graba un video:</Text>
+            <View style={styles.videoButtonsContainer}>
+              <TouchableOpacity style={styles.videoButton} onPress={seleccionarVideo}>
+                <MaterialIcons name="video-library" size={30} color="#FFD700" />
+                <Text style={styles.videoButtonText}>Subir Video</Text>
               </TouchableOpacity>
-            )}
+              <TouchableOpacity style={styles.videoButton} onPress={grabarVideo}>
+                <MaterialIcons name="videocam" size={30} color="#FFD700" />
+                <Text style={styles.videoButtonText}>Grabar Video</Text>
+              </TouchableOpacity>
+            </View>
 
-            {/* Vista Previa de Media */}
-            {media && (
+            {/* Vista Previa de Video */}
+            {media && mediaType === "video" && (
               <View style={styles.mediaContainer}>
-                {mediaType === "image" ? (
-                  <Image source={{ uri: media }} style={styles.mediaPreview} />
-                ) : mediaType === "video" ? (
-                  <Video
-                    source={{ uri: media }}
-                    rate={1.0}
-                    volume={1.0}
-                    isMuted={false}
-                    resizeMode="cover"
-                    shouldPlay={false}
-                    isLooping={false}
-                    style={styles.mediaPreview}
-                    useNativeControls
-                  />
-                ) : null}
+                <Video
+                  source={{ uri: media }}
+                  rate={1.0}
+                  volume={1.0}
+                  isMuted={false}
+                  resizeMode="cover"
+                  shouldPlay={false}
+                  isLooping={false}
+                  style={styles.mediaPreview}
+                  useNativeControls
+                />
                 <TouchableOpacity style={styles.deleteButton} onPress={eliminarMedia}>
                   <MaterialIcons name="delete" size={24} color="#E74C3C" />
                 </TouchableOpacity>
-              </View>
-            )}
-
-            {/* Vista Previa de Audio */}
-            {isAudioMode && (
-              <View style={styles.audioContainer}>
-                <TouchableOpacity 
-                  style={styles.audioButton}
-                  onPress={isRecording ? stopRecording : startRecording}
-                >
-                  <MaterialIcons 
-                    name={isRecording ? "stop" : "mic"} 
-                    size={40} 
-                    color="#FFD700" 
-                  />
-                  <Text style={styles.audioButtonText}>
-                    {isRecording ? "Detener" : "Grabar"}
-                  </Text>
-                </TouchableOpacity>
-                {audioUri && (
-                  <View style={styles.audioPreview}>
-                    <Text style={styles.audioText}>Audio grabado:</Text>
-                    <TouchableOpacity onPress={handlePlayAudio}>
-                      <Text style={styles.audioPlayText}>Reproducir Audio</Text>
-                    </TouchableOpacity>
-                  </View>
-                )}
               </View>
             )}
 
@@ -452,25 +357,10 @@ const styles = StyleSheet.create({
     marginLeft: 5,
     alignItems: 'center',
   },
-  subscribeButton: {
-    // Este estilo ahora se maneja en commonStyles
-  },
-  subscribeButtonText: {
-    // Este estilo ahora se maneja en commonStyles
-  },
-  cancelButton: {
-    // Este estilo ahora se maneja en commonStyles
-  },
-  cancelButtonText: {
-    // Este estilo ahora se maneja en commonStyles
-  },
   buttonText: {
     color: '#1E1E1E',
     fontWeight: 'bold',
     fontSize: 16,
-  },
-  premiumIcon: {
-    // Este estilo ahora se maneja en commonStyles
   },
   title: {
     fontSize: 24,
@@ -506,29 +396,22 @@ const styles = StyleSheet.create({
   pickerItem: {
     color: '#FFD700', // Color dorado en items
   },
-  messageInput: {
-    borderWidth: 1,
-    borderColor: "#FFD700", // Bordes dorados
+  videoButtonsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+    marginBottom: 20,
+  },
+  videoButton: {
+    flex: 1,
+    backgroundColor: 'rgba(255, 215, 0, 0.8)', // Fondo dorado semi-transparente
+    padding: 15,
     borderRadius: 8,
-    padding: 10,
-    marginBottom: 20,
-    backgroundColor: "rgba(255,255,255,0.1)", // Fondo semi-transparente oscuro
-    color: "#FFD700",
-    width: "100%",
-    minHeight: 100,
-    textAlignVertical: 'top',
+    alignItems: 'center',
+    marginHorizontal: 5,
   },
-  switchItem: {
-    marginBottom: 20,
-    width: "100%",
-  },
-  iconButton: {
-    alignItems: "center",
-    marginVertical: 15,
-  },
-  iconButtonText: {
-    color: "#FFD700", // Texto dorado
-    fontSize: 14,
+  videoButtonText: {
+    color: "#1E1E1E", // Texto oscuro para contraste
     fontWeight: "bold",
     marginTop: 5,
   },
@@ -542,7 +425,6 @@ const styles = StyleSheet.create({
     width: "100%",
     height: 200,
     borderRadius: 10,
-    resizeMode: "cover",
   },
   deleteButton: {
     position: "absolute",
@@ -551,67 +433,6 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(255,255,255,0.8)",
     borderRadius: 15,
     padding: 5,
-  },
-  audioContainer: {
-    width: "100%",
-    alignItems: "center",
-    marginBottom: 20,
-    borderWidth: 1,
-    borderColor: "#FFD700",
-    borderRadius: 8,
-    padding: 10,
-    backgroundColor: 'rgba(255,255,255,0.1)', // Fondo semi-transparente oscuro
-  },
-  audioButton: {
-    alignItems: "center",
-    marginVertical: 10,
-  },
-  audioButtonText: {
-    color: "#FFD700", // Texto dorado
-    fontSize: 14,
-    fontWeight: "bold",
-    marginTop: 5,
-  },
-  audioPreview: {
-    marginTop: 10,
-    alignItems: 'center',
-  },
-  audioText: {
-    color: "#FFD700",
-    marginBottom: 5,
-  },
-  audioPlayText: {
-    color: "#FFD700",
-    textDecorationLine: 'underline',
-  },
-  spotifyResultsContainer: {
-    width: "100%",
-    backgroundColor: "rgba(255,255,255,0.1)", // Fondo semi-transparente oscuro
-    borderRadius: 8,
-    maxHeight: 200,
-    marginTop: 10,
-    elevation: 5,
-  },
-  spotifyResults: {
-    paddingHorizontal: 10,
-  },
-  spotifyItem: {
-    paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: "#FFD700", // Bordes dorados
-  },
-  spotifyText: {
-    color: "#FFD700",
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: "#FFD700", // Bordes dorados
-    borderRadius: 8,
-    padding: 10,
-    marginBottom: 20,
-    backgroundColor: "rgba(255,255,255,0.1)", // Fondo semi-transparente oscuro
-    color: "#FFD700",
-    width: "100%",
   },
   dateButton: {
     padding: 12,
