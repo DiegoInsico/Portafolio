@@ -24,17 +24,25 @@ import TicketDetails from "./pages/system/TicketDetails";
 import RolManagment from "./pages/rol/rolManagment";
 
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [currentUser, setCurrentUser] = useState(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(
+    localStorage.getItem("isAuthenticated") ==="true"
+  );
+  const [currentUser, setCurrentUser] = useState(
+    JSON.parse(localStorage.getItem("currentUser"))
+  );
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
       if (user) {
         setCurrentUser(user);
         setIsAuthenticated(true);
+        localStorage.setItem("isAuthenticated", "true");
+        localStorage.setItem("currentUser", JSON.stringify(user));
       } else {
         setCurrentUser(null);
         setIsAuthenticated(false);
+        localStorage.removeItem("isAuthenticated");
+        localStorage.removeItem("currentUser");
       }
     });
     return () => unsubscribe();
@@ -43,23 +51,34 @@ function App() {
   const handleLogin = (user) => {
     setIsAuthenticated(true);
     setCurrentUser(user);
+    localStorage.setItem("isAuthenticated", "true");
+    localStorage.setItem("currentUser", JSON.stringify(user));
   };
 
+  const handleLogout = () => {
+    auth.signOut().then(() => {
+      setIsAuthenticated(false);
+      setCurrentUser(null);
+      localStorage.removeItem("isAuthenticated");
+      localStorage.removeItem("currentUser");
+    });
+  };
   return (
     <Router>
       <AppRoutes 
         isAuthenticated={isAuthenticated} 
         currentUser={currentUser} 
         handleLogin={handleLogin} 
+        handleLogout={handleLogout}
       />
     </Router>
   );
 }
 
-const AppRoutes = ({ isAuthenticated, currentUser, handleLogin }) => {
+const AppRoutes = ({ isAuthenticated, currentUser, handleLogin, handleLogout  }) => {
   return (
     <MainLayout isAuthenticated={isAuthenticated} currentUser={currentUser}>
-      {isAuthenticated && <RightBar />}  {/* Añade esta línea */}
+      {isAuthenticated && <RightBar />}
       <Routes>
         {/* Ruta de Login */}
         <Route path="/login" element={<LoginPage onLogin={handleLogin} />} />

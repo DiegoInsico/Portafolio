@@ -1,6 +1,5 @@
-// src/pages/system/TicketDetails.js
-
 import React, { useEffect, useState, useRef } from 'react';
+import Container from '../../components/container'
 import { 
   useParams, 
   useNavigate 
@@ -225,6 +224,7 @@ const TicketDetails = () => {
   }
 
   return (
+
     <div className="ticket-details-container">
       {/* Header */}
       <Box className="header">

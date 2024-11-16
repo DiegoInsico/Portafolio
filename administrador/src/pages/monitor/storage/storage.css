@@ -27,11 +27,11 @@
   border-radius: 10px;
 }
 
-h2 {
+/* h2 {
   text-align: center;
-  color: #f0e6d2; /* Texto dorado */
+  color: #f0e6d2; 
   margin-bottom: 20px;
-}
+} */
 
 .chart-container {
   width: 100%;
