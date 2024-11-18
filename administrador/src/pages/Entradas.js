@@ -43,8 +43,13 @@ const Entradas = () => {
         }
 
         // Contar entradas por mes
-        const creationDate = entry.fechaCreacion ? new Date(entry.fechaCreacion.seconds * 1000) : new Date();
-        const month = creationDate.toLocaleString("default", { month: "long", year: "numeric" });
+        const creationDate = entry.fechaCreacion
+          ? new Date(entry.fechaCreacion.seconds * 1000)
+          : new Date();
+        const month = creationDate.toLocaleString("default", {
+          month: "long",
+          year: "numeric",
+        });
         monthlyEntries[month] = (monthlyEntries[month] || 0) + 1;
       });
 
@@ -59,7 +64,6 @@ const Entradas = () => {
     fetchData();
   }, []);
 
-  // Configuración para el gráfico de emociones
   const emotionChartData = {
     labels: Object.keys(emotionCount),
     datasets: [
@@ -69,6 +73,10 @@ const Entradas = () => {
         backgroundColor: "rgba(75,192,192,0.6)",
       },
     ],
+  };
+
+  const emotionChartOptions = {
+    maintainAspectRatio: false,
   };
 
   // Configuración para el gráfico de entradas por mes
@@ -81,6 +89,10 @@ const Entradas = () => {
         backgroundColor: "rgba(255,159,64,0.6)",
       },
     ],
+  };
+
+  const monthlyEntriesChartOptions = {
+    maintainAspectRatio: false,
   };
 
   return (
@@ -135,16 +147,17 @@ const Entradas = () => {
             </table>
           </div>
 
-          {/* Contenedor para el gráfico de emociones */}
           <div className="emotion-chart-container">
             <h2>Frecuencia de Emociones en las Entradas</h2>
-            <Bar data={emotionChartData} />
+            <Bar data={emotionChartData} options={emotionChartOptions} />
           </div>
 
-          {/* Contenedor para el gráfico de entradas por mes */}
           <div className="monthly-entries-chart-container">
             <h2>Tendencia de Entradas por Mes</h2>
-            <Bar data={monthlyEntriesChartData} />
+            <Bar
+              data={monthlyEntriesChartData}
+              options={monthlyEntriesChartOptions}
+            />
           </div>
         </div>
       </div>

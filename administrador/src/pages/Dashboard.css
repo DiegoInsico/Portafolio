@@ -36,7 +36,7 @@
 }
 
 
-.notifi-area {
+.notifi-area, .dash-music {
   grid-area: notifi;
   max-height: 30vh; 
   overflow-y: auto; 
@@ -48,9 +48,10 @@
   margin-top: 50px;
   width: 100%;
   position: relative;
+  height: 100vh;
 }
 
-.notifi-area h1 {
+.notifi-area h1, .dash-music h1 {
   position: sticky;
   top: 0;
   background-color: #ffffffe5; 
@@ -63,7 +64,7 @@
 }
 
 .notifi-area p {
-  font-size: 12px;
+  font-size: 15px;
   margin-top: 10px;
   color: #000000;
   border-bottom: 1px solid #00000025;
@@ -108,7 +109,7 @@
   height: 150px;
   border-radius: 30px;
   background: #e0e0e0;
-  box-shadow: 15px 15px 30px #bebebe, -15px -15px 30px #ffffff;
+  box-shadow: 10px 10px 15px #bebebe, -7px -7px 15px #c9c9c9;
   /* display: flex; */
   flex-direction: column;
   margin: 0;
@@ -264,14 +265,9 @@
 
 /* Artista que más transmite */
 .dash-music {
-  /* grid-area: dash-music; */
   grid-area: notifi;
-  background-color: rgba(252, 252, 252, 0.768);
-  border-radius: 10px;
   margin-top: 80%;
   width: 100%;
-  text-align: center;
-  font-size: 20px;
 }
 
 .dash-music h1 {
@@ -284,9 +280,12 @@
 }
 
 .loader {
+  margin: auto; 
   display: flex;
   flex-direction: row;
-  height: 4em;
+  height: 5em;
+  width: 24em;
+  margin-top: 10px;
   background-color: #3b3b3b;
   border-radius: 10px;
   transition: 0.4s ease-in-out;

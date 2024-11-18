@@ -120,7 +120,7 @@
   height: 90%;
 }
 
-.graphics-chart-item {
+.graphics-chart-item canvas {
   background-color: #e0e0e0d4;
   padding: 20px;
   border-radius: 10px;
@@ -129,6 +129,8 @@
   width: 100%;
   height: 95%;
   overflow: hidden;
+  width: 100% !important;
+  height: 82% !important;
 }
 
 .graphics-chart-item h2{
@@ -163,3 +165,5 @@
     width: 100%;
   }
 }
+
+

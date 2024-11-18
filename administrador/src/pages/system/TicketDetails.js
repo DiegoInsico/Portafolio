@@ -223,9 +223,8 @@ const TicketDetails = () => {
 
   return (
     <Container>
-      <div className="ticket-details-container">
-
         
+      <div className="ticket-details-container">
         <div className="ticket-header">
           <h5>Asunto: {ticket.subject}</h5>
           <button onClick={() => navigate(-1)} className="ticket-btn-close">

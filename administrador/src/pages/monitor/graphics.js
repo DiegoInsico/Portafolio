@@ -7,6 +7,7 @@ import "./graphs.css";
 import Container from "../../components/container";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
+import * as XLSX from "xlsx";
 
 const Graphics = () => {
   const [selectedChart, setSelectedChart] = useState("weeklyUsage");
@@ -16,6 +17,9 @@ const Graphics = () => {
   const [hourlyRangeData, setHourlyRangeData] = useState(null);
   const [dailyData, setDailyData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [premiumUserData, setPremiumUserData] = useState(null);
+  const [vaultUsageData, setVaultUsageData] = useState(null);
+  const [userCountryData, setUserCountryData] = useState(null);
 
   const fetchUsageData = async () => {
     try {
@@ -31,10 +35,17 @@ const Graphics = () => {
         "20-23": 0,
       };
       const dailyUsage = {};
-      const q = query(collection(db, "entradas"), orderBy("fechaCreacion"));
-      const snapshot = await getDocs(q);
+      let premiumCount = 0;
+      let nonPremiumCount = 0;
+      let vaultLevel2Count = 0;
+      let vaultLevel3Count = 0;
+      const countryCount = {};
 
-      snapshot.forEach((doc) => {
+      const entradasSnapshot = await getDocs(
+        query(collection(db, "entradas"), orderBy("fechaCreacion"))
+      );
+
+      entradasSnapshot.forEach((doc) => {
         const data = doc.data();
         const fechaCreacion = data.fechaCreacion.toDate();
         const hour = fechaCreacion.getHours();
@@ -78,7 +89,30 @@ const Graphics = () => {
         });
       });
 
-      // Datos de uso semanal ordenado cronológicamente
+      const usersSnapshot = await getDocs(query(collection(db, "users")));
+
+      usersSnapshot.forEach((doc) => {
+        const data = doc.data();
+
+        // Contar usuarios premium y no premium
+        if (data.isPremium) {
+          premiumCount++;
+        } else {
+          nonPremiumCount++;
+        }
+
+        // Contar uso de baúles nivel 2 y nivel 3
+        if (data.level2Password) vaultLevel2Count++;
+        if (data.level3Password) vaultLevel3Count++;
+
+        // Contar usuarios por país
+        const countryCode = data.countryCode;
+        if (countryCode) {
+          countryCount[countryCode] = (countryCount[countryCode] || 0) + 1;
+        }
+      });
+
+      // Configuración de datos para gráficos
       const sortedWeeks = Object.keys(weeklyUsage).sort(
         (a, b) => new Date(a.split(" / ")[0]) - new Date(b.split(" / ")[0])
       );
@@ -154,6 +188,44 @@ const Graphics = () => {
         datasets: emotionDatasets,
       });
 
+      setPremiumUserData({
+        labels: ["Usuarios Premium", "Usuarios No Premium"],
+        datasets: [
+          {
+            label: "Distribución de Usuarios Premium",
+            data: [premiumCount, nonPremiumCount],
+            backgroundColor: ["#4caf50", "#f44336"],
+          },
+        ],
+      });
+
+      setVaultUsageData({
+        labels: ["Nivel 2", "Nivel 3"],
+        datasets: [
+          {
+            label: "Uso de Baúles",
+            data: [vaultLevel2Count, vaultLevel3Count],
+            backgroundColor: ["#2196f3", "#ff9800"],
+          },
+        ],
+      });
+
+      const countryLabels = Object.keys(countryCount).map((code) =>
+        code === "+56" ? "Chile" : code === "+1" ? "EE.UU." : code
+      );
+      const countryData = Object.values(countryCount);
+
+      setUserCountryData({
+        labels: countryLabels,
+        datasets: [
+          {
+            label: "Usuarios por País",
+            data: countryData,
+            backgroundColor: ["#3f51b5", "#ff5722", "#8bc34a"],
+          },
+        ],
+      });
+
       setLoading(false);
     } catch (error) {
       console.error("Error obteniendo datos de uso:", error);
@@ -165,92 +237,57 @@ const Graphics = () => {
     fetchUsageData();
   }, []);
 
+  // Función para exportar todos los gráficos a PDF
   const handleExportToPDF = () => {
     const doc = new jsPDF();
-
-    const weeklyUsageData = {
-      title: "Uso Semanal de Usuarios",
-      columns: ["Semana", "Cantidad de Usuarios"],
-      rows: weeklyData.labels.map((week, index) => [
-        week,
-        weeklyData.datasets[0].data[index],
-      ]),
-    };
-
-    const hourlyRangeUsageData = {
-      title: "Uso de Usuarios por Rango de Horas",
-      columns: ["Rango de Horas", "Cantidad de Usuarios"],
-      rows: hourlyRangeData.labels.map((range, index) => [
-        range,
-        hourlyRangeData.datasets[0].data[index],
-      ]),
-    };
-
-    // Datos del gráfico de categorías por mes
-    const categoryUsageData = {
-      title: "Categorías por Mes",
-      columns: [
-        "Mes",
-        ...monthlyCategoryData.datasets.map((dataset) => dataset.label),
-      ],
-      rows: monthlyCategoryData.labels.map((month, rowIndex) => [
-        month,
-        ...monthlyCategoryData.datasets.map(
-          (dataset) => dataset.data[rowIndex]
-        ),
-      ]),
-    };
-
-    // Datos del gráfico de emociones por mes
-    const emotionUsageData = {
-      title: "Emociones por Mes",
-      columns: [
-        "Mes",
-        ...monthlyEmotionData.datasets.map((dataset) => dataset.label),
-      ],
-      rows: monthlyEmotionData.labels.map((month, rowIndex) => [
-        month,
-        ...monthlyEmotionData.datasets.map((dataset) => dataset.data[rowIndex]),
-      ]),
-    };
-
-    const addTableToPDF = (title, columns, rows, startY) => {
-      doc.text(title, 14, startY);
+    
+    const addChartToPDF = (title, chartData) => {
+      const columns = ["Etiqueta", "Valor"];
+      const rows = chartData.labels.map((label, index) => [
+        label,
+        chartData.datasets[0].data[index],
+      ]);
+      doc.text(title, 14, doc.previousAutoTable.finalY || 10);
       doc.autoTable({
-        startY: startY + 10,
+        startY: doc.previousAutoTable ? doc.previousAutoTable.finalY + 10 : 20,
         head: [columns],
         body: rows,
       });
-      return doc.previousAutoTable.finalY + 10;
     };
 
-    let currentY = 10;
-    currentY = addTableToPDF(
-      weeklyUsageData.title,
-      weeklyUsageData.columns,
-      weeklyUsageData.rows,
-      currentY
-    );
-    currentY = addTableToPDF(
-      hourlyRangeUsageData.title,
-      hourlyRangeUsageData.columns,
-      hourlyRangeUsageData.rows,
-      currentY
-    );
-    currentY = addTableToPDF(
-      categoryUsageData.title,
-      categoryUsageData.columns,
-      categoryUsageData.rows,
-      currentY
-    );
-    currentY = addTableToPDF(
-      emotionUsageData.title,
-      emotionUsageData.columns,
-      emotionUsageData.rows,
-      currentY
-    );
+    addChartToPDF("Uso Semanal de Usuarios", weeklyData);
+    addChartToPDF("Uso por Rango de Horas", hourlyRangeData);
+    addChartToPDF("Categoría por Mes", monthlyCategoryData);
+    addChartToPDF("Emociones por Mes", monthlyEmotionData);
+    addChartToPDF("Distribución de Usuarios Premium", premiumUserData);
+    addChartToPDF("Uso de Baúles", vaultUsageData);
+    addChartToPDF("Usuarios por País", userCountryData);
 
-    doc.save("report.pdf");
+    doc.save("Reportes_Graficos.pdf");
+  };
+
+  // Función para exportar todos los gráficos a Excel
+  const exportToExcel = () => {
+    const workbook = XLSX.utils.book_new();
+
+    const addSheet = (sheetName, data) => {
+      const rows = data.labels.map((label, index) => ({
+        Label: label,
+        Value: data.datasets[0].data[index],
+      }));
+      const worksheet = XLSX.utils.json_to_sheet(rows);
+      XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
+    };
+
+    if (weeklyData) addSheet("Uso Semanal", weeklyData);
+    if (hourlyRangeData) addSheet("Rango Horas", hourlyRangeData);
+    if (monthlyCategoryData) addSheet("Categorias por Mes", monthlyCategoryData);
+    if (monthlyEmotionData) addSheet("Emociones por Mes", monthlyEmotionData);
+    if (premiumUserData) addSheet("Usuarios Premium", premiumUserData);
+    if (vaultUsageData) addSheet("Uso de Baúles", vaultUsageData);
+    if (userCountryData) addSheet("Usuarios por País", userCountryData);
+
+    XLSX.writeFile(workbook, "Reportes_Graficos_Improved_Formatted.xlsx");
   };
 
   const handleButtonClick = (chartType) => {
@@ -287,6 +324,24 @@ const Graphics = () => {
           >
             Emociones por Mes
           </button>
+          <button
+            className="graphics-btn-filter"
+            onClick={() => handleButtonClick("premiumUsers")}
+          >
+            Usuarios Premium
+          </button>
+          <button
+            className="graphics-btn-filter"
+            onClick={() => handleButtonClick("vaultUsage")}
+          >
+            Uso de Baúles
+          </button>
+          <button
+            className="graphics-btn-filter"
+            onClick={() => handleButtonClick("userCountry")}
+          >
+            Usuarios por País
+          </button>
           <div className="graphics-data">
             <button
               className="graphics-btn-function-a"
@@ -294,10 +349,7 @@ const Graphics = () => {
             >
               Exportar a PDF
             </button>
-            <button
-              className="graphics-btn-function-b"
-              onClick={() => window.alert("Exportar como Excel")}
-            >
+            <button className="graphics-btn-function-b" onClick={exportToExcel}>
               Exportar Xls
             </button>
           </div>
@@ -338,6 +390,47 @@ const Graphics = () => {
               </p>
             </div>
           )}
+          {selectedChart === "premiumUsers" && premiumUserData && (
+            <div className="graphics-chart-item">
+              <h2>Distribución de Usuarios Premium</h2>
+              <Pie
+                data={premiumUserData}
+                options={{ maintainAspectRatio: true }}
+              />
+              <p className="graphics-description">
+                Este gráfico muestra la proporción de usuarios premium y no
+                premium.
+              </p>
+            </div>
+          )}
+
+          {selectedChart === "vaultUsage" && vaultUsageData && (
+            <div className="graphics-chart-item">
+              <h2>Uso de Baúles</h2>
+              <Bar
+                data={vaultUsageData}
+                options={{ maintainAspectRatio: true }}
+              />
+              <p className="graphics-description">
+                Este gráfico muestra cuántos usuarios están usando los baúles de
+                nivel 2 y 3.
+              </p>
+            </div>
+          )}
+
+          {selectedChart === "userCountry" && userCountryData && (
+            <div className="graphics-chart-item">
+              <h2>Usuarios por País</h2>
+              <Pie
+                data={userCountryData}
+                options={{ maintainAspectRatio: true }}
+              />
+              <p className="graphics-description">
+                Este gráfico muestra la distribución de usuarios por país.
+              </p>
+            </div>
+          )}
+
           {selectedChart === "emotionUsage" && monthlyEmotionData && (
             <div className="graphics-chart-item">
               <h2>Emociones por Mes</h2>

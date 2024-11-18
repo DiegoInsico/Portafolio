@@ -6,11 +6,11 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 
 
-import SideBar from "./SideBar";
+import SideBar from "./sideBar";
 
 // Importar pantallas
 import Home from "../../screens/home/home";
-import ListEntry from "../../screens/entrys/ListEntry";
+import ListEntry from "../../screens/entrys/listEntry";
 
 const Tab = createBottomTabNavigator();
 

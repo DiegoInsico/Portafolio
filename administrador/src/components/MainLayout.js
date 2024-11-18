@@ -33,7 +33,7 @@ const MainLayout = ({ children, isAuthenticated, currentUser }) => {
             </NavLink>
             <NavLink to="/entradas">
               <ListAltIcon className="icon" />
-              <span className="sidebar-number">|</span> Gestión de Entradas
+              <span className="sidebar-number">|</span> Datos de Entradas
             </NavLink>
             <NavLink to="/monitor/graphics">
               <BarChartIcon className="icon" />
