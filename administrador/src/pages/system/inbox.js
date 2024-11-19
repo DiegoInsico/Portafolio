@@ -195,7 +195,6 @@ const Inbox = () => {
   });
 
   return (
-    <Container>
       <div className="inbox-container">
         <h1 className="inbox-title">Bandeja de Entrada - Tickets de Soporte</h1>
 
@@ -275,7 +274,6 @@ const Inbox = () => {
         {/* Contenedor de Notificaciones */}
         <ToastContainer />
       </div>
-    </Container>
   );
 };
 

@@ -169,7 +169,6 @@ const RolManagement = () => {
   };
 
   return (
-    <Container>
       <div className="role-management-container">
         <div className="column col-1">
           <button className="create-user-button" onClick={openCreateForm}>
@@ -280,7 +279,6 @@ const RolManagement = () => {
           </div>
         )}
       </div>
-    </Container>
   );
 };
 

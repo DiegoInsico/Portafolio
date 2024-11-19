@@ -197,7 +197,7 @@
   backdrop-filter: blur(3px);
 }
 
-.dash-chart-container h1, h2,
+.dash-chart-container h1,
 .btn-functions h1{
   position: sticky;
   top: 0;

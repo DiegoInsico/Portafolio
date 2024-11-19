@@ -297,8 +297,7 @@ const Graphics = () => {
   if (loading) return <p>Cargando datos...</p>;
 
   return (
-    <Container>
-      <div className="graphics-container">
+          <div className="graphics-container">
         <div className="graphics-filter-buttons">
           <button
             className="graphics-btn-filter"
@@ -445,7 +444,6 @@ const Graphics = () => {
           )}
         </div>
       </div>
-    </Container>
   );
 };
 

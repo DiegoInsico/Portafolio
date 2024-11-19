@@ -221,9 +221,7 @@ const TicketDetails = () => {
     );
   }
 
-  return (
-    <Container>
-        
+  return (        
       <div className="ticket-details-container">
         <div className="ticket-header">
           <h5>Asunto: {ticket.subject}</h5>
@@ -322,7 +320,6 @@ const TicketDetails = () => {
 
         <ToastContainer />
       </div>
-    </Container>
   );
 };
 

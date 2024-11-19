@@ -26,7 +26,6 @@ const UserActivity = () => {
   };
 
   return (
-    <Container>
       <div className="user-dashboard-container">
         <div className="user-table-section">
           <h2>Usuarios</h2>
@@ -77,7 +76,6 @@ const UserActivity = () => {
           </div>
         )}
       </div>
-    </Container>
   );
 };
 
