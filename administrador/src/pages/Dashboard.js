@@ -32,7 +32,7 @@ const Dashboard = () => {
       progress: undefined,
     });
   };
-  
+
 
 
   useEffect(() => {
@@ -226,17 +226,17 @@ const Dashboard = () => {
           collection(db, "tickets"),
           where("status", "==", "abierto")
         ));
-  
+
         const today = new Date();
         const lastNotified = JSON.parse(localStorage.getItem("lastNotifiedTickets")) || {};
-  
+
         const pendingTickets = snapshot.docs
           .map(doc => {
             const data = doc.data();
             const lastUpdate = data.updatedAt?.toDate();
             const diffInDays = Math.floor((today - lastUpdate) / (1000 * 60 * 60 * 24)); // Diferencia en días
-            
-            if (diffInDays >= 1 && !lastNotified[doc.id]) { 
+
+            if (diffInDays >= 1 && !lastNotified[doc.id]) {
               showUnansweredTicketAlert({
                 ...data,
                 lastUpdate,
@@ -244,7 +244,7 @@ const Dashboard = () => {
               });
               lastNotified[doc.id] = true;
             }
-            
+
             return {
               ...data,
               id: doc.id,
@@ -253,24 +253,24 @@ const Dashboard = () => {
             };
           })
           .filter(ticket => ticket);
-  
+
         setOpenTickets(pendingTickets);
         localStorage.setItem("lastNotifiedTickets", JSON.stringify(lastNotified));
-  
+
       } catch (error) {
         console.error("Error verificando tickets sin respuesta:", error);
       }
     };
-  
+
     // Ejecuta la verificación una vez al día
     checkUnansweredTickets();
     const intervalId = setInterval(checkUnansweredTickets, 24 * 60 * 60 * 1000); // Cada 24 horas
-  
+
     // Limpiar el intervalo al desmontar el componente
     return () => clearInterval(intervalId);
   }, []);
 
-// tickets con css
+  // tickets con css
   useEffect(() => {
     const fetchOpenTickets = async () => {
       try {
@@ -306,7 +306,7 @@ const Dashboard = () => {
 
     fetchOpenTickets();
   }, []);
-  
+
   const handleButtonClick = (chartType) => {
     setSelectedChart(chartType);
   };
@@ -374,6 +374,12 @@ const Dashboard = () => {
           </div>
           <div className="dash-chart-container">
             <h1>Información Adicional</h1>
+            <div className="btn-functions">
+              {/* <h2>Seleccione un gráfico para ver a la izquierda</h2> */}
+              <button className="btn-perso" onClick={() => handleButtonClick("unverifiedUsers")}>Usuarios sin verificar</button>
+              <button className="btn-perso" onClick={() => handleButtonClick("categoryUsage")}>Categoría más usada</button>
+              <button className="btn-perso" onClick={() => handleButtonClick("creationPeak")}>Creaciones maximas</button>
+            </div>
             {selectedChart === "unverifiedUsers" && unverifiedUsersData && (
               <div className="chart-content chart-unverified-users">
                 <h2>Usuarios sin Verificar</h2>
@@ -393,14 +399,8 @@ const Dashboard = () => {
               </div>
             )}
           </div>
-          <div className="btn-functions">
-            <h1>Seleccione un gráfico para ver a la izquierda</h1>
-            <button className="btn-perso" onClick={() => handleButtonClick("unverifiedUsers")}>Usuarios sin verificar</button>
-            <button className="btn-perso" onClick={() => handleButtonClick("categoryUsage")}>Categoría más usada</button>
-            <button className="btn-perso" onClick={() => handleButtonClick("creationPeak")}>Creaciones maximas</button>
-          </div>
         </div>
-          <ToastContainer/>
+        <ToastContainer />
       </div>
     </Container>
   );
