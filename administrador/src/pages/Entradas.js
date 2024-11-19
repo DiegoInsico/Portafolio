@@ -96,7 +96,6 @@ const Entradas = () => {
   };
 
   return (
-    <Container>
       <div className="entradas-container">
         <div className="entradas-content">
           {/* Contenedor para la tabla de estadísticas generales */}
@@ -161,7 +160,6 @@ const Entradas = () => {
           </div>
         </div>
       </div>
-    </Container>
   );
 };
 

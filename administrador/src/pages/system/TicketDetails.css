@@ -8,36 +8,38 @@
   grid-template-columns: 1fr 2fr 0.3fr;
   grid-template-rows: 0.1fr auto auto auto;
   gap: 10px;
-  /* margin-top: 80px; */
-  padding: 20px;
+  margin-top:80px;
+  margin-left: 5%;
   background-color: #f0f2f53b;
   width: 90vw;
-  backdrop-filter: blur(5px);
   height: 80vh;
-  margin-top: 80px;
+  backdrop-filter: blur(5px);
   border-radius: 20px;
   font-family: 'Roboto', sans-serif;
+  padding: 10px;
   color: #333;
 }
+
 
 .ticket-header {
   grid-area: header;
   display: flex;
   background-color: #ffffff7c; 
   color: black;
-  border-radius: 30px;
+  border-radius: 20px;
   backdrop-filter: blur(5px);
   justify-content: space-between;
   align-items: center;
   margin: 0;
   width: 100%;
   z-index: 2;
-  border-bottom: 1px solid #ff9900; 
+  /* border-bottom: 1px solid #ff9900;  */
 }
 
 .ticket-header h5{
   color: black;
   text-align: center;
+  border-radius: 20px;
   font-size: 20px;
   margin-left: 15px;
 }
