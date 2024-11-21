@@ -1,118 +1,190 @@
-/* src/pages/system/TicketDetails.css */
-
 .ticket-details-container {
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-    padding: 20px;
-    box-sizing: border-box;
-    background-color: #f0f2f5;
-    font-family: 'Roboto', sans-serif;
-  }
-  
-  .header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background-color: #1976d2;
-    color: #fff;
-    padding: 10px 20px;
-    border-radius: 8px 8px 0 0;
-  }
-  
-  .assignment-section {
-    display: flex;
-    align-items: center;
-    padding: 10px 20px;
-    background-color: #ffffff;
-    border-bottom: 1px solid #ccc;
-  }
-  
-  .assign-select {
-    min-width: 200px;
-  }
-  
-  .assign-button {
-    padding: 6px 12px;
-  }
-  
-  .description-section {
-    padding: 20px;
-    background-color: #ffffff;
-    border-bottom: 1px solid #ccc;
-  }
-  
-  .chat-section {
-    flex-grow: 1;
-    padding: 20px;
-    overflow-y: auto;
-    background-color: #f5f5f5;
-  }
-  
-  .send-message-bar {
-    display: flex;
-    align-items: center;
-    padding: 10px 20px;
-    background-color: #ffffff;
-    border-top: 1px solid #ccc;
-  }
-  
-  .send-message-bar .MuiTextField-root {
-    margin-right: 10px;
-  }
-  
-  .mark-solved-section {
-    padding: 10px 20px;
-    background-color: #ffffff;
-    border-top: 1px solid #ccc;
-    text-align: right;
-  }
-  
-  .message-item {
-    display: flex;
-    align-items: flex-start;
-    margin-bottom: 10px;
-  }
-  
-  .user-message {
-    justify-content: flex-start;
-  }
-  
-  .admin-message {
-    justify-content: flex-end;
-  }
-  
-  .message-bubble {
-    padding: 10px 15px;
-    border-radius: 15px;
-    max-width: 70%;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-  }
-  
-  .user-message .message-bubble {
-    background-color: #e0f7fa;
-  }
-  
-  .admin-message .message-bubble {
-    background-color: #c5cae9;
-  }
-  
-  @media (max-width: 768px) {
-    .assignment-section, .description-section, .chat-section, .send-message-bar, .mark-solved-section {
-      padding: 10px;
-    }
-  
-    .assign-select {
-      min-width: 150px;
-    }
-  
-    .assign-button {
-      padding: 4px 8px;
-      font-size: 0.875rem;
-    }
-  
-    .send-message-bar .MuiTextField-root {
-      margin-right: 5px;
-    }
-  }
-  
+  display: grid;
+  grid-template-areas: 
+    "header header header"
+    "assign chat ready"
+    "info chat nothing"
+    "ntng input send-btn";
+  grid-template-columns: 1fr 2fr 0.3fr;
+  grid-template-rows: 0.1fr auto auto auto;
+  gap: 10px;
+  margin-top:80px;
+  margin-left: 5%;
+  background-color: #f0f2f53b;
+  width: 90vw;
+  height: 80vh;
+  backdrop-filter: blur(5px);
+  border-radius: 20px;
+  font-family: 'Roboto', sans-serif;
+  padding: 10px;
+  color: #333;
+}
+
+
+.ticket-header {
+  grid-area: header;
+  display: flex;
+  background-color: #ffffff7c; 
+  color: black;
+  border-radius: 20px;
+  backdrop-filter: blur(5px);
+  justify-content: space-between;
+  align-items: center;
+  margin: 0;
+  width: 100%;
+  z-index: 2;
+  /* border-bottom: 1px solid #ff9900;  */
+}
+
+.ticket-header h5{
+  color: black;
+  text-align: center;
+  border-radius: 20px;
+  font-size: 20px;
+  margin-left: 15px;
+}
+
+.ticket-btn-close {
+  /* background: none; */
+  border: none;
+  width: 80px;
+  margin-right: 10px;
+  background-color: rgb(202, 62, 62);
+  border-radius: 30px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: #fff;
+}
+
+.ticket-btn-close:hover{
+  transition: 0.3s;
+  background-color: red;
+}
+
+.ticket-assignment-section {
+  grid-area: assign;
+  display: flex;
+  flex-direction: column;
+}
+
+.ticket-assign-select {
+  width: 100%;
+  margin-top: 5px;
+  background-color: #ffffff88;
+  font-size: 15px;
+  padding: 5px;
+}
+
+
+.ticket-assign-button {
+  grid-area: assign-btn;
+  align-self: start;
+  padding: 5px 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  background-color: #1976d2;
+  color: white;
+}
+
+
+.ticket-assign-button:hover{
+ background-color: blueviolet;
+}
+
+.ticket-description-section {
+  grid-area: info;
+  background-color: #ffffff88;
+  padding: 10px;
+  border-radius: 10px;
+  height: 100%;
+}
+
+.ticket-description-section p{
+  text-align: left;
+  color: black;
+  /* align-items: flex-start; */
+}
+
+.ticket-chat-section {
+  grid-area: chat;
+  background-color: #ffffff;
+  padding: 10px;
+  border-radius: 10px;
+  overflow-y: auto;
+  max-height: 100%;
+}
+
+.ticket-message-item {
+  display: flex;
+  margin-bottom: 10px;
+}
+
+.ticket-user-message .ticket-message-bubble {
+  background-color: rgb(245, 212, 253);
+  margin-right: auto;
+}
+
+.ticket-message-bubble p{
+  color: black;
+  text-align: left;
+}
+
+.ticket-admin-message .ticket-message-bubble {
+  background-color: #c5cdff;
+  margin-left: auto;
+}
+
+.ticket-message-sender{
+  color: red;
+}
+
+.ticket-message-bubble {
+  padding: 10px;
+  border-radius: 10px;
+  max-width: 70%;
+}
+
+.ticket-send-message-bar {
+  grid-area: input;
+  display: flex;
+}
+
+.ticket-message-input {
+  grid-area: input;
+  width: 100%;
+  padding: 10px;
+
+  border: 1px solid #ddd;
+  border-radius: 25px;
+  resize: none;
+}
+
+.ticket-send-button {
+  grid-area: send-btn;
+  padding: 5px 10px;
+  border: none;
+  width: 80px;
+  border-radius: 25px;
+  cursor: pointer;
+  background-color: #1976d2;
+  color: white;
+  margin-left: 10px;
+}
+
+.ticket-mark-solved-section {
+  grid-area: ready;
+  margin-top: 10px;
+  text-align: center;
+}
+
+.ticket-mark-solved-button {
+  padding: 5px 10px;
+  border: none;
+  width: 100px;
+  border-radius: 15px;
+  cursor: pointer;
+  background-color: #5ab900;
+  color: white;
+  font-size: 15px;
+}

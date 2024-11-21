@@ -3,6 +3,8 @@ import { Injectable, Logger } from '@nestjs/common';
 import { FirestoreService } from '../firestore/firestore.service';
 import { OcrService } from '../ocr/ocr.service';
 import { AiService } from 'src/ai/ai.service';
+import { NotificationService } from '../notification/notification.service';
+import path from 'path';
 
 @Injectable()
 export class CertificadoService {
@@ -12,7 +14,8 @@ export class CertificadoService {
     private readonly firestoreService: FirestoreService,
     private readonly ocrService: OcrService,
     private readonly aiService: AiService,
-  ) {}
+    private readonly notificationService: NotificationService,
+  ) { }
 
   /**
    * Procesa un certificado: extrae texto, lo analiza y actualiza su estado.
@@ -26,8 +29,22 @@ export class CertificadoService {
         return;
       }
 
-      const fileBuffer = await this.firestoreService.downloadFile(certificado.filePath);
-      const extractedText = await this.ocrService.extractText(fileBuffer);
+      let extractedText: string;
+
+      // Determinar el tipo de archivo
+      const fileExtension = path.extname(certificado.fileName).toLowerCase();
+      if (fileExtension === '.pdf') {
+        this.logger.log(`Procesando certificado PDF: ${certificado.fileName}`);
+        extractedText = await this.ocrService.extractTextFromPdf(certificado.filePath, 'application/pdf');
+      } else if (['.jpg', '.jpeg', '.png'].includes(fileExtension)) {
+        this.logger.log(`Procesando certificado de imagen: ${certificado.fileName}`);
+        const fileBuffer = await this.firestoreService.downloadFile(certificado.filePath);
+        extractedText = await this.ocrService.extractTextFromImage(fileBuffer);
+      } else {
+        this.logger.warn(`Formato de archivo no soportado para el certificado ${certificado.fileName}.`);
+        return;
+      }
+
       const isValid = await this.aiService.analyzeCertificate(extractedText);
 
       if (isValid) {
@@ -35,6 +52,8 @@ export class CertificadoService {
         await this.firestoreService.updateCertificateStatus(certificadoId, 'approved');
         // Actualizar el estado del usuario a fallecido
         await this.firestoreService.updateUserIsDeceased(certificado.userId, true);
+        // Notificar al testigo principal
+        await this.notifyPrimaryTestigo(certificado.userId);
         this.logger.log(`Certificado ${certificadoId} aprobado. Usuario ${certificado.userId} marcado como fallecido.`);
       } else {
         // Rechazar el certificado
@@ -45,6 +64,12 @@ export class CertificadoService {
       this.logger.error(`Error al procesar el certificado ${certificadoId}:`, error);
       throw error;
     }
+  }
+
+  // Añadir este método dentro de CertificadoService
+  private async notifyPrimaryTestigo(userId: string): Promise<void> {
+    // Lógica para notificar al testigo principal
+    await this.notificationService.notifyPrimaryTestigo(userId);
   }
 
   /**

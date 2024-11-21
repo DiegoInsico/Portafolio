@@ -2,24 +2,27 @@
   text-align: center;
   background-color: rgba(255, 255, 255, 0.1); 
   padding: 10px;
-  width: 98%;
-  height: 100vh;
+  width: 90vw;
+  height: 80vh;
+  margin-left: 4%;
   border-radius: 10px;
   font-family: Arial, sans-serif;
-
   color: #fff;
+  display: flex;
+  justify-content: center;
 }
 
 .dashboard-content {
   display: grid;
   grid-template-areas:
-    "notifi main right"
-    "dash-music main right";
-  grid-template-columns: 1.2fr 1fr 1fr 0.8fr;
+    "activity head"
+    "graph ticket"
+    "graph music";
+  grid-template-columns: 2fr 1fr;
+  grid-template-rows: 0.2fr 1fr 1fr;
   gap: 10px;
   margin-top: 10px;
   width: 100%;
-  padding: 10px;
   border-radius: 10px;
 }
 
@@ -32,12 +35,11 @@
   font-size: 100px;
   text-shadow: 4px 4px 4px #aaa;
   font-family: 'Tangerine', serif;
-
 }
 
-
-.notifi-area {
-  grid-area: notifi;
+/* contenedores */
+.notifi-area, .dash-music {
+  grid-area: ticket;
   max-height: 30vh; 
   overflow-y: auto; 
   background-color: #ffffff7d;
@@ -45,25 +47,90 @@
   color: #ffffff;
   border: 1px solid #ffa82691;
   border-radius: 25px;
-  margin-top: 50px;
   width: 100%;
   position: relative;
+  height: 100vh;
 }
 
-.notifi-area h1 {
+
+.dashboard-grid {
+  grid-area: activity;
+  display: flex;
+  /* background-color: red; */
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.simple-card {
+  background-color: rgba(255, 255, 255, 0.495);
+  backdrop-filter: blur(5px);
+  border-radius: 10px;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+
+/* graficos */
+.dash-chart-container {
+  grid-area: graph ;
+  border-radius: 10px;
+  background-color: #fdfdff7e;
+}
+
+.chart-content canvas{
+  grid-area: graph;
+  height: 40vh !important;
+  width: 50vw !important;
+  padding: 15px;
+  margin: 0 auto;
+  border-radius: 10px;
+  background-color: #d9d9d909;
+  /* box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); */
+}
+
+.chart-category-usage canvas{
+  grid-area: graph;
+  display: flex;
+  justify-items: center;
+  margin: 0 auto;
+  height: 30% !important;
+  width: 30% !important;
+}
+
+.chart-unverified-users h2,
+.chart-category-usage h2,
+.chart-creation-peak h2 {
+  color: black;
+  font-size: 20px;
+  margin-bottom: 15px;
+}
+
+/* titulos h1 */
+.dash-chart-container h1,
+.btn-functions h1,
+.notifi-area h1,
+.dash-music h1{
   position: sticky;
   top: 0;
-  background-color: #ffffffe5; 
+  border-radius: 20px;
+  font-size: 18PX;
   color: black;
   backdrop-filter: blur(5px);
   padding: 20px 0;
   margin: 0;
+  width: 100%;
   z-index: 2;
-  border-bottom: 1px solid #ff9900; 
+  /* border-bottom: 1px solid #ff9900;  */
+}
+
+.btn-functions h2{
+  font-size: 12px;
+  color: grey;
 }
 
 .notifi-area p {
-  font-size: 12px;
+  font-size: 15px;
   margin-top: 10px;
   color: #000000;
   border-bottom: 1px solid #00000025;
@@ -86,38 +153,10 @@
 
 
 
-.dashboard-grid {
-  grid-area: main;
-  display: flex;
-  flex-direction: row;
-  align-content: center;
-  flex-wrap: wrap;
-  gap: 10px;
-    /* padding-left: 50px; */
-
-  align-items: center;
-  /* margin-top: 50px; */
-  /* background-color: rgba(239, 8, 8, 0.923); */
-  border-radius: 30px;
-  width: 100%;
-}
-
-.simple-card {
-  width: 145px;
-  height: 150px;
-  border-radius: 30px;
-  background: #e0e0e0;
-  box-shadow: 15px 15px 30px #bebebe, -15px -15px 30px #ffffff;
-  /* display: flex; */
-  flex-direction: column;
-  margin: 0;
-  margin-bottom: 30px;
-  align-items: center;
-}
 
 .simple-card h3{
   /* margin-top: 10px; */
-  font-size: 30px;
+  font-size: 15px;
   margin: 0;
   margin-top: 5px;
   color: #000000;
@@ -128,16 +167,6 @@
   margin: 0;
   font-size: 25px;
 }
-
-.dash-col {
-  grid-area: right;
-  background-color: aquamarine;
-  border-radius: 20px;
-  padding: 20px;
-  text-align: left;
-  
-}
-
 
 /* boton personalizado */
 /* From Uiverse.io by barisdogansutcu */ 
@@ -154,6 +183,7 @@
 .btn-perso {
   padding: 17px 40px;
   border-radius: 50px;
+  width: 30%;
   cursor: pointer;
   /* border: 0; */
   background-color: rgb(0, 0, 0);
@@ -181,64 +211,14 @@
 }
 
 
-/* graficos */
-.dash-chart-container {
-  grid-area: right;
-  /* background-color: #0055ff48; */
-  margin-top: 50px;
-  max-height: 90%;
-  border-radius: 20px;
-  padding: 20px;
-  text-align: center;
-  color: #ffffff;
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
-  backdrop-filter: blur(3px);
-}
 
-.dash-chart-container h1{
-  margin: 0;
-  font-size: 30px;
-  color: black;
-}
-
-.chart-content {
-  margin-top: 20px;
-  padding: 15px;
-  border-radius: 10px;
-  background-color: #d9d9d9b2;
-  width: 30   0px;
-  height: 350px;
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-.chart-unverified-users h2,
-.chart-category-usage h2,
-.chart-creation-peak h2 {
-  color: black;
-  font-size: 20px;
-  margin-bottom: 15px;
-  
-}
 
 .btn-functions {
   display: flex;
-  max-height: 100%;
-  flex-direction: column;
-  gap: 25px;
-  width: 100%;
-  padding: 10px;
-  margin-top: 50px;
-  backdrop-filter: blur(5px);
-  border-radius: 25px;
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+  flex-direction: row;
+  justify-content: center;
 }
 
-
-.btn-functions h1{
-  font-size: 20px;
-  margin: 0;
-  color: black;
-}
 
 .btn-perso {
   padding: 12px 35px;
@@ -247,7 +227,7 @@
   border: 0;
   background-color: #e7e7e2;
   color: #080101;
-  font-size: 10px;
+  font-size: 9px;
   transition: all 0.3s ease;
 }
 
@@ -259,29 +239,20 @@
 
 /* Artista que más transmite */
 .dash-music {
-  /* grid-area: dash-music; */
-  grid-area: notifi;
-  background-color: rgba(252, 252, 252, 0.768);
-  border-radius: 10px;
-  margin-top: 80%;
-  width: 100%;
-  text-align: center;
-  font-size: 20px;
+  grid-area: music;
+  /* margin-top: 80%; */
+  width: 90%;
+  margin: 0 auto;
 }
 
-.dash-music h1 {
-  border-bottom: 1px solid black;
-  padding: 10px;
-  font-size: 25px;
-  margin: 0;
-  color: black;
-
-}
 
 .loader {
+  margin: auto; 
   display: flex;
   flex-direction: row;
-  height: 4em;
+  height: 5em;
+  width: 80%;
+  margin-top: 10px;
   background-color: #3b3b3b;
   border-radius: 10px;
   transition: 0.4s ease-in-out;

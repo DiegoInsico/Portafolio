@@ -9,7 +9,6 @@ import {
   Alert,
   ScrollView,
   ImageBackground,
-  Platform,
   SafeAreaView,
   ActivityIndicator,
 } from 'react-native';
@@ -20,21 +19,52 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { AuthContext } from '../../context/AuthContext';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import PropTypes from 'prop-types';
+import * as FileSystem from 'expo-file-system'; // Importar FileSystem para manejar archivos
 
 const SubirCertificado = ({ navigation }) => {
   const { user } = useContext(AuthContext);
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
 
+  console.log("Authenticated user:", user); // Para depuración
+
+  // Helper function to convert URI to Blob
+  const uriToBlob = (uri) => {
+    return new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.onload = function () {
+        resolve(xhr.response);
+      };
+      xhr.onerror = function () {
+        reject(new TypeError("Network request failed"));
+      };
+      xhr.responseType = 'blob';
+      xhr.open('GET', uri, true);
+      xhr.send(null);
+    });
+  };
+
   // Función para seleccionar el documento (imagen o PDF)
   const pickDocument = async () => {
     try {
       let result = await DocumentPicker.getDocumentAsync({
         type: ['application/pdf', 'image/*'],
-        copyToCacheDirectory: false,
+        copyToCacheDirectory: true, // Cambiar de false a true
       });
-      if (result.type === 'success') {
-        setFile(result);
+      console.log("DocumentPicker result:", result); // Para depuración
+      if (!result.canceled && result.assets && result.assets.length > 0) {
+        const selectedAsset = result.assets[0];
+        console.log("Selected file:", selectedAsset); // Para depuración
+        
+        // Verificar que el nombre y la URI están presentes
+        let fileName = selectedAsset.name;
+        if (!fileName) {
+          const uriParts = selectedAsset.uri.split('/');
+          fileName = uriParts[uriParts.length - 1];
+        }
+        console.log("Selected file name:", fileName); // Para depuración
+
+        setFile({ ...selectedAsset, name: fileName });
       }
     } catch (error) {
       console.log("Error al seleccionar el documento:", error);
@@ -50,24 +80,31 @@ const SubirCertificado = ({ navigation }) => {
     }
 
     setLoading(true);
+    console.log("Uploading file:", file); // Para depuración
 
     try {
-      const response = await fetch(file.uri);
-      const blob = await response.blob();
-      const storageRef = ref(storage, `certificados/${user.uid}/${Date.now()}_${file.name}`);
+      const blob = await uriToBlob(file.uri);
+      const fileName = `${Date.now()}_${file.name}`;
+      console.log("Uploading to Firebase Storage as:", fileName); // Para depuración
+      const storageRef = ref(storage, `certificados/${user.uid}/${fileName}`);
       await uploadBytes(storageRef, blob);
       const fileUrl = await getDownloadURL(storageRef);
+      console.log("File uploaded successfully:", fileUrl); // Para depuración
+
+      // Reemplazar 'ID_REAL_DEL_TESTIGO' con el ID real del testigo principal
+      const testigoId = 'ID_REAL_DEL_TESTIGO'; // Implementa la lógica para obtener este ID
 
       // Agregar el documento en Firestore
       await addDoc(collection(db, 'certificados'), {
         userId: user.uid,
-        testigoId: 'ID_DEL_TESTIGO_ACTUAL', // Reemplaza con el ID del testigo principal
+        testigoId: testigoId, // Usa el ID real del testigo
         fileName: file.name,
         filePath: storageRef.fullPath,
         fileUrl: fileUrl,
         status: 'pending',
         createdAt: Timestamp.fromDate(new Date()),
       });
+      console.log("Firestore document created successfully."); // Para depuración
 
       Alert.alert('Éxito', 'Certificado subido correctamente.');
       setFile(null);

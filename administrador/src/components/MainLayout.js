@@ -33,16 +33,16 @@ const MainLayout = ({ children, isAuthenticated, currentUser }) => {
             </NavLink>
             <NavLink to="/entradas">
               <ListAltIcon className="icon" />
-              <span className="sidebar-number">|</span> Gestión de Entradas
+              <span className="sidebar-number">|</span> Datos de Entradas
             </NavLink>
             <NavLink to="/monitor/graphics">
               <BarChartIcon className="icon" />
               <span className="sidebar-number">|</span> Ver Gráficos
             </NavLink>
-            <NavLink to="/system/notifications">
+            {/* <NavLink to="/system/notifications">
               <NotificationsIcon className="icon" />
               <span className="sidebar-number">|</span> Notificaciones
-            </NavLink>
+            </NavLink> */}
             <NavLink to="/monitor/SoulmatePage">
               <MusicNoteIcon className="icon" />
               <span className="sidebar-number">|</span> Lista de Emociones y Canciones

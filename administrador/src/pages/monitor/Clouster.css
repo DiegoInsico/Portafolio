@@ -10,11 +10,11 @@
     text-align: center;
 }
 
-h1, h2 {
+/* h1, h2 {
     font-size: 24px;
     color: #f0a500;
     margin-bottom: 20px;
-}
+} */
 
 .chart-container {
     margin: 20px auto;

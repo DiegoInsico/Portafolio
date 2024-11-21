@@ -191,13 +191,13 @@ export class FirestoreService {
         .collection('certificados')
         .where('status', '==', 'pending')
         .get();
-
+  
       return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
     } catch (error) {
       this.logger.error('Error al obtener certificados pendientes:', error);
       throw error;
     }
-  }
+  }  
 
   // Actualizar el estado de un certificado
   async updateCertificateStatus(certificadoId: string, status: string): Promise<void> {

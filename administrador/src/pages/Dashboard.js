@@ -6,6 +6,9 @@ import { collection, getDocs, query, where, orderBy } from "firebase/firestore";
 import { db } from "../firebase";
 import { Timestamp } from "firebase/firestore";
 import { Line, Pie, Bar } from "react-chartjs-2";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -16,6 +19,21 @@ const Dashboard = () => {
     dailyUserActivity: 0,
   });
   const [mostPlayedSongs, setMostPlayedSongs] = useState([]);
+  const [openTickets, setOpenTickets] = useState([]); // Estado para tickets abiertos
+
+  const showUnansweredTicketAlert = (ticket) => {
+    toast.warn(`Ticket sin respuesta desde ${ticket.lastUpdate.toLocaleDateString()} (${ticket.diffInDays} días)`, {
+      position: "top-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+    });
+  };
+
+
 
   useEffect(() => {
     const fetchMostPlayedSongs = async () => {
@@ -200,6 +218,95 @@ const Dashboard = () => {
     fetchChartData();
   }, []);
 
+  // recordatorio notificaciones
+  useEffect(() => {
+    const checkUnansweredTickets = async () => {
+      try {
+        const snapshot = await getDocs(query(
+          collection(db, "tickets"),
+          where("status", "==", "abierto")
+        ));
+
+        const today = new Date();
+        const lastNotified = JSON.parse(localStorage.getItem("lastNotifiedTickets")) || {};
+
+        const pendingTickets = snapshot.docs
+          .map(doc => {
+            const data = doc.data();
+            const lastUpdate = data.updatedAt?.toDate();
+            const diffInDays = Math.floor((today - lastUpdate) / (1000 * 60 * 60 * 24)); // Diferencia en días
+
+            if (diffInDays >= 1 && !lastNotified[doc.id]) {
+              showUnansweredTicketAlert({
+                ...data,
+                lastUpdate,
+                diffInDays
+              });
+              lastNotified[doc.id] = true;
+            }
+
+            return {
+              ...data,
+              id: doc.id,
+              lastUpdate,
+              diffInDays
+            };
+          })
+          .filter(ticket => ticket);
+
+        setOpenTickets(pendingTickets);
+        localStorage.setItem("lastNotifiedTickets", JSON.stringify(lastNotified));
+
+      } catch (error) {
+        console.error("Error verificando tickets sin respuesta:", error);
+      }
+    };
+
+    // Ejecuta la verificación una vez al día
+    checkUnansweredTickets();
+    const intervalId = setInterval(checkUnansweredTickets, 24 * 60 * 60 * 1000); // Cada 24 horas
+
+    // Limpiar el intervalo al desmontar el componente
+    return () => clearInterval(intervalId);
+  }, []);
+
+  // tickets con css
+  useEffect(() => {
+    const fetchOpenTickets = async () => {
+      try {
+        const ticketsQuery = query(
+          collection(db, "tickets"),
+          where("status", "==", "abierto")
+        );
+        const snapshot = await getDocs(ticketsQuery);
+
+        const openTicketsList = await Promise.all(
+          snapshot.docs.map(async (doc) => {
+            const ticketData = doc.data();
+            const userId = ticketData.userId;
+
+            let displayName = "Usuario desconocido";
+            if (userId) {
+              const userRef = collection(db, "users");
+              const userSnapshot = await getDocs(query(userRef, where("uid", "==", userId)));
+              if (!userSnapshot.empty) {
+                displayName = userSnapshot.docs[0].data().displayName || "Usuario desconocido";
+              }
+            }
+
+            return { id: doc.id, ...ticketData, displayName };
+          })
+        );
+
+        setOpenTickets(openTicketsList);
+      } catch (error) {
+        console.error("Error fetching open tickets:", error);
+      }
+    };
+
+    fetchOpenTickets();
+  }, []);
+
   const handleButtonClick = (chartType) => {
     setSelectedChart(chartType);
   };
@@ -210,16 +317,14 @@ const Dashboard = () => {
         <div className="dashboard-content">
           {/* <h1 className="dash-tittle">Dashboard</h1> */}
           <div className="notifi-area">
-            <h1>notificaciones por responder</h1>
-            <p>soy un usuario molesto primero</p>
-            <p>soy un usuario molesto2</p>
-            <p>soy un usuario molesto2</p>
-            <p>soy un usuario molesto2</p>
-            <p>soy un usuario molesto2</p>
-            <p>soy un usuario molesto2</p>
-            <p>soy un usuario molesto2</p>
-            <p>soy un usuario molesto2</p>
-            <p>soy un usuario molesto ultimo</p>
+            <h1>Tickets Pendientes</h1>
+            {openTickets.length > 0 ? (
+              openTickets.map((ticket) => (
+                <p key={ticket.id}>{`${ticket.subject} - ${ticket.displayName}`}</p>
+              ))
+            ) : (
+              <p>No hay tickets abiertos en este momento.</p>
+            )}
           </div>
 
           <div className="dash-music">
@@ -269,6 +374,12 @@ const Dashboard = () => {
           </div>
           <div className="dash-chart-container">
             <h1>Información Adicional</h1>
+            <div className="btn-functions">
+              {/* <h2>Seleccione un gráfico para ver a la izquierda</h2> */}
+              <button className="btn-perso" onClick={() => handleButtonClick("unverifiedUsers")}>Usuarios sin verificar</button>
+              <button className="btn-perso" onClick={() => handleButtonClick("categoryUsage")}>Categoría más usada</button>
+              <button className="btn-perso" onClick={() => handleButtonClick("creationPeak")}>Creaciones maximas</button>
+            </div>
             {selectedChart === "unverifiedUsers" && unverifiedUsersData && (
               <div className="chart-content chart-unverified-users">
                 <h2>Usuarios sin Verificar</h2>
@@ -288,13 +399,8 @@ const Dashboard = () => {
               </div>
             )}
           </div>
-          <div className="btn-functions">
-            <h1>Seleccione un gráfico para ver a la izquierda</h1>
-            <button className="btn-perso" onClick={() => handleButtonClick("unverifiedUsers")}>Usuarios sin verificar</button>
-            <button className="btn-perso" onClick={() => handleButtonClick("categoryUsage")}>Categoría más usada</button>
-            <button className="btn-perso" onClick={() => handleButtonClick("creationPeak")}>Creaciones maximas</button>
-          </div>
         </div>
+        <ToastContainer />
       </div>
     </Container>
   );

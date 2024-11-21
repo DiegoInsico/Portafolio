@@ -15,6 +15,7 @@ import { OcrService } from './services/ocr/ocr.service';
 import { CertificadoService } from './services/certificado/certificado.service';
 import * as admin from 'firebase-admin';
 import { AiService } from './ai/ai.service';
+import { TasksService } from './tasks/tasks.service';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { AiService } from './ai/ai.service';
     AppService,
     OcrService,
     CertificadoService,
+    TasksService,
     {
       provide: 'FIREBASE_ADMIN',
       useFactory: (configService: ConfigService) => {

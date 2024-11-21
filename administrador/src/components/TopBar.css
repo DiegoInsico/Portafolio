@@ -16,10 +16,12 @@
 /* Columna de usuario */
 .topbar-user {
   color: #1f1c17;
-  font-size: 40px;
+  font-size: 50px;
   font-family: 'Tangerine', serif;
   margin-left: 20px;
-  justify-self: start; /* Alinea al inicio de la columna izquierda */
+  justify-self: start;
+  text-shadow: 1px 1px 3px #bebebe, -1px 3px #a7a7a7;
+
 }
 
 /* Columna de título */
@@ -30,6 +32,8 @@
   color: #000000;
   text-align: center;
   justify-self: center; /* Centra el título en la columna */
+  text-shadow: 1px 1px 3px #bebebe, -1px 3px #a7a7a7;
+
 }
 
 /* Columna de botón (Logout) */
@@ -37,7 +41,7 @@
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  width: 90px;
+  width: 60px;
   height: 50px;
   border: none;
   border-radius: 40%;
@@ -88,7 +92,6 @@
 /* Hover effect button's text */
 .Btn:hover .sign {
   width: 30%;
-  padding-left: 5px;
 }
 
 .Btn:hover .text {
