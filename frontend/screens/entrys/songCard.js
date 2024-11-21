@@ -1,14 +1,24 @@
+// SongCard.js
 import React from "react";
 import { View, Text, Image, Pressable, StyleSheet } from "react-native";
-import EmotionFlag from "../../components/general/EmotionFlag";
 import AudioPlayer from "../../components/audioPlayer";
 import { MaterialIcons } from "@expo/vector-icons";
 import PropTypes from "prop-types";
+import { emotionToEmoji } from "../../utils/emotionUtils";
 
 const SongCard = ({ entry, onPress }) => {
   if (!entry) return null;
 
   const { cancion, texto, emociones } = entry;
+
+  const renderEmotions = (emotions) => {
+    if (!emotions || emotions.length === 0) return null;
+    return emotions.map((emotion, index) => (
+      <Text key={index} style={styles.emoji}>
+        {emotionToEmoji(emotion)}
+      </Text>
+    ));
+  };
 
   return (
     <Pressable onPress={onPress} style={styles.card}>
@@ -44,9 +54,9 @@ const SongCard = ({ entry, onPress }) => {
         </View>
       )}
 
-      {/* Footer con emoción y flecha */}
+      {/* Footer con emociones y flecha */}
       <View style={styles.footer}>
-        <EmotionFlag emociones={emociones || []} />
+        <View style={styles.emotionsContainer}>{renderEmotions(emociones)}</View>
         <MaterialIcons name="arrow-forward-ios" size={20} color="#ccc" />
       </View>
     </Pressable>
@@ -123,6 +133,13 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingHorizontal: 15,
     paddingVertical: 10,
+  },
+  emotionsContainer: {
+    flexDirection: "row",
+  },
+  emoji: {
+    fontSize: 20,
+    marginHorizontal: 3,
   },
 });
 

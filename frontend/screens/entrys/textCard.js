@@ -1,8 +1,9 @@
+// TextCard.js
 import React from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
-import EmotionFlag from "../../components/general/EmotionFlag";
 import { MaterialIcons } from "@expo/vector-icons";
 import PropTypes from "prop-types";
+import { emotionToEmoji } from "../../utils/emotionUtils";
 
 const TextCard = ({ entry, onPress }) => {
   if (!entry) return null;
@@ -11,14 +12,21 @@ const TextCard = ({ entry, onPress }) => {
     entry.fechaCreacion?.toDate()?.toLocaleDateString("es-ES") || "";
   const { texto, emociones } = entry;
 
+  const renderEmotions = (emotions) => {
+    if (!emotions || emotions.length === 0) return null;
+    return emotions.map((emotion, index) => (
+      <Text key={index} style={styles.emoji}>
+        {emotionToEmoji(emotion)}
+      </Text>
+    ));
+  };
+
   return (
     <Pressable onPress={onPress} style={styles.card}>
-      {/* Icono de emoción */}
-      <View style={styles.emotionContainer}>
-        <EmotionFlag emociones={emociones || []} />
-      </View>
+      {/* Emociones */}
+      <View style={styles.emotionContainer}>{renderEmotions(emociones)}</View>
 
-      {/* Contenido de la tarjeta */}
+      {/* Contenido */}
       <View style={styles.content}>
         {texto && (
           <Text style={styles.text} numberOfLines={3} ellipsizeMode="tail">
@@ -61,7 +69,9 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   emotionContainer: {
+    flexDirection: "column", // Cambiado a columna para apilar emojis
     marginRight: 12,
+    alignItems: "center", // Opcional, centra los emojis
   },
   content: {
     flex: 1,
@@ -74,6 +84,10 @@ const styles = StyleSheet.create({
   date: {
     fontSize: 14,
     color: "#888888",
+  },
+  emoji: {
+    fontSize: 20,
+    marginVertical: 2, // Espaciado vertical entre emojis
   },
 });
 

@@ -4,21 +4,14 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { emotionToEmoji } from '../../utils/emotionUtils'; // Importa la función desde utils
 
-const EmotionFlag = ({ emociones }) => {
-    if (!emociones || emociones.length === 0) {
-        return null; // No renderizar nada si no hay emociones
-    }
-
-    return (
-        <View style={styles.emojiFlag}>
-            {emociones.map((emotion, index) => (
-                <Text key={index} style={styles.emoji}>
-                    {emotionToEmoji(emotion)}
-                </Text>
-            ))}
-        </View>
-    );
-};
+const renderEmotions = (emotions) => {
+    if (!emotions || emotions.length === 0) return null;
+    return emotions.map((emoji, index) => (
+      <Text key={index} style={styles.emoji}>
+        {emoji}
+      </Text>
+    ));
+  };
 
 const styles = StyleSheet.create({
     emojiFlag: {

@@ -28,6 +28,7 @@ import ModalEntry from "../entrys/modalEntry";
 import { ScrollView } from "react-native-gesture-handler";
 import { StatusBar } from "react-native";
 import { AuthContext } from "../../context/AuthContext";
+import SideBarMenu from "../../components/navigation/sideBarMenu";
 
 const { width: viewportWidth, height: viewportHeight } = Dimensions.get("window");
 
@@ -37,6 +38,7 @@ const Home = ({ navigation }) => {
   const [entries, setEntries] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
+  const [menuVisible, setMenuVisible] = useState(false);
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(0.5)).current;
@@ -50,6 +52,10 @@ const Home = ({ navigation }) => {
     month: "long",
     day: "numeric",
   });
+
+  const toggleMenu = () => {
+    setMenuVisible((prev) => !prev);
+  };
 
   const getGreeting = () => {
     const hour = today.getHours();
@@ -169,7 +175,7 @@ const Home = ({ navigation }) => {
     <>
       <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
       <ImageBackground
-        source={require("../../assets/background/barco.jpg")}
+        source={require("../../assets/background/fondo2.webp")}
         style={styles.background}
         resizeMode="cover"
       >
@@ -179,12 +185,34 @@ const Home = ({ navigation }) => {
               style={[{ opacity: fadeAnim, transform: [{ scale: scaleAnim }] }]}
             >
               <View style={styles.headerContainer}>
+
+                {/* Botón para abrir el menú */}
+                <TouchableOpacity style={styles.menuButton} onPress={toggleMenu}>
+                  <FontAwesome name="bars" size={24} color="#fff" />
+                </TouchableOpacity>
+
                 <Text style={styles.greetingText}>
                   {getGreeting()}, {userName}
                 </Text>
                 <Text style={styles.dateText}>{formattedDate}</Text>
               </View>
             </Animated.View>
+
+            {/* Botones superiores */}
+            <View style={styles.topButtonsContainer}>
+              <TouchableOpacity
+                style={styles.squareButton}
+                onPress={() => handleOpenModal("Categoría 1")}
+              >
+                <Text style={styles.squareButtonText}>🤔</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.squareButton}
+                onPress={() => handleOpenModal("Categoría 2")}
+              >
+                <Text style={styles.squareButtonText}>💪</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </ScrollView>
 
@@ -197,6 +225,34 @@ const Home = ({ navigation }) => {
               </View>
             </View>
           ) : null}
+
+          {/* Botones inferiores */}
+          <View style={styles.bottomButtonsContainer}>
+            <TouchableOpacity
+              style={styles.squareButton}
+              onPress={() => handleOpenModal("Categoría 3")}
+            >
+              <Text style={styles.squareButtonText}>😊</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.squareButton}
+              onPress={() => handleOpenModal("Categoría 4")}
+            >
+              <Text style={styles.squareButtonText}>🙏</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.squareButton}
+              onPress={() => handleOpenModal("Categoría 5")}
+            >
+              <Text style={styles.squareButtonText}>❤️</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.squareButton}
+              onPress={() => handleOpenModal("Categoría 6")}
+            >
+              <Text style={styles.squareButtonText}>💔</Text>
+            </TouchableOpacity>
+          </View>
 
           <TouchableOpacity
             style={styles.roundButtonContainer}
@@ -211,6 +267,46 @@ const Home = ({ navigation }) => {
           <ModalEntry visible={modalVisible} onClose={handleCloseModal} />
         </View>
       </ImageBackground>
+      <SideBarMenu
+        isVisible={menuVisible}
+        toggleMenu={toggleMenu}
+        navigateToHome={() => {
+          toggleMenu();
+          navigation.navigate("Home");
+        }}
+        navigateToEntries={() => {
+          toggleMenu();
+          navigation.navigate("ListEntry");
+        }}
+        navigateToProfile={() => {
+          toggleMenu();
+          navigation.navigate("Profile");
+        }}
+        navigateToSettings={() => {
+          toggleMenu();
+          navigation.navigate("Settings");
+        }}
+        navigateToTestigos={() => {
+          toggleMenu();
+          navigation.navigate("Testigos");
+        }}
+        navigateToBeneficiarios={() => {
+          toggleMenu();
+          navigation.navigate("Beneficiarios");
+        }}
+        navigateToProgramarMensaje={() => {
+          toggleMenu();
+          navigation.navigate("ProgramarMensaje");
+        }}
+        navigateToSoporte={() => {
+          toggleMenu();
+          navigation.navigate("Soporte");
+        }}
+        handleSignOut={() => {
+          toggleMenu();
+          console.log("Cerrando sesión...");
+        }}
+      />
     </>
   );
 };
@@ -298,6 +394,43 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+  },
+  /* Botones superiores */
+  topButtonsContainer: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    marginTop: 20,
+    width: "100%",
+  },
+  /* Botones inferiores */
+  bottomButtonsContainer: {
+    position: "absolute",
+    bottom: 70,
+    width: "100%",
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-around",
+  },
+  squareButton: {
+    width: viewportWidth * 0.20, // Botones cuadrados
+    height: viewportWidth * 0.20,
+    backgroundColor: "#FFD700",
+    justifyContent: "center",
+    alignItems: "center",
+    margin: 3,
+    marginBottom: 20,
+    borderRadius: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 2, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  squareButtonText: {
+    fontSize: 40,
+    fontWeight: "bold",
+    color: "#000",
+    textAlign: "center",
   },
 });
 

@@ -1,9 +1,10 @@
+// AudioCard.js
 import React from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
-import EmotionFlag from "../../components/general/EmotionFlag";
 import AudioPlayer from "../../components/audioPlayer";
 import { MaterialIcons } from "@expo/vector-icons";
 import PropTypes from "prop-types";
+import { emotionToEmoji } from "../../utils/emotionUtils";
 
 const AudioCard = ({ entry, onPress }) => {
   if (!entry) return null;
@@ -12,14 +13,21 @@ const AudioCard = ({ entry, onPress }) => {
     entry.fechaCreacion?.toDate()?.toLocaleDateString("es-ES") || "";
   const { audio, texto, emociones } = entry;
 
+  const renderEmotions = (emotions) => {
+    if (!emotions || emotions.length === 0) return null;
+    return emotions.map((emotion, index) => (
+      <Text key={index} style={styles.emoji}>
+        {emotionToEmoji(emotion)}
+      </Text>
+    ));
+  };
+
   return (
     <Pressable onPress={onPress} style={styles.card}>
-      {/* Icono de emoción */}
-      <View style={styles.emotionContainer}>
-        <EmotionFlag emociones={emociones || []} />
-      </View>
+      {/* Emociones */}
+      <View style={styles.emotionContainer}>{renderEmotions(emociones)}</View>
 
-      {/* Contenido de la tarjeta */}
+      {/* Contenido */}
       <View style={styles.content}>
         {texto && (
           <Text style={styles.text} numberOfLines={3} ellipsizeMode="tail">
@@ -65,6 +73,7 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   emotionContainer: {
+    flexDirection: "row",
     marginRight: 12,
   },
   content: {
@@ -82,6 +91,10 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#888888",
     marginTop: 8,
+  },
+  emoji: {
+    fontSize: 20,
+    marginHorizontal: 3,
   },
 });
 

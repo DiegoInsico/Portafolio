@@ -1,36 +1,43 @@
 import React from "react";
 import { View, Text, Image, Pressable, StyleSheet } from "react-native";
-import EmotionFlag from "../../components/general/EmotionFlag";
 import { MaterialIcons } from "@expo/vector-icons";
 import PropTypes from "prop-types";
+import { emotionToEmoji } from "../../utils/emotionUtils";
 
 const PolaroidCard = ({ entry, onPress }) => {
   if (!entry) return null;
 
-  const { media, texto, emociones } = entry;
+  const { media, fechaCreacion, emociones } = entry;
+
+  const formatDate = (date) => {
+    if (!date) return "";
+    const dateObj = date.toDate();
+    return dateObj.toLocaleDateString("es-ES");
+  };
+
+  const renderEmotions = (emotions) => {
+    if (!emotions || emotions.length === 0) return null;
+    return emotions.map((emotion, index) => (
+      <Text key={index} style={styles.emoji}>
+        {emotionToEmoji(emotion)}
+      </Text>
+    ));
+  };
 
   return (
     <Pressable onPress={onPress} style={styles.card}>
-      {/* Imagen */}
       <View style={styles.imageContainer}>
         <Image
           source={{ uri: media }}
           style={styles.image}
-          resizeMode="cover" // Aseguramos que la imagen cubra todo el contenedor
+          resizeMode="cover"
         />
-        {/* Si hay texto, mostrarlo sobre la imagen */}
-        {texto && (
-          <View style={styles.overlay}>
-            <Text style={styles.overlayText} numberOfLines={3}>
-              {texto}
-            </Text>
-          </View>
-        )}
       </View>
-
-      {/* Footer con emoción y flecha */}
       <View style={styles.footer}>
-        <EmotionFlag emociones={emociones || []} />
+        <View style={styles.emotionsContainer}>{renderEmotions(emociones)}</View>
+        <Text style={styles.dateText}>
+          {fechaCreacion ? formatDate(fechaCreacion) : ""}
+        </Text>
         <MaterialIcons name="arrow-forward-ios" size={20} color="#ccc" />
       </View>
     </Pressable>
