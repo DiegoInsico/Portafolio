@@ -321,7 +321,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: "rgba(0, 0, 0, 0.7)",
+    backgroundColor: "rgba(0, 0, 0, 0.5)", // Fondo semi-transparente para superposición
     zIndex: 998,
   },
   sidebarContainer: {
@@ -330,16 +330,16 @@ const styles = StyleSheet.create({
     top: 0,
     bottom: 0,
     width: 280,
-    backgroundColor: "#2C3E50",
+    backgroundColor: "#d9d3c2", // Fondo principal en tono pastel suave
     zIndex: 999,
-    paddingTop: 50, // Mantener según diseño
+    paddingTop: 50,
     paddingLeft: 20,
     paddingRight: 20,
     shadowColor: "#000",
     shadowOffset: { width: -2, height: 0 },
-    shadowOpacity: 0.8,
+    shadowOpacity: 0.2,
     shadowRadius: 5,
-    elevation: 10,
+    elevation: 5,
     borderTopLeftRadius: 20,
     borderBottomLeftRadius: 20,
     display: "flex",
@@ -352,63 +352,64 @@ const styles = StyleSheet.create({
   },
   profileContainer: {
     alignItems: "center",
-    marginBottom: 10,
+    marginBottom: 20,
   },
   profileImage: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    borderWidth: 3,
-    borderColor: "#FFD700",
+    width: 90,
+    height: 90,
+    borderRadius: 45,
+    borderWidth: 2,
+    borderColor: "#dad7c9", // Borde en crema claro
     marginBottom: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5, // Efecto de sombra negra
   },
   profileName: {
     fontSize: 18,
     fontWeight: "bold",
-    color: "#FFD700",
+    color: "#000000", // Texto en negro
     textAlign: "center",
   },
   drawerButton: {
     flexDirection: "row",
     alignItems: "center",
-    paddingVertical: 15,
-    paddingHorizontal: 10,
-    marginVertical: 5,
-    borderRadius: 10,
-    backgroundColor: "#34495E",
+    paddingVertical: 12,
+    paddingHorizontal: 15,
+    marginVertical: 6,
+    borderRadius: 12,
+    backgroundColor: "#dad7c9", // Fondo crema claro para los botones
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 2,
-    elevation: 3,
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 4, // Efecto de sombra para los botones
   },
   drawerButtonText: {
     fontSize: 16,
-    color: "#fff",
+    color: "#000000", // Texto en negro
     paddingLeft: 15,
   },
   selectedButton: {
-    backgroundColor: "#FFD700",
-    shadowColor: "#FFD700",
+    backgroundColor: "#dad7c9", // Fondo crema claro para el botón seleccionado
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.8,
+    shadowOpacity: 0.3,
     shadowRadius: 6,
     elevation: 6,
     borderColor: "#FFFFFF",
     borderWidth: 1,
   },
-  selectedButtonText: {
-    color: "#000",
-    fontWeight: "bold",
-  },
   divider: {
     width: "100%",
     height: 1,
-    backgroundColor: "#FFD700",
+    backgroundColor: "#dad7c9", // Línea divisoria en crema claro
     marginVertical: 15,
   },
   safeArea: {
     flex: 1,
-    backgroundColor: "transparent", // Mantener transparente para superposición
+    backgroundColor: "transparent", // Fondo transparente para superposición
   },
 });

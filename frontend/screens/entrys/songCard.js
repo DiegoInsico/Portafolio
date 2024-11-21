@@ -1,122 +1,129 @@
-import React from 'react';
-import { View, Text, Image, StyleSheet, Pressable } from 'react-native';
-import EmotionFlag from '../../components/general/EmotionFlag';
-import AudioPlayer from '../../components/audioPlayer';
-import { MaterialIcons } from '@expo/vector-icons';
+import React from "react";
+import { View, Text, Image, Pressable, StyleSheet } from "react-native";
+import EmotionFlag from "../../components/general/EmotionFlag";
+import AudioPlayer from "../../components/audioPlayer";
+import { MaterialIcons } from "@expo/vector-icons";
+import PropTypes from "prop-types";
 
 const SongCard = ({ entry, onPress }) => {
+  if (!entry) return null;
 
-    if (!entry) {
-        return null;
-    }
+  const { cancion, texto, emociones } = entry;
 
-    const formattedFechaCreacion = entry.fechaCreacion
-        ? entry.fechaCreacion.toDate().toLocaleDateString('es-ES')
-        : '';
+  return (
+    <Pressable onPress={onPress} style={styles.card}>
+      {/* Imagen del álbum */}
+      <View style={styles.imageContainer}>
+        <Image
+          source={{ uri: cancion.albumImage }}
+          style={styles.image}
+          resizeMode="cover"
+        />
+        {/* Información de la canción */}
+        <View style={styles.overlay}>
+          <Text style={styles.songName} numberOfLines={1}>
+            {cancion.name}
+          </Text>
+          <Text style={styles.artistName} numberOfLines={1}>
+            {cancion.artist}
+          </Text>
+        </View>
+      </View>
 
-    const { cancion, color, texto, audio, emociones } = entry;
+      {/* Contenido adicional */}
+      {texto && (
+        <View style={styles.textContainer}>
+          <Text style={styles.text}>{texto}</Text>
+        </View>
+      )}
 
-    return (
-        <Pressable onPress={onPress} style={[styles.card, { borderColor: color || '#ddd' }]}>
-            <EmotionFlag emociones={emociones} />
+      {/* Reproductor de audio */}
+      {cancion.previewUrl && (
+        <View style={styles.audioContainer}>
+          <AudioPlayer audioUri={cancion.previewUrl} />
+        </View>
+      )}
 
-            {cancion && (
-                <>
-                    <Image source={{ uri: cancion.albumImage }} style={styles.albumImage} />
-                    {formattedFechaCreacion && (
-                        <Text style={styles.date}>{formattedFechaCreacion}</Text>
-                    )}
-                    <Text style={styles.songName}>{cancion.name}</Text>
-                    <Text style={styles.artistName}>{cancion.artist}</Text>
+      {/* Footer con emoción y flecha */}
+      <View style={styles.footer}>
+        <EmotionFlag emociones={emociones || []} />
+        <MaterialIcons name="arrow-forward-ios" size={20} color="#ccc" />
+      </View>
+    </Pressable>
+  );
+};
 
-                    <View style={styles.controlsContainer}>
-                        <MaterialIcons name="skip-previous" size={28} color="#FFD700" />
-                        <MaterialIcons name="play-arrow" size={28} color="#FFD700" />
-                        <MaterialIcons name="skip-next" size={28} color="#FFD700" />
-                    </View>
-                </>
-            )}
-
-            <View style={styles.detailsContainer}>
-                {texto && (
-                    <Text style={styles.text}>{texto}</Text>
-                )}
-                {audio && (
-                    <AudioPlayer audioUri={audio} />
-                )}
-            </View>
-        </Pressable>
-    );
+SongCard.propTypes = {
+  entry: PropTypes.shape({
+    cancion: PropTypes.shape({
+      albumImage: PropTypes.string,
+      name: PropTypes.string,
+      artist: PropTypes.string,
+      previewUrl: PropTypes.string,
+    }),
+    texto: PropTypes.string,
+    emociones: PropTypes.arrayOf(PropTypes.string),
+  }).isRequired,
+  onPress: PropTypes.func.isRequired,
 };
 
 const styles = StyleSheet.create({
-    card: {
-        alignItems: 'center',
-        backgroundColor: '#FFFDF4',
-        borderRadius: 18,
-        borderWidth: 3,
-        paddingVertical: 20,
-        paddingHorizontal: 15,
-        marginVertical: 15,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 5 },
-        shadowOpacity: 0.3,
-        shadowRadius: 8,
-        elevation: 8,
-        width: 280,
-        position: 'relative',
-    },
-    albumImage: {
-        width: 220,
-        height: 220,
-        borderRadius: 15,
-        marginBottom: 8,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 3 },
-        shadowOpacity: 0.4,
-        shadowRadius: 5,
-    },
-    songName: {
-        marginTop: 10,
-        fontWeight: 'bold',
-        fontSize: 20,
-        textAlign: 'center',
-        color: '#333',
-    },
-    artistName: {
-        fontSize: 16,
-        color: '#777',
-        textAlign: 'center',
-        marginBottom: 10,
-    },
-    date: {
-        fontSize: 12,
-        color: '#999',
-        position: 'absolute',
-        top: 10,
-        right: 15,
-        backgroundColor: 'rgba(0, 0, 0, 0.6)',
-        paddingVertical: 4,
-        paddingHorizontal: 6,
-        borderRadius: 5,
-        color: '#fff',
-    },
-    text: {
-        fontSize: 14,
-        color: '#555',
-        textAlign: 'center',
-        marginVertical: 10,
-    },
-    controlsContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        width: '70%',
-        marginVertical: 10,
-        borderTopWidth: 1,
-        borderColor: '#ddd',
-        paddingTop: 5,
-    },
+  card: {
+    backgroundColor: "#ffffff",
+    borderRadius: 12,
+    marginVertical: 8,
+    marginHorizontal: 16,
+    overflow: "hidden",
+    shadowColor: "#000000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 3,
+  },
+  imageContainer: {
+    width: "100%",
+    aspectRatio: 1, // Mantener proporción cuadrada
+    position: "relative",
+  },
+  image: {
+    width: "100%",
+    height: "100%",
+  },
+  overlay: {
+    position: "absolute",
+    bottom: 0,
+    width: "100%",
+    backgroundColor: "rgba(0, 0, 0, 0.6)",
+    padding: 10,
+  },
+  songName: {
+    color: "#ffffff",
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  artistName: {
+    color: "#cccccc",
+    fontSize: 14,
+  },
+  textContainer: {
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+  },
+  text: {
+    fontSize: 16,
+    color: "#333333",
+  },
+  audioContainer: {
+    paddingHorizontal: 15,
+    paddingBottom: 10,
+  },
+  footer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+  },
 });
 
 export default SongCard;

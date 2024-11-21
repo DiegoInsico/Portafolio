@@ -1,15 +1,16 @@
 import React from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import EmotionFlag from "../../components/general/EmotionFlag";
+import AudioPlayer from "../../components/audioPlayer";
 import { MaterialIcons } from "@expo/vector-icons";
 import PropTypes from "prop-types";
 
-const TextCard = ({ entry, onPress }) => {
+const AudioCard = ({ entry, onPress }) => {
   if (!entry) return null;
 
   const formattedFechaCreacion =
     entry.fechaCreacion?.toDate()?.toLocaleDateString("es-ES") || "";
-  const { texto, emociones } = entry;
+  const { audio, texto, emociones } = entry;
 
   return (
     <Pressable onPress={onPress} style={styles.card}>
@@ -25,8 +26,10 @@ const TextCard = ({ entry, onPress }) => {
             {texto}
           </Text>
         )}
-        {formattedFechaCreacion && (
-          <Text style={styles.date}>{formattedFechaCreacion}</Text>
+        {audio && (
+          <View style={styles.audioContainer}>
+            <AudioPlayer audioUri={audio} />
+          </View>
         )}
       </View>
 
@@ -36,8 +39,9 @@ const TextCard = ({ entry, onPress }) => {
   );
 };
 
-TextCard.propTypes = {
+AudioCard.propTypes = {
   entry: PropTypes.shape({
+    audio: PropTypes.string,
     texto: PropTypes.string,
     emociones: PropTypes.arrayOf(PropTypes.string),
     fechaCreacion: PropTypes.object,
@@ -71,10 +75,14 @@ const styles = StyleSheet.create({
     color: "#333333",
     marginBottom: 8,
   },
+  audioContainer: {
+    marginTop: 8,
+  },
   date: {
     fontSize: 14,
     color: "#888888",
+    marginTop: 8,
   },
 });
 
-export default TextCard;
+export default AudioCard;

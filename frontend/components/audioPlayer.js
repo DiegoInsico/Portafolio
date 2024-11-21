@@ -1,97 +1,126 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, TouchableOpacity, StyleSheet, Text } from 'react-native';
-import Slider from '@react-native-community/slider'; // Actualiza la importación
+import Slider from '@react-native-community/slider';
 import { Audio } from 'expo-av';
-import Icon from 'react-native-vector-icons/FontAwesome'; // Importamos los íconos
+import { FontAwesome } from '@expo/vector-icons';
+import PropTypes from 'prop-types';
 
 const AudioPlayer = ({ audioUri }) => {
-    const [sound, setSound] = useState();
-    const [isPlaying, setIsPlaying] = useState(false);
-    const [position, setPosition] = useState(0);
-    const [duration, setDuration] = useState(0);
+  const [sound, setSound] = useState(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [position, setPosition] = useState(0);
+  const [duration, setDuration] = useState(1); // Evitar división por cero
+  const [isBuffering, setIsBuffering] = useState(false);
 
-    const loadAudio = async () => {
-        const { sound } = await Audio.Sound.createAsync(
-            { uri: audioUri },
-            { shouldPlay: false },
-            onPlaybackStatusUpdate
-        );
-        setSound(sound);
+  useEffect(() => {
+    if (audioUri) {
+      loadAudio();
+    }
+
+    return () => {
+      if (sound) {
+        sound.unloadAsync();
+      }
     };
+  }, [audioUri]);
 
-    const onPlaybackStatusUpdate = (status) => {
-        if (status.isLoaded) {
-            setPosition(status.positionMillis);
-            setDuration(status.durationMillis);
-            setIsPlaying(status.isPlaying);
-        }
-    };
+  const loadAudio = async () => {
+    try {
+      const { sound: newSound } = await Audio.Sound.createAsync(
+        { uri: audioUri },
+        { shouldPlay: false },
+        onPlaybackStatusUpdate
+      );
+      setSound(newSound);
+    } catch (error) {
+      console.log('Error al cargar el audio:', error);
+    }
+  };
 
-    const togglePlayPause = async () => {
-        if (!sound) {
-            await loadAudio();
-        }
-        if (isPlaying) {
-            await sound.pauseAsync();
-        } else {
-            await sound.playAsync();
-        }
-    };
+  const onPlaybackStatusUpdate = (status) => {
+    if (status.isLoaded) {
+      setPosition(status.positionMillis);
+      setDuration(status.durationMillis || 1); // Evitar división por cero
+      setIsPlaying(status.isPlaying);
+      setIsBuffering(status.isBuffering);
+    }
+  };
 
-    const onSeek = async (value) => {
-        if (sound) {
-            const seekPosition = value * duration;
-            await sound.setPositionAsync(seekPosition);
-        }
-    };
+  const togglePlayPause = async () => {
+    if (!sound) {
+      await loadAudio();
+    }
+    if (isPlaying) {
+      await sound.pauseAsync();
+    } else {
+      await sound.playAsync();
+    }
+  };
 
-    return (
-        <View style={styles.container}>
-            <TouchableOpacity onPress={togglePlayPause} style={styles.playButton}>
-                <Icon
-                    name={isPlaying ? 'pause' : 'play'}
-                    size={24}
-                    color="#fff"
-                />
-            </TouchableOpacity>
-            <Slider
-                style={styles.slider}
-                value={position / duration}
-                onValueChange={onSeek}
-                minimumTrackTintColor="#1EB1FC"
-                maximumTrackTintColor="#D3D3D3"
-            />
-            <Text style={styles.timer}>
-                {Math.floor(position / 1000)} / {Math.floor(duration / 1000)} s
-            </Text>
+  const formatTime = (milliseconds) => {
+    const totalSeconds = Math.floor(milliseconds / 1000);
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+  };
+
+  if (!audioUri) return null;
+
+  return (
+    <View style={styles.container}>
+      <TouchableOpacity onPress={togglePlayPause} style={styles.playButton}>
+        <FontAwesome name={isPlaying ? 'pause' : 'play'} size={20} color="#FFF" />
+      </TouchableOpacity>
+      <View style={styles.sliderContainer}>
+        <Slider
+          style={styles.slider}
+          value={position / duration}
+          onSlidingComplete={(value) =>
+            sound && sound.setPositionAsync(value * duration)
+          }
+          minimumTrackTintColor="#1DB954"
+          maximumTrackTintColor="#ccc"
+          thumbTintColor="#1DB954"
+        />
+        <View style={styles.timeContainer}>
+          <Text style={styles.timeText}>{formatTime(position)}</Text>
+          <Text style={styles.timeText}>{formatTime(duration)}</Text>
         </View>
-    );
+      </View>
+    </View>
+  );
+};
+
+AudioPlayer.propTypes = {
+  audioUri: PropTypes.string.isRequired,
 };
 
 const styles = StyleSheet.create({
-    container: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        padding: 10,
-        backgroundColor: '#e0e0e0',
-        borderRadius: 5,
-        marginVertical: 10,
-    },
-    playButton: {
-        backgroundColor: '#1EB1FC',
-        padding: 10,
-        borderRadius: 5,
-        marginRight: 10,
-    },
-    slider: {
-        flex: 1,
-        height: 40,
-    },
-    timer: {
-        marginLeft: 10,
-        fontSize: 12,
-        color: '#333',
-    },
+  container: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  playButton: {
+    backgroundColor: '#1DB954',
+    padding: 12,
+    borderRadius: 30,
+    marginRight: 10,
+  },
+  sliderContainer: {
+    flex: 1,
+  },
+  slider: {
+    flex: 1,
+  },
+  timeContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 4,
+  },
+  timeText: {
+    fontSize: 12,
+    color: '#555',
+  },
 });
 
 export default AudioPlayer;

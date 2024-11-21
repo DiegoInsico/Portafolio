@@ -241,7 +241,7 @@ const styles = StyleSheet.create({
   /* Sección Inferior Translucida */
   translucentBackground: {
     position: "absolute",
-    bottom: 60, // Ajusta según necesidad
+    bottom: 70, // Ajusta según necesidad
     left: 0,
     right: 0,
     padding: 20,

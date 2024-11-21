@@ -12,7 +12,7 @@ import {
   TextInput,
   Platform,
 } from "react-native";
-import DateTimePicker from '@react-native-community/datetimepicker';
+import DateTimePicker from "@react-native-community/datetimepicker";
 import {
   updateDoc,
   doc,
@@ -24,22 +24,36 @@ import {
   onSnapshot,
 } from "firebase/firestore";
 import { db } from "../../utils/firebase";
-import PolaroidCard from "./polaroidCard";
-import SongCard from "./songCard";
-import TextCard from "./textCard";
+import { Video } from "expo-av"; // Asegúrate de importar Video
+import AudioPlayer from "../../components/audioPlayer"; // Importa tu componente de audio
 import { Picker } from "@react-native-picker/picker";
 import { MaterialIcons, Feather } from "@expo/vector-icons";
 
 const EntryItem = ({ item, onClose, beneficiaries }) => {
+  if (!item) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.errorText}>
+          No hay datos disponibles para esta entrada.
+        </Text>
+        <TouchableOpacity style={styles.closeButton} onPress={onClose}>
+          <MaterialIcons name="close" size={24} color="#FFF" />
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
   const [addBeneficiary, setAddBeneficiary] = useState(false);
   const [selectedBeneficiary, setSelectedBeneficiary] = useState("");
   const [beneficiary, setBeneficiary] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [imageError, setImageError] = useState(false);
 
   // Estados para reflexiones
   const [reflexiones, setReflexiones] = useState([]);
   const [isReflexionModalVisible, setIsReflexionModalVisible] = useState(false);
-  const [isAddReflexionModalVisible, setIsAddReflexionModalVisible] = useState(false);
+  const [isAddReflexionModalVisible, setIsAddReflexionModalVisible] =
+    useState(false);
   const [nuevaReflexion, setNuevaReflexion] = useState("");
 
   // Estados para fecha de recuerdo
@@ -130,7 +144,7 @@ const EntryItem = ({ item, onClose, beneficiaries }) => {
     try {
       const entryRef = doc(db, "entradas", item.id);
       await updateDoc(entryRef, {
-        fechaRecuerdo: date, // Firestore acepta objetos Date
+        fechaRecuerdo: date,
       });
       Alert.alert("Éxito", "Fecha de recuerdo actualizada correctamente.");
     } catch (error) {
@@ -215,18 +229,6 @@ const EntryItem = ({ item, onClose, beneficiaries }) => {
     );
   };
 
-  const renderEntryContent = () => {
-    if (item.media && (item.mediaType === "image" || item.mediaType === "video")) {
-      return <PolaroidCard entry={item} />;
-    } else if (item.cancion) {
-      return <SongCard entry={item} />;
-    } else if (item.texto || item.audio) {
-      return <TextCard entry={item} />;
-    } else {
-      return <Text style={styles.noContentText}>No hay contenido disponible</Text>;
-    }
-  };
-
   const handleAgregarReflexion = async () => {
     if (!nuevaReflexion.trim()) {
       Alert.alert("Error", "La reflexión no puede estar vacía.");
@@ -238,7 +240,6 @@ const EntryItem = ({ item, onClose, beneficiaries }) => {
       await addDoc(reflexionesRef, {
         texto: nuevaReflexion.trim(),
         fecha: new Date(),
-        // usuarioId: currentUser.uid, // Si usas autenticación y deseas asociar la reflexión a un usuario
       });
       Alert.alert("Éxito", "Reflexión agregada correctamente.");
       setNuevaReflexion("");
@@ -249,46 +250,131 @@ const EntryItem = ({ item, onClose, beneficiaries }) => {
     }
   };
 
+  const renderEntryContent = () => {
+    console.log("URL de la imagen:", item.media); // Verificar la URL de la imagen
+    if (item.media && item.mediaType === "image") {
+      return (
+        <View style={styles.entryContent}>
+          <Image
+            source={
+              !imageError && item.media
+                ? { uri: item.media }
+                : require("../../assets/images/placeholder.png") // Imagen de marcador de posición
+            }
+            style={styles.fullImage}
+            resizeMode="contain"
+            onError={() => setImageError(true)} // Manejar error de carga de imagen
+          />
+          {item.texto && (
+            <Text style={styles.fullText}>{item.texto}</Text>
+          )}
+        </View>
+      );
+    } else if (item.media && item.mediaType === "video") {
+      return (
+        <View style={styles.entryContent}>
+          <Video
+            source={{ uri: item.media }}
+            style={styles.fullVideo}
+            useNativeControls
+            resizeMode="contain"
+          />
+          {item.texto && (
+            <Text style={styles.fullText}>{item.texto}</Text>
+          )}
+        </View>
+      );
+    } else if (item.cancion) {
+      return (
+        <View style={styles.entryContent}>
+          {/* Mostrar detalles de la canción */}
+          <View style={styles.songContainer}>
+            <Image
+              source={{ uri: item.cancion.albumImage }}
+              style={styles.songImage}
+            />
+            <View style={styles.songDetails}>
+              <Text style={styles.songTitle}>{item.cancion.name}</Text>
+              <Text style={styles.songArtist}>{item.cancion.artist}</Text>
+            </View>
+          </View>
+          {item.texto && (
+            <Text style={styles.fullText}>{item.texto}</Text>
+          )}
+          {(item.cancion.previewUrl || item.cancion.audioUri || item.audio) && (
+            <AudioPlayer
+              audioUri={
+                item.cancion.previewUrl || item.cancion.audioUri || item.audio
+              }
+            />
+          )}
+        </View>
+      );
+    } else if (item.audio) {
+      return (
+        <View style={styles.entryContent}>
+          <AudioPlayer audioUri={item.audio} />
+          {item.texto && (
+            <Text style={styles.fullText}>{item.texto}</Text>
+          )}
+        </View>
+      );
+    } else if (item.texto) {
+      return <Text style={styles.fullText}>{item.texto}</Text>;
+    } else {
+      return (
+        <Text style={styles.noContentText}>No hay contenido disponible</Text>
+      );
+    }
+  };
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      
-      {/* Sección de Fecha de Creación */}
-      <View style={styles.fechaCreacionContainer}>
-        <Text style={styles.fechaCreacionText}>
-          Creado el: {formattedCreationDate} a las {formattedCreationTime}
-        </Text>
+      {/* Encabezado */}
+      <View style={styles.headerContainer}>
+        <Text style={styles.headerTitle}>Detalle de la Entrada</Text>
+        <TouchableOpacity style={styles.closeButton} onPress={onClose}>
+          <MaterialIcons name="close" size={24} color="#FFF" />
+        </TouchableOpacity>
       </View>
 
-      {/* Contenido de la Entrada */}
-      <View style={styles.entryContentContainer}>
-        {renderEntryContent()}
-      </View>
+      {/* Fecha de creación */}
+      <Text style={styles.creationDate}>
+        Creado el: {formattedCreationDate} a las {formattedCreationTime}
+      </Text>
+
+      {/* Contenido de la entrada */}
+      <View style={styles.entryContentContainer}>{renderEntryContent()}</View>
 
       {/* Reflexiones */}
-      <View style={styles.reflexionesContainer}>
-        <View style={styles.reflexionesHeader}>
-          <Text style={styles.reflexionesTitle}>Reflexiones ({reflexiones.length})</Text>
-          <TouchableOpacity 
-            style={styles.agregarReflexionButton} 
+      <View style={styles.reflectionsContainer}>
+        <View style={styles.reflectionsHeader}>
+          <Text style={styles.reflectionsTitle}>
+            Reflexiones ({reflexiones.length})
+          </Text>
+          <TouchableOpacity
+            style={styles.addReflectionButton}
             onPress={() => setIsAddReflexionModalVisible(true)}
           >
             <MaterialIcons name="add" size={24} color="#FFF" />
           </TouchableOpacity>
         </View>
         {reflexiones.length > 0 ? (
-          <TouchableOpacity style={styles.verReflexionesButton} onPress={() => setIsReflexionModalVisible(true)}>
-            <Text style={styles.buttonText}>Ver Reflexiones</Text>
+          <TouchableOpacity
+            style={styles.viewReflectionsButton}
+            onPress={() => setIsReflexionModalVisible(true)}
+          >
+            <Text style={styles.viewReflectionsText}>Ver Reflexiones</Text>
           </TouchableOpacity>
         ) : (
-          <Text style={styles.noReflexionesText}>No hay reflexiones aún.</Text>
+          <Text style={styles.noReflectionsText}>No hay reflexiones aún.</Text>
         )}
       </View>
 
-      {/* Sección de Fecha de Recuerdo */}
-      <View style={styles.fechaRecuerdoContainer}>
-        <View style={styles.fechaRecuerdoHeader}>
-          <Feather name="calendar" size={20} color="#FFD700" />
-          <Text style={styles.fechaRecuerdoLabel}>Fecha de Recuerdo</Text>
+      {/* Fecha de Recuerdo */}
+      <View style={styles.reminderDateContainer}>
+        <View style={styles.reminderHeader}>
+          <Text style={styles.reminderTitle}>Fecha de Recuerdo</Text>
           <Switch
             value={enableRecuerdoDate}
             onValueChange={(value) => {
@@ -299,14 +385,13 @@ const EntryItem = ({ item, onClose, beneficiaries }) => {
                 setShowRecuerdoDatePicker(true);
               }
             }}
-            trackColor={{ false: "#767577", true: "#FFD700" }}
-            thumbColor={enableRecuerdoDate ? "#FFD700" : "#f4f3f4"}
+            trackColor={{ false: "#767577", true: "#81b0ff" }}
+            thumbColor={enableRecuerdoDate ? "#f5dd4b" : "#f4f3f4"}
           />
         </View>
-
         {enableRecuerdoDate && recuerdoDate && (
-          <View style={styles.recuerdoDateDisplay}>
-            <Text style={styles.recuerdoDateText}>
+          <View style={styles.reminderDateDisplay}>
+            <Text style={styles.reminderDateText}>
               {recuerdoDate.toLocaleDateString("es-ES")}
             </Text>
             <TouchableOpacity onPress={() => setShowRecuerdoDatePicker(true)}>
@@ -314,12 +399,11 @@ const EntryItem = ({ item, onClose, beneficiaries }) => {
             </TouchableOpacity>
           </View>
         )}
-
         {showRecuerdoDatePicker && (
           <DateTimePicker
             value={recuerdoDate || new Date()}
             mode="date"
-            display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+            display={Platform.OS === "ios" ? "spinner" : "default"}
             onChange={onChangeRecuerdoDate}
             maximumDate={new Date()}
             style={styles.dateTimePicker}
@@ -327,14 +411,17 @@ const EntryItem = ({ item, onClose, beneficiaries }) => {
         )}
       </View>
 
-      {/* Beneficiarios */}
-      <View style={styles.beneficiariosContainer}>
+      {/* Beneficiario */}
+      <View style={styles.beneficiaryContainer}>
         {beneficiary ? (
           <View style={styles.beneficiaryInfoContainer}>
             <Text style={styles.beneficiaryTitle}>Beneficiario Asignado:</Text>
             <View style={styles.beneficiaryDetails}>
               {beneficiary.profileImage ? (
-                <Image source={{ uri: beneficiary.profileImage }} style={styles.beneficiaryImage} />
+                <Image
+                  source={{ uri: beneficiary.profileImage }}
+                  style={styles.beneficiaryImage}
+                />
               ) : (
                 <View style={styles.beneficiaryPlaceholder}>
                   <Text style={styles.beneficiaryPlaceholderText}>
@@ -348,10 +435,16 @@ const EntryItem = ({ item, onClose, beneficiaries }) => {
               </View>
             </View>
             <View style={styles.beneficiaryButtonContainer}>
-              <TouchableOpacity style={styles.changeButton} onPress={() => setAddBeneficiary(true)}>
+              <TouchableOpacity
+                style={styles.changeButton}
+                onPress={() => setAddBeneficiary(true)}
+              >
                 <Text style={styles.buttonText}>Cambiar</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.removeButton} onPress={handleRemoveBeneficiary}>
+              <TouchableOpacity
+                style={styles.removeButton}
+                onPress={handleRemoveBeneficiary}
+              >
                 <Text style={styles.buttonText}>Eliminar</Text>
               </TouchableOpacity>
             </View>
@@ -359,17 +452,16 @@ const EntryItem = ({ item, onClose, beneficiaries }) => {
         ) : (
           <View style={styles.optionsContainer}>
             <View style={styles.optionItem}>
-              <Text style={styles.modalText}>¿Agregar Beneficiario?</Text>
+              <Text style={styles.optionText}>¿Agregar Beneficiario?</Text>
               <Switch
                 value={addBeneficiary}
                 onValueChange={(value) => setAddBeneficiary(value)}
                 thumbColor={addBeneficiary ? "#FFD700" : "#f4f3f4"}
-                trackColor={{ false: "#767577", true: "#FFD700" }}
+                trackColor={{ false: "#767577", true: "#81b0ff" }}
               />
             </View>
-
             {addBeneficiary && (
-              <View style={styles.beneficiaryContainer}>
+              <View style={styles.beneficiaryPickerContainer}>
                 <Picker
                   selectedValue={selectedBeneficiary}
                   onValueChange={(itemValue) => setSelectedBeneficiary(itemValue)}
@@ -386,23 +478,22 @@ const EntryItem = ({ item, onClose, beneficiaries }) => {
                       />
                     ))
                   ) : (
-                    <Picker.Item label="No hay beneficiarios disponibles" value="" />
+                    <Picker.Item
+                      label="No hay beneficiarios disponibles"
+                      value=""
+                    />
                   )}
                 </Picker>
-                <TouchableOpacity style={styles.assignButton} onPress={handleAssignBeneficiary}>
+                <TouchableOpacity
+                  style={styles.assignButton}
+                  onPress={handleAssignBeneficiary}
+                >
                   <Text style={styles.buttonText}>Asignar</Text>
                 </TouchableOpacity>
               </View>
             )}
           </View>
         )}
-      </View>
-
-      {/* Botón de Cerrar */}
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-          <Text style={styles.buttonText}>Cerrar</Text>
-        </TouchableOpacity>
       </View>
 
       {/* Modal para listar reflexiones */}
@@ -420,12 +511,19 @@ const EntryItem = ({ item, onClose, beneficiaries }) => {
                 <View key={reflexion.id} style={styles.reflexionItem}>
                   <Text style={styles.reflexionTexto}>{reflexion.texto}</Text>
                   <Text style={styles.reflexionFecha}>
-                    {new Date(reflexion.fecha.seconds * 1000).toLocaleDateString("es-ES")}
+                    {reflexion.fecha
+                      ? new Date(reflexion.fecha.seconds * 1000).toLocaleDateString(
+                          "es-ES"
+                        )
+                      : "Fecha no disponible"}
                   </Text>
                 </View>
               ))}
             </ScrollView>
-            <TouchableOpacity style={styles.closeButton} onPress={() => setIsReflexionModalVisible(false)}>
+            <TouchableOpacity
+              style={styles.closeModalButton}
+              onPress={() => setIsReflexionModalVisible(false)}
+            >
               <Text style={styles.buttonText}>Cerrar</Text>
             </TouchableOpacity>
           </View>
@@ -442,21 +540,25 @@ const EntryItem = ({ item, onClose, beneficiaries }) => {
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Agregar Reflexión</Text>
-            <ScrollView>
-              <TextInput
-                style={styles.textInput}
-                placeholder="Escribe tu reflexión aquí"
-                placeholderTextColor="#ABB2B9"
-                multiline
-                numberOfLines={4}
-                value={nuevaReflexion}
-                onChangeText={setNuevaReflexion}
-              />
-            </ScrollView>
-            <TouchableOpacity style={styles.saveButton} onPress={handleAgregarReflexion}>
+            <TextInput
+              style={styles.textInput}
+              placeholder="Escribe tu reflexión aquí"
+              placeholderTextColor="#ABB2B9"
+              multiline
+              numberOfLines={4}
+              value={nuevaReflexion}
+              onChangeText={setNuevaReflexion}
+            />
+            <TouchableOpacity
+              style={styles.saveButton}
+              onPress={handleAgregarReflexion}
+            >
               <Text style={styles.buttonText}>Guardar Reflexión</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.closeButton} onPress={() => setIsAddReflexionModalVisible(false)}>
+            <TouchableOpacity
+              style={styles.closeModalButton}
+              onPress={() => setIsAddReflexionModalVisible(false)}
+            >
               <Text style={styles.buttonText}>Cancelar</Text>
             </TouchableOpacity>
           </View>
@@ -468,335 +570,336 @@ const EntryItem = ({ item, onClose, beneficiaries }) => {
 
 const styles = StyleSheet.create({
   container: {
-    padding: 20,
-    backgroundColor: "#1C2833",
-    paddingBottom: 40,
-  },
-  /* Sección de Fecha de Creación */
-  fechaCreacionContainer: {
-    marginBottom: 20,
-    width: "100%",
-    padding: 10,
-    backgroundColor: "#2C3E50",
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: "#FFD700",
+    paddingVertical: 20,
+    backgroundColor: "#F5F5F5",
+    flexGrow: 1,
     alignItems: "center",
-    flexDirection: "row",
-    justifyContent: "center",
-    shadowColor: "#FFD700",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.7,
-    shadowRadius: 4,
-    elevation: 5,
   },
-  fechaCreacionText: {
-    color: "#FFD700",
-    fontSize: 14,
-    fontWeight: "600",
-  },
-
-  /* Contenido de la Entrada */
-  entryContentContainer: {
+  errorText: {
+    color: "#E74C3C",
+    fontSize: 16,
     marginBottom: 20,
-    width: "100%",
-    alignItems: "center",
-    padding: 15,
-    backgroundColor: "#2C3E50",
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: "#FFD700",
-    shadowColor: "#FFD700",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.7,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  dateText: {
-    marginTop: 10,
-    fontSize: 12,
-    color: "#FFD700",
     textAlign: "center",
   },
-
-  /* Reflexiones */
-  reflexionesContainer: {
-    marginBottom: 20,
-    width: "100%",
-    paddingHorizontal: 10,
-  },
-  reflexionesHeader: {
+  headerContainer: {
     flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "center",
-  },
-  reflexionesTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#FFD700",
-  },
-  agregarReflexionButton: {
-    backgroundColor: "#3498DB",
-    padding: 6,
-    borderRadius: 20,
-    alignItems: "center",
+    marginBottom: 10,
+    width: "90%",
     justifyContent: "center",
   },
-  verReflexionesButton: {
+  headerTitle: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "#333",
+    textAlign: "center",
+  },
+  closeButton: {
+    position: "absolute",
+    right: 0,
+    backgroundColor: "#E74C3C",
+    padding: 8,
+    borderRadius: 50,
+  },
+  creationDate: {
+    fontSize: 14,
+    color: "#555",
+    marginBottom: 15,
+    textAlign: "center",
+  },
+  entryContentContainer: {
+    marginBottom: 20,
+    width: "90%",
+    alignItems: "center",
+  },
+  fullImage: {
+    width: "100%",
+    height: 300,
+    borderRadius: 10,
+  },
+  fullVideo: {
+    width: "100%",
+    height: 300,
+    borderRadius: 10,
+  },
+  audioContainer: {
+    width: "100%",
+    alignItems: "center",
+    marginVertical: 20,
+  },
+  fullText: {
+    fontSize: 16,
+    color: "#333",
+    textAlign: "justify",
+    padding: 10,
+    backgroundColor: "#fff",
+    borderRadius: 10,
+  },
+  noContentText: {
+    color: "#888",
+    fontSize: 16,
+    textAlign: "center",
+    marginVertical: 20,
+  },
+  reflectionsContainer: {
+    backgroundColor: "#FFFFFF",
+    padding: 15,
+    borderRadius: 8,
+    marginBottom: 20,
+    width: "90%",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  reflectionsHeader: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    width: "100%",
+    marginBottom: 10,
+  },
+  reflectionsTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#333",
+    textAlign: "center",
+  },
+  addReflectionButton: {
+    position: "absolute",
+    right: 0,
+    backgroundColor: "#3498DB",
+    padding: 6,
+    borderRadius: 50,
+  },
+  viewReflectionsButton: {
+    marginTop: 10,
     backgroundColor: "#2980B9",
     padding: 10,
     borderRadius: 5,
     alignItems: "center",
-    marginTop: 10,
-  },
-  noReflexionesText: {
-    color: "#95A5A6",
-    fontSize: 14,
-    textAlign: "center",
-    marginTop: 10,
-  },
-
-  /* Sección de Fecha de Recuerdo */
-  fechaRecuerdoContainer: {
-    marginBottom: 20,
     width: "100%",
-    paddingHorizontal: 10,
-    paddingVertical: 10,
-    backgroundColor: "#2C3E50",
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: "#FFD700",
-    shadowColor: "#FFD700",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.7,
-    shadowRadius: 4,
-    elevation: 5,
   },
-  fechaRecuerdoHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  fechaRecuerdoLabel: {
-    color: "#FFD700",
+  viewReflectionsText: {
+    color: "#FFF",
     fontSize: 16,
-    fontWeight: "600",
-    marginLeft: 5,
+    fontWeight: "bold",
   },
-  switchRecuerdoContainer: {
+  noReflectionsText: {
+    color: "#888",
+    fontSize: 14,
+    marginTop: 10,
+    textAlign: "center",
+  },
+  reminderDateContainer: {
+    backgroundColor: "#FFFFFF",
+    padding: 15,
+    borderRadius: 8,
+    marginBottom: 20,
+    width: "90%",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  reminderHeader: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    width: "100%",
+    marginBottom: 10,
+  },
+  reminderTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#333",
+    textAlign: "center",
+  },
+  reminderDateDisplay: {
+    marginTop: 10,
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
   },
-  recuerdoDateDisplay: {
-    marginTop: 8,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  recuerdoDateText: {
-    color: "#FFD700",
-    fontSize: 14,
-    fontWeight: "500",
-  },
-  cambiarFechaText: {
-    color: "#FFD700",
-    fontSize: 14,
-    textDecorationLine: "underline",
+  reminderDateText: {
+    fontSize: 16,
+    color: "#555",
+    marginRight: 10,
   },
   dateTimePicker: {
     width: "100%",
-    backgroundColor: "#2C3E50",
+    backgroundColor: "#fff",
   },
-
-  /* Beneficiarios */
-  beneficiariosContainer: {
+  beneficiaryContainer: {
+    backgroundColor: "#FFFFFF",
+    padding: 15,
+    borderRadius: 8,
     marginBottom: 20,
-    width: "100%",
-    paddingHorizontal: 10,
+    width: "90%",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
   },
   beneficiaryInfoContainer: {
     width: "100%",
-    padding: 15,
-    backgroundColor: "#2C3E50",
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: "#FFD700",
-    shadowColor: "#FFD700",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.7,
-    shadowRadius: 4,
-    elevation: 5,
+    alignItems: "center",
   },
   beneficiaryTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: "bold",
-    marginBottom: 10,
-    color: "#FFD700",
+    color: "#333",
+    marginBottom: 15,
     textAlign: "center",
   },
   beneficiaryDetails: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 10,
+    marginBottom: 15,
   },
   beneficiaryImage: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
     marginRight: 15,
-    borderWidth: 2,
-    borderColor: "#FFD700",
   },
   beneficiaryPlaceholder: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: "#FFD700",
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: "#3498DB",
     justifyContent: "center",
     alignItems: "center",
     marginRight: 15,
   },
   beneficiaryPlaceholderText: {
-    color: "#2C3E50",
-    fontSize: 20,
+    color: "#FFF",
+    fontSize: 24,
     fontWeight: "bold",
   },
   beneficiaryTextContainer: {
-    flex: 1,
+    alignItems: "center",
   },
   beneficiaryName: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: "bold",
-    color: "#FFD700",
+    color: "#333",
   },
   beneficiaryEmail: {
-    fontSize: 12,
-    color: "#ABB2B9",
+    fontSize: 14,
+    color: "#888",
   },
   beneficiaryButtonContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginTop: 10,
+    width: "100%",
   },
   changeButton: {
     backgroundColor: "#FFD700",
-    padding: 8,
+    padding: 10,
     borderRadius: 5,
     width: "48%",
     alignItems: "center",
   },
   removeButton: {
     backgroundColor: "#E74C3C",
-    padding: 8,
+    padding: 10,
     borderRadius: 5,
     width: "48%",
     alignItems: "center",
   },
-
   optionsContainer: {
     width: "100%",
-    padding: 15,
-    backgroundColor: "#2C3E50",
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: "#FFD700",
-    shadowColor: "#FFD700",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.7,
-    shadowRadius: 4,
-    elevation: 5,
+    alignItems: "center",
   },
   optionItem: {
     flexDirection: "row",
+    justifyContent: "center",
     alignItems: "center",
-    justifyContent: "space-between",
     marginBottom: 10,
+    width: "100%",
   },
-  modalText: {
+  optionText: {
     fontSize: 16,
-    color: "#FFD700",
+    color: "#333",
+    marginRight: 10,
+  },
+  beneficiaryPickerContainer: {
+    marginTop: 10,
+    width: "100%",
+    alignItems: "center",
   },
   picker: {
-    width: "100%",
     height: 50,
-    color: "#FFD700",
-    backgroundColor: "#34495E",
+    width: "100%",
+    color: "#333",
+    backgroundColor: "#F0F2F5",
     borderRadius: 8,
-    paddingHorizontal: 10,
+    marginBottom: 10,
   },
   assignButton: {
     backgroundColor: "#FFD700",
     padding: 10,
     borderRadius: 5,
     alignItems: "center",
-    marginTop: 10,
+    width: "100%",
   },
   buttonText: {
-    color: "#2C3E50",
+    color: "#FFF",
     fontSize: 16,
     fontWeight: "bold",
   },
-  closeButton: {
-    backgroundColor: "#E74C3C",
-    padding: 12,
-    borderRadius: 5,
-    alignItems: "center",
-    marginTop: 10,
-  },
-  buttonContainer: {
-    marginBottom: 20,
-    width: "100%",
-    paddingHorizontal: 10,
-  },
-
-  /* Modal */
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Fondo semi-transparente
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "center",
+    alignItems: "center",
   },
   modalContent: {
-    backgroundColor: "#2C3E50",
+    backgroundColor: "#FFFFFF",
     padding: 20,
-    borderRadius: 10,
-    maxHeight: '80%', // Limita la altura para permitir el scroll si es necesario
-    width: '90%', // Ancho del modal
+    borderRadius: 8,
+    width: "90%",
+    maxHeight: "80%",
   },
   modalTitle: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: "bold",
-    color: "#FFD700",
+    color: "#333",
+    marginBottom: 15,
     textAlign: "center",
-    marginBottom: 20,
   },
   reflexionItem: {
-    backgroundColor: "#34495E",
+    backgroundColor: "#F0F2F5",
     padding: 15,
-    borderRadius: 8,
+    borderRadius: 5,
     marginBottom: 10,
   },
   reflexionTexto: {
     fontSize: 16,
-    color: "#ECF0F1",
+    color: "#333",
     marginBottom: 5,
   },
   reflexionFecha: {
     fontSize: 12,
-    color: "#95A5A6",
+    color: "#888",
     textAlign: "right",
   },
   textInput: {
-    height: 80,
-    borderColor: "#FFD700",
+    height: 100,
+    borderColor: "#CCC",
     borderWidth: 1,
-    borderRadius: 8,
+    borderRadius: 5,
     padding: 10,
-    color: "#ECF0F1",
-    backgroundColor: "#34495E",
-    marginBottom: 20,
-    textAlignVertical: 'top', // Para alinear el texto en la parte superior
+    color: "#333",
+    backgroundColor: "#F9F9F9",
+    marginBottom: 15,
+    textAlignVertical: "top",
   },
   saveButton: {
     backgroundColor: "#2ECC71",
@@ -805,10 +908,26 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 10,
   },
-  noContentText: {
-    color: "#95A5A6",
-    fontSize: 16,
-    textAlign: "center",
+  closeModalButton: {
+    backgroundColor: "#E74C3C",
+    padding: 12,
+    borderRadius: 5,
+    alignItems: "center",
+  },
+  entryContentContainer: {
+    marginBottom: 20,
+    width: "90%",
+    alignItems: "center",
+  },
+  entryContent: {
+    width: "100%",
+    alignItems: "center",
+  },
+  fullImage: {
+    width: "100%",
+    height: 300,
+    borderRadius: 10,
+    backgroundColor: "#eaeaea", // Color de fondo mientras carga la imagen
   },
 });
 

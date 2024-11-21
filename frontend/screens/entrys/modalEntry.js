@@ -556,6 +556,7 @@ const ModalEntry = ({ visible, onClose }) => {
                         placeholderTextColor="#999"
                         value={texto}
                         onChangeText={setTexto}
+                        scrollEnabled={true} // Habilitar scroll en el TextInput
                       />
                     </View>
                   ) : (
@@ -587,6 +588,7 @@ const ModalEntry = ({ visible, onClose }) => {
                       placeholderTextColor="#999"
                       value={texto}
                       onChangeText={setTexto}
+                      scrollEnabled={true} // Habilitar scroll en el TextInput
                     />
                   </View>
                 </View>
@@ -784,8 +786,8 @@ const styles = StyleSheet.create({
     padding: 10, // Aumentado para más espacio interno
     textAlignVertical: "top",
     backgroundColor: "#f1f1f1",
-    height: 100, // Aumentado para mayor área de texto
-    width: "100%",
+    height: 100, // Altura fija
+    width: 260,
     marginBottom: 10, // Aumentado para más espacio entre elementos
     color: "#333",
     fontSize: 16,

@@ -1,16 +1,13 @@
-// MainTabs.js
-
 import React, { useState } from "react";
 import { View, StyleSheet } from "react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 
-
-import SideBar from "./sideBar";
+import SideBar from "./SideBar";
 
 // Importar pantallas
 import Home from "../../screens/home/home";
-import ListEntry from "../../screens/entrys/listEntry";
+import ListEntry from "../../screens/entrys/ListEntry";
 
 const Tab = createBottomTabNavigator();
 
@@ -45,11 +42,11 @@ function MainTabs({ navigation, user }) {
         }}
         navigateToProgramarMensaje={() => {
           handleToggleSidebar();
-          navigation.navigate("ProgramarMensaje")
+          navigation.navigate("ProgramarMensaje");
         }}
         navigateToSoporte={() => {
           handleToggleSidebar();
-          navigation.navigate("Soporte")
+          navigation.navigate("Soporte");
         }}
         navigateToSubirCertificado={() => {
           handleToggleSidebar();
@@ -61,7 +58,7 @@ function MainTabs({ navigation, user }) {
       <Tab.Navigator
         initialRouteName="Home"
         screenOptions={({ route }) => ({
-          tabBarIcon: ({ color, size }) => {
+          tabBarIcon: ({ focused, color, size }) => {
             let iconName;
 
             if (route.name === "Home") {
@@ -72,24 +69,15 @@ function MainTabs({ navigation, user }) {
               iconName = "bars";
             }
 
+            // Cambiar tamaño de icono si está enfocado
+            size = focused ? 28 : 24;
+
             return <FontAwesome name={iconName} size={size} color={color} />;
           },
-          tabBarActiveTintColor: "#dbcd0f",
-          tabBarInactiveTintColor: "#A9A9A9",
-          tabBarStyle: {
-            backgroundColor: "#2C3E50",
-            height: 70,
-            borderTopLeftRadius: 20,
-            borderTopRightRadius: 20,
-            borderTopWidth: 0,
-            position: "absolute",
-            paddingBottom: 10,
-            paddingTop: 10,
-          },
-          tabBarLabelStyle: {
-            fontSize: 10,
-            fontWeight: "bold",
-          },
+          tabBarActiveTintColor: "#f0a500",
+          tabBarInactiveTintColor: "#b0b0b0",
+          tabBarStyle: styles.tabBarStyle,
+          tabBarLabelStyle: styles.tabBarLabelStyle,
           headerShown: false,
         })}
       >
@@ -97,7 +85,7 @@ function MainTabs({ navigation, user }) {
           name="Home"
           component={Home}
           options={{
-            title: "Home",
+            title: "Inicio",
           }}
         />
         <Tab.Screen
@@ -130,7 +118,29 @@ export default MainTabs;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "transparent",
+    backgroundColor: "#1E1E2C", // Fondo oscuro para que combine con la barra
     position: "relative",
+  },
+  tabBarStyle: {
+    backgroundColor: "#1E1E2C",
+    height: 70,
+    borderRadius: 35, // Redondear completamente la barra
+    marginHorizontal: 5, // Separación de los bordes laterales
+    marginBottom: 5, // Separación del borde inferior
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3.5,
+    elevation: 8, // Efecto flotante
+    zIndex: 10, // Asegura que esté al frente
+    position: "absolute", // Posición absoluta para flotar
+  },
+  tabBarLabelStyle: {
+    fontSize: 12,
+    fontWeight: "bold",
+    marginBottom: 5,
   },
 });

@@ -1,3 +1,4 @@
+// ListEntry.js
 import React, { useEffect, useState } from "react";
 import {
   ScrollView,
@@ -18,6 +19,7 @@ import { Picker } from "@react-native-picker/picker";
 import PolaroidCard from "./polaroidCard";
 import SongCard from "./songCard";
 import TextCard from "./textCard";
+import AudioCard from "./AudioCard"; // Importa el AudioCard si lo usas
 import { listenToEntries, listenToBeneficiaries, db } from "../../utils/firebase";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
@@ -37,6 +39,7 @@ const ListEntry = ({ user }) => {
   const [filteredEntries, setFilteredEntries] = useState([]);
   const [password, setPassword] = useState("");
   const [userPasswords, setUserPasswords] = useState({ level2Password: "", level3Password: "" });
+  const [selectedEntryId, setSelectedEntryId] = useState(null); // Nuevo estado para rastrear la tarjeta seleccionada
 
   useEffect(() => {
     const auth = getAuth();
@@ -101,6 +104,7 @@ const ListEntry = ({ user }) => {
 
   const closeModal = () => {
     setSelectedEntry(null);
+    setSelectedEntryId(null); // Reiniciar el ID de la tarjeta seleccionada
   };
 
   const onAccessGranted = () => {
@@ -171,7 +175,7 @@ const ListEntry = ({ user }) => {
               >
                 <Picker.Item label="Diario" value="1" />
                 <Picker.Item label="Personal" value="2" />
-                <Picker.Item label="Intimo" value="3" />
+                <Picker.Item label="Íntimo" value="3" />
               </Picker>
             </View>
           </View>
@@ -192,21 +196,26 @@ const ListEntry = ({ user }) => {
                 </Text>
               ) : (
                 filteredEntries.map((entry) => {
-                  const EntryComponent =
-                    entry.mediaType === "image" || entry.mediaType === "video"
-                      ? PolaroidCard
-                      : entry.cancion
-                      ? SongCard
-                      : TextCard;
+                  let EntryComponent = TextCard; // Predeterminado
+
+                  if (entry.mediaType === "image" || entry.mediaType === "video") {
+                    EntryComponent = PolaroidCard;
+                  } else if (entry.cancion) {
+                    EntryComponent = SongCard;
+                  } else if (entry.audio && !entry.cancion && !entry.mediaType) {
+                    EntryComponent = AudioCard;
+                  }
+
                   return (
-                    <Pressable
-                      key={entry.id}
-                      onPress={() => setSelectedEntry(entry)}
-                      style={styles.pressable}
-                      pointerEvents="box-only"
-                    >
-                      <EntryComponent entry={entry} />
-                    </Pressable>
+                    <EntryComponent
+                    key={entry.id}
+                    entry={entry}
+                    isSelected={entry.id === selectedEntryId}
+                    onPress={() => {
+                      setSelectedEntry(entry);
+                      setSelectedEntryId(entry.id); // Establecer el ID de la tarjeta seleccionada
+                    }}
+                  />
                   );
                 })
               )}
@@ -295,80 +304,86 @@ const styles = StyleSheet.create({
   overlay: {
     flex: 1,
     backgroundColor: "rgba(0,0,0,0.5)", // Fondo oscuro y semitransparente
-    padding: 16,
-    paddingBottom: 45,
+    padding: 12,
+    paddingBottom: 60,
   },
   searchContainer: {
-    backgroundColor: "rgba(255, 255, 255, 0.95)",
+    backgroundColor: "#ffffff",
     borderRadius: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 5,
-    marginBottom: 20,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 6,
-    elevation: 5,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    marginHorizontal: 16,
+    marginTop: 20,
+    marginBottom: 10,
+    flexDirection: "row",
+    alignItems: "center",
+    shadowColor: "#000000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
   },
   searchInput: {
+    flex: 1,
     fontSize: 16,
-    color: "#4B4E6D",
+    color: "#333333",
   },
   levelSelector: {
     flexDirection: "row",
     alignItems: "center",
-    padding: 12,
-    backgroundColor: "rgba(240, 228, 194, 0.95)",
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    backgroundColor: "#ffffff",
     borderRadius: 12,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 6,
-    elevation: 5,
+    marginHorizontal: 16,
+    marginBottom: 10,
+    shadowColor: "#000000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
   },
   label: {
-    fontSize: 15,
-    fontWeight: "600",
-    color: "#4B4E6D",
+    fontSize: 16,
+    color: "#333333",
     marginRight: 10,
   },
   pickerContainer: {
     flex: 1,
     borderWidth: 1,
-    borderColor: "#C2A66B",
+    borderColor: "#cccccc",
     borderRadius: 8,
     overflow: "hidden",
   },
   picker: {
     height: 40,
-    color: "#4B4E6D",
+    color: "#333333",
     backgroundColor: "transparent",
-  },
+  },  
   loadingContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
   },
   pressable: {
-    flex: 1,
     width: "100%",
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 5,
+    marginBottom: 10,
   },
   modalOverlay: {
     flex: 1,
     backgroundColor: "rgba(0,0,0,0.5)",
     justifyContent: "center",
     alignItems: "center",
-    padding: 20,
+    padding: 12,
   },
   modalContent: {
     width: "100%",
     maxHeight: "90%",
     backgroundColor: "#fff",
     borderRadius: 10,
-    padding: 5,
+    padding: 8,
   },
   message: {
     textAlign: "center",
@@ -376,7 +391,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#fff",
   },
-  // MODAL DE PROTECCION
   fullScreenModalOverlay: {
     flex: 1,
     backgroundColor: "rgba(0, 0, 0, 0.85)", // Cubre toda la pantalla
