@@ -1,0 +1,53 @@
+/* src/album/CreateAlbum.css */
+
+.create-album-container {
+    z-index: 10;
+    padding: 16px;
+    position: relative;
+    margin-left: 70%;
+}
+
+.create-album-container h2 {
+    margin-bottom: 16px;
+    font-size: 20px;
+    color: #333;
+}
+
+.create-album-container form {
+    display: flex;
+    flex-direction: column;
+}
+
+.create-album-input {
+    padding: 10px;
+    margin-bottom: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.beneficiario-select {
+    padding: 10px;
+    margin-bottom: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    background-color: #fff;
+    color: #333;
+    cursor: pointer;
+}
+
+.create-album-button {
+    padding: 12px;
+    background-color: #27ae60;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.create-album-button:hover {
+    background-color: #219150;
+}

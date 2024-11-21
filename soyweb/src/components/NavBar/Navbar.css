@@ -1,0 +1,90 @@
+/* src/components/Navbar.css */
+
+.navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px 30px;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.9), transparent);
+    position: fixed;
+    top: 0;
+    width: 100%;
+    color: white;
+    font-family: Arial, sans-serif;
+    z-index: 1000;
+    box-sizing: border-box;
+}
+
+.navbar-brand {
+    font-size: 2rem;
+    color: white;
+    font-weight: bold;
+    text-decoration: none;
+    margin-right: 20px;
+    /* Espacio entre el logo y los enlaces */
+}
+
+.navbar-center {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    flex-grow: 1;
+    /* Hace que el contenedor central ocupe el espacio disponible */
+}
+
+.navbar-center a {
+    color: white;
+    text-decoration: none;
+    font-size: 1rem;
+}
+
+.navbar-center a:hover {
+    text-decoration: underline;
+}
+
+.navbar-actions {
+    display: flex;
+    gap: 15px;
+}
+
+.navbar-actions a,
+.logout-button {
+    color: white;
+    text-decoration: none;
+    font-size: 1rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.logout-button:hover {
+    text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+    .navbar {
+        flex-direction: column;
+        align-items: center;
+        padding: 10px;
+    }
+
+    .navbar-brand {
+        font-size: 1.5rem;
+        margin-bottom: 10px;
+    }
+
+    .navbar-center,
+    .navbar-actions {
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+        gap: 10px;
+    }
+
+    .navbar-center a,
+    .navbar-actions a,
+    .logout-button {
+        text-align: center;
+        font-size: 0.9rem;
+    }
+}

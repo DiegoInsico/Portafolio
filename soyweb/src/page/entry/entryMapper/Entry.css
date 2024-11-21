@@ -1,0 +1,92 @@
+/* src/components/TextAudioEntry.css */
+.text-audio-entry-card {
+    border: 1px solid #ccc;
+    padding: 10px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+}
+
+.text-audio-entry-card:hover {
+    background-color: #f9f9f9;
+}
+
+.audio-player {
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.text-audio-text {
+    font-size: 0.9em;
+    color: #333;
+}
+
+/* src/components/MediaEntry.css */
+.media-entry-card {
+    border: 1px solid #ccc;
+    padding: 10px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+}
+
+.media-entry-card:hover {
+    background-color: #f9f9f9;
+}
+
+.media-entry-image,
+.media-entry-video {
+    width: 100%;
+    height: auto;
+    border-radius: 4px;
+}
+
+.media-text {
+    margin-top: 5px;
+    font-size: 0.9em;
+    color: #333;
+}
+
+
+/* src/components/SongEntry.css */
+.song-entry-card {
+    border: 1px solid #ccc;
+    padding: 10px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.song-entry-card:hover {
+    background-color: #f9f9f9;
+}
+
+.song-entry-image {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.song-entry-info {
+    flex: 1;
+}
+
+.song-name {
+    font-weight: bold;
+    margin: 0;
+}
+
+.song-artist {
+    margin: 0;
+    color: #666;
+}
+
+.song-text {
+    margin-top: 5px;
+    font-size: 0.9em;
+    color: #333;
+}

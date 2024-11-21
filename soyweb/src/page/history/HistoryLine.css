@@ -1,0 +1,230 @@
+/* Contenedor principal de la línea de tiempo con posición relativa para superponer las áreas de desplazamiento */
+.timeline-wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+/* Áreas de desplazamiento izquierda y derecha */
+.scroll-area {
+    position: absolute;
+    top: 0;
+    width: 15%;
+    /* Ajusta el tamaño según prefieras */
+    height: 100%;
+    cursor: pointer;
+    z-index: 2;
+    /* Asegura que estén por encima de la línea de tiempo */
+    background: transparent;
+}
+
+.scroll-area.left {
+    left: 0;
+}
+
+.scroll-area.right {
+    right: 0;
+}
+
+/* Contenedor de la línea de tiempo */
+.timeline-container {
+    padding: 20px;
+    margin-left: 20px;
+    margin-right: 50px;
+    background-color: #ffffff;
+    overflow-x: auto;
+    max-width: 100%;
+    height: 400px;
+    display: flex;
+    align-items: flex-end;
+    /* Línea de tiempo en la parte inferior */
+    position: relative;
+    scroll-behavior: smooth;
+    /* Desplazamiento suave */
+    -ms-overflow-style: none;
+    /* IE y Edge */
+    scrollbar-width: none;
+    /* Firefox */
+}
+
+.timeline-container::-webkit-scrollbar {
+    display: none;
+}
+
+/* Título de la línea de tiempo */
+.timeline-title {
+    text-align: center;
+    color: #333;
+    font-size: 2rem;
+    margin-bottom: 20px;
+}
+
+/* Contenedor de la línea de tiempo horizontal */
+.horizontal-timeline {
+    display: flex;
+    align-items: flex-end;
+    /* Posiciona los puntos en la parte inferior */
+    position: relative;
+    gap: 60px;
+    /* Este valor puede ser ajustado o eliminado, ya que ahora usamos líneas dinámicas */
+    padding-bottom: 20px;
+    width: max-content;
+}
+
+/* Cada evento en la línea de tiempo */
+.timeline-event {
+    position: relative;
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    /* Poner fecha debajo del punto */
+    justify-content: center;
+}
+
+/* Línea entre eventos */
+.line-between-events {
+    height: 4px;
+    background-color: #ddd;
+    /* El ancho se establecerá dinámicamente desde el estilo en línea */
+}
+
+/* Punto del evento */
+.event-circle {
+    width: 24px;
+    height: 24px;
+    background-color: #ffffff;
+    /* Color por defecto */
+    border-radius: 50%;
+    position: relative;
+    margin: 0 10px;
+    cursor: pointer;
+    transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.event-circle:hover {
+    transform: scale(1.3);
+    background-color: #ff6f61;
+}
+
+/* Fecha debajo del punto de evento */
+.event-date {
+    margin-top: 10px;
+    font-size: 0.9rem;
+    color: #333;
+}
+
+/* Tarjeta emergente (hover card) */
+.hover-card {
+    position: absolute;
+    top: -240px;
+    /* Ajusta según sea necesario */
+    left: -90px;
+    /* Ajusta según sea necesario */
+    width: 200px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 15px;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    text-align: left;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s;
+    display: block;
+}
+
+.event-circle:hover .hover-card {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Flecha inferior de la tarjeta */
+.hover-card::before {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: calc(50% - 10px);
+    border-width: 10px;
+    border-style: solid;
+    border-color: #fff transparent transparent transparent;
+}
+
+/* Contenido de la tarjeta emergente */
+.hover-card h3 {
+    margin: 0 0 5px;
+    font-size: 1.1rem;
+    color: #333;
+}
+
+.hover-card p {
+    margin: 5px 0;
+    font-size: 1rem;
+    color: #555;
+}
+
+.hover-card img {
+    width: 100%;
+    margin-top: 10px;
+    border-radius: 5px;
+}
+
+.hover-card audio {
+    width: 100%;
+    margin-top: 10px;
+}
+
+/* Estilos para la etiqueta de año */
+.timeline-year-label {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    margin: 0 20px;
+    position: relative;
+}
+
+.year-text {
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: #fff;
+    margin-bottom: 10px;
+
+    /* Añade fondo y padding */
+    background-color: #4a90e2;
+    /* Fondo azul */
+    padding: 8px 12px;
+    border-radius: 8px;
+
+    /* Añade sombra */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Línea o marcador para el año */
+.timeline-year-label::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    width: 2px;
+    height: 20px;
+    background-color: #4a90e2;
+}
+
+/* Estilos para .history-line-card */
+.history-line-card {
+    background-color: rgba(255, 255, 255, 0.9);
+    /* Fondo blanco semitransparente */
+    border-radius: 15px;
+    box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.2);
+    width: 90%;
+    /* Hacemos el contenedor más amplio */
+    max-width: 1400px;
+    /* Aumentamos el ancho máximo */
+    padding: 50px;
+    text-align: center;
+    position: relative;
+    z-index: 3;
+    /* Asegura que esté por encima del blur */
+    margin: 0 auto;
+    /* Centra el contenedor horizontalmente */
+}
