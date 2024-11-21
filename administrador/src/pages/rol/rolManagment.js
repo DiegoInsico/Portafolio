@@ -6,15 +6,16 @@ import {
   addDoc,
   updateDoc,
   deleteDoc,
-  query,
-  where,
+  doc,
 } from "firebase/firestore";
 import Container from "../../components/container";
+import UserForm from "./userForm";
+import UserList from "./userList";
 import "./roles.css";
 
 const RolManagement = () => {
   const [users, setUsers] = useState([]);
-  const [displayForm, setDisplayForm] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
   const [formData, setFormData] = useState({
     displayName: "",
     email: "",
@@ -23,262 +24,176 @@ const RolManagement = () => {
     phoneNumber: "",
     role: "user",
   });
+  const [displayForm, setDisplayForm] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
   const [error, setError] = useState("");
 
+  // Definir la función fetchUsers
   const fetchUsers = async () => {
-    const usersSnapshot = await getDocs(
-      query(collection(db, "users"), where("role", "!=", ""))
-    );
-    const usersList = usersSnapshot.docs
-      .map((doc) => ({ id: doc.id, ...doc.data() }))
-      .sort((a, b) => a.displayName.localeCompare(b.displayName));
-    setUsers(usersList);
+    try {
+      const usersSnapshot = await getDocs(collection(db, "users"));
+      const usersList = usersSnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ref: doc.ref,
+        ...doc.data(),
+      }));
+      setUsers(usersList);
+    } catch (error) {
+      console.error("Error al cargar usuarios:", error);
+    }
   };
 
+  // Llamar a fetchUsers al montar el componente
   useEffect(() => {
     fetchUsers();
   }, []);
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({ ...prevData, [name]: value }));
-  };
-
   const handleCreateUser = async () => {
-    if (
-      !formData.displayName ||
-      !formData.email ||
-      !formData.password ||
-      !formData.phoneNumber
-    ) {
+    if (!formData.displayName || !formData.email || !formData.password) {
       setError("Todos los campos son obligatorios.");
-      return;
-    }
-
-    const emailExists = users.some((user) => user.email === formData.email);
-    if (emailExists) {
-      setError("Este correo ya está registrado.");
       return;
     }
 
     try {
       await addDoc(collection(db, "users"), {
-        displayName: formData.displayName,
-        email: formData.email,
-        phoneNumber: formData.phoneNumber,
-        countryCode: formData.countryCode,
-        role: formData.role,
-        isVerified: false,
-        notificationsEnabled: true,
-        bio: "",
-        birthDate: "",
+        ...formData,
+        isBanned: false,
         createdAt: new Date(),
       });
-      setError("");
-      setFormData({
-        displayName: "",
-        email: "",
-        password: "",
-        countryCode: "+56",
-        phoneNumber: "",
-        role: "user",
-      });
       setDisplayForm(false);
-      fetchUsers();
+      fetchUsers(); // Actualizar usuarios
     } catch (error) {
-      setError("Error al crear usuario.");
-      console.error(error);
+      console.error("Error al crear usuario:", error);
     }
   };
 
   const handleEditUser = async () => {
     try {
       await updateDoc(editingUser.ref, {
-        displayName: formData.displayName,
-        email: formData.email,
-        phoneNumber: formData.phoneNumber,
-        countryCode: formData.countryCode,
-        role: formData.role,
+        ...formData,
       });
       setEditingUser(null);
-      setFormData({
-        displayName: "",
-        email: "",
-        password: "",
-        countryCode: "+56",
-        phoneNumber: "",
-        role: "user",
-      });
-      fetchUsers();
+      setDisplayForm(false);
+      fetchUsers(); // Actualizar usuarios
     } catch (error) {
-      setError("Error al modificar usuario.");
-      console.error(error);
+      console.error("Error al modificar usuario:", error);
     }
   };
 
   const handleDeleteUser = async () => {
-    if (
-      window.confirm(
-        "¿Estás seguro de que deseas eliminar este usuario? Esta acción es irreversible."
-      )
-    ) {
-      try {
-        await deleteDoc(editingUser.ref);
-        setEditingUser(null);
-        setFormData({
-          displayName: "",
-          email: "",
-          password: "",
-          countryCode: "+56",
-          phoneNumber: "",
-          role: "user",
-        });
-        fetchUsers();
-      } catch (error) {
-        setError("Error al eliminar usuario.");
-        console.error(error);
-      }
+    try {
+      await deleteDoc(editingUser.ref);
+      setEditingUser(null);
+      setDisplayForm(false);
+      fetchUsers(); // Actualizar usuarios
+    } catch (error) {
+      console.error("Error al eliminar usuario:", error);
     }
   };
 
-  const openCreateForm = () => {
-    setEditingUser(null);
-    setDisplayForm(true);
-    setFormData({
-      displayName: "",
-      email: "",
-      password: "",
-      countryCode: "+56",
-      phoneNumber: "",
-      role: "user",
-    });
+  const handleToggleBan = async (userId, isBanned) => {
+    try {
+      const userDoc = doc(db, "users", userId);
+      await updateDoc(userDoc, { isBanned: !isBanned });
+      fetchUsers(); // Actualizar usuarios
+    } catch (error) {
+      console.error("Error al banear/desbanear usuario:", error);
+    }
   };
 
-  const openEditForm = (user) => {
-    setEditingUser(user);
-    setDisplayForm(true);
-    setFormData({
-      displayName: user.displayName,
-      email: user.email,
-      password: "", // No se modifica la contraseña
-      countryCode: user.countryCode || "+56",
-      phoneNumber: user.phoneNumber || "",
-      role: user.role,
-    });
+  const handleUserClick = (user) => {
+    setSelectedUser(user);
   };
 
   return (
-      <div className="role-management-container">
-        <div className="column col-1">
-          <button className="create-user-button" onClick={openCreateForm}>
-            <div className="sign">+</div>
-            <div className="text">Crear Usuario</div>
-          </button>
-          <h3>Usuarios</h3>
-          <table className="user-table">
-            <thead>
-              <tr>
-                <th>Nombre</th>
-                <th>Rol</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {users.map((user) => (
-                <tr key={user.id}>
-                  <td>{user.displayName}</td>
-                  <td>{user.role === "admin" ? "Administrador" : "Usuario"}</td>
-                  <td>
-                    <button
-                      onClick={() => openEditForm(user)}
-                      className="edit-user-button"
-                    >
-                      Modificar
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+    <Container>
+      <div className="rol-management-container">
+        <button
+          className="rol-create-button"
+          onClick={() => {
+            setDisplayForm(true);
+            setEditingUser(null);
+            setFormData({
+              displayName: "",
+              email: "",
+              password: "",
+              countryCode: "+56",
+              phoneNumber: "",
+              role: "user",
+            });
+          }}
+        >
+          Crear Usuario
+        </button>
+
+        <h1>Gestión de Roles y Usuarios</h1>
+
+        <UserList
+          users={users}
+          onEdit={(user) => {
+            setEditingUser(user);
+            setFormData({
+              displayName: user.displayName,
+              email: user.email,
+              countryCode: user.countryCode || "+56",
+              phoneNumber: user.phoneNumber || "",
+              role: user.role,
+            });
+            setDisplayForm(true);
+          }}
+          onToggleBan={handleToggleBan}
+          onView={handleUserClick}
+        />
 
         {displayForm && (
-          <div className="column col-2">
-            <h3>{editingUser ? "Modificar Usuario" : "Crear Usuario"}</h3>
-            {error && <p className="error-message">{error}</p>}
-            <input
-              type="text"
-              name="displayName"
-              placeholder="Nombre de usuario"
-              value={formData.displayName}
-              onChange={handleInputChange}
-              required
-            />
-            <input
-              type="email"
-              name="email"
-              placeholder="Correo del Usuario"
-              value={formData.email}
-              onChange={handleInputChange}
-              required
-            />
-            {!editingUser && (
-              <input
-                type="password"
-                name="password"
-                placeholder="Contraseña"
-                value={formData.password}
-                onChange={handleInputChange}
-                required
+          <UserForm
+            formData={formData}
+            onChange={(e) =>
+              setFormData({ ...formData, [e.target.name]: e.target.value })
+            }
+            onSubmit={editingUser ? handleEditUser : handleCreateUser}
+            onDelete={editingUser ? handleDeleteUser : null}
+            isEditing={!!editingUser}
+            error={error}
+          />
+        )}
+
+        {selectedUser && (
+          <div className="user-summary-section">
+            <h2>Información del Usuario</h2>
+            <div className="user-summary-details">
+              <img
+                src={selectedUser.photoURL || "/path/to/default-image.jpg"}
+                alt="Perfil"
+                className="user-profile-pic"
               />
-            )}
-            <div className="phone-input">
-              <select
-                name="countryCode"
-                value={formData.countryCode}
-                onChange={handleInputChange}
-              >
-                <option value="+56">Chile (+56)</option>
-                <option value="+54">Argentina (+54)</option>
-                <option value="+51">Perú (+51)</option>
-                <option value="+57">Colombia (+57)</option>
-                <option value="+58">Venezuela (+58)</option>
-                <option value="+591">Bolivia (+591)</option>
-              </select>
-              <input
-                type="number"
-                name="phoneNumber"
-                placeholder="Número celular"
-                value={formData.phoneNumber}
-                onChange={handleInputChange}
-                required
-                maxLength="9"
-              />
+              <p>
+                <strong>Nombre:</strong> {selectedUser.displayName}
+              </p>
+              <p>
+                <strong>Correo:</strong> {selectedUser.email}
+              </p>
+              <p>
+                <strong>Teléfono:</strong> {selectedUser.phoneNumber || "No disponible"}
+              </p>
+              <p>
+                <strong>Rol:</strong>{" "}
+                {selectedUser.role === "admin" ? "Administrador" : "Usuario"}
+              </p>
+              <p>
+                <strong>Bio:</strong> {selectedUser.bio || "No disponible"}
+              </p>
+              <p>
+                <strong>Fecha de Registro:</strong>{" "}
+                {selectedUser.createdAt
+                  ? selectedUser.createdAt.toDate().toLocaleDateString()
+                  : "No disponible"}
+              </p>
             </div>
-            <select
-              name="role"
-              value={formData.role}
-              onChange={handleInputChange}
-              required
-            >
-              <option value="user">Usuario</option>
-              <option value="admin">Administrador</option>
-            </select>
-            <button
-              onClick={editingUser ? handleEditUser : handleCreateUser}
-              className="submit-button"
-            >
-              {editingUser ? "Modificar Usuario" : "Crear Usuario"}
-            </button>
-            {editingUser && (
-              <button onClick={handleDeleteUser} className="delete-user-button">
-                Eliminar Usuario
-              </button>
-            )}
           </div>
         )}
       </div>
+    </Container>
   );
 };
 

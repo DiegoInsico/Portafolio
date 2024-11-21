@@ -1,174 +1,67 @@
+/* Contenedor principal */
 .entradas-container {
-  height: 80vh;
-  border-radius: 20px;
-  margin: auto;
-  width: 90vw;
-  background-color: rgba(255, 255, 255, 0.205);
-  display: flex;
-  justify-content: center;
-  padding: 20px;
+  padding: 2rem;
+  background-color: #f7f7f7;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.entradas-content {
-  display: grid;
-  grid-template-areas: 
-    "tables chart1"
-    "tables chart2";
-  gap: 10px;
-  align-items: end;
-  justify-content: space-between;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: 0.6fr 1fr;
-  width: 100%;
-  height: 100%;
-  padding: 10px;
-  border-radius: 8px;
-}
-
-.table-container, .emotion-chart-container, .monthly-entries-chart-container {
-  /* padding: 15px; */
-  border-radius: 30px;
-  background-color: rgba(252, 252, 252, 0.473);
-  backdrop-filter: blur(3px);
-}
-
-.table-container h2,
-.category-table-container h2,
-.emotion-chart-container h2,
-.monthly-entries-chart-container h2 {
-  color: black;
-  margin: 0;
-  font-size: 20px;
-}
-
-.stats-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin: 20px 0;
-  /* height: 10%; */
-}
-
-.stats-table th,
-.stats-table td {
-  border: 1px solid #ddd;
-  padding: 5px;
-  text-align: left;
-}
-
-.stats-table th {
-  background-color: #f4f4f4;
+.entradas-title {
+  font-size: 2rem;
   font-weight: bold;
+  color: #333;
+  text-align: center;
+  margin-bottom: 2rem;
 }
 
-/* Contenedor del gráfico de entradas por mes */
-.monthly-entries-chart-container {
-  grid-area: chart;
-  height: 25vh;
-  width: 50%;
-  height: 40%;
-  margin-left: auto;
-  margin-bottom: auto;
+/* Secciones */
+.entradas-section {
+  margin-bottom: 2rem;
 }
 
-/* Contenedor de la tabla de estadísticas generales */
-.table-container {
-  grid-area: tables;
-  height: 30%;
-  margin-bottom: auto;
-  border-radius: 30px;
-  background-color: rgba(252, 252, 252, 0.473);
-  /* background-color: red; */
-  backdrop-filter: blur(3px);
+.section-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #555;
+  margin-bottom: 1rem;
 }
 
-.table-container h2{
-  color: black;
-  font-size: 20px;
-  margin: 0;
-}
-
-
-/* Contenedor de la tabla de entradas por categoría */
-.category-table-container {
-  grid-area: tables;
-  border-radius: 20px;
-  height: 60%;
-  padding-bottom: 30px;
-  background-color: rgba(252, 252, 252, 0.473);
-  /* background-color: black; */
-  backdrop-filter: blur(3px);
-}
-
-.category-table-container h2{
-  color: black;
-  font-size: 25px;
-}
-
-/* Contenedor del gráfico de emociones */
-.emotion-chart-container {
-  grid-area: chart;
-  height: 100%;
-  width: 100%;
-  margin-left: auto;
-  border-radius: 20px;
-  /* background-color: rgba(252, 252, 252, 0.473); */
-  backdrop-filter: blur(3px);
-}
-
-.emotion-chart-container h2{
-  color: black;
-  font-size: 25px;
-  margin: 0;
-}
-
-.stats-table {
-  grid-area: tables;
+/* Tablas */
+.entradas-table {
   width: 100%;
   border-collapse: collapse;
-  height: 30%;
-  padding: 10px;
-  margin: 20px 0;
+  margin-bottom: 1rem;
 }
 
-.stats-table th,
-.stats-table td {
+.entradas-table th,
+.entradas-table td {
+  padding: 0.75rem;
   border: 1px solid #ddd;
-  padding: 8px;
-  font-size: 10px;
   text-align: left;
 }
 
-.emotion-chart-container {
-  grid-area: chart2;
-  width: 100%;
-  max-width: 100%;
-  height: 100%;
-  /* margin: auto; */
-  border-radius: 20px;
-  background-color: rgba(252, 252, 252, 0.473);
-  backdrop-filter: blur(3px);
-  overflow: hidden;
+.entradas-table th {
+  background-color: #f0f0f0;
+  font-weight: bold;
+  color: #333;
 }
 
-.monthly-entries-chart-container {
-  grid-area: chart1;
-  width: 100%;
-  max-width: 100%;
-  height: 80%;
-  border-radius: 30px;
-  background-color: rgba(252, 252, 252, 0.473);
-  backdrop-filter: blur(3px);
-  overflow: hidden;
+.entradas-table tr:hover {
+  background-color: #f9f9f9;
 }
 
-.emotion-chart-container canvas{
-  width: 100% !important;
-  height: 90% !important;
-  margin: auto;
+/* Gráficos */
+.chart-container {
+  height: 300px;
 }
-.monthly-entries-chart-container canvas,
-.category-table-container canvas{
-  width: 90% !important;
-  height: 70% !important;
-  margin: auto;
+
+/* Responsividad */
+@media (max-width: 768px) {
+  .entradas-container {
+    padding: 1rem;
+  }
+
+  .chart-container {
+    height: 250px;
+  }
 }

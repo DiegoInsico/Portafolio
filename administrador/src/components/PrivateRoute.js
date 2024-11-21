@@ -1,4 +1,3 @@
-// src/components/PrivateRoute.js
 import React, { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 import { onAuthStateChanged } from "firebase/auth";
@@ -6,32 +5,45 @@ import { auth, db } from "../firebase";
 import { doc, getDoc } from "firebase/firestore";
 
 const PrivateRoute = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [authStatus, setAuthStatus] = useState({
+    isAuthenticated: false,
+    isAdmin: false,
+    loading: true,
+  });
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
-        const docRef = doc(db, "users", user.uid);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists() && docSnap.data().role === "admin") {
-          setIsAdmin(true);
+        try {
+          const docRef = doc(db, "users", user.uid);
+          const docSnap = await getDoc(docRef);
+          const isAdmin = docSnap.exists() && docSnap.data().role === "admin";
+          setAuthStatus({ isAuthenticated: true, isAdmin, loading: false });
+        } catch (error) {
+          console.error("Error al verificar el rol del usuario:", error);
+          setAuthStatus({ isAuthenticated: false, isAdmin: false, loading: false });
         }
-        setUser(user);
       } else {
-        setUser(null);
+        setAuthStatus({ isAuthenticated: false, isAdmin: false, loading: false });
       }
-      setLoading(false);
     });
+
     return () => unsubscribe();
   }, []);
 
-  if (loading) {
-    return <div>Loading...</div>;
+  if (authStatus.loading) {
+    return (
+      <div style={{ textAlign: "center", padding: "2rem" }}>
+        <p>Cargando...</p>
+      </div>
+    );
   }
 
-  return user && isAdmin ? children : <Navigate to="/login" />;
+  if (!authStatus.isAuthenticated || !authStatus.isAdmin) {
+    return <Navigate to="/login" />;
+  }
+
+  return children;
 };
 
 export default PrivateRoute;

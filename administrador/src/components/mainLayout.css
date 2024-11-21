@@ -1,107 +1,85 @@
-.main-layout {
+/* src/components/mainLayout.css */
+
+/* Contenedor principal */
+.main-layout-container {
   display: flex;
+  flex-direction: column;
   height: 100vh;
-  overflow: hidden;
+  background-color: #f7f7f7;
 }
 
-/* Sidebar oculta */
-.sidebar {
-  width: 40px; /* Tamaño reducido para el estado colapsado */
-  background-color: #eeecec40;
-  backdrop-filter: blur(5px);
-  color: #ffffff;
-  padding: 20px 10px; /* Padding ajustado */
-  position: fixed;
-  top: 77.2px; /* Altura de la topbar */
-  left: 0;
-  height: calc(100% - 60px);
-  overflow: hidden;
-  transition: width 0.3s ease;
-  font-size: 18px;
-  z-index: 5;
+/* Envoltura principal */
+.main-layout-wrapper {
+  display: flex;
+  flex: 1;
 }
 
-.sidebar:hover {
-  width: 300px; /* Tamaño expandido al hacer hover */
+/* Barra lateral */
+.main-layout-sidebar {
+  width: 240px;
+  background-color: #1f2937;
+  color: white;
+  padding: 1rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 
-.sidebar a {
+/* Título de la barra lateral */
+.main-layout-title {
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: #e5e7eb;
+  padding: 0 1rem;
+}
+
+/* Navegación */
+.main-layout-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Enlaces */
+.main-layout-link {
   display: flex;
   align-items: center;
-  color: #000000;
-  padding: 15px 10px;
+  gap: 0.75rem;
   text-decoration: none;
+  color: #e5e7eb;
   font-size: 1rem;
-  border-radius: 10px;
-  transition: background-color 0.2s ease, transform 0.2s ease;
-  white-space: nowrap;
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-.sidebar a:hover {
-  background-color: #ffb74d;
-  color: #2e2e2e;
-  transform: scale(1.05);
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
-}
-
-/* Estilo para los números de la sidebar */
-.sidebar-number {
-  display: inline-block;
-  width: 25px;
-  margin-right: 10px;
-  text-align: center;
-  font-weight: bold;
+.main-layout-link:hover {
+  background-color: #374151;
   color: #ffffff;
-  opacity: 0.7;
 }
 
+.main-layout-link-active {
+  background-color: #4b5563;
+  color: #ffffff;
+}
 
-.login-content {
+/* Iconos */
+.main-layout-icon {
+  font-size: 1.5rem;
+}
+
+/* Contenido principal */
+.main-layout-content {
+  flex: 1;
+  padding: 2rem;
+  overflow-y: auto;
+}
+
+/* Vista de login */
+.main-layout-login {
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 100%;
   height: 100vh;
-  background-color: #1d1f27;
-}
-
-
-/* estilo para la barra derecha */
-.rightbar {
-  width: 40px;
-  background-color: #eeecec40;
-  backdrop-filter: blur(5px);
-  color: #ffffff;
-  padding: 20px 10px;
-  position: fixed;
-  top: 77.2px;
-  right: 0;
-  height: calc(100% - 60px);
-  overflow: hidden;
-  transition: width 0.3s ease;
-  font-size: 18px;
-  z-index: 5;
-}
-
-.rightbar:hover {
-  width: 300px;
-}
-
-.rightbar a {
-  display: flex;
-  align-items: center;
-  color: #000000;
-  padding: 15px 10px;
-  text-decoration: none;
-  font-size: 1rem;
-  transition: background-color 0.2s ease, transform 0.2s ease;
-  white-space: nowrap;
-}
-
-.rightbar a:hover {
-  background-color: #ffb74d;
-  color: #2e2e2e;
-  border-radius: 10px;
-  transform: scale(1.05);
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
+  background-color: #f7f7f7;
 }

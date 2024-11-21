@@ -1,106 +1,62 @@
-@import url('https://fonts.googleapis.com/css?family=Tangerine');
-
-/* Configuración general del TopBar */
-.topbar {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr; /* Distribuye en tres columnas */
+/* Contenedor principal */
+.topbar-container {
+  display: flex;
+  justify-content: space-between;
   align-items: center;
-  background-color: #eeecec00;
-  backdrop-filter: blur(5px);
-  width: 100%;
-  position: fixed;
-  z-index: 5;
-  padding: 10px;
+  padding: 1rem;
+  background-color: #1f2937; /* Fondo oscuro */
+  color: #ffffff; /* Texto blanco */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-/* Columna de usuario */
+/* Usuario */
 .topbar-user {
-  color: #1f1c17;
-  font-size: 50px;
-  font-family: 'Tangerine', serif;
-  margin-left: 20px;
-  justify-self: start;
-  text-shadow: 1px 1px 3px #bebebe, -1px 3px #a7a7a7;
-
-}
-
-/* Columna de título */
-.topbar-title {
-  font-family: 'Tangerine', serif;
-  font-size: 58px;
-  margin: 0;
-  color: #000000;
-  text-align: center;
-  justify-self: center; /* Centra el título en la columna */
-  text-shadow: 1px 1px 3px #bebebe, -1px 3px #a7a7a7;
-
-}
-
-/* Columna de botón (Logout) */
-.Btn {
   display: flex;
   align-items: center;
-  justify-content: flex-start;
-  width: 60px;
-  height: 50px;
-  border: none;
-  border-radius: 40%;
-  cursor: pointer;
-  position: relative;
-  overflow: hidden;
-  transition-duration: .3s;
-  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.199);
-  background-color: rgb(255, 65, 65);
-  justify-self: end;
-  margin-right: 50px;
+  gap: 0.5rem;
 }
 
-/* Plus sign */
-.sign {
-  width: 100px;
-  transition-duration: .3s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.topbar-user-icon {
+  font-size: 1.5rem;
+  color: #4ade80; /* Verde */
 }
 
-.sign svg {
-  width: 17px;
-}
-
-.sign svg path {
-  fill: white;
-}
-
-/* Text */
-.text {
-  right: 0;
-  width: 0;
-  opacity: 0;
-  color: white;
-  font-size: 1.2em;
+.topbar-user-name {
+  font-size: 1rem;
   font-weight: 600;
-  transition-duration: .3s;
 }
 
-/* Hover effect on button width */
-.Btn:hover {
-  width: 125px;
-  border-radius: 40px;
+/* Título */
+.topbar-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  font-style: italic;
+  text-align: center;
 }
 
-/* Hover effect button's text */
-.Btn:hover .sign {
-  width: 30%;
+/* Botón de Cerrar Sesión */
+.topbar-logout-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background-color: #ef4444; /* Rojo */
+  color: white;
+  border: none;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
-.Btn:hover .text {
-  opacity: 1;
-  width: 70%;
-  padding-right: 10px;
+.topbar-logout-btn:hover {
+  background-color: #dc2626; /* Rojo más oscuro */
 }
 
-/* Button click effect */
-.Btn:active {
-  transform: translate(2px, 2px);
+.topbar-logout-icon {
+  font-size: 1.25rem;
+}
+
+.topbar-logout-text {
+  font-size: 1rem;
+  font-weight: 600;
 }

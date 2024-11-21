@@ -1,18 +1,18 @@
-// MainLayout.js
-import React from 'react';
-import { NavLink } from 'react-router-dom';
-import { auth } from '../firebase';
-import TopBar from './TopBar';
-import HomeIcon from '@mui/icons-material/Home';
-import ListAltIcon from '@mui/icons-material/ListAlt';
-import PeopleIcon from '@mui/icons-material/People';
-import BarChartIcon from '@mui/icons-material/BarChart';
-import NotificationsIcon from '@mui/icons-material/Notifications';
-import MusicNoteIcon from '@mui/icons-material/MusicNote';
-import GroupIcon from '@mui/icons-material/Group';
-import InboxIcon from '@mui/icons-material/Inbox';
-import BugReportIcon from '@mui/icons-material/BugReport';
-import './mainLayout.css';
+import React from "react";
+import { NavLink } from "react-router-dom";
+import { auth } from "../firebase";
+import TopBar from "./TopBar";
+import {
+  Home,
+  ListAlt,
+  BarChart,
+  MusicNote,
+  BugReport,
+  People,
+  Inbox,
+  ManageAccounts,
+} from "@mui/icons-material";
+import "./mainLayout.css";
 
 const MainLayout = ({ children, isAuthenticated, currentUser }) => {
   const handleLogout = () => {
@@ -22,44 +22,98 @@ const MainLayout = ({ children, isAuthenticated, currentUser }) => {
   };
 
   return (
-    <div className="main-layout">
+    <div className="main-layout-container">
       {isAuthenticated ? (
         <>
+          {/* Barra superior */}
           <TopBar currentUser={currentUser} handleLogout={handleLogout} />
-          <div className="sidebar">
-            <NavLink to="/dashboard">
-              <HomeIcon className="icon" />
-              <span className="sidebar-number">|</span> Dashboard
-            </NavLink>
-            <NavLink to="/entradas">
-              <ListAltIcon className="icon" />
-              <span className="sidebar-number">|</span> Datos de Entradas
-            </NavLink>
-            <NavLink to="/monitor/graphics">
-              <BarChartIcon className="icon" />
-              <span className="sidebar-number">|</span> Ver Gráficos
-            </NavLink>
-            {/* <NavLink to="/system/notifications">
-              <NotificationsIcon className="icon" />
-              <span className="sidebar-number">|</span> Notificaciones
-            </NavLink> */}
-            <NavLink to="/monitor/SoulmatePage">
-              <MusicNoteIcon className="icon" />
-              <span className="sidebar-number">|</span> Lista de Emociones y Canciones
-            </NavLink>
-            <NavLink to="/test">
-              <BugReportIcon className="icon" />
-              <span className="sidebar-number">|</span> Página de Testeo
-            </NavLink>
-          </div>
-          <div className="content">
-            {children}
+
+          <div className="main-layout-wrapper">
+            {/* Barra lateral izquierda */}
+            <aside className="main-layout-sidebar">
+              <h2 className="main-layout-title">Navegación</h2>
+              <nav className="main-layout-nav">
+                <NavLink
+                  to="/dashboard"
+                  className={({ isActive }) =>
+                    `main-layout-link ${isActive ? "main-layout-link-active" : ""}`
+                  }
+                >
+                  <Home className="main-layout-icon" />
+                  Dashboard
+                </NavLink>
+                <NavLink
+                  to="/entradas"
+                  className={({ isActive }) =>
+                    `main-layout-link ${isActive ? "main-layout-link-active" : ""}`
+                  }
+                >
+                  <ListAlt className="main-layout-icon" />
+                  Datos de Entradas
+                </NavLink>
+                <NavLink
+                  to="/monitor/graphics"
+                  className={({ isActive }) =>
+                    `main-layout-link ${isActive ? "main-layout-link-active" : ""}`
+                  }
+                >
+                  <BarChart className="main-layout-icon" />
+                  Ver Gráficos
+                </NavLink>
+                <NavLink
+                  to="/monitor/SoulmatePage"
+                  className={({ isActive }) =>
+                    `main-layout-link ${isActive ? "main-layout-link-active" : ""}`
+                  }
+                >
+                  <MusicNote className="main-layout-icon" />
+                  Lista de Emociones y Canciones
+                </NavLink>
+                <NavLink
+                  to="/test"
+                  className={({ isActive }) =>
+                    `main-layout-link ${isActive ? "main-layout-link-active" : ""}`
+                  }
+                >
+                  <BugReport className="main-layout-icon" />
+                  Página de Testeo
+                </NavLink>
+                <NavLink
+                  to="/monitor/users/userActivity"
+                  className={({ isActive }) =>
+                    `main-layout-link ${isActive ? "main-layout-link-active" : ""}`
+                  }
+                >
+                  <People className="main-layout-icon" />
+                  Gestión de Usuarios
+                </NavLink>
+                <NavLink
+                  to="/system/inbox"
+                  className={({ isActive }) =>
+                    `main-layout-link ${isActive ? "main-layout-link-active" : ""}`
+                  }
+                >
+                  <Inbox className="main-layout-icon" />
+                  Consultas y Soporte
+                </NavLink>
+                <NavLink
+                  to="/rol/RolManagment"
+                  className={({ isActive }) =>
+                    `main-layout-link ${isActive ? "main-layout-link-active" : ""}`
+                  }
+                >
+                  <ManageAccounts className="main-layout-icon" />
+                  Administración de Usuarios
+                </NavLink>
+              </nav>
+            </aside>
+
+            {/* Contenido principal */}
+            <main className="main-layout-content">{children}</main>
           </div>
         </>
       ) : (
-        <div className="login-content">
-          {children}
-        </div>
+        <div className="main-layout-login">{children}</div>
       )}
     </div>
   );

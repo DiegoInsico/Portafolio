@@ -1,4 +1,3 @@
-// src/pages/Entradas.js
 import React, { useState, useEffect } from "react";
 import { db } from "../firebase";
 import { collection, getDocs } from "firebase/firestore";
@@ -16,49 +15,55 @@ const Entradas = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const entriesSnapshot = await getDocs(collection(db, "entradas"));
-      const entriesList = entriesSnapshot.docs.map((doc) => doc.data());
+      try {
+        const entriesSnapshot = await getDocs(collection(db, "entradas"));
+        const entriesList = entriesSnapshot.docs.map((doc) => doc.data());
 
-      const userSet = new Set();
-      let totalEntriesCount = 0;
-      const categoryCounts = {};
-      const emotionCounts = {};
-      const monthlyEntries = {};
-      let totalEmotions = 0;
+        const userSet = new Set();
+        let totalEntriesCount = 0;
+        const categoryCounts = {};
+        const emotionCounts = {};
+        const monthlyEntries = {};
+        let totalEmotions = 0;
 
-      entriesList.forEach((entry) => {
-        userSet.add(entry.userId);
-        totalEntriesCount += 1;
+        entriesList.forEach((entry) => {
+          userSet.add(entry.userId);
+          totalEntriesCount++;
 
-        // Contar categorías
-        const category = entry.categoria || "Sin categoría";
-        categoryCounts[category] = (categoryCounts[category] || 0) + 1;
+          // Categorías
+          const category = entry.categoria || "Sin categoría";
+          categoryCounts[category] = (categoryCounts[category] || 0) + 1;
 
-        // Contar emociones
-        if (entry.emociones && Array.isArray(entry.emociones)) {
-          totalEmotions += entry.emociones.length;
-          entry.emociones.forEach((emotion) => {
-            emotionCounts[emotion] = (emotionCounts[emotion] || 0) + 1;
+          // Emociones
+          if (entry.emociones && Array.isArray(entry.emociones)) {
+            totalEmotions += entry.emociones.length;
+            entry.emociones.forEach((emotion) => {
+              emotionCounts[emotion] = (emotionCounts[emotion] || 0) + 1;
+            });
+          }
+
+          // Entradas por mes
+          const creationDate = entry.fechaCreacion
+            ? new Date(entry.fechaCreacion.seconds * 1000)
+            : new Date();
+          const month = creationDate.toLocaleString("default", {
+            month: "long",
+            year: "numeric",
           });
-        }
-
-        // Contar entradas por mes
-        const creationDate = entry.fechaCreacion
-          ? new Date(entry.fechaCreacion.seconds * 1000)
-          : new Date();
-        const month = creationDate.toLocaleString("default", {
-          month: "long",
-          year: "numeric",
+          monthlyEntries[month] = (monthlyEntries[month] || 0) + 1;
         });
-        monthlyEntries[month] = (monthlyEntries[month] || 0) + 1;
-      });
 
-      setTotalUsers(userSet.size);
-      setTotalEntries(totalEntriesCount);
-      setEntriesByCategory(categoryCounts);
-      setEmotionCount(emotionCounts);
-      setEntriesByMonth(monthlyEntries);
-      setAvgEmotionsPerEntry(totalEmotions / totalEntriesCount);
+        setTotalUsers(userSet.size);
+        setTotalEntries(totalEntriesCount);
+        setEntriesByCategory(categoryCounts);
+        setEmotionCount(emotionCounts);
+        setEntriesByMonth(monthlyEntries);
+        setAvgEmotionsPerEntry(
+          totalEntriesCount > 0 ? totalEmotions / totalEntriesCount : 0
+        );
+      } catch (error) {
+        console.error("Error al obtener datos:", error);
+      }
     };
 
     fetchData();
@@ -75,11 +80,6 @@ const Entradas = () => {
     ],
   };
 
-  const emotionChartOptions = {
-    maintainAspectRatio: false,
-  };
-
-  // Configuración para el gráfico de entradas por mes
   const monthlyEntriesChartData = {
     labels: Object.keys(entriesByMonth),
     datasets: [
@@ -91,75 +91,79 @@ const Entradas = () => {
     ],
   };
 
-  const monthlyEntriesChartOptions = {
-    maintainAspectRatio: false,
-  };
-
   return (
+    <Container>
       <div className="entradas-container">
-        <div className="entradas-content">
-          {/* Contenedor para la tabla de estadísticas generales */}
-          <div className="table-container">
-            <h2>Estadísticas Generales</h2>
-            <table className="stats-table">
-              <thead>
-                <tr>
-                  <th>Métrica</th>
-                  <th>Valor</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>Total de Usuarios</td>
-                  <td>{totalUsers}</td>
-                </tr>
-                <tr>
-                  <td>Total de Entradas</td>
-                  <td>{totalEntries}</td>
-                </tr>
-                <tr>
-                  <td>Promedio de Emociones por Entrada</td>
-                  <td>{avgEmotionsPerEntry.toFixed(2)}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+        <h1 className="entradas-title">Estadísticas de Entradas</h1>
 
-          {/* Contenedor para la tabla de entradas por categoría */}
-          <div className="category-table-container">
-            <h2>Entradas por Categoría</h2>
-            <table className="stats-table">
-              <thead>
-                <tr>
-                  <th>Categoría</th>
-                  <th>Cantidad</th>
+        {/* Tabla de estadísticas generales */}
+        <div className="entradas-section">
+          <h2 className="section-title">Estadísticas Generales</h2>
+          <table className="entradas-table">
+            <thead>
+              <tr>
+                <th>Métrica</th>
+                <th>Valor</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Total de Usuarios</td>
+                <td>{totalUsers}</td>
+              </tr>
+              <tr>
+                <td>Total de Entradas</td>
+                <td>{totalEntries}</td>
+              </tr>
+              <tr>
+                <td>Promedio de Emociones por Entrada</td>
+                <td>{avgEmotionsPerEntry.toFixed(2)}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        {/* Tabla de entradas por categoría */}
+        <div className="entradas-section">
+          <h2 className="section-title">Entradas por Categoría</h2>
+          <table className="entradas-table">
+            <thead>
+              <tr>
+                <th>Categoría</th>
+                <th>Cantidad</th>
+              </tr>
+            </thead>
+            <tbody>
+              {Object.entries(entriesByCategory).map(([category, count]) => (
+                <tr key={category}>
+                  <td>{category}</td>
+                  <td>{count}</td>
                 </tr>
-              </thead>
-              <tbody>
-                {Object.entries(entriesByCategory).map(([category, count]) => (
-                  <tr key={category}>
-                    <td>{category}</td>
-                    <td>{count}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+              ))}
+            </tbody>
+          </table>
+        </div>
 
-          <div className="emotion-chart-container">
-            <h2>Frecuencia de Emociones en las Entradas</h2>
-            <Bar data={emotionChartData} options={emotionChartOptions} />
+        {/* Gráfico de emociones */}
+        <div className="entradas-section">
+          <h2 className="section-title">Frecuencia de Emociones</h2>
+          <div className="chart-container">
+            <Bar data={emotionChartData} options={{ maintainAspectRatio: false }} />
           </div>
+        </div>
 
-          <div className="monthly-entries-chart-container">
-            <h2>Tendencia de Entradas por Mes</h2>
+        {/* Gráfico de entradas por mes */}
+        <div className="entradas-section">
+          <h2 className="section-title">Entradas por Mes</h2>
+          <div className="chart-container">
             <Bar
               data={monthlyEntriesChartData}
-              options={monthlyEntriesChartOptions}
+              options={{ maintainAspectRatio: false }}
             />
           </div>
         </div>
       </div>
+    </Container>
   );
 };
 

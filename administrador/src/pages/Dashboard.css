@@ -1,341 +1,150 @@
+/* Contenedor principal del Dashboard */
 .dashboard-container {
-  text-align: center;
-  background-color: rgba(255, 255, 255, 0.1); 
-  padding: 10px;
-  width: 90vw;
-  height: 80vh;
-  margin-left: 4%;
-  border-radius: 10px;
-  font-family: Arial, sans-serif;
-  color: #fff;
   display: flex;
-  justify-content: center;
-}
-
-.dashboard-content {
-  display: grid;
-  grid-template-areas:
-    "activity head"
-    "graph ticket"
-    "graph music";
-  grid-template-columns: 2fr 1fr;
-  grid-template-rows: 0.2fr 1fr 1fr;
-  gap: 10px;
-  margin-top: 10px;
-  width: 100%;
-  border-radius: 10px;
-}
-
-@import url('https://fonts.googleapis.com/css?family=Tangerine');
-
-.dash-tittle {
-  grid-area: notifi;
-  color: rgb(7, 7, 7);
-  margin: 0;
-  font-size: 100px;
-  text-shadow: 4px 4px 4px #aaa;
-  font-family: 'Tangerine', serif;
-}
-
-/* contenedores */
-.notifi-area, .dash-music {
-  grid-area: ticket;
-  max-height: 30vh; 
-  overflow-y: auto; 
-  background-color: #ffffff7d;
-  backdrop-filter: blur(5px);
-  color: #ffffff;
-  border: 1px solid #ffa82691;
-  border-radius: 25px;
-  width: 100%;
-  position: relative;
-  height: 100vh;
-}
-
-
-.dashboard-grid {
-  grid-area: activity;
-  display: flex;
-  /* background-color: red; */
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-}
-
-.simple-card {
-  background-color: rgba(255, 255, 255, 0.495);
-  backdrop-filter: blur(5px);
-  border-radius: 10px;
-  width: 100%;
-  height: 100%;
-  margin: 0;
-}
-
-/* graficos */
-.dash-chart-container {
-  grid-area: graph ;
-  border-radius: 10px;
-  background-color: #fdfdff7e;
-}
-
-.chart-content canvas{
-  grid-area: graph;
-  height: 40vh !important;
-  width: 50vw !important;
-  padding: 15px;
-  margin: 0 auto;
-  border-radius: 10px;
-  background-color: #d9d9d909;
-  /* box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); */
-}
-
-.chart-category-usage canvas{
-  grid-area: graph;
-  display: flex;
-  justify-items: center;
-  margin: 0 auto;
-  height: 30% !important;
-  width: 30% !important;
-}
-
-.chart-unverified-users h2,
-.chart-category-usage h2,
-.chart-creation-peak h2 {
-  color: black;
-  font-size: 20px;
-  margin-bottom: 15px;
-}
-
-/* titulos h1 */
-.dash-chart-container h1,
-.btn-functions h1,
-.notifi-area h1,
-.dash-music h1{
-  position: sticky;
-  top: 0;
-  border-radius: 20px;
-  font-size: 18PX;
-  color: black;
-  backdrop-filter: blur(5px);
-  padding: 20px 0;
-  margin: 0;
-  width: 100%;
-  z-index: 2;
-  /* border-bottom: 1px solid #ff9900;  */
-}
-
-.btn-functions h2{
-  font-size: 12px;
-  color: grey;
-}
-
-.notifi-area p {
-  font-size: 15px;
-  margin-top: 10px;
-  color: #000000;
-  border-bottom: 1px solid #00000025;
-}
-
-/* Scroll personalizado para el área de notificaciones */
-.notifi-area::-webkit-scrollbar {
-  width: 5px;
-  background-color: #ffffff; /* Fondo oscuro del scroll */
-}
-
-.notifi-area::-webkit-scrollbar-thumb {
-  background-color: #afafaf; /* Pulgar del scroll */
-  border-radius: 5px;
-}
-
-.notifi-area::-webkit-scrollbar-thumb:hover {
-  background-color: #777777;
-}
-
-
-
-
-.simple-card h3{
-  /* margin-top: 10px; */
-  font-size: 15px;
-  margin: 0;
-  margin-top: 5px;
-  color: #000000;
-}
-
-.simple-value{
-  color: #7a7a7a;
-  margin: 0;
-  font-size: 25px;
-}
-
-/* boton personalizado */
-/* From Uiverse.io by barisdogansutcu */ 
-.btn-funtions{
-  background-color: rgba(255, 245, 245, 0.582);
-  display: flex;
-  gap: 10px;
-  width: 100%;
-  height: 100%;
   flex-direction: column;
+  gap: 2rem;
+  padding: 2rem;
+  background-color: #f9f9f9;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-
-.btn-perso {
-  padding: 17px 40px;
-  border-radius: 50px;
-  width: 30%;
-  cursor: pointer;
-  /* border: 0; */
-  background-color: rgb(0, 0, 0);
-  box-shadow: rgb(0 0 0 / 5%) 0 0 8px;
-  /* letter-spacing: 1.5px; */
-  text-transform: uppercase;
-  font-size: 10px;
-  transition: all 0.5s ease;
-}
-
-.btn-perso:hover {
-  letter-spacing: 3px;
-  background-color: hsl(261deg 80% 48%);
-  color: hsl(0, 0%, 100%);
-  box-shadow: rgb(93 24 220) 0px 7px 29px 0px;
-}
-
-.btn-perso:active {
-  letter-spacing: 3px;
-  background-color: hsl(261deg 80% 48%);
-  color: hsl(0, 0%, 100%);
-  box-shadow: rgb(93 24 220) 0px 0px 0px 0px;
-  transform: translateY(10px);
-  transition: 100ms;
-}
-
-
-
-
-.btn-functions {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-}
-
-
-.btn-perso {
-  padding: 12px 35px;
-  border-radius: 50px;
-  cursor: pointer;
-  border: 0;
-  background-color: #e7e7e2;
-  color: #080101;
-  font-size: 9px;
-  transition: all 0.3s ease;
-}
-
-.btn-perso:hover {
-  background-color: #9b9b9b9a;
-  box-shadow: 0px 4px 10px rgba(126, 121, 114, 0.6);
-}
-
-
-/* Artista que más transmite */
-.dash-music {
-  grid-area: music;
-  /* margin-top: 80%; */
-  width: 90%;
-  margin: 0 auto;
-}
-
-
-.loader {
-  margin: auto; 
-  display: flex;
-  flex-direction: row;
-  height: 5em;
-  width: 80%;
-  margin-top: 10px;
-  background-color: #3b3b3b;
-  border-radius: 10px;
-  transition: 0.4s ease-in-out;
-  align-items: center;
-}
-
-/* .loader:hover {
-  cursor: pointer;
-  background-color: lightgray;
-} */
-
-.song {
-  flex-grow: 1;
-  text-align: left;
-  color: black;
-}
-
-.name {
-  font-size: 1em;
+/* Estadísticas generales */
+.dashboard-stats h1 {
+  font-size: 1.75rem;
   font-weight: bold;
-  margin: 0;
-  color: #1db954;
+  margin-bottom: 1rem;
+  color: #333;
 }
 
-.artist {
-  font-size: 0.8em;
-  margin: 0;
-  color: gray;
+.dashboard-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
 }
 
-.albumcover {
-  height: 50px;
+.card {
+  background-color: #ffffff;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  text-align: center;
+  font-size: 1rem;
+  color: #333;
+  font-weight: bold;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Artistas más escuchados */
+.dashboard-music h2 {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #444;
+}
+
+.song-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 1rem 0;
+  padding: 1rem;
+  background-color: #ffffff;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+}
+
+.song-card:hover {
+  transform: translateY(-3px);
+}
+
+.song-card img {
   width: 50px;
-  background-color: #e9e8e8;
-  border-radius: 5px;
-  margin-right: 10px;
-}
-
-.album-img {
-  width: 100%;
-  height: 100%;
+  height: 50px;
+  border-radius: 0.25rem;
   object-fit: cover;
 }
 
-.loading {
-  display: flex;
-  margin-left: auto;
-  transform: rotate(180deg);
-  margin-right: 1em;
+.song-card p {
+  margin: 0;
+  font-size: 1rem;
+  color: #333;
 }
 
-.load {
-  width: 3px;
-  height: 33px;
-  background-color: limegreen;
-  animation: 1s move6 infinite;
-  border-radius: 5px;
-  margin: 0 2px;
+/* Gráficos */
+.dashboard-charts {
+  padding: 1rem;
+  background-color: #ffffff;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.load:nth-child(1) {
-  animation-delay: 0.2s;
+.dashboard-charts h2 {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #444;
+  margin-bottom: 1rem;
 }
 
-.load:nth-child(2) {
-  animation-delay: 0.4s;
+.dashboard-charts button {
+  margin: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 0.375rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
-.load:nth-child(3) {
-  animation-delay: 0.6s;
+.dashboard-charts button:hover {
+  background-color: #0056b3;
+  transform: translateY(-2px);
 }
 
-@keyframes move6 {
-  0% {
-    height: 0.2em;
+.dashboard-charts button:active {
+  transform: translateY(0);
+}
+
+/* Tickets abiertos */
+.dashboard-tickets {
+  padding: 1rem;
+  background-color: #ffffff;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.dashboard-tickets h2 {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #444;
+  margin-bottom: 1rem;
+}
+
+.dashboard-tickets p {
+  margin: 0.5rem 0;
+  font-size: 1rem;
+  color: #555;
+}
+
+/* Responsividad */
+@media (max-width: 768px) {
+  .dashboard-container {
+    padding: 1rem;
   }
-  25% {
-    height: 0.7em;
+
+  .dashboard-cards {
+    grid-template-columns: 1fr;
   }
-  50% {
-    height: 1.5em;
-  }
-  100% {
-    height: 0.2em;
+
+  .dashboard-charts button {
+    font-size: 0.875rem;
+    padding: 0.5rem 1rem;
   }
 }

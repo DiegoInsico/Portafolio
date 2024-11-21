@@ -1,0 +1,91 @@
+/* Contenedor del formulario */
+.rol-form {
+    padding: 1.5rem;
+    background-color: #ffffff;
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    max-width: 500px;
+    margin: 2rem auto;
+  }
+  
+  .rol-form h2 {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 1rem;
+  }
+  
+  /* Campos de entrada */
+  .rol-form input,
+  .rol-form select {
+    width: 100%;
+    padding: 0.75rem;
+    margin-bottom: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 0.375rem;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+  }
+  
+  .rol-form input:focus,
+  .rol-form select:focus {
+    border-color: #007bff;
+    outline: none;
+  }
+  
+  /* Botones */
+  .submit-button {
+    width: 100%;
+    padding: 0.75rem;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 0.375rem;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+  }
+  
+  .submit-button:hover {
+    background-color: #218838;
+    transform: translateY(-2px);
+  }
+  
+  .delete-user-button {
+    width: 100%;
+    padding: 0.75rem;
+    background-color: #ff5555;
+    color: white;
+    border: none;
+    border-radius: 0.375rem;
+    font-size: 1rem;
+    cursor: pointer;
+    margin-top: 1rem;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+  }
+  
+  .delete-user-button:hover {
+    background-color: #cc0000;
+    transform: translateY(-2px);
+  }
+  
+  /* Mensajes de error */
+  .rol-error {
+    color: #ff0000;
+    font-size: 0.875rem;
+    margin-bottom: 1rem;
+  }
+  
+  /* Responsividad */
+  @media (max-width: 768px) {
+    .rol-form {
+      padding: 1rem;
+    }
+  
+    .submit-button,
+    .delete-user-button {
+      font-size: 0.9rem;
+      padding: 0.5rem;
+    }
+  }
+  
