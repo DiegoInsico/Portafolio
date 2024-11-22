@@ -1,4 +1,12 @@
-import { collection, getDocs, orderBy, query, Timestamp, where } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  limit,
+  orderBy,
+  query,
+  Timestamp,
+  where,
+} from "firebase/firestore";
 import { db } from "../../../firebase";
 import { getMetadata, getStorage, listAll, ref } from "firebase/storage";
 
@@ -17,20 +25,40 @@ const getZodiacSign = (birthDate) => {
   const day = date.getDate();
   const month = date.getMonth() + 1;
 
-  if ((month === 1 && day >= 20) || (month === 2 && day <= 18)) return "Acuario";
+  if ((month === 1 && day >= 20) || (month === 2 && day <= 18))
+    return "Acuario";
   if ((month === 2 && day >= 19) || (month === 3 && day <= 20)) return "Piscis";
   if ((month === 3 && day >= 21) || (month === 4 && day <= 19)) return "Aries";
   if ((month === 4 && day >= 20) || (month === 5 && day <= 20)) return "Tauro";
-  if ((month === 5 && day >= 21) || (month === 6 && day <= 20)) return "Géminis";
+  if ((month === 5 && day >= 21) || (month === 6 && day <= 20))
+    return "Géminis";
   if ((month === 6 && day >= 21) || (month === 7 && day <= 22)) return "Cáncer";
   if ((month === 7 && day >= 23) || (month === 8 && day <= 22)) return "Leo";
   if ((month === 8 && day >= 23) || (month === 9 && day <= 22)) return "Virgo";
   if ((month === 9 && day >= 23) || (month === 10 && day <= 22)) return "Libra";
-  if ((month === 10 && day >= 23) || (month === 11 && day <= 21)) return "Escorpio";
-  if ((month === 11 && day >= 22) || (month === 12 && day <= 21)) return "Sagitario";
+  if ((month === 10 && day >= 23) || (month === 11 && day <= 21))
+    return "Escorpio";
+  if ((month === 11 && day >= 22) || (month === 12 && day <= 21))
+    return "Sagitario";
   return "Capricornio";
 };
 
+// Función para calcular la edad
+const calculateAge = (birthDate) => {
+  const today = new Date();
+  const birthDateObj = new Date(birthDate);
+  let age = today.getFullYear() - birthDateObj.getFullYear();
+  const monthDifference = today.getMonth() - birthDateObj.getMonth();
+
+  if (
+    monthDifference < 0 ||
+    (monthDifference === 0 && today.getDate() < birthDateObj.getDate())
+  ) {
+    age--;
+  }
+
+  return age;
+};
 
 // Función para obtener datos del dashboard
 export const fetchDashboardData = async () => {
@@ -89,7 +117,9 @@ export const fetchDashboardData = async () => {
       }
     });
 
-    const sortedSongs = Object.values(songCounts).sort((a, b) => b.count - a.count);
+    const sortedSongs = Object.values(songCounts).sort(
+      (a, b) => b.count - a.count
+    );
     const mostPlayedSongsData = sortedSongs.slice(0, 2);
 
     // Tickets abiertos
@@ -171,6 +201,49 @@ export const fetchDashboardData = async () => {
   }
 };
 
+export const fetchActiveUsersData = async () => {
+  // Fetch data for active users
+  const usersSnapshot = await getDocs(collection(db, "users"));
+  const users = usersSnapshot.docs.map((doc) => ({
+    username: doc.data().username,
+    country: doc.data().country || "Desconocido",
+    city: doc.data().city || "Desconocida",
+  }));
+  return users;
+};
+
+export const fetchEntriesData = async () => {
+  // Fetch data for entries
+  const entriesSnapshot = await getDocs(collection(db, "entradas"));
+  const entries = entriesSnapshot.docs.map((doc) => ({
+    type: doc.data().tipo || "Desconocido",
+    securityLevel: doc.data().nivelSeguridad || "Baja",
+  }));
+  return entries;
+};
+
+export const fetchLastActivityData = async () => {
+  // Fetch data for last activity
+  const activitiesSnapshot = await getDocs(
+    query(collection(db, "activities"), orderBy("timestamp", "desc"), limit(10))
+  );
+  const activities = activitiesSnapshot.docs.map((doc) => ({
+    date: doc.data().timestamp?.toDate().toLocaleString() || "Desconocida",
+    description: doc.data().descripcion || "Sin descripción",
+  }));
+  return { history: activities };
+};
+
+export const fetchDailyActivityData = async () => {
+  // Fetch data for daily user activity
+  const dailySnapshot = await getDocs(collection(db, "dailyActivity"));
+  const lastEntry = dailySnapshot.docs[0]?.data() || {};
+  return {
+    type: lastEntry.tipo || "Desconocido",
+    user: lastEntry.username || "Anónimo",
+  };
+};
+
 // Función para obtener datos de almacenamiento
 export const fetchStorageData = async () => {
   const storage = getStorage();
@@ -203,7 +276,9 @@ export const fetchStorageData = async () => {
 
     const entriesCollection = collection(db, "entradas");
     const entriesSnapshot = await getDocs(entriesCollection);
-    const textEntriesCount = entriesSnapshot.docs.filter((doc) => doc.data().texto).length;
+    const textEntriesCount = entriesSnapshot.docs.filter(
+      (doc) => doc.data().texto
+    ).length;
 
     storageData.Texto = textEntriesCount;
   } catch (error) {
@@ -236,6 +311,7 @@ export const fetchUsageData = async () => {
   const dailyCreations = {};
   const emotionCounts = {};
   const countryData = {};
+  const cityData = {};
   const zodiacSigns = {};
   let premiumCount = 0;
   let nonPremiumCount = 0;
@@ -243,6 +319,7 @@ export const fetchUsageData = async () => {
   let verifiedFalse = 0;
   let notificationsTrue = 0;
   let notificationsFalse = 0;
+  const ageGroups = {};
 
   const entradasSnapshot = await getDocs(
     query(collection(db, "entradas"), orderBy("fechaCreacion"))
@@ -289,12 +366,26 @@ export const fetchUsageData = async () => {
   usersSnapshot.forEach((doc) => {
     const data = doc.data();
 
+    if (data.birthDate) {
+      const birthDateMs = data.birthDate.seconds * 1000;
+      const age = calculateAge(birthDateMs);
+      ageGroups[age] = (ageGroups[age] || 0) + 1;
+
+      const zodiac = getZodiacSign(birthDateMs);
+      zodiacSigns[zodiac] = (zodiacSigns[zodiac] || 0) + 1;
+    } else {
+      // Contar usuarios sin fecha de nacimiento
+      ageGroups["Undefined"] = (ageGroups["Undefined"] || 0) + 1;
+    }
+
     if (data.isPremium) premiumCount++;
     else nonPremiumCount++;
 
     // País y ciudad
-    const country = data.country || "Desconocido";
+    const country = data.country || "Pais Desconocido";
     countryData[country] = (countryData[country] || 0) + 1;
+    const city = data.city || "Ciudad Desconocida";
+    cityData[city] = (cityData[city] || 0) + 1;
 
     // Signo zodiacal
     if (data.birthDate) {
@@ -309,8 +400,21 @@ export const fetchUsageData = async () => {
     // Notificaciones activadas
     if (data.notificationsEnabled) notificationsTrue++;
     else notificationsFalse++;
+
+    if (data.birthDate) {
+      const birthDateMs = data.birthDate.seconds * 1000;
+      const age = calculateAge(birthDateMs);
+      const ageGroup = `${Math.floor(age / 10) * 10}s`;
+      ageGroups[age] = (ageGroups[age] || 0) + 1;
+
+      const zodiac = getZodiacSign(birthDateMs);
+      zodiacSigns[zodiac] = (zodiacSigns[zodiac] || 0) + 1;
+    }
   });
   const data = {
+    zodiacSigns,
+    ageGroups,
+
     weeklyData: {
       labels: Object.keys(weeklyUsage),
       datasets: [
@@ -394,6 +498,16 @@ export const fetchUsageData = async () => {
         },
       ],
     },
+    cityData: {
+      labels: Object.keys(cityData),
+      datasets: [
+        {
+          label: "Usuarios por Ciudad",
+          data: Object.values(cityData),
+          backgroundColor: "#ef5350",
+        },
+      ],
+    },
     verifiedUserData: {
       labels: ["Verificados", "No Verificados"],
       datasets: [
@@ -417,7 +531,10 @@ export const fetchUsageData = async () => {
   };
 
   localStorage.setItem(CACHE_KEY, JSON.stringify(data));
-  localStorage.setItem(CACHE_EXPIRATION_KEY, new Date().getTime() + CACHE_DURATION);
+  localStorage.setItem(
+    CACHE_EXPIRATION_KEY,
+    new Date().getTime() + CACHE_DURATION
+  );
 
   return data;
 };

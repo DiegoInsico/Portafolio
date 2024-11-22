@@ -1,3 +1,4 @@
+/* Contenedor principal */
 .main-layout-container {
   display: flex;
   flex-direction: column;
@@ -10,9 +11,10 @@
   flex: 1;
 }
 
+/* Barra lateral */
 .main-layout-sidebar {
-  position: fixed; 
-  top: 60px; 
+  position: fixed;
+  top: 60px;
   left: 0;
   width: 210px;
   height: calc(100vh - 60px);
@@ -22,7 +24,29 @@
   flex-direction: column;
   padding: 1rem;
   overflow-y: auto;
-  z-index: 5; 
+  z-index: 5;
+  transition: width 0.3s ease;
+}
+
+.main-layout-sidebar.collapsed {
+  width: 50px;
+}
+
+.sidebar-toggle-btn {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer;
+  margin-bottom: 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: transform 0.3s ease;
+}
+
+.sidebar-toggle-btn:hover {
+  transform: scale(1.1);
 }
 
 .main-layout-title {
@@ -30,8 +54,15 @@
   font-weight: bold;
   color: #e5e7eb;
   padding: 0 1rem;
+  transition: opacity 0.3s ease;
 }
 
+.main-layout-title.collapsed {
+  opacity: 0;
+  visibility: hidden;
+}
+
+/* Navegación */
 .main-layout-nav {
   display: flex;
   flex-direction: column;
@@ -61,16 +92,35 @@
   color: #ffffff;
 }
 
-/* Iconos */
 .main-layout-icon {
   font-size: 1.5rem;
+  transition: transform 0.3s ease;
+}
+
+.main-layout-link span {
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.main-layout-sidebar.collapsed .main-layout-link span {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.main-layout-sidebar.collapsed .main-layout-icon {
+  transform: scale(1.2);
 }
 
 /* Contenido principal */
 .main-layout-content {
   flex: 1;
+  margin-left: 210px;
   padding: 2rem;
   overflow-y: auto;
+  transition: margin-left 0.3s ease;
+}
+
+.main-layout-sidebar.collapsed + .main-layout-content {
+  margin-left: 70px;
 }
 
 /* Vista de login */
