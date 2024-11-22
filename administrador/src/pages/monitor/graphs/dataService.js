@@ -1,6 +1,17 @@
+import { collection, getDocs, orderBy, query, Timestamp, where } from "firebase/firestore";
 import { db } from "../../../firebase";
-import { collection, getDocs, query, orderBy } from "firebase/firestore";
+import { getMetadata, getStorage, listAll, ref } from "firebase/storage";
 
+const CACHE_KEY = "usageDataCache";
+const CACHE_EXPIRATION_KEY = "usageDataCacheExpiration";
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutos
+
+const isCacheValid = () => {
+  const expirationTime = localStorage.getItem(CACHE_EXPIRATION_KEY);
+  return expirationTime && new Date().getTime() < Number(expirationTime);
+};
+
+// Función para obtener el signo zodiacal
 const getZodiacSign = (birthDate) => {
   const date = new Date(birthDate);
   const day = date.getDate();
@@ -20,7 +31,198 @@ const getZodiacSign = (birthDate) => {
   return "Capricornio";
 };
 
+
+// Función para obtener datos del dashboard
+export const fetchDashboardData = async () => {
+  try {
+    // Estadísticas generales
+    const usersSnapshot = await getDocs(collection(db, "users"));
+    const activeUsers = usersSnapshot.size;
+
+    const entriesSnapshot = await getDocs(collection(db, "entradas"));
+    let lastActivity = "";
+    let entriesUploaded = 0;
+
+    entriesSnapshot.forEach((doc) => {
+      const data = doc.data();
+      entriesUploaded++;
+      if (!lastActivity || data.fechaCreacion > lastActivity) {
+        lastActivity = data.fechaCreacion;
+      }
+    });
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const sessionsQuery = query(
+      collection(db, "sessions"),
+      where("timestamp", ">=", Timestamp.fromDate(today))
+    );
+
+    const sessionsSnapshot = await getDocs(sessionsQuery);
+    const dailyUserActivity = sessionsSnapshot.size;
+
+    const statsData = {
+      activeUsers,
+      lastActivity: lastActivity.toDate().toLocaleString(),
+      entriesUploaded,
+      dailyUserActivity,
+    };
+
+    // Canciones más escuchadas
+    const snapshot = await getDocs(collection(db, "entradas"));
+    const songCounts = {};
+
+    snapshot.forEach((doc) => {
+      const data = doc.data();
+      if (data.cancion) {
+        const songId = `${data.cancion.artist}-${data.cancion.name}`;
+        if (!songCounts[songId]) {
+          songCounts[songId] = {
+            artist: data.cancion.artist,
+            name: data.cancion.name,
+            albumImage: data.cancion.albumImage,
+            count: 0,
+          };
+        }
+        songCounts[songId].count += 1;
+      }
+    });
+
+    const sortedSongs = Object.values(songCounts).sort((a, b) => b.count - a.count);
+    const mostPlayedSongsData = sortedSongs.slice(0, 2);
+
+    // Tickets abiertos
+    const ticketsQuery = query(
+      collection(db, "tickets"),
+      where("status", "==", "abierto")
+    );
+    const ticketsSnapshot = await getDocs(ticketsQuery);
+
+    const openTicketsData = ticketsSnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+
+    // Datos de gráficos
+    const unverifiedUsersQuery = query(
+      collection(db, "users"),
+      where("isVerified", "==", false)
+    );
+    const unverifiedSnapshot = await getDocs(unverifiedUsersQuery);
+    const unverifiedCount = unverifiedSnapshot.size;
+
+    const categoryCount = {};
+    entriesSnapshot.forEach((doc) => {
+      const data = doc.data();
+      const categoria = data.categoria || "Sin categoría";
+      categoryCount[categoria] = (categoryCount[categoria] || 0) + 1;
+    });
+
+    const dailyCreations = {};
+    entriesSnapshot.forEach((doc) => {
+      const fechaCreacion = doc.data().fechaCreacion.toDate();
+      const dia = fechaCreacion.toLocaleDateString();
+      dailyCreations[dia] = (dailyCreations[dia] || 0) + 1;
+    });
+
+    const chartData = {
+      unverifiedUsers: {
+        labels: ["Usuarios sin verificar"],
+        datasets: [
+          {
+            label: "Usuarios sin verificar",
+            data: [unverifiedCount],
+            backgroundColor: "rgba(255, 99, 132, 0.6)",
+          },
+        ],
+      },
+      categoryUsage: {
+        labels: Object.keys(categoryCount),
+        datasets: [
+          {
+            label: "Categorías Usadas",
+            data: Object.values(categoryCount),
+            backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56"],
+          },
+        ],
+      },
+      creationPeak: {
+        labels: Object.keys(dailyCreations),
+        datasets: [
+          {
+            label: "Pico de Creaciones",
+            data: Object.values(dailyCreations),
+            backgroundColor: "rgba(75,192,192,0.4)",
+          },
+        ],
+      },
+    };
+
+    return {
+      statsData,
+      mostPlayedSongsData,
+      openTicketsData,
+      chartData,
+    };
+  } catch (error) {
+    console.error("Error obteniendo datos del dashboard:", error);
+    throw error;
+  }
+};
+
+// Función para obtener datos de almacenamiento
+export const fetchStorageData = async () => {
+  const storage = getStorage();
+  const storageRef = ref(storage, "/");
+  const storageData = { Imagen: 0, Video: 0, Audio: 0, Texto: 0 };
+
+  try {
+    const fileList = await listAll(storageRef);
+
+    for (const folder of fileList.prefixes) {
+      const folderRef = ref(storage, folder.fullPath);
+      const folderList = await listAll(folderRef);
+
+      for (const file of folderList.items) {
+        const metadata = await getMetadata(file);
+        const contentType = metadata.contentType;
+
+        if (contentType.startsWith("image/")) {
+          storageData.Imagen += 1;
+        } else if (contentType.startsWith("video/")) {
+          storageData.Video += 1;
+        } else if (
+          contentType.startsWith("audio/") ||
+          contentType === "application/ogg"
+        ) {
+          storageData.Audio += 1;
+        }
+      }
+    }
+
+    const entriesCollection = collection(db, "entradas");
+    const entriesSnapshot = await getDocs(entriesCollection);
+    const textEntriesCount = entriesSnapshot.docs.filter((doc) => doc.data().texto).length;
+
+    storageData.Texto = textEntriesCount;
+  } catch (error) {
+    console.error("Error al obtener datos de almacenamiento:", error);
+    throw new Error("Error al obtener datos de almacenamiento.");
+  }
+
+  return storageData;
+};
+
+// Función principal para obtener datos de uso
 export const fetchUsageData = async () => {
+  if (isCacheValid()) {
+    console.log("Usando datos del caché");
+    return JSON.parse(localStorage.getItem(CACHE_KEY));
+  }
+
+  console.log("Cargando datos desde la base de datos");
+
   const weeklyUsage = {};
   const hourlyRangeUsage = {
     "0-3": 0,
@@ -30,13 +232,17 @@ export const fetchUsageData = async () => {
     "16-19": 0,
     "20-23": 0,
   };
-  const countryData = {};
+  const categoryUsage = {};
+  const dailyCreations = {};
   const emotionCounts = {};
+  const countryData = {};
   const zodiacSigns = {};
-  const securityLevels = { level2: 0, level3: 0 };
-  const deceasedUsers = [];
   let premiumCount = 0;
   let nonPremiumCount = 0;
+  let verifiedTrue = 0;
+  let verifiedFalse = 0;
+  let notificationsTrue = 0;
+  let notificationsFalse = 0;
 
   const entradasSnapshot = await getDocs(
     query(collection(db, "entradas"), orderBy("fechaCreacion"))
@@ -45,7 +251,9 @@ export const fetchUsageData = async () => {
   entradasSnapshot.forEach((doc) => {
     const data = doc.data();
     const fechaCreacion = data.fechaCreacion.toDate();
+    const day = fechaCreacion.toLocaleDateString();
     const hour = fechaCreacion.getHours();
+    const category = data.categoria || "Sin categoría";
     const emotions = data.emociones || [];
 
     // Rango de horas
@@ -56,10 +264,16 @@ export const fetchUsageData = async () => {
     else if (hour >= 16 && hour <= 19) hourlyRangeUsage["16-19"]++;
     else if (hour >= 20 && hour <= 23) hourlyRangeUsage["20-23"]++;
 
+    // Categorías
+    categoryUsage[category] = (categoryUsage[category] || 0) + 1;
+
     // Emociones
     emotions.forEach((emotion) => {
       emotionCounts[emotion] = (emotionCounts[emotion] || 0) + 1;
     });
+
+    // Creaciones diarias
+    dailyCreations[day] = (dailyCreations[day] || 0) + 1;
 
     // Semana
     const startOfWeek = new Date(fechaCreacion);
@@ -74,6 +288,7 @@ export const fetchUsageData = async () => {
 
   usersSnapshot.forEach((doc) => {
     const data = doc.data();
+
     if (data.isPremium) premiumCount++;
     else nonPremiumCount++;
 
@@ -87,15 +302,15 @@ export const fetchUsageData = async () => {
       zodiacSigns[zodiac] = (zodiacSigns[zodiac] || 0) + 1;
     }
 
-    // Niveles de seguridad
-    if (data.level2Password) securityLevels.level2++;
-    if (data.level3Password) securityLevels.level3++;
+    // Verificados
+    if (data.isVerified) verifiedTrue++;
+    else verifiedFalse++;
 
-    // Usuarios descansando
-    if (data.isDeceased) deceasedUsers.push(data.displayName);
+    // Notificaciones activadas
+    if (data.notificationsEnabled) notificationsTrue++;
+    else notificationsFalse++;
   });
-
-  return {
+  const data = {
     weeklyData: {
       labels: Object.keys(weeklyUsage),
       datasets: [
@@ -118,18 +333,34 @@ export const fetchUsageData = async () => {
         },
       ],
     },
+    categoryUsageData: {
+      labels: Object.keys(categoryUsage),
+      datasets: [
+        {
+          label: "Categorías más utilizadas",
+          data: Object.values(categoryUsage),
+          backgroundColor: "#ffa726",
+        },
+      ],
+    },
+    dailyCreationsData: {
+      labels: Object.keys(dailyCreations),
+      datasets: [
+        {
+          label: "Creaciones Diarias",
+          data: Object.values(dailyCreations),
+          borderColor: "rgba(75, 192, 192, 1)",
+          fill: false,
+        },
+      ],
+    },
     emotionData: {
       labels: Object.keys(emotionCounts),
       datasets: [
         {
           label: "Frecuencia de emociones",
           data: Object.values(emotionCounts),
-          backgroundColor: [
-            "rgba(255,99,132,0.2)",
-            "rgba(54,162,235,0.2)",
-            "rgba(75,192,192,0.2)",
-            "rgba(153,102,255,0.2)",
-          ],
+          backgroundColor: "#66bb6a",
         },
       ],
     },
@@ -149,13 +380,7 @@ export const fetchUsageData = async () => {
         {
           label: "Distribución de Signos Zodiacales",
           data: Object.values(zodiacSigns),
-          backgroundColor: [
-            "#FF5733",
-            "#33FF57",
-            "#5733FF",
-            "#FFD700",
-            "#FF33A1",
-          ],
+          backgroundColor: "#42a5f5",
         },
       ],
     },
@@ -165,11 +390,34 @@ export const fetchUsageData = async () => {
         {
           label: "Usuarios por País",
           data: Object.values(countryData),
-          backgroundColor: ["#3f51b5", "#ff5722", "#8bc34a", "#ff9800"],
+          backgroundColor: "#ef5350",
         },
       ],
     },
-    securityLevels,
-    deceasedUsers,
+    verifiedUserData: {
+      labels: ["Verificados", "No Verificados"],
+      datasets: [
+        {
+          label: "Estado de Verificación",
+          data: [verifiedTrue, verifiedFalse],
+          backgroundColor: ["#4caf50", "#f44336"],
+        },
+      ],
+    },
+    notificationsUserData: {
+      labels: ["Notificaciones Activas", "Notificaciones Inactivas"],
+      datasets: [
+        {
+          label: "Estado de Notificaciones",
+          data: [notificationsTrue, notificationsFalse],
+          backgroundColor: ["#42a5f5", "#ef5350"],
+        },
+      ],
+    },
   };
+
+  localStorage.setItem(CACHE_KEY, JSON.stringify(data));
+  localStorage.setItem(CACHE_EXPIRATION_KEY, new Date().getTime() + CACHE_DURATION);
+
+  return data;
 };

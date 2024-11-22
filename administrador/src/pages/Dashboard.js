@@ -2,8 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Dashboard.css";
 import Container from "../components/container";
-import { collection, getDocs, query, where, orderBy, Timestamp } from "firebase/firestore";
-import { db } from "../firebase";
+import { fetchDashboardData } from "./monitor/graphs/dataService";
 import { Line, Pie, Bar } from "react-chartjs-2";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -18,7 +17,6 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-
 
 ChartJS.register(
   CategoryScale,
@@ -41,176 +39,43 @@ const Dashboard = () => {
   });
   const [mostPlayedSongs, setMostPlayedSongs] = useState([]);
   const [openTickets, setOpenTickets] = useState([]);
-  const [chartData, setChartData] = useState({
-    unverifiedUsers: null,
-    categoryUsage: null,
-    creationPeak: null,
-  });
+  const [chartData, setChartData] = useState({});
   const [selectedChart, setSelectedChart] = useState("creationPeak");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchStats = async () => {
+    const loadDashboardData = async () => {
       try {
-        const usersSnapshot = await getDocs(collection(db, "users"));
-        const activeUsers = usersSnapshot.size;
+        setLoading(true);
+        const {
+          statsData,
+          mostPlayedSongsData,
+          openTicketsData,
+          chartData,
+        } = await fetchDashboardData();
 
-        const entriesSnapshot = await getDocs(collection(db, "entradas"));
-        let lastActivity = "";
-        let entriesUploaded = 0;
-
-        entriesSnapshot.forEach((doc) => {
-          const data = doc.data();
-          entriesUploaded++;
-          if (!lastActivity || data.fechaCreacion > lastActivity) {
-            lastActivity = data.fechaCreacion;
-          }
-        });
-
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-
-        const sessionsQuery = query(
-          collection(db, "sessions"),
-          where("timestamp", ">=", Timestamp.fromDate(today))
-        );
-
-        const sessionsSnapshot = await getDocs(sessionsQuery);
-        const dailyUserActivity = sessionsSnapshot.size;
-
-        setStats({
-          activeUsers,
-          lastActivity: lastActivity.toDate().toLocaleString(),
-          entriesUploaded,
-          dailyUserActivity,
-        });
+        setStats(statsData);
+        setMostPlayedSongs(mostPlayedSongsData);
+        setOpenTickets(openTicketsData);
+        setChartData(chartData);
       } catch (error) {
-        console.error("Error obteniendo estadísticas de Firebase:", error);
+        console.error("Error cargando datos del dashboard:", error);
+        toast.error("Error al cargar datos del dashboard.");
+      } finally {
+        setLoading(false);
       }
     };
 
-    fetchStats();
+    loadDashboardData();
   }, []);
 
-  useEffect(() => {
-    const fetchMostPlayedSongs = async () => {
-      try {
-        const snapshot = await getDocs(collection(db, "entradas"));
-        const songCounts = {};
-
-        snapshot.forEach((doc) => {
-          const data = doc.data();
-          if (data.cancion) {
-            const songId = `${data.cancion.artist}-${data.cancion.name}`;
-            if (!songCounts[songId]) {
-              songCounts[songId] = {
-                artist: data.cancion.artist,
-                name: data.cancion.name,
-                albumImage: data.cancion.albumImage,
-                count: 0,
-              };
-            }
-            songCounts[songId].count += 1;
-          }
-        });
-
-        const sortedSongs = Object.values(songCounts).sort((a, b) => b.count - a.count);
-        setMostPlayedSongs(sortedSongs.slice(0, 2));
-      } catch (error) {
-        console.error("Error obteniendo canciones más escuchadas:", error);
-      }
-    };
-
-    fetchMostPlayedSongs();
-  }, []);
-
-  useEffect(() => {
-    const fetchOpenTickets = async () => {
-      try {
-        const ticketsQuery = query(
-          collection(db, "tickets"),
-          where("status", "==", "abierto")
-        );
-        const snapshot = await getDocs(ticketsQuery);
-
-        const openTicketsList = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-
-        setOpenTickets(openTicketsList);
-      } catch (error) {
-        console.error("Error obteniendo tickets abiertos:", error);
-      }
-    };
-
-    fetchOpenTickets();
-  }, []);
-
-  const fetchChartData = async () => {
-    try {
-      const unverifiedUsersQuery = query(
-        collection(db, "users"),
-        where("isVerified", "==", false)
-      );
-      const unverifiedSnapshot = await getDocs(unverifiedUsersQuery);
-      const unverifiedCount = unverifiedSnapshot.size;
-
-      const categoryCount = {};
-      const entriesSnapshot = await getDocs(collection(db, "entradas"));
-
-      entriesSnapshot.forEach((doc) => {
-        const data = doc.data();
-        const categoria = data.categoria || "Sin categoría";
-        categoryCount[categoria] = (categoryCount[categoria] || 0) + 1;
-      });
-
-      const dailyCreations = {};
-      entriesSnapshot.forEach((doc) => {
-        const fechaCreacion = doc.data().fechaCreacion.toDate();
-        const dia = fechaCreacion.toLocaleDateString();
-        dailyCreations[dia] = (dailyCreations[dia] || 0) + 1;
-      });
-
-      setChartData({
-        unverifiedUsers: {
-          labels: ["Usuarios sin verificar"],
-          datasets: [
-            {
-              label: "Usuarios sin verificar",
-              data: [unverifiedCount],
-              backgroundColor: "rgba(255, 99, 132, 0.6)",
-            },
-          ],
-        },
-        categoryUsage: {
-          labels: Object.keys(categoryCount),
-          datasets: [
-            {
-              label: "Categorías Usadas",
-              data: Object.values(categoryCount),
-              backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56"],
-            },
-          ],
-        },
-        creationPeak: {
-          labels: Object.keys(dailyCreations),
-          datasets: [
-            {
-              label: "Pico de Creaciones",
-              data: Object.values(dailyCreations),
-              backgroundColor: "rgba(75,192,192,0.4)",
-            },
-          ],
-        },
-      });
-    } catch (error) {
-      console.error("Error obteniendo datos de gráficos:", error);
-    }
-  };
-
-  useEffect(() => {
-    fetchChartData();
-  }, []);
+  if (loading) {
+    return (
+      <Container>
+        <div className="dashboard-loading">Cargando datos del dashboard...</div>
+      </Container>
+    );
+  }
 
   return (
     <Container>
@@ -234,7 +99,7 @@ const Dashboard = () => {
               </div>
             ))
           ) : (
-            <p>Cargando canciones...</p>
+            <p>No hay canciones disponibles.</p>
           )}
         </div>
         <div className="dashboard-charts">
@@ -261,7 +126,11 @@ const Dashboard = () => {
         <div className="dashboard-tickets">
           <h2>Tickets Abiertos</h2>
           {openTickets.length ? (
-            openTickets.map((ticket) => <p key={ticket.id}>{ticket.subject}</p>)
+            openTickets.map((ticket) => (
+              <div key={ticket.id} className="ticket-card">
+                <p>{ticket.subject}</p>
+              </div>
+            ))
           ) : (
             <p>No hay tickets abiertos.</p>
           )}
