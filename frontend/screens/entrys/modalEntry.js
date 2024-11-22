@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from "react";
 import {
-  Switch,
   Modal,
   View,
   Text,
@@ -20,7 +19,6 @@ import {
 import * as ImagePicker from "expo-image-picker";
 import RNPickerSelect from "react-native-picker-select";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import ColorPicker from "../../components/ui/ColorPicker";
 import { Audio } from "expo-av";
 import AudioRecorder from "../../components/general/audioComponent";
 import { MaterialIcons, Entypo, Feather } from "@expo/vector-icons";
@@ -41,10 +39,11 @@ import uuid from "react-native-uuid";
 import SegmentedControl from "@react-native-segmented-control/segmented-control";
 import { Video } from "expo-av";
 
-const ModalEntry = ({ visible, onClose }) => {
+const ModalEntry = ({ visible, onClose, category }) => {
   const [selectedType, setSelectedType] = useState("Galería");
   const [categoria, setCategoria] = useState("");
   const [texto, setTexto] = useState("");
+  const [nickname, setNickname] = useState("");
   const [audioUri, setAudioUri] = useState(null);
   const [sound, setSound] = useState(null);
   const [media, setMedia] = useState(null);
@@ -56,12 +55,16 @@ const ModalEntry = ({ visible, onClose }) => {
   const [enableRecuerdoDate, setEnableRecuerdoDate] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const [selectedColor, setSelectedColor] = useState("#fff");
   const [baul, setBaul] = useState(false);
   const today = new Date();
 
-  // Nuevo estado para controlar Texto o Audio
   const [selectedSubType, setSelectedSubType] = useState("Texto");
+
+  useEffect(() => {
+    if (category) {
+      setCategoria(category);
+    }
+  }, [category]);
 
   useEffect(() => {
     (async () => {
@@ -169,11 +172,9 @@ const ModalEntry = ({ visible, onClose }) => {
   };
 
   const handleGuardar = async () => {
-    // Obtener la instancia de autenticación
     const auth = getAuth();
-    const user = auth.currentUser; // Obtener el usuario autenticado
+    const user = auth.currentUser;
 
-    // Comprobamos el límite de entradas por nivel
     const userEntriesQuery = query(
       collection(db, "entradas"),
       where("userId", "==", user.uid),
@@ -190,7 +191,6 @@ const ModalEntry = ({ visible, onClose }) => {
       return;
     }
 
-    // Verificar si el usuario está autenticado
     if (!user) {
       Alert.alert(
         "Error",
@@ -199,9 +199,13 @@ const ModalEntry = ({ visible, onClose }) => {
       return;
     }
 
-    // Validaciones iniciales
     if (!categoria) {
       Alert.alert("Error", "Por favor, selecciona una categoría.");
+      return;
+    }
+
+    if (!nickname.trim()) {
+      Alert.alert("Error", "Por favor, asigna un apodo a la entrada.");
       return;
     }
 
@@ -228,6 +232,8 @@ const ModalEntry = ({ visible, onClose }) => {
       let audioURL = null;
       let cancionData = null;
       let emociones = [];
+
+      const colorAsignado = "#fff"; // Color de fondo neutro
 
       // Subir media (imagen o video) si existe
       if (media) {
@@ -279,20 +285,21 @@ const ModalEntry = ({ visible, onClose }) => {
       }
 
       const nuevaEntrada = {
-        userId: user.uid, // Añadir el ID del usuario autenticado
+        userId: user.uid,
         categoria,
+        nickname,
         texto: texto || null,
         audio: audioURL || null,
         cancion: cancionData || null,
         media: mediaURL || null,
         mediaType: mediaType || null,
-        color: selectedColor,
+        color: colorAsignado,
         baul,
         fechaCreacion: serverTimestamp(),
         fechaRecuerdo: enableRecuerdoDate ? selectedDate : null,
-        emociones, // Aquí guardamos las emociones detectadas
-        nivel, // Nivel de profundidad
-        isProtected: nivel === "2" || nivel === "3", // Seguridad adicional para niveles 2 y 3
+        emociones,
+        nivel,
+        isProtected: nivel === "2" || nivel === "3",
       };
 
       const docRef = await addDoc(collection(db, "entradas"), nuevaEntrada);
@@ -314,6 +321,7 @@ const ModalEntry = ({ visible, onClose }) => {
     setSelectedType("Galería");
     setCategoria("");
     setTexto("");
+    setNickname("");
     setAudioUri(null);
     setSound(null);
     setMedia(null);
@@ -321,9 +329,8 @@ const ModalEntry = ({ visible, onClose }) => {
     setCancion(null);
     setSelectedDate(new Date());
     setBaul(false);
-    setSelectedColor("#ffffff");
     setEnableRecuerdoDate(false);
-    setSelectedSubType("Texto"); // Resetear a "Texto" por defecto
+    setSelectedSubType("Texto");
   };
 
   const onChangeDate = (event, selectedDateValue) => {
@@ -344,18 +351,27 @@ const ModalEntry = ({ visible, onClose }) => {
       onRequestClose={onClose}
     >
       <SafeAreaView style={styles.safeArea}>
-        {/* Configurar el StatusBar */}
         <StatusBar
           barStyle="dark-content"
           translucent={false}
-          backgroundColor="#f0f0f0"
+          backgroundColor="rgba(0,0,0,0.5)"
         />
 
         <View style={styles.background}>
           <ScrollView contentContainerStyle={styles.modalContainer}>
             <View style={styles.modalContent}>
               {/* Título del Modal */}
-              <Text style={styles.titulo}>Crear Nuevo Instante</Text>
+              <Text style={styles.titulo}>Crear Nueva Entrada</Text>
+
+              {/* Campo de Apodo */}
+              <Text style={styles.label}>Apodo de la Entrada</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Ingresa un apodo"
+                placeholderTextColor="#888"
+                value={nickname}
+                onChangeText={setNickname}
+              />
 
               {/* Selector de Tipo usando SegmentedControl */}
               <SegmentedControl
@@ -374,11 +390,11 @@ const ModalEntry = ({ visible, onClose }) => {
                   setAudioUri(null);
                   setTexto("");
                   setSpotifyResults([]);
-                  setSelectedSubType("Texto"); // Resetear a "Texto" por defecto
+                  setSelectedSubType("Texto");
                 }}
-                tintColor="#4CAF50"
+                tintColor="#6200ee"
                 style={styles.segmentedControl}
-                fontStyle={{ color: "#333" }}
+                fontStyle={{ color: "#6200ee" }}
                 activeFontStyle={{ color: "#fff", fontWeight: "700" }}
               />
 
@@ -398,7 +414,7 @@ const ModalEntry = ({ visible, onClose }) => {
                             style={styles.eliminarIcono}
                             onPress={eliminarMedia}
                           >
-                            <MaterialIcons name="close" size={24} color="red" />
+                            <MaterialIcons name="close" size={24} color="#fff" />
                           </Pressable>
                         </View>
                       )}
@@ -419,7 +435,7 @@ const ModalEntry = ({ visible, onClose }) => {
                             style={styles.eliminarIcono}
                             onPress={eliminarMedia}
                           >
-                            <MaterialIcons name="close" size={24} color="red" />
+                            <MaterialIcons name="close" size={24} color="#fff" />
                           </Pressable>
                         </View>
                       )}
@@ -428,7 +444,7 @@ const ModalEntry = ({ visible, onClose }) => {
                           style={styles.iconoGaleria}
                           onPress={seleccionarMedia}
                         >
-                          <Entypo name="image" size={50} color="#4CAF50" />
+                          <Entypo name="image" size={50} color="#6200ee" />
                           <Text style={styles.iconoGaleriaTexto}>
                             Seleccionar Media
                           </Text>
@@ -445,7 +461,7 @@ const ModalEntry = ({ visible, onClose }) => {
                           <TextInput
                             style={styles.input}
                             placeholder="Buscar canción en Spotify"
-                            placeholderTextColor="#ccc"
+                            placeholderTextColor="#888"
                             value={searchQuery}
                             onChangeText={(text) => {
                               setSearchQuery(text);
@@ -518,7 +534,7 @@ const ModalEntry = ({ visible, onClose }) => {
                             style={styles.eliminarIcono}
                             onPress={eliminarCancion}
                           >
-                            <MaterialIcons name="close" size={24} color="red" />
+                            <MaterialIcons name="close" size={24} color="#fff" />
                           </Pressable>
                         </View>
                       )}
@@ -528,7 +544,9 @@ const ModalEntry = ({ visible, onClose }) => {
                   {/* Selector para elegir entre Texto o Audio */}
                   <SegmentedControl
                     values={["Texto", "Audio"]}
-                    selectedIndex={["Texto", "Audio"].indexOf(selectedSubType)}
+                    selectedIndex={["Texto", "Audio"].indexOf(
+                      selectedSubType
+                    )}
                     onChange={(event) => {
                       const index = event.nativeEvent.selectedSegmentIndex;
                       const type = ["Texto", "Audio"][index];
@@ -539,9 +557,9 @@ const ModalEntry = ({ visible, onClose }) => {
                         setTexto("");
                       }
                     }}
-                    tintColor="#4CAF50"
+                    tintColor="#6200ee"
                     style={styles.subSegmentedControl}
-                    fontStyle={{ color: "#333" }}
+                    fontStyle={{ color: "#6200ee" }}
                     activeFontStyle={{ color: "#fff", fontWeight: "700" }}
                   />
 
@@ -553,10 +571,10 @@ const ModalEntry = ({ visible, onClose }) => {
                         multiline
                         numberOfLines={4}
                         placeholder="Añade un comentario"
-                        placeholderTextColor="#999"
+                        placeholderTextColor="#888"
                         value={texto}
                         onChangeText={setTexto}
-                        scrollEnabled={true} // Habilitar scroll en el TextInput
+                        scrollEnabled={true}
                       />
                     </View>
                   ) : (
@@ -568,7 +586,7 @@ const ModalEntry = ({ visible, onClose }) => {
                         <View style={styles.audioPreview}>
                           <Text style={styles.audioText}>Audio Grabado</Text>
                           <Pressable onPress={eliminarAudio}>
-                            <MaterialIcons name="close" size={20} color="red" />
+                            <MaterialIcons name="close" size={20} color="#6200ee" />
                           </Pressable>
                         </View>
                       )}
@@ -585,10 +603,10 @@ const ModalEntry = ({ visible, onClose }) => {
                       multiline
                       numberOfLines={4}
                       placeholder="Cuéntame algo"
-                      placeholderTextColor="#999"
+                      placeholderTextColor="#888"
                       value={texto}
                       onChangeText={setTexto}
-                      scrollEnabled={true} // Habilitar scroll en el TextInput
+                      scrollEnabled={true}
                     />
                   </View>
                 </View>
@@ -601,21 +619,12 @@ const ModalEntry = ({ visible, onClose }) => {
                     <View style={styles.audioPreview}>
                       <Text style={styles.audioText}>Audio Grabado</Text>
                       <Pressable onPress={eliminarAudio}>
-                        <MaterialIcons name="close" size={20} color="red" />
+                        <MaterialIcons name="close" size={20} color="#6200ee" />
                       </Pressable>
                     </View>
                   )}
                 </View>
               )}
-
-              {/* Selector de Color */}
-              <View style={styles.pickerContent}>
-                <ColorPicker
-                  style={styles.recuadroPicker}
-                  selectedColor={selectedColor}
-                  onColorSelect={(color) => setSelectedColor(color)}
-                />
-              </View>
 
               {/* Nivel de profundidad */}
               <Text style={styles.label}>Nivel de profundidad</Text>
@@ -634,74 +643,18 @@ const ModalEntry = ({ visible, onClose }) => {
                 value={nivel}
               />
 
-              {/* Categoría */}
-              <Text style={styles.label}>Categoría</Text>
-              <RNPickerSelect
-                onValueChange={(value) => setCategoria(value)}
-                items={[
-                  { label: "😊 Alegría", value: "Alegría" },
-                  { label: "🙏 Gratitud", value: "Gratitud" },
-                  { label: "❤️ Amor", value: "Amor" },
-                  { label: "💔 Pérdida", value: "Pérdida" },
-                  { label: "🤔 Reflexión", value: "Reflexión" },
-                  { label: "💪 Desafío", value: "Desafío" },
-                ]}
-                placeholder={{
-                  label: "Selecciona una categoría",
-                  value: "",
-                  color: "#9EA0A4",
-                }}
-                style={pickerSelectStyles}
-                value={categoria}
-              />
-
-              {/* Fecha del Recuerdo */}
-              <View style={styles.fechaRecuerdoContainer}>
-                <View style={styles.fechaRecuerdoHeader}>
-                  <Feather name="calendar" size={20} color="#FFD700" />
-                  <Text style={styles.fechaRecuerdoLabel}>Fecha de Recuerdo</Text>
-                  <Switch
-                    value={enableRecuerdoDate}
-                    onValueChange={(value) => {
-                      setEnableRecuerdoDate(value);
-                      if (!value) {
-                        setSelectedDate(new Date());
-                      }
-                    }}
-                    trackColor={{ false: "#767577", true: "#FFD700" }}
-                    thumbColor={enableRecuerdoDate ? "#FFD700" : "#f4f3f4"}
-                  />
-                </View>
-
-                {enableRecuerdoDate && selectedDate && (
-                  <View style={styles.recuerdoDateDisplay}>
-                    <Text style={styles.recuerdoDateText}>
-                      {selectedDate.toLocaleDateString("es-ES")}
-                    </Text>
-                    <Pressable onPress={() => setShowDatePicker(true)}>
-                      <Feather name="edit" size={18} color="#FFD700" />
-                    </Pressable>
-                  </View>
-                )}
-
-                {showDatePicker && (
-                  <DateTimePicker
-                    value={selectedDate || new Date()}
-                    mode="date"
-                    display={Platform.OS === "ios" ? "spinner" : "default"}
-                    onChange={onChangeDate}
-                    maximumDate={today}
-                    style={styles.dateTimePicker}
-                  />
-                )}
-              </View>
-
               {/* Botones de Acción */}
               <View style={styles.botonContainer}>
-                <Pressable style={styles.botonGuardar} onPress={handleGuardar}>
+                <Pressable
+                  style={[styles.botonGuardar, { backgroundColor: "#6200ee" }]}
+                  onPress={handleGuardar}
+                >
                   <Text style={styles.botonTexto}>Guardar</Text>
                 </Pressable>
-                <Pressable style={styles.botonCancelar} onPress={onClose}>
+                <Pressable
+                  style={[styles.botonCancelar, { backgroundColor: "#b00020" }]}
+                  onPress={onClose}
+                >
                   <Text style={styles.botonTexto}>Cancelar</Text>
                 </Pressable>
               </View>
@@ -735,18 +688,17 @@ const styles = StyleSheet.create({
   modalContainer: {
     justifyContent: "center",
     alignItems: "center",
-    padding: 1,
+    padding: 10,
   },
   modalContent: {
-    width: "90%", // Ajuste para ocupar el 90% de la pantalla
-    height: "97%", // Ajuste para ocupar el 97% de la pantalla en altura
-    backgroundColor: "#f0f0f0", // Fondo sólido y moderno
-    borderRadius: 20, // Bordes más redondeados para un aspecto más suave
-    padding: 30,
-    elevation: 10, // Sombra más sutil y moderna
+    width: "95%",
+    backgroundColor: "#fff",
+    borderRadius: 20,
+    padding: 20,
+    elevation: 10,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
+    shadowOpacity: 0.25,
     shadowRadius: 4.65,
   },
 
@@ -754,54 +706,55 @@ const styles = StyleSheet.create({
   titulo: {
     fontSize: 24,
     fontWeight: "700",
-    marginBottom: 5, // Aumentado para más espacio
+    marginBottom: 15,
     textAlign: "center",
     color: "#333",
   },
   label: {
-    marginTop: 1, // Aumentado para más espacio
-    marginBottom: 5, // Aumentado para más espacio
+    marginTop: 10,
+    marginBottom: 5,
     fontWeight: "600",
     color: "#333",
     fontSize: 16,
+    textAlign: "center",
   },
 
   /* ====== Input Styles ====== */
   input: {
     borderWidth: 1,
     borderColor: "#ccc",
-    borderRadius: 12,
-    padding: 10, // Aumentado para más espacio interno
+    borderRadius: 8,
+    padding: 12,
     textAlignVertical: "top",
     backgroundColor: "#f9f9f9",
     color: "#333",
     width: "100%",
-    marginBottom: 10, // Aumentado para más espacio entre elementos
+    marginBottom: 15,
     fontSize: 16,
   },
   inputTexto: {
     borderWidth: 1,
     borderColor: "#ccc",
-    borderRadius: 12,
-    padding: 10, // Aumentado para más espacio interno
+    borderRadius: 8,
+    padding: 12,
     textAlignVertical: "top",
-    backgroundColor: "#f1f1f1",
-    height: 100, // Altura fija
-    width: 260,
-    marginBottom: 10, // Aumentado para más espacio entre elementos
+    backgroundColor: "#f9f9f9",
+    height: 120,
+    width: "100%",
+    marginBottom: 15,
     color: "#333",
     fontSize: 16,
   },
 
   /* ====== Segmented Control Styles ====== */
   segmentedControl: {
-    marginBottom: 25, // Aumentado para más espacio
+    marginBottom: 25,
     width: "100%",
-    height: 45, // Aumentado para mejor visibilidad
-    borderRadius: 30, // Mantener bordes redondeados
+    height: 45,
+    borderRadius: 30,
   },
   subSegmentedControl: {
-    marginBottom: 15, // Espacio entre el segmented control y el contenido
+    marginBottom: 15,
     width: "100%",
     height: 40,
     borderRadius: 20,
@@ -811,7 +764,7 @@ const styles = StyleSheet.create({
   switchContentContainer: {
     justifyContent: "center",
     alignItems: "center",
-    marginVertical: 15, // Aumentado para más espacio
+    marginVertical: 15,
     width: "100%",
   },
   textoContainer: {
@@ -827,7 +780,7 @@ const styles = StyleSheet.create({
   audioPreview: {
     flexDirection: "row",
     alignItems: "center",
-    marginTop: 15, // Aumentado para más espacio
+    marginTop: 15,
   },
   audioText: {
     flex: 1,
@@ -838,24 +791,24 @@ const styles = StyleSheet.create({
   /* ====== Botón Styles ====== */
   botonContainer: {
     flexDirection: "row",
-    marginTop: 5, // Aumentado para más espacio
+    marginTop: 20,
     width: "100%",
   },
   botonGuardar: {
-    backgroundColor: "#4CAF50",
-    paddingVertical: 16, // Aumentado para mayor altura
-    borderRadius: 12,
+    backgroundColor: "#6200ee",
+    paddingVertical: 14,
+    borderRadius: 8,
     flex: 1,
-    marginRight: 12, // Aumentado para más espacio entre botones
+    marginRight: 10,
     alignItems: "center",
     justifyContent: "center",
   },
   botonCancelar: {
-    backgroundColor: "#f44336",
-    paddingVertical: 16, // Aumentado para mayor altura
-    borderRadius: 12,
+    backgroundColor: "#b00020",
+    paddingVertical: 14,
+    borderRadius: 8,
     flex: 1,
-    marginLeft: 12, // Aumentado para más espacio entre botones
+    marginLeft: 10,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -870,11 +823,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     position: "relative",
     width: "100%",
-    marginTop: 5,
     height: 200,
     borderRadius: 12,
     overflow: "hidden",
-    backgroundColor: "#f0f0f0",
+    backgroundColor: "#e0e0e0",
+    marginBottom: 15,
   },
   mediaPreview: {
     width: "100%",
@@ -890,27 +843,34 @@ const styles = StyleSheet.create({
   },
   eliminarIcono: {
     position: "absolute",
-    top: 15, // Aumentado para mejor posición
-    right: 15, // Aumentado para mejor posición
-    backgroundColor: "rgba(255, 255, 255, 0.8)",
-    padding: 6, // Aumentado para mejor toque
+    top: 10,
+    right: 10,
+    backgroundColor: "rgba(0,0,0,0.6)",
+    padding: 6,
     borderRadius: 20,
   },
 
   /* ====== Galería y Spotify Styles ====== */
   iconoGaleria: {
     alignSelf: "center",
-    marginVertical: 20, // Aumentado para más espacio
+    marginVertical: 20,
+    alignItems: "center",
+    width: "100%",
+    height: 200,
+    borderRadius: 12,
+    backgroundColor: "#6200ee",
+    justifyContent: "center",
     alignItems: "center",
   },
   iconoGaleriaTexto: {
-    marginTop: 15, // Aumentado para más espacio
+    marginTop: 15,
     fontSize: 16,
-    color: "#4CAF50",
+    color: "#fff",
+    textAlign: "center",
   },
   spotifyContainer: {
     width: "100%",
-    marginVertical: 15, // Aumentado para más espacio
+    marginVertical: 15,
     position: "relative",
   },
   spotifyResultsContainer: {
@@ -925,20 +885,20 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
   spotifyResults: {
-    paddingHorizontal: 20, // Aumentado para más espacio interno
+    paddingHorizontal: 20,
   },
   trackContainer: {
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: "#f5f5f5",
-    padding: 12, // Aumentado para más espacio interno
+    padding: 12,
     borderRadius: 10,
-    marginBottom: 12, // Aumentado para más espacio entre tracks
+    marginBottom: 12,
   },
   trackImage: {
-    width: 60, // Aumentado para mejor visibilidad
-    height: 60, // Aumentado para mejor visibilidad
-    marginRight: 20, // Aumentado para más espacio entre imagen y texto
+    width: 60,
+    height: 60,
+    marginRight: 20,
     borderRadius: 10,
   },
   trackInfo: {
@@ -952,7 +912,7 @@ const styles = StyleSheet.create({
   trackArtist: {
     color: "#666",
     fontSize: 14,
-    marginTop: 6, // Aumentado para mejor separación
+    marginTop: 6,
   },
   trackNameSelect: {
     fontWeight: "700",
@@ -967,69 +927,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginTop: 4,
   },
-
-  /* ====== Color Picker Styles ====== */
-  pickerContent: {
-    borderRadius: 12,
-    alignItems: "center",
-    marginBottom: 20, // Aumentado para más espacio
-    width: "100%",
-  },
-  recuadroPicker: {
-    width: "100%", // Ajustado para que no se extienda fuera del modal
-    marginBottom: 10, // Aumentado para más espacio
-  },
-
-  /* ====== Fecha de Recuerdo Styles ====== */
-  fechaRecuerdoContainer: {
-    marginBottom: 10, // Aumentado para más espacio
-    width: "100%",
-    paddingHorizontal: 10,
-    paddingVertical: 20, // Aumentado para más espacio
-    backgroundColor: "#f9f9f9",
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: "#ccc",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  fechaRecuerdoHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  fechaRecuerdoLabel: {
-    color: "#333",
-    fontSize: 16,
-    fontWeight: "600",
-    marginLeft: 5,
-  },
-  recuerdoDateDisplay: {
-    marginTop: 15, // Aumentado para más espacio
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  recuerdoDateText: {
-    color: "#333",
-    fontSize: 16,
-    fontWeight: "500",
-  },
-  dateTimePicker: {
-    width: "100%",
-    backgroundColor: "#fff",
-  },
-
-  /* ====== Additional Styles ====== */
-  switchItem: {
-    marginBottom: 10,
-  },
-  datePickerPressable: {
-    marginBottom: 10,
-  },
 });
 
 // Estilos para react-native-picker-select
@@ -1040,7 +937,7 @@ const pickerSelectStyles = StyleSheet.create({
     paddingHorizontal: 12,
     borderWidth: 1,
     borderColor: "#ccc",
-    borderRadius: 12,
+    borderRadius: 8,
     color: "black",
     paddingRight: 30,
     backgroundColor: "#f9f9f9",
@@ -1053,7 +950,7 @@ const pickerSelectStyles = StyleSheet.create({
     paddingVertical: 10,
     borderWidth: 1,
     borderColor: "#ccc",
-    borderRadius: 12,
+    borderRadius: 8,
     color: "black",
     paddingRight: 30,
     backgroundColor: "#f9f9f9",

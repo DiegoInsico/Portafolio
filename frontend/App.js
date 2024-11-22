@@ -11,6 +11,19 @@ import ModalEntry from "./screens/entrys/modalEntry";
 
 import { AuthProvider, AuthContext } from "./context/AuthContext"; // Importar AuthContext
 
+// Importar Provider de React Native Paper
+import { Provider as PaperProvider, DefaultTheme } from 'react-native-paper';
+
+// Definir un tema personalizado si lo deseas
+const theme = {
+  ...DefaultTheme,
+  colors: {
+    ...DefaultTheme.colors,
+    primary: '#3498DB', // Cambia esto según tu paleta de colores
+    accent: '#FFD700',  // Cambia esto según tu paleta de colores
+  },
+};
+
 const Main = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const { loading } = useContext(AuthContext);
@@ -31,7 +44,8 @@ const Main = () => {
       }
     };
 
-    const subscription = Linking.addEventListener("url", handleOpenURL);
+    // React Native 0.65 y posteriores usan addListener en lugar de addEventListener
+    Linking.addListener("url", handleOpenURL);
 
     Linking.getInitialURL().then((url) => {
       if (url && url.includes("shortcut=crearEntrada")) {
@@ -40,8 +54,8 @@ const Main = () => {
     });
 
     return () => {
-      // Eliminar correctamente el listener
-      subscription.remove();
+      // Eliminar correctamente el listener usando removeListener
+      Linking.removeListener("url", handleOpenURL);
     };
   }, []);
 
@@ -60,9 +74,12 @@ const Main = () => {
 export default function App() {
   return (
     <AuthProvider>
-      <NavigationContainer>
-        <Main />
-      </NavigationContainer>
+      {/* Envolver con PaperProvider */}
+      <PaperProvider theme={theme}>
+        <NavigationContainer>
+          <Main />
+        </NavigationContainer>
+      </PaperProvider>
     </AuthProvider>
   );
 }

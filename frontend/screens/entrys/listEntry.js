@@ -1,45 +1,37 @@
 // ListEntry.js
+
 import React, { useEffect, useState } from "react";
 import {
-  ScrollView,
+  FlatList,
   Text,
   Pressable,
   StyleSheet,
-  Modal,
   View,
   ActivityIndicator,
   SafeAreaView,
   ImageBackground,
-  Dimensions,
   TextInput,
   TouchableOpacity,
   Alert,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
-import PolaroidCard from "./polaroidCard";
-import SongCard from "./songCard";
-import TextCard from "./textCard";
-import AudioCard from "./AudioCard"; // Importa el AudioCard si lo usas
 import { listenToEntries, listenToBeneficiaries, db } from "../../utils/firebase";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
-import EntryItem from "./entryItem";
-import ProtectedAccess from "../../components/ProtectedAccess";
+import EntryCard from "./EntryCard"; // Asegúrate de que la ruta sea correcta
+import { useNavigation } from "@react-navigation/native";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons"; // Para el ícono de búsqueda y candado
 
-const ListEntry = ({ user }) => {
+const ListEntry = () => {
   const [entries, setEntries] = useState([]);
   const [beneficiaries, setBeneficiaries] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [selectedEntry, setSelectedEntry] = useState(null);
-  const [selectedLevel, setSelectedLevel] = useState("1");
-  const [showProtectedModal, setShowProtectedModal] = useState(false);
-  const [accessGranted, setAccessGranted] = useState(false);
+  const [selectedLevel, setSelectedLevel] = useState("1"); // 1: Restringido, 2: Rojo, 3: Confidencial
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredEntries, setFilteredEntries] = useState([]);
-  const [password, setPassword] = useState("");
   const [userPasswords, setUserPasswords] = useState({ level2Password: "", level3Password: "" });
-  const [selectedEntryId, setSelectedEntryId] = useState(null); // Nuevo estado para rastrear la tarjeta seleccionada
+  const navigation = useNavigation();
 
   useEffect(() => {
     const auth = getAuth();
@@ -84,53 +76,41 @@ const ListEntry = ({ user }) => {
           entry.emociones?.some((emotion) =>
             emotion.toLowerCase().includes(searchQuery.toLowerCase())
           ) ||
-          entry.fechaCreacion
-            ?.toDate()
-            .toLocaleDateString("es-ES")
-            .includes(searchQuery))
+          (entry.fechaCreacion &&
+            new Date(entry.fechaCreacion.seconds * 1000)
+              .toLocaleDateString("es-ES")
+              .includes(searchQuery)))
     );
     setFilteredEntries(filtered);
   }, [entries, searchQuery, selectedLevel]);
 
   const handleLevelChange = (level) => {
     setSelectedLevel(level);
-    setAccessGranted(false);
-    if (level === "1") {
-      setAccessGranted(true);
-    } else {
-      setShowProtectedModal(true);
-    }
-  };
-
-  const closeModal = () => {
-    setSelectedEntry(null);
-    setSelectedEntryId(null); // Reiniciar el ID de la tarjeta seleccionada
-  };
-
-  const onAccessGranted = () => {
-    setAccessGranted(true);
-    setShowProtectedModal(false);
-    setPassword("");
-  };
-
-  const handlePasswordSubmit = () => {
-    const correctPassword =
-      selectedLevel === "2" ? userPasswords.level2Password : userPasswords.level3Password;
-
-    if (password === correctPassword) {
-      onAccessGranted();
-    } else {
-      Alert.alert("Error", "Contraseña incorrecta. Inténtalo de nuevo.");
-    }
   };
 
   const getBackgroundImage = (level) => {
-    if (level === "1") {
-      return require("../../assets/background/level1.jpg");
-    } else if (level === "2") {
-      return require("../../assets/background/level2.jpg");
-    } else if (level === "3") {
-      return require("../../assets/background/level3.jpg");
+    switch (level) {
+      case "1":
+        return require("../../assets/background/level1.webp"); // Reemplaza con la ruta correcta
+      case "2":
+        return require("../../assets/background/level1.webp"); // Reemplaza con la ruta correcta
+      case "3":
+        return require("../../assets/background/level1.webp"); // Reemplaza con la ruta correcta
+      default:
+        return require("../../assets/background/level1.webp"); // Imagen por defecto
+    }
+  };
+
+  const getLockIconColor = (level) => {
+    switch (level) {
+      case "1":
+        return "#00BFFF"; // Celeste
+      case "2":
+        return "#FF0000"; // Rojo
+      case "3":
+        return "#000000"; // Negro
+      default:
+        return "#FFFFFF"; // Blanco por defecto
     }
   };
 
@@ -152,32 +132,52 @@ const ListEntry = ({ user }) => {
         resizeMode="cover"
       >
         <View style={styles.overlay}>
-          {/* Barra de búsqueda */}
+          {/* Barra de búsqueda modernizada */}
           <View style={styles.searchContainer}>
+            <Icon name="magnify" size={24} color="#333333" style={styles.searchIcon} />
             <TextInput
               style={styles.searchInput}
               placeholder="Buscar entradas..."
-              placeholderTextColor="#aaa"
+              placeholderTextColor="#888888"
               value={searchQuery}
               onChangeText={setSearchQuery}
+              accessible={true}
+              accessibilityLabel="Barra de búsqueda"
+              accessibilityHint="Permite buscar entradas por texto, emociones o fecha de creación"
             />
+            {searchQuery.length > 0 && (
+              <TouchableOpacity onPress={() => setSearchQuery("")} accessible={true} accessibilityLabel="Limpiar búsqueda" accessibilityHint="Limpia el texto de búsqueda">
+                <Icon name="close-circle" size={24} color="#333333" style={styles.searchIcon} />
+              </TouchableOpacity>
+            )}
           </View>
 
-          {/* Selector de Nivel */}
+          {/* Selector de Nivel actualizado */}
           <View style={styles.levelSelector}>
-            <Text style={styles.label}>Profundidad:</Text>
+            <Text style={styles.label}>Nivel:</Text>
             <View style={styles.pickerContainer}>
               <Picker
                 selectedValue={selectedLevel}
-                onValueChange={handleLevelChange}
+                onValueChange={(itemValue) => handleLevelChange(itemValue)}
                 style={styles.picker}
-                dropdownIconColor="#4B4E6D"
+                mode="dropdown"
+                accessibilityLabel="Selector de nivel"
+                accessibilityHint="Selecciona el nivel de las entradas que deseas ver"
               >
-                <Picker.Item label="Diario" value="1" />
-                <Picker.Item label="Personal" value="2" />
-                <Picker.Item label="Íntimo" value="3" />
+                <Picker.Item label="Restringido" value="1" />
+                <Picker.Item label="Rojo" value="2" />
+                <Picker.Item label="Confidencial" value="3" />
               </Picker>
             </View>
+            <Icon
+              name="lock"
+              size={24}
+              color={getLockIconColor(selectedLevel)}
+              style={styles.lockIcon}
+              accessible={true}
+              accessibilityLabel={`Icono de nivel ${selectedLevel}`}
+              accessibilityHint="Indica el nivel de seguridad de las entradas seleccionadas"
+            />
           </View>
 
           {/* Lista de Entradas */}
@@ -186,115 +186,41 @@ const ListEntry = ({ user }) => {
               <ActivityIndicator size="large" color="#4B4E6D" />
             </View>
           ) : (
-            <ScrollView
-              contentContainerStyle={styles.container}
-              showsVerticalScrollIndicator={false}
-            >
-              {accessGranted && filteredEntries.length === 0 ? (
+            <FlatList
+              data={filteredEntries}
+              keyExtractor={(item) => item.id}
+              renderItem={({ item }) => (
+                <EntryCard
+                  entry={item}
+                  onPress={() =>
+                    navigation.navigate("EntryDetailScreen", { // Asegúrate de usar "EntryDetailScreen"
+                      item,
+                      beneficiaries,
+                    })
+                  }
+                />
+              )}
+              ListEmptyComponent={
                 <Text style={styles.message}>
                   No hay entradas disponibles para el nivel seleccionado
                 </Text>
-              ) : (
-                filteredEntries.map((entry) => {
-                  let EntryComponent = TextCard; // Predeterminado
-
-                  if (entry.mediaType === "image" || entry.mediaType === "video") {
-                    EntryComponent = PolaroidCard;
-                  } else if (entry.cancion) {
-                    EntryComponent = SongCard;
-                  } else if (entry.audio && !entry.cancion && !entry.mediaType) {
-                    EntryComponent = AudioCard;
-                  }
-
-                  return (
-                    <EntryComponent
-                    key={entry.id}
-                    entry={entry}
-                    isSelected={entry.id === selectedEntryId}
-                    onPress={() => {
-                      setSelectedEntry(entry);
-                      setSelectedEntryId(entry.id); // Establecer el ID de la tarjeta seleccionada
-                    }}
-                  />
-                  );
-                })
-              )}
-            </ScrollView>
-          )}
-
-          {/* Modal que muestra los detalles de la entrada */}
-          {selectedEntry && (
-            <Modal
-              animationType="slide"
-              transparent={true}
-              visible={!!selectedEntry}
-              onRequestClose={closeModal}
-            >
-              <View style={styles.modalOverlay}>
-                <View style={styles.modalContent}>
-                  <EntryItem
-                    item={selectedEntry}
-                    onClose={closeModal}
-                    beneficiaries={beneficiaries}
-                  />
-                </View>
-              </View>
-            </Modal>
-          )}
-
-          {/* Modal de acceso protegido */}
-          {showProtectedModal && (
-            <Modal
-              animationType="fade"
-              transparent={true}
-              visible={showProtectedModal}
-              onRequestClose={() => setShowProtectedModal(false)}
-            >
-              <View style={styles.fullScreenModalOverlay}>
-                <View style={styles.fullScreenModalContent}>
-                  <Text style={styles.modalTitle}>Acceso Protegido</Text>
-                  <Text style={styles.modalMessage}>
-                    Estás intentando acceder a un nivel más profundo de tus
-                    entradas. Este nivel requiere una verificación de acceso.
-                  </Text>
-                  <TextInput
-                    style={styles.passwordInput}
-                    placeholder="Introduce la contraseña"
-                    placeholderTextColor="#999"
-                    secureTextEntry
-                    value={password}
-                    onChangeText={setPassword}
-                  />
-                  <TouchableOpacity
-                    style={styles.modalButton}
-                    onPress={handlePasswordSubmit}
-                  >
-                    <Text style={styles.modalButtonText}>Confirmar</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={styles.modalCancelButton}
-                    onPress={() => {
-                      setShowProtectedModal(false);
-                      setSelectedLevel("1");
-                    }}
-                  >
-                    <Text style={styles.modalCancelButtonText}>Cancelar</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            </Modal>
+              }
+              contentContainerStyle={styles.listContainer}
+              showsVerticalScrollIndicator={false}
+            />
           )}
         </View>
       </ImageBackground>
     </SafeAreaView>
   );
+
 };
 
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: "transparent",
-    paddingTop: 25, // Espaciado superior para evitar superposición con la barra de estado
+    paddingTop: 50,
   },
   background: {
     flex: 1,
@@ -303,25 +229,28 @@ const styles = StyleSheet.create({
   },
   overlay: {
     flex: 1,
-    backgroundColor: "rgba(0,0,0,0.5)", // Fondo oscuro y semitransparente
+    backgroundColor: "rgba(0,0,0,0.2)", // Fondo oscuro y semitransparente
     padding: 12,
-    paddingBottom: 60,
+    paddingBottom: 10,
   },
   searchContainer: {
-    backgroundColor: "#ffffff",
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#FFFFFF",
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 8,
     marginHorizontal: 16,
     marginTop: 20,
     marginBottom: 10,
-    flexDirection: "row",
-    alignItems: "center",
     shadowColor: "#000000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 2,
+  },
+  searchIcon: {
+    marginRight: 8,
   },
   searchInput: {
     flex: 1,
@@ -333,7 +262,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: 16,
     paddingVertical: 8,
-    backgroundColor: "#ffffff",
+    backgroundColor: "#FFFFFF",
     borderRadius: 12,
     marginHorizontal: 16,
     marginBottom: 10,
@@ -359,108 +288,23 @@ const styles = StyleSheet.create({
     height: 40,
     color: "#333333",
     backgroundColor: "transparent",
-  },  
+  },
+  lockIcon: {
+    marginLeft: 10,
+  },
   loadingContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
   },
-  pressable: {
-    width: "100%",
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 10,
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.5)",
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 12,
-  },
-  modalContent: {
-    width: "100%",
-    maxHeight: "90%",
-    backgroundColor: "#fff",
-    borderRadius: 10,
-    padding: 8,
+  listContainer: {
+    paddingBottom: 20,
   },
   message: {
     textAlign: "center",
     marginTop: 20,
     fontSize: 16,
     color: "#fff",
-  },
-  fullScreenModalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.85)", // Cubre toda la pantalla
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  fullScreenModalContent: {
-    width: "90%",
-    backgroundColor: "#F0E4C2", // Fondo suave y claro
-    borderRadius: 15,
-    padding: 25,
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.4,
-    shadowRadius: 5,
-    elevation: 8,
-  },
-  modalTitle: {
-    fontSize: 22,
-    fontWeight: "bold",
-    color: "#4B4E6D",
-    marginBottom: 10,
-    textAlign: "center",
-  },
-  modalMessage: {
-    fontSize: 16,
-    color: "#4B4E6D",
-    textAlign: "center",
-    marginBottom: 10,
-    lineHeight: 22,
-  },
-  passwordInput: {
-    width: "100%",
-    height: 50,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: "#C2A66B",
-    padding: 10,
-    backgroundColor: "#fff",
-    color: "#4B4E6D",
-    marginBottom: 20,
-  },
-  modalButton: {
-    backgroundColor: "#FFD700",
-    borderRadius: 8,
-    paddingVertical: 12,
-    paddingHorizontal: 30,
-    marginVertical: 5,
-    alignItems: "center",
-    shadowColor: "#FFD700",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.7,
-    shadowRadius: 5,
-  },
-  modalButtonText: {
-    fontSize: 16,
-    color: "#1C2833",
-    fontWeight: "bold",
-  },
-  modalCancelButton: {
-    marginTop: 15,
-    paddingVertical: 12,
-    paddingHorizontal: 30,
-    borderRadius: 8,
-  },
-  modalCancelButtonText: {
-    fontSize: 16,
-    color: "#B0AFAF",
-    fontWeight: "bold",
   },
 });
 

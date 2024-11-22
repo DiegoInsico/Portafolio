@@ -21,7 +21,10 @@ import CrearTicket from "../../screens/soporte/CrearTicket";
 import ListaTickets from "../../screens/soporte/ListaTickets";
 import DetalleTicket from "../../screens/soporte/DetalleTicket";
 import SubirCertificado from "../../screens/user/SubirCertificado";
+import ListEntry from "../../screens/entrys/ListEntry";
 import { AuthContext } from "../../context/AuthContext";
+import EntryScreen from "../../screens/entrys/EntryScreen";
+import EntryDetailScreen from "../../screens/entrys/EntryDetailScreen";
 
 const Stack = createStackNavigator();
 
@@ -52,7 +55,7 @@ export default function AppNavigator() {
         headerTintColor: "#FFD700", // Color de iconos (flecha de retroceso, etc.)
         headerTitleAlign: "center", // Alinear el título al centro
         headerStyle: {
-          height: 70, // Reducir altura del header
+          height: 90, // Reducir altura del header
           backgroundColor: "transparent",
           shadowColor: "transparent", // Eliminar sombra en iOS
           elevation: 0, // Eliminar sombra en Android
@@ -129,6 +132,23 @@ export default function AppNavigator() {
             name="SubirCertificado"
             component={SubirCertificado}
             options={{ title: "Subir Certificado" }}
+          />
+          <Stack.Screen
+            name="ListEntry"
+            component={ListEntry}
+            options={{
+              title: "Listado de Instancias",
+            }}
+          />
+          <Stack.Screen
+            name="Entry"
+            component={EntryScreen}
+            options={{ title: "Instancias" }}
+          />
+          <Stack.Screen
+            name="EntryDetailScreen"
+            component={EntryDetailScreen}
+            options={{ title: "Detalle" }}
           />
         </>
       ) : (

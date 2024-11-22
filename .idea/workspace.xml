@@ -6,9 +6,14 @@
   <component name="ChangeListManager">
     <list default="true" id="2137b152-a29a-4d26-8781-e8af1c953a9c" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/components/general/EmotionFlag.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/App.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/App.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/components/audioPlayer.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/components/audioPlayer.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/components/navigation/AppNavigator.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/components/navigation/AppNavigator.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/components/navigation/MainTabs.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/components/navigation/MainTabs.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/screens/entrys/AudioCard.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/screens/entrys/AudioCard.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/components/navigation/sideBarMenu.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/components/navigation/sideBarMenu.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/screens/entrys/entryItem.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/screens/entrys/entryItem.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/screens/entrys/listEntry.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/screens/entrys/listEntry.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/screens/entrys/modalEntry.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/screens/entrys/modalEntry.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/screens/entrys/polaroidCard.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/screens/entrys/polaroidCard.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/screens/entrys/songCard.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/screens/entrys/songCard.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/screens/entrys/textCard.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/screens/entrys/textCard.js" afterDir="false" />

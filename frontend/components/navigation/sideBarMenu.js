@@ -14,7 +14,7 @@ export default function SideBarMenu({
   isVisible,
   toggleMenu,
   navigateToHome,
-  navigateToListEntries,
+  navigateToEntries,
   navigateToProfile,
   navigateToSettings,
   navigateToTestigos,
@@ -56,7 +56,7 @@ export default function SideBarMenu({
             <Text style={styles.menuText}>Inicio</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.menuItem} onPress={navigateToListEntries}>
+          <TouchableOpacity style={styles.menuItem} onPress={navigateToEntries}>
             <FontAwesome name="tasks" size={24} color="#fff" />
             <Text style={styles.menuText}>Entradas</Text>
           </TouchableOpacity>

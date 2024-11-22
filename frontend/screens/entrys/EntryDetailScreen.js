@@ -1,4 +1,4 @@
-// EntryItem.js
+// EntryDetailScreen.js
 
 import React, { useState, useEffect } from "react";
 import {
@@ -38,6 +38,7 @@ import { Video } from "expo-av";
 import AudioPlayer from "../../components/audioPlayer";
 import { Picker } from "@react-native-picker/picker";
 import { MaterialIcons, Feather } from "@expo/vector-icons";
+import { useRoute, useNavigation } from "@react-navigation/native";
 
 // Función para determinar el color del texto basado en el color de fondo
 const getContrastingTextColor = (bgColor) => {
@@ -46,32 +47,17 @@ const getContrastingTextColor = (bgColor) => {
   const r = parseInt(color.substring(0, 2), 16);
   const g = parseInt(color.substring(2, 4), 16);
   const b = parseInt(color.substring(4, 6), 16);
-  
+
   // Calcular la luminancia
   const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-  
+
   return luminance > 0.5 ? "#000000" : "#FFFFFF";
 };
 
-const EntryItem = ({ item, onClose, beneficiaries }) => {
-  if (!item) {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.errorText}>
-          No hay datos disponibles para esta entrada.
-        </Text>
-        <Button
-          mode="contained"
-          onPress={onClose}
-          style={styles.fullWidthButton}
-          accessibilityLabel="Cerrar detalle de entrada"
-          accessibilityHint="Cierra el detalle de la entrada actual"
-        >
-          Cerrar
-        </Button>
-      </View>
-    );
-  }
+const EntryDetailScreen = () => {
+  const route = useRoute();
+  const navigation = useNavigation();
+  const { item, beneficiaries } = route.params || {};
 
   // Estados
   const [addBeneficiary, setAddBeneficiary] = useState(false);
@@ -86,11 +72,6 @@ const EntryItem = ({ item, onClose, beneficiaries }) => {
   const [isAddReflexionModalVisible, setIsAddReflexionModalVisible] =
     useState(false);
   const [nuevaReflexion, setNuevaReflexion] = useState("");
-
-  // Estados para fecha de recuerdo
-  const [enableRecuerdoDate, setEnableRecuerdoDate] = useState(false);
-  const [recuerdoDate, setRecuerdoDate] = useState(null);
-  const [showRecuerdoDatePicker, setShowRecuerdoDatePicker] = useState(false);
 
   // Formateo de fechas
   const creationDateTime = item.fechaCreacion
@@ -114,7 +95,7 @@ const EntryItem = ({ item, onClose, beneficiaries }) => {
     : "Hora no disponible";
 
   // Obtener color de la categoría desde la base de datos
-  const categoryColor = item.color || "#1E1E1E"; // Color por defecto si no está definido
+  const categoryColor = item.color || "#000"; // Color por defecto si no está definido
   const buttonTextColor = getContrastingTextColor(categoryColor);
 
   // Efecto para obtener beneficiario
@@ -173,60 +154,6 @@ const EntryItem = ({ item, onClose, beneficiaries }) => {
 
     fetchReflexiones();
   }, [item.id]);
-
-  // Efecto para obtener fecha de recuerdo
-  useEffect(() => {
-    const fetchRecuerdoDate = async () => {
-      if (item.fechaRecuerdo) {
-        setEnableRecuerdoDate(true);
-        setRecuerdoDate(item.fechaRecuerdo.toDate());
-      }
-    };
-
-    fetchRecuerdoDate();
-  }, [item.fechaRecuerdo]);
-
-  // Manejador de cambio de fecha de recuerdo
-  const onChangeRecuerdoDate = (event, selectedDate) => {
-    setShowRecuerdoDatePicker(false);
-    if (selectedDate) {
-      setRecuerdoDate(selectedDate);
-      asignarFechaRecuerdo(selectedDate);
-    }
-  };
-
-  // Asignar fecha de recuerdo
-  const asignarFechaRecuerdo = async (date) => {
-    try {
-      const entryRef = doc(db, "entradas", item.id);
-      await updateDoc(entryRef, {
-        fechaRecuerdo: date,
-      });
-      Alert.alert("Éxito", "Fecha de recuerdo actualizada correctamente.");
-    } catch (error) {
-      console.error("Error al asignar fecha de recuerdo:", error);
-      Alert.alert("Error", "Ocurrió un error al asignar la fecha de recuerdo.");
-    }
-  };
-
-  // Eliminar fecha de recuerdo
-  const eliminarFechaRecuerdo = async () => {
-    try {
-      const entryRef = doc(db, "entradas", item.id);
-      await updateDoc(entryRef, {
-        fechaRecuerdo: null,
-      });
-      setEnableRecuerdoDate(false);
-      setRecuerdoDate(null);
-      Alert.alert("Éxito", "Fecha de recuerdo eliminada correctamente.");
-    } catch (error) {
-      console.error("Error al eliminar fecha de recuerdo:", error);
-      Alert.alert(
-        "Error",
-        "Ocurrió un error al eliminar la fecha de recuerdo."
-      );
-    }
-  };
 
   // Asignar beneficiario
   const handleAssignBeneficiary = async () => {
@@ -302,12 +229,7 @@ const EntryItem = ({ item, onClose, beneficiaries }) => {
     }
 
     try {
-      const reflexionesRef = collection(
-        db,
-        "entradas",
-        item.id,
-        "reflexiones"
-      );
+      const reflexionesRef = collection(db, "entradas", item.id, "reflexiones");
       await addDoc(reflexionesRef, {
         texto: nuevaReflexion.trim(),
         fecha: new Date(),
@@ -325,7 +247,7 @@ const EntryItem = ({ item, onClose, beneficiaries }) => {
   const renderEntryContent = () => {
     if (item.media && item.mediaType === "image") {
       return (
-        <Card style={[styles.card, { backgroundColor: "#1E1E1E" }]}>
+        <Card style={[styles.card]}>
           <Card.Cover
             source={
               !imageError && item.media
@@ -439,46 +361,39 @@ const EntryItem = ({ item, onClose, beneficiaries }) => {
       <View style={styles.mainContainer}>
         {/* Encabezado con Fondo Negro */}
         <View style={styles.headerBackground}>
-          <View style={styles.headerContainer}>
-            <Text style={styles.headerTitle}>Detalle de la Entrada</Text>
-            <TouchableOpacity
-              style={[styles.closeButton, { backgroundColor: categoryColor }]}
-              onPress={onClose}
-            >
-              <MaterialIcons name="close" size={24} color={buttonTextColor} />
-            </TouchableOpacity>
-          </View>
           {/* Fecha de creación */}
           <Text style={styles.creationDate}>
-            Creado el: {formattedCreationDate} a las {formattedCreationTime}
+            Creado el {formattedCreationDate} a las {formattedCreationTime}
           </Text>
           {/* Línea Divisoria */}
           <Divider style={styles.divider} />
-        </View>
 
-        {/* Contenido de la entrada */}
-        <View style={styles.entryContentContainer}>{renderEntryContent()}</View>
+          {/* Información General */}
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Contenido</Text>
+            {/* Contenido de la entrada */}
+            {renderEntryContent()}
+          </View>
 
-        {/* Reflexiones */}
-        <View style={styles.reflectionsContainer}>
+          {/* Línea Divisoria */}
+          <Divider style={styles.divider} />
+
+          {/* Reflexiones */}
           <View style={styles.reflectionsHeader}>
             <Text style={styles.reflectionsTitle}>
               Reflexiones ({reflexiones.length})
             </Text>
             <Button
               icon="plus"
-              mode="contained"
               onPress={() => setIsAddReflexionModalVisible(true)}
               style={[
                 styles.addReflectionButton,
                 { backgroundColor: categoryColor },
               ]}
-              labelStyle={{ color: buttonTextColor }}
-              contentStyle={{ flexDirection: "row-reverse" }}
+              labelStyle={{ color: textColor }}
               accessibilityLabel="Añadir reflexión"
               accessibilityHint="Abre un diálogo para agregar una nueva reflexión"
             >
-              Añadir
             </Button>
           </View>
           {reflexiones.length > 0 ? (
@@ -487,9 +402,9 @@ const EntryItem = ({ item, onClose, beneficiaries }) => {
               onPress={() => setIsReflexionModalVisible(true)}
               style={[
                 styles.viewReflectionsButton,
-                { borderColor: categoryColor, backgroundColor: "#1E1E1E" },
+                { backgroundColor: categoryColor },
               ]}
-              labelStyle={{ color: categoryColor }}
+              labelStyle={{ color: textColor }}
               uppercase={false}
               accessibilityLabel="Ver reflexiones"
               accessibilityHint="Abre un diálogo para ver todas las reflexiones"
@@ -497,195 +412,102 @@ const EntryItem = ({ item, onClose, beneficiaries }) => {
               Ver Reflexiones
             </Button>
           ) : (
-            <Text style={styles.noReflectionsText}>No hay reflexiones aún.</Text>
+            <Text style={styles.noReflectionsText}>
+              No hay reflexiones aún.
+            </Text>
           )}
-        </View>
 
-        {/* Beneficiario */}
-        <View style={styles.beneficiaryContainer}>
-          {isLoading ? (
-            <ActivityIndicator animating={true} color={categoryColor} />
-          ) : beneficiary ? (
-            <>
-              {!addBeneficiary ? (
-                <Card
-                  style={[
-                    styles.beneficiaryCard,
-                    { backgroundColor: categoryColor },
-                  ]}
-                >
-                  <Card.Title
-                    title={beneficiary.name}
-                    subtitle={beneficiary.email}
-                    titleStyle={{ color: buttonTextColor }}
-                    subtitleStyle={{
-                      color: getContrastingTextColor(categoryColor),
-                    }}
-                    left={(props) =>
-                      beneficiary.profileImage ? (
-                        <Avatar.Image
-                          size={40}
-                          source={{ uri: beneficiary.profileImage }}
-                        />
-                      ) : (
-                        <Avatar.Icon
-                          size={40}
-                          icon="account"
-                          color={buttonTextColor}
-                          style={{ backgroundColor: "transparent" }}
-                        />
-                      )
-                    }
-                  />
-                  <Card.Actions style={styles.cardActions}>
-                    <Button
-                      mode="outlined"
-                      onPress={() => setAddBeneficiary(true)}
-                      style={[
-                        styles.fullWidthButton,
-                        { borderColor: categoryColor, marginRight: 10 },
-                      ]}
-                      labelStyle={{ color: buttonTextColor }}
-                      accessibilityLabel="Cambiar beneficiario"
-                      accessibilityHint="Abre opciones para cambiar el beneficiario asignado"
-                    >
-                      Cambiar
-                    </Button>
+          <View style={styles.beneficiarySection}>
+            {isLoading ? (
+              <ActivityIndicator animating={true} color={categoryColor} />
+            ) : (
+              <View style={styles.beneficiaryCard}>
+                {/* Foto del beneficiario */}
+                <Avatar.Image
+                  size={60}
+                  source={
+                    beneficiary?.profileImage
+                      ? { uri: beneficiary.profileImage }
+                      : require("../../assets/images/placeholder.png")
+                  }
+                  style={styles.beneficiaryAvatar}
+                />
+
+                {/* Información del beneficiario */}
+                <View style={styles.beneficiaryInfo}>
+                  <Text style={styles.beneficiaryName}>
+                    {beneficiary ? beneficiary.name : "Sin beneficiario"}
+                  </Text>
+                  <Text style={styles.beneficiaryEmail}>
+                    {beneficiary
+                      ? beneficiary.email
+                      : "Selecciona un beneficiario."}
+                  </Text>
+                </View>
+
+                {/* Acciones cuando hay beneficiario */}
+                {beneficiary && (
+                  <View style={styles.beneficiaryActions}>
                     <Button
                       mode="contained"
-                      onPress={handleRemoveBeneficiary}
-                      style={[styles.fullWidthButton, styles.removeButton]}
-                      labelStyle={{ color: "#FFFFFF" }}
-                      accessibilityLabel="Eliminar beneficiario"
-                      accessibilityHint="Elimina el beneficiario asignado a esta entrada"
+                      onPress={handleRemoveBeneficiary} // Elimina el beneficiario asignado
+                      style={[styles.beneficiaryButton, styles.removeButton]}
                     >
-                      Eliminar
+                      X
                     </Button>
-                  </Card.Actions>
-                </Card>
-              ) : (
-                <Card
-                  style={[
-                    styles.beneficiaryCard,
-                    { backgroundColor: "#1E1E1E" },
-                  ]}
-                >
-                  <Card.Content>
-                    <Text style={styles.beneficiaryPrompt}>
-                      Cambiar Beneficiario
-                    </Text>
-                    <Picker
-                      selectedValue={selectedBeneficiary}
-                      onValueChange={(itemValue) =>
-                        setSelectedBeneficiary(itemValue)
+                  </View>
+                )}
+                {/* Picker cuando no hay beneficiario o se selecciona "Cambiar" */}
+                {!beneficiary || addBeneficiary ? (
+                  <Picker
+                    selectedValue={selectedBeneficiary}
+                    onValueChange={async (itemValue) => {
+                      setSelectedBeneficiary(itemValue);
+                      const beneficiaryData = beneficiaries.find(
+                        (b) => b.id === itemValue
+                      );
+                      if (beneficiaryData) {
+                        try {
+                          const entryRef = doc(db, "entradas", item.id);
+                          await updateDoc(entryRef, {
+                            beneficiary: {
+                              id: beneficiaryData.id,
+                              name: beneficiaryData.name,
+                              email: beneficiaryData.email,
+                              profileImage: beneficiaryData.profileImage,
+                            },
+                          });
+                          setBeneficiary(beneficiaryData);
+                          setAddBeneficiary(false);
+                          Alert.alert(
+                            "Éxito",
+                            "Beneficiario asignado correctamente."
+                          );
+                        } catch (error) {
+                          console.error(
+                            "Error al asignar beneficiario: ",
+                            error
+                          );
+                          Alert.alert(
+                            "Error",
+                            "No se pudo asignar el beneficiario."
+                          );
+                        }
                       }
-                      style={styles.fullWidthPicker}
-                      dropdownIconColor={categoryColor}
-                      itemStyle={{ color: "#FFFFFF", height: 50 }}
-                      accessibilityLabel="Selector de beneficiarios"
-                      accessibilityHint="Selecciona un beneficiario de la lista"
-                    >
-                      <Picker.Item
-                        label="Selecciona un beneficiario"
-                        value=""
-                      />
-                      {beneficiaries.length > 0 ? (
-                        beneficiaries.map((beneficiary) => (
-                          <Picker.Item
-                            key={beneficiary.id}
-                            label={beneficiary.name}
-                            value={beneficiary.id}
-                          />
-                        ))
-                      ) : (
-                        <Picker.Item
-                          label="No hay beneficiarios disponibles"
-                          value=""
-                        />
-                      )}
-                    </Picker>
-                    <Button
-                      mode="contained"
-                      onPress={handleAssignBeneficiary}
-                      style={[
-                        styles.fullWidthButton,
-                        { backgroundColor: categoryColor, marginBottom: 10 },
-                      ]}
-                      labelStyle={{ color: buttonTextColor }}
-                      accessibilityLabel="Asignar beneficiario"
-                      accessibilityHint="Asigna el beneficiario seleccionado a esta entrada"
-                    >
-                      Asignar
-                    </Button>
-                    <Button
-                      mode="text"
-                      onPress={() => setAddBeneficiary(false)}
-                      style={styles.cancelChangeButton}
-                      labelStyle={{ color: "#888888" }}
-                      accessibilityLabel="Cancelar cambio de beneficiario"
-                      accessibilityHint="Cancela el cambio de beneficiario"
-                    >
-                      Cancelar
-                    </Button>
-                  </Card.Content>
-                </Card>
-              )}
-            </>
-          ) : (
-            <Card
-              style={[
-                styles.beneficiaryCard,
-                { backgroundColor: "#1E1E1E" },
-              ]}
-            >
-              <Card.Content>
-                <Text style={styles.beneficiaryPrompt}>
-                  ¿Agregar Beneficiario?
-                </Text>
-                <Picker
-                  selectedValue={selectedBeneficiary}
-                  onValueChange={(itemValue) => setSelectedBeneficiary(itemValue)}
-                  style={styles.fullWidthPicker}
-                  dropdownIconColor={categoryColor}
-                  itemStyle={{ color: "#FFFFFF", height: 50 }}
-                  accessibilityLabel="Selector de beneficiarios"
-                  accessibilityHint="Selecciona un beneficiario de la lista"
-                >
-                  <Picker.Item
-                    label="Selecciona un beneficiario"
-                    value=""
-                  />
-                  {beneficiaries.length > 0 ? (
-                    beneficiaries.map((beneficiary) => (
-                      <Picker.Item
-                        key={beneficiary.id}
-                        label={beneficiary.name}
-                        value={beneficiary.id}
-                      />
-                    ))
-                  ) : (
-                    <Picker.Item
-                      label="No hay beneficiarios disponibles"
-                      value=""
-                    />
-                  )}
-                </Picker>
-                <Button
-                  mode="contained"
-                  onPress={handleAssignBeneficiary}
-                  style={[
-                    styles.fullWidthButton,
-                    { backgroundColor: categoryColor },
-                  ]}
-                  labelStyle={{ color: buttonTextColor }}
-                  accessibilityLabel="Asignar beneficiario"
-                  accessibilityHint="Asigna el beneficiario seleccionado a esta entrada"
-                >
-                  Asignar
-                </Button>
-              </Card.Content>
-            </Card>
-          )}
+                    }}
+                    style={styles.fullWidthPicker}
+                    dropdownIconColor="#666"
+                    itemStyle={{ color: "#000", height: 50 }}
+                  >
+                    <Picker.Item label="Selecciona un beneficiario" value="" />
+                    {beneficiaries.map((b) => (
+                      <Picker.Item key={b.id} label={b.name} value={b.id} />
+                    ))}
+                  </Picker>
+                ) : null}
+              </View>
+            )}
+          </View>
         </View>
 
         {/* Modal para listar reflexiones */}
@@ -693,19 +515,16 @@ const EntryItem = ({ item, onClose, beneficiaries }) => {
           <Dialog
             visible={isReflexionModalVisible}
             onDismiss={() => setIsReflexionModalVisible(false)}
-            style={{ backgroundColor: categoryColor }}
+            style={styles.dialogContainer}
           >
-            <Dialog.Title style={{ color: buttonTextColor }}>
+            <Dialog.Title style={{ color: textColor }}>
               Listado de Reflexiones
             </Dialog.Title>
             <Dialog.Content>
               {reflexiones.map((reflexion) => (
                 <Card
                   key={reflexion.id}
-                  style={[
-                    styles.reflexionCard,
-                    { backgroundColor: "#2C2C2C" },
-                  ]}
+                  style={[styles.reflexionCard, { backgroundColor: "#2C2C2C" }]}
                 >
                   <Card.Content>
                     <Paragraph style={styles.reflexionTexto}>
@@ -716,11 +535,11 @@ const EntryItem = ({ item, onClose, beneficiaries }) => {
                         ? new Date(
                             reflexion.fecha.seconds * 1000
                           ).toLocaleDateString("es-ES", {
-                              weekday: "long",
-                              year: "numeric",
-                              month: "long",
-                              day: "numeric",
-                            })
+                            weekday: "long",
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
+                          })
                         : "Fecha no disponible"}
                     </Text>
                   </Card.Content>
@@ -735,8 +554,14 @@ const EntryItem = ({ item, onClose, beneficiaries }) => {
             <Dialog.Actions>
               <Button
                 onPress={() => setIsReflexionModalVisible(false)}
-                style={{ color: buttonTextColor }}
-                mode="text"
+                mode="contained"
+                style={[
+                  styles.fullWidthButtonR,
+                  { backgroundColor: categoryColor },
+                ]}
+                labelStyle={{ color: buttonTextColor }}
+                accessibilityLabel="Cerrar reflexiones"
+                accessibilityHint="Cierra el listado de reflexiones"
               >
                 Cerrar
               </Button>
@@ -749,39 +574,46 @@ const EntryItem = ({ item, onClose, beneficiaries }) => {
           <Dialog
             visible={isAddReflexionModalVisible}
             onDismiss={() => setIsAddReflexionModalVisible(false)}
-            style={{ backgroundColor: categoryColor }}
+            style={styles.dialogContainer}
           >
-            <Dialog.Title style={{ color: buttonTextColor }}>
+            <Dialog.Title style={{ color: textColor }}>
               Agregar Reflexión
             </Dialog.Title>
             <Dialog.Content>
               <TextInput
                 label="Escribe tu reflexión aquí"
-                mode="outlined"
-                multiline
-                numberOfLines={4}
                 value={nuevaReflexion}
                 onChangeText={setNuevaReflexion}
                 style={styles.fullWidthTextInput}
                 theme={{
-                  colors: { text: "#FFFFFF", primary: categoryColor },
+                  colors: { text: "#0000", primary: categoryColor },
                 }}
-                accessibilityLabel="Campo de texto para reflexión"
-                accessibilityHint="Escribe una nueva reflexión para esta entrada"
               />
             </Dialog.Content>
             <Dialog.Actions>
               <Button
                 onPress={() => setIsAddReflexionModalVisible(false)}
-                style={{ color: buttonTextColor }}
-                mode="text"
+                mode="contained"
+                style={[
+                  styles.fullWidthButton,
+                  { backgroundColor: categoryColor },
+                ]}
+                labelStyle={{ color: buttonTextColor }}
+                accessibilityLabel="Cancelar agregar reflexión"
+                accessibilityHint="Cancela la acción de agregar una nueva reflexión"
               >
                 Cancelar
               </Button>
               <Button
                 onPress={handleAgregarReflexion}
-                style={{ color: buttonTextColor }}
-                mode="text"
+                mode="contained"
+                style={[
+                  styles.fullWidthButton,
+                  { backgroundColor: categoryColor },
+                ]}
+                labelStyle={{ color: buttonTextColor }}
+                accessibilityLabel="Guardar reflexión"
+                accessibilityHint="Guarda la nueva reflexión agregada"
               >
                 Guardar
               </Button>
@@ -793,15 +625,24 @@ const EntryItem = ({ item, onClose, beneficiaries }) => {
   );
 };
 
+// Color global para el texto
+const textColor = "#fff"; // Cambiar este valor para ajustar el color del texto en toda la pantalla
+
 const styles = StyleSheet.create({
+  // Contenedor principal del ScrollView
   scrollContainer: {
     padding: 0,
     flexGrow: 1,
   },
+
+  // Contenedor principal del contenido
   mainContainer: {
     width: "90%",
     alignItems: "center",
+    paddingVertical: 80,
   },
+
+  // Contenedor genérico para la pantalla
   container: {
     alignItems: "center",
     justifyContent: "center",
@@ -809,43 +650,59 @@ const styles = StyleSheet.create({
     backgroundColor: "#121212", // Fondo oscuro si no hay entrada
     flex: 1,
   },
+
+  // Texto de error
   errorText: {
-    color: "#E74C3C",
+    color: "#E74C3C", // Rojo para errores
     fontSize: 16,
     marginBottom: 20,
     textAlign: "center",
   },
+
+  // Fondo del encabezado
   headerBackground: {
-    backgroundColor: "#000000", // Fondo negro para el encabezado
+    backgroundColor: "#1E1E1E", // Fondo negro
     paddingVertical: 15,
     paddingHorizontal: 20,
     width: "100%",
     borderRadius: 8,
+    alignItems: "center",
   },
+
+  // Contenedor del encabezado
   headerContainer: {
     flexDirection: "row",
     alignItems: "center",
+    width: "100%",
     position: "relative",
   },
+
+  // Título del encabezado
   headerTitle: {
     flex: 1,
     fontSize: 24,
     fontWeight: "bold",
-    color: "#FFFFFF", // Texto blanco para fondo negro
+    color: textColor,
     textAlign: "center",
   },
+
+  // Botón para cerrar
   closeButton: {
     position: "absolute",
     right: 0,
     padding: 6,
     borderRadius: 20,
   },
+
+  // Línea divisoria
   divider: {
     marginTop: 10,
     backgroundColor: "#444444",
     height: 1,
     width: "100%",
   },
+
+  // Fecha de creación
   creationDate: {
     fontSize: 14,
     color: "#BBBBBB",
@@ -853,32 +710,46 @@ const styles = StyleSheet.create({
     textAlign: "center",
     width: "100%",
   },
-  entryContentContainer: {
-    marginBottom: 20,
+
+  // Contenedor de secciones generales
+  section: {
     width: "100%",
+    marginBottom: 20,
     alignItems: "center",
-    padding: 10,
   },
+
+  // Título de cada sección
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: textColor,
+    marginBottom: 10,
+    textAlign: "center",
+    width: "100%",
+  },
+
+  // Estilo genérico de tarjetas
   card: {
     width: "100%",
     borderRadius: 10,
     marginBottom: 20,
     overflow: "hidden",
-    elevation: 3,
-    shadowColor: "#000000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
   },
+
+  // Imagen dentro de las tarjetas
   cardImage: {
     height: 200,
   },
+
+  // Texto dentro de las tarjetas
   cardText: {
     fontSize: 16,
-    color: "#FFFFFF",
+    color: textColor,
     textAlign: "justify",
     marginTop: 10,
   },
+
+  // Contenedor de videos
   videoContainer: {
     width: "100%",
     height: 200,
@@ -886,23 +757,28 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     overflow: "hidden",
   },
+
+  // Estilo del video
   video: {
     width: "100%",
     height: "100%",
   },
+
+  // Contenedor de reflexiones
   reflectionsContainer: {
     padding: 15,
     borderRadius: 8,
     marginBottom: 20,
     width: "100%",
     alignItems: "center",
-    backgroundColor: "#1E1E1E",
     elevation: 2,
     shadowColor: "#000000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 4,
   },
+
+  // Encabezado de reflexiones
   reflectionsHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -910,29 +786,41 @@ const styles = StyleSheet.create({
     width: "100%",
     marginBottom: 10,
   },
+
+  // Título de reflexiones
   reflectionsTitle: {
     fontSize: 20,
     fontWeight: "bold",
-    color: "#FFFFFF",
+    color: textColor,
   },
+
+  // Botón para añadir reflexiones
   addReflectionButton: {
+    flex: 1,
     borderRadius: 5,
-    width: "100%", // Ocupa todo el ancho disponible
+    flex: 1,
+    marginLeft: 10,
+    width: 20,
   },
+
+  // Botón para ver reflexiones
   viewReflectionsButton: {
     marginTop: 10,
     width: "100%",
     borderWidth: 1,
     borderRadius: 5,
     padding: 8,
-    backgroundColor: "#1E1E1E",
   },
+
+  // Texto cuando no hay reflexiones
   noReflectionsText: {
     color: "#888888",
     fontSize: 14,
     marginTop: 10,
     textAlign: "center",
   },
+
+  // Contenedor del beneficiario
   beneficiaryContainer: {
     padding: 15,
     borderRadius: 8,
@@ -946,40 +834,51 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 4,
   },
+
+  // Tarjeta del beneficiario
   beneficiaryCard: {
     width: "100%",
     borderRadius: 10,
     overflow: "hidden",
-    backgroundColor: "#1E1E1E", // Fondo predeterminado, se puede sobrescribir dinámicamente
+    backgroundColor: "#1E1E1E",
+    marginBottom: 10,
   },
+
+  // Texto de ayuda para el beneficiario
   beneficiaryPrompt: {
     fontSize: 18,
-    color: "#FFFFFF",
+    color: textColor,
     marginBottom: 10,
     textAlign: "center",
   },
+
+  // Estilo genérico de los Picker
   picker: {
     height: 50,
     width: "100%",
-    color: "#FFFFFF",
+    color: textColor,
     backgroundColor: "#333333",
     borderRadius: 8,
     marginBottom: 10,
   },
+
+  // Picker en toda la pantalla
   fullWidthPicker: {
-    height: 50,
-    width: "100%",
-    color: "#FFFFFF",
-    backgroundColor: "#333333",
-    borderRadius: 8,
-    marginBottom: 10,
+    height: 20,
+    width: "15%",
+    color: textColor,
+    borderRadius: 10,
   },
+
+  // Botón para asignar algo
   assignButton: {
     padding: 10,
     borderRadius: 5,
     alignItems: "center",
     width: "100%",
   },
+
+  // Tarjeta para reflexiones
   reflexionCard: {
     marginBottom: 10,
     backgroundColor: "#2C2C2C",
@@ -987,82 +886,111 @@ const styles = StyleSheet.create({
     padding: 10,
     width: "100%",
   },
+
+  // Texto de reflexiones
   reflexionTexto: {
     fontSize: 16,
-    color: "#FFFFFF",
+    color: textColor,
     marginBottom: 5,
   },
+
+  // Fecha de reflexiones
   reflexionFecha: {
     fontSize: 12,
     color: "#AAAAAA",
     textAlign: "right",
   },
+
+  // Entrada de texto
   textInput: {
     height: 100,
     borderColor: "#555555",
     borderWidth: 1,
     borderRadius: 5,
     padding: 10,
-    color: "#FFFFFF",
+    color: textColor,
     backgroundColor: "#2C2C2C",
     marginBottom: 15,
     textAlignVertical: "top",
   },
+
+  // Entrada de texto a ancho completo
   fullWidthTextInput: {
     height: 100,
     borderColor: "#555555",
-    borderWidth: 1,
     borderRadius: 5,
-    padding: 10,
-    color: "#FFFFFF",
-    backgroundColor: "#2C2C2C",
+    color: textColor,
     marginBottom: 15,
     textAlignVertical: "top",
     width: "100%",
   },
+
+  // Botón para cerrar modal
   closeModalButton: {
     backgroundColor: "#E74C3C",
     padding: 12,
     borderRadius: 5,
     alignItems: "center",
   },
+
+  // Texto cuando no hay contenido
   noContentText: {
     color: "#888888",
     fontSize: 16,
     textAlign: "center",
     marginVertical: 20,
   },
+
+  // Botón para cambiar algo
   changeButton: {
     borderWidth: 1,
     borderRadius: 5,
     paddingVertical: 10,
     paddingHorizontal: 10,
-    width: "100%", // Ocupa todo el ancho disponible
+    width: "100%",
     marginBottom: 10,
   },
+
+  // Botón para eliminar algo
   removeButton: {
     backgroundColor: "#E74C3C",
     borderRadius: 5,
     paddingVertical: 10,
     paddingHorizontal: 10,
-    width: "100%", // Ocupa todo el ancho disponible
+    width: "100%",
   },
+
+  // Botón a ancho completo
   fullWidthButton: {
-    width: "100%", // Ocupa todo el ancho disponible
+    width: "50%",
     borderRadius: 5,
     marginBottom: 10,
   },
+
+  // Botón Cerrar Reflexion ancho completo
+  fullWidthButtonR: {
+    width: "100%",
+    borderRadius: 5,
+    marginBottom: 10,
+  },
+
+  // Botón para cancelar
   cancelChangeButton: {
     marginTop: 10,
     color: "#888888",
     width: "100%",
   },
+
+  // Acciones dentro de una tarjeta
   cardActions: {
     flexDirection: "column",
     alignItems: "center",
     width: "100%",
+    paddingHorizontal: 10,
+    paddingBottom: 10,
   },
-  // Spotify-like music card
+
+  // Tarjeta estilo Spotify
   cardSpotify: {
     width: "100%",
     borderRadius: 10,
@@ -1074,24 +1002,110 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 4,
   },
+
+  // Contenido estilo Spotify
   spotifyContent: {
     flexDirection: "row",
     alignItems: "center",
     padding: 10,
   },
+
+  // Información estilo Spotify
   spotifyInfo: {
     marginLeft: 15,
     flex: 1,
   },
+
+  // Título estilo Spotify
   spotifyTitle: {
     fontSize: 18,
     fontWeight: "bold",
-    color: "#FFFFFF",
+    color: textColor,
   },
+
+  // Subtítulo estilo Spotify
   spotifySubtitle: {
     fontSize: 14,
     color: "#BBBBBB",
   },
+
+  // Contenedor de modales
+  dialogContainer: {
+    width: "90%",
+    alignSelf: "center",
+    backgroundColor: "#1E1E1E",
+  },
+
+  // Estilos para la sección de beneficiarios
+  beneficiarySection: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#F8F8F8", // Fondo claro para contraste
+    padding: 10,
+    borderRadius: 8,
+    marginVertical: 10,
+    elevation: 2,
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
+  },
+
+  beneficiaryCard: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+  },
+
+  beneficiaryAvatar: {
+    backgroundColor: "#CCCCCC", // Fondo gris si no hay imagen
+    marginRight: 10,
+  },
+
+  beneficiaryInfo: {
+    flex: 1,
+    justifyContent: "center",
+  },
+
+  beneficiaryName: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#333",
+  },
+
+  beneficiaryEmail: {
+    fontSize: 14,
+    color: "#666",
+  },
+
+  beneficiaryActions: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+
+  beneficiaryButton: {
+    marginHorizontal: 5,
+    borderRadius: 8,
+    paddingVertical: 4,
+    paddingHorizontal: 10,
+  },
+
+  removeButton: {
+    backgroundColor: "#E74C3C", // Rojo para eliminar
+  },
+
+  changeButton: {
+    backgroundColor: "#3498DB", // Azul para cambiar
+  },
+
+  addButton: {
+    backgroundColor: "#2ECC71", // Verde para agregar
+  },
+
+  beneficiaryButtonLabel: {
+    fontSize: 12,
+    color: "#FFFFFF",
+  },
 });
 
-export default EntryItem;
+export default EntryDetailScreen;

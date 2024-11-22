@@ -1,3 +1,5 @@
+// AudioPlayer.js
+
 import React, { useEffect, useState } from 'react';
 import { View, TouchableOpacity, StyleSheet, Text } from 'react-native';
 import Slider from '@react-native-community/slider';
@@ -28,7 +30,7 @@ const AudioPlayer = ({ audioUri }) => {
     try {
       const { sound: newSound } = await Audio.Sound.createAsync(
         { uri: audioUri },
-        { shouldPlay: false },
+        { shouldPlay: false, isLooping: false },
         onPlaybackStatusUpdate
       );
       setSound(newSound);
@@ -69,7 +71,7 @@ const AudioPlayer = ({ audioUri }) => {
   return (
     <View style={styles.container}>
       <TouchableOpacity onPress={togglePlayPause} style={styles.playButton}>
-        <FontAwesome name={isPlaying ? 'pause' : 'play'} size={20} color="#FFF" />
+        <FontAwesome name={isPlaying ? 'pause' : 'play'} size={20} color="#FFFFFF" />
       </TouchableOpacity>
       <View style={styles.sliderContainer}>
         <Slider
@@ -79,7 +81,7 @@ const AudioPlayer = ({ audioUri }) => {
             sound && sound.setPositionAsync(value * duration)
           }
           minimumTrackTintColor="#1DB954"
-          maximumTrackTintColor="#ccc"
+          maximumTrackTintColor="#FFFFFF"
           thumbTintColor="#1DB954"
         />
         <View style={styles.timeContainer}>
@@ -99,9 +101,13 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
+    backgroundColor: '#282828', // Fondo oscuro similar a Spotify
+    borderRadius: 10,
+    padding: 10,
+    marginBottom: 13,
   },
   playButton: {
-    backgroundColor: '#1DB954',
+    backgroundColor: '#1DB954', // Verde característico de Spotify
     padding: 12,
     borderRadius: 30,
     marginRight: 10,
@@ -110,16 +116,16 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   slider: {
-    flex: 1,
+    width: '100%',
+    height: 40,
   },
   timeContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: 4,
   },
   timeText: {
     fontSize: 12,
-    color: '#555',
+    color: '#FFFFFF',
   },
 });
 

@@ -1,63 +1,51 @@
 // SongCard.js
+
 import React from "react";
 import { View, Text, Image, Pressable, StyleSheet } from "react-native";
-import AudioPlayer from "../../components/audioPlayer";
-import { MaterialIcons } from "@expo/vector-icons";
 import PropTypes from "prop-types";
-import { emotionToEmoji } from "../../utils/emotionUtils";
 
 const SongCard = ({ entry, onPress }) => {
-  if (!entry) return null;
+  const { categoria, nickname, fechaCreacion, color, cancion, texto, emociones } = entry;
 
-  const { cancion, texto, emociones } = entry;
-
-  const renderEmotions = (emotions) => {
-    if (!emotions || emotions.length === 0) return null;
-    return emotions.map((emotion, index) => (
-      <Text key={index} style={styles.emoji}>
-        {emotionToEmoji(emotion)}
-      </Text>
-    ));
-  };
+  // Formatear la fecha de creación
+  const formattedFechaCreacion = fechaCreacion
+    ? fechaCreacion.toDate().toLocaleDateString("es-ES", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      })
+    : "";
 
   return (
-    <Pressable onPress={onPress} style={styles.card}>
-      {/* Imagen del álbum */}
-      <View style={styles.imageContainer}>
-        <Image
-          source={{ uri: cancion.albumImage }}
-          style={styles.image}
-          resizeMode="cover"
-        />
-        {/* Información de la canción */}
-        <View style={styles.overlay}>
-          <Text style={styles.songName} numberOfLines={1}>
-            {cancion.name}
-          </Text>
-          <Text style={styles.artistName} numberOfLines={1}>
-            {cancion.artist}
-          </Text>
-        </View>
+    <Pressable onPress={onPress} style={[styles.card, { backgroundColor: color }]}>
+      <View style={styles.header}>
+        <Text style={styles.tipoText}>{categoria}</Text>
       </View>
-
-      {/* Contenido adicional */}
-      {texto && (
-        <View style={styles.textContainer}>
-          <Text style={styles.text}>{texto}</Text>
+      <View style={styles.apodoContainer}>
+        <Text style={styles.apodoText}>{nickname}</Text>
+      </View>
+      <View style={styles.contenidoContainer}>
+        {/* Información de la canción */}
+        <View style={styles.cancionContainer}>
+          <Image
+            source={{ uri: cancion.albumImage }}
+            style={styles.imagenAlbum}
+            resizeMode="cover"
+          />
+          <View style={styles.infoCancion}>
+            <Text style={styles.nombreCancion}>{cancion.name}</Text>
+            <Text style={styles.artistaCancion}>{cancion.artist}</Text>
+          </View>
         </View>
-      )}
-
-      {/* Reproductor de audio */}
-      {cancion.previewUrl && (
-        <View style={styles.audioContainer}>
-          <AudioPlayer audioUri={cancion.previewUrl} />
-        </View>
-      )}
-
-      {/* Footer con emociones y flecha */}
+        {/* Comentario adicional */}
+        {texto ? (
+          <Text style={styles.texto} numberOfLines={2} ellipsizeMode="tail">
+            {texto}
+          </Text>
+        ) : null}
+      </View>
       <View style={styles.footer}>
-        <View style={styles.emotionsContainer}>{renderEmotions(emociones)}</View>
-        <MaterialIcons name="arrow-forward-ios" size={20} color="#ccc" />
+        <Text style={styles.fechaText}>{formattedFechaCreacion}</Text>
       </View>
     </Pressable>
   );
@@ -65,6 +53,10 @@ const SongCard = ({ entry, onPress }) => {
 
 SongCard.propTypes = {
   entry: PropTypes.shape({
+    categoria: PropTypes.string.isRequired,
+    nickname: PropTypes.string.isRequired,
+    fechaCreacion: PropTypes.object.isRequired,
+    color: PropTypes.string.isRequired,
     cancion: PropTypes.shape({
       albumImage: PropTypes.string,
       name: PropTypes.string,
@@ -79,67 +71,67 @@ SongCard.propTypes = {
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: "#ffffff",
     borderRadius: 12,
+    padding: 15,
     marginVertical: 8,
     marginHorizontal: 16,
-    overflow: "hidden",
-    shadowColor: "#000000",
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
-    elevation: 3,
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 5,
   },
-  imageContainer: {
-    width: "100%",
-    aspectRatio: 1, // Mantener proporción cuadrada
-    position: "relative",
+  header: {
+    marginBottom: 10,
   },
-  image: {
-    width: "100%",
-    height: "100%",
-  },
-  overlay: {
-    position: "absolute",
-    bottom: 0,
-    width: "100%",
-    backgroundColor: "rgba(0, 0, 0, 0.6)",
-    padding: 10,
-  },
-  songName: {
-    color: "#ffffff",
-    fontSize: 18,
+  tipoText: {
+    fontSize: 20,
     fontWeight: "bold",
+    color: "#fff",
   },
-  artistName: {
-    color: "#cccccc",
-    fontSize: 14,
+  apodoContainer: {
+    marginBottom: 10,
   },
-  textContainer: {
-    paddingHorizontal: 15,
-    paddingVertical: 10,
-  },
-  text: {
+  apodoText: {
     fontSize: 16,
-    color: "#333333",
+    color: "#fff",
   },
-  audioContainer: {
-    paddingHorizontal: 15,
-    paddingBottom: 10,
+  contenidoContainer: {
+    marginBottom: 10,
   },
-  footer: {
+  cancionContainer: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 15,
-    paddingVertical: 10,
+    marginBottom: 10,
   },
-  emotionsContainer: {
-    flexDirection: "row",
+  imagenAlbum: {
+    width: 60,
+    height: 60,
+    borderRadius: 8,
+    marginRight: 10,
   },
-  emoji: {
-    fontSize: 20,
-    marginHorizontal: 3,
+  infoCancion: {
+    flex: 1,
+  },
+  nombreCancion: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#fff",
+  },
+  artistaCancion: {
+    fontSize: 14,
+    color: "#fff",
+  },
+  texto: {
+    fontSize: 16,
+    color: "#fff",
+  },
+  footer: {
+    alignItems: "flex-end",
+  },
+  fechaText: {
+    fontSize: 14,
+    color: "#fff",
   },
 });
 

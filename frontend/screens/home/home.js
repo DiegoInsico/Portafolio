@@ -11,8 +11,8 @@ import {
   Animated,
   TouchableOpacity,
   Image,
-  RefreshControl,
   ImageBackground,
+  StatusBar,
 } from "react-native";
 import axios from "axios";
 import {
@@ -25,12 +25,21 @@ import {
 import { db } from "../../utils/firebase";
 import { FontAwesome } from "@expo/vector-icons";
 import ModalEntry from "../entrys/modalEntry";
-import { ScrollView } from "react-native-gesture-handler";
-import { StatusBar } from "react-native";
 import { AuthContext } from "../../context/AuthContext";
 import SideBarMenu from "../../components/navigation/sideBarMenu";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons"; // Para los íconos de búsqueda
 
-const { width: viewportWidth, height: viewportHeight } = Dimensions.get("window");
+const { width: viewportWidth } = Dimensions.get("window");
+
+// Mapeo de categorías a colores pastel de planetas
+const categoryColors = {
+  Alegria: "#FFE4B5", // Moccasin (Sol)
+  Tristeza: "#B0C4DE", // LightSteelBlue (Neptuno)
+  Ira: "#FFB6C1", // LightPink (Marte)
+  Miedo: "#FFDAB9", // PeachPuff (Venus)
+  Idea: "#98FB98", // PaleGreen (Tierra)
+  Consejo: "#FFE4C4", // Bisque (Júpiter)
+};
 
 const Home = ({ navigation }) => {
   const [question, setQuestion] = useState("");
@@ -39,6 +48,7 @@ const Home = ({ navigation }) => {
   const [refreshing, setRefreshing] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [menuVisible, setMenuVisible] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState("");
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(0.5)).current;
@@ -68,12 +78,14 @@ const Home = ({ navigation }) => {
     }
   };
 
-  const handleOpenModal = () => {
+  const handleOpenModal = (categoria) => {
+    setSelectedCategory(categoria);
     setModalVisible(true);
   };
 
   const handleCloseModal = () => {
     setModalVisible(false);
+    setSelectedCategory("");
   };
 
   useEffect(() => {
@@ -98,7 +110,10 @@ const Home = ({ navigation }) => {
       fetchEntries();
       fetchQuestion(user.uid);
     } else {
-      Alert.alert("Sesión no iniciada", "Por favor inicia sesión para continuar.");
+      Alert.alert(
+        "Sesión no iniciada",
+        "Por favor inicia sesión para continuar."
+      );
       navigation.navigate("Login");
     }
   }, [user]);
@@ -111,7 +126,10 @@ const Home = ({ navigation }) => {
       setQuestion(response.data.question);
     } catch (error) {
       console.error("Error al obtener la pregunta:", error);
-      Alert.alert("Error", "Ocurrió un error al obtener la pregunta de reflexión.");
+      Alert.alert(
+        "Error",
+        "Ocurrió un error al obtener la pregunta de reflexión."
+      );
     }
   };
 
@@ -132,14 +150,18 @@ const Home = ({ navigation }) => {
           const data = doc.data();
           entriesData.push({
             id: doc.id,
-            text: data.message,
-            media: data.mediaURL || null,
-            isVideo: data.mediaURL
-              ? data.mediaURL.endsWith(".mp4") || data.mediaURL.endsWith(".mov")
-              : false,
-            createdAt: data.createdAt
-              ? data.createdAt.toDate().toLocaleDateString()
+            text: data.texto,
+            media: data.media || null,
+            isVideo: data.mediaType === "video",
+            createdAt: data.fechaCreacion
+              ? data.fechaCreacion.toDate().toLocaleDateString()
               : "",
+            nickname: data.nickname || "",
+            color: data.color || "#ffffff",
+            categoria: data.categoria || "",
+            mediaType: data.mediaType || "text",
+            nivel: data.nivel || "1", // Asegurar que nivel está presente
+            emociones: data.emociones || [], // Añadir emociones si están presentes
           });
         });
         setEntries(entriesData);
@@ -171,100 +193,132 @@ const Home = ({ navigation }) => {
     setRefreshing(false);
   };
 
+  // Definición de categorías con imágenes y colores pastel
+  const categories = [
+    {
+      id: "1",
+      name: "Alegria",
+      image: require("../../assets/icons/Alegria.png"),
+      color: categoryColors.Alegria,
+      emotion: "Alegria",
+    },
+    {
+      id: "2",
+      name: "Tristeza",
+      image: require("../../assets/icons/Tristeza.png"),
+      color: categoryColors.Tristeza,
+      emotion: "Tristeza",
+    },
+    {
+      id: "3",
+      name: "Ira",
+      image: require("../../assets/icons/Ira.png"),
+      color: categoryColors.Ira,
+      emotion: "Ira",
+    },
+    {
+      id: "4",
+      name: "Miedo",
+      image: require("../../assets/icons/Miedo.png"),
+      color: categoryColors.Miedo,
+      emotion: "Miedo",
+    },
+    {
+      id: "5",
+      name: "Idea",
+      image: require("../../assets/icons/Idea.png"),
+      color: categoryColors.Idea,
+      emotion: "Idea",
+    },
+    {
+      id: "6",
+      name: "Consejo",
+      image: require("../../assets/icons/Consejo.png"),
+      color: categoryColors.Consejo,
+      emotion: "Consejo",
+    },
+  ];
+
   return (
     <>
-      <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
+      <StatusBar
+        barStyle="light-content"
+        backgroundColor="transparent"
+        translucent
+      />
       <ImageBackground
         source={require("../../assets/background/fondo2.webp")}
         style={styles.background}
         resizeMode="cover"
       >
-        <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-          <View style={styles.container}>
-            <Animated.View
-              style={[{ opacity: fadeAnim, transform: [{ scale: scaleAnim }] }]}
-            >
-              <View style={styles.headerContainer}>
+        {/* Botón para abrir el menú */}
+        <TouchableOpacity style={styles.menuButton} onPress={toggleMenu}>
+          <FontAwesome name="bars" size={24} color="#fff" />
+        </TouchableOpacity>
 
-                {/* Botón para abrir el menú */}
-                <TouchableOpacity style={styles.menuButton} onPress={toggleMenu}>
-                  <FontAwesome name="bars" size={24} color="#fff" />
-                </TouchableOpacity>
-
-                <Text style={styles.greetingText}>
-                  {getGreeting()}, {userName}
-                </Text>
-                <Text style={styles.dateText}>{formattedDate}</Text>
-              </View>
-            </Animated.View>
-
-            {/* Botones superiores */}
-            <View style={styles.topButtonsContainer}>
-              <TouchableOpacity
-                style={styles.squareButton}
-                onPress={() => handleOpenModal("Categoría 1")}
-              >
-                <Text style={styles.squareButtonText}>🤔</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.squareButton}
-                onPress={() => handleOpenModal("Categoría 2")}
-              >
-                <Text style={styles.squareButtonText}>💪</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </ScrollView>
-
-        {/* Sección Inferior Translucida */}
-        <View style={styles.translucentBackground}>
-          {question ? (
-            <View style={styles.questionContainer}>
-              <View style={styles.questionBackground}>
-                <Text style={styles.generatedQuestionText}>{question}</Text>
-              </View>
-            </View>
-          ) : null}
-
-          {/* Botones inferiores */}
-          <View style={styles.bottomButtonsContainer}>
-            <TouchableOpacity
-              style={styles.squareButton}
-              onPress={() => handleOpenModal("Categoría 3")}
-            >
-              <Text style={styles.squareButtonText}>😊</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.squareButton}
-              onPress={() => handleOpenModal("Categoría 4")}
-            >
-              <Text style={styles.squareButtonText}>🙏</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.squareButton}
-              onPress={() => handleOpenModal("Categoría 5")}
-            >
-              <Text style={styles.squareButtonText}>❤️</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.squareButton}
-              onPress={() => handleOpenModal("Categoría 6")}
-            >
-              <Text style={styles.squareButtonText}>💔</Text>
-            </TouchableOpacity>
-          </View>
-
-          <TouchableOpacity
-            style={styles.roundButtonContainer}
-            onPress={handleOpenModal}
+        <View style={styles.container}>
+          <Animated.View
+            style={[
+              styles.headerAnimated,
+              { opacity: fadeAnim, transform: [{ scale: scaleAnim }] },
+            ]}
           >
-            <View style={styles.roundButton}>
-              <FontAwesome name="plus" size={24} color="#000" />
-              <Text style={styles.roundButtonText}>Nuevo Instante</Text>
+            <View style={styles.headerContainer}>
+              <Text style={styles.greetingText}>
+                {getGreeting()}, {userName}
+              </Text>
+              <Text style={styles.dateText}>{formattedDate}</Text>
             </View>
-          </TouchableOpacity>
+            {/* Pregunta autogenerada */}
+            {question && (
+              <View style={styles.questionContainer}>
+                <View style={styles.questionBackground}>
+                  <Text style={styles.generatedQuestionText}>{question}</Text>
+                </View>
+              </View>
+            )}
+          </Animated.View>
 
-          <ModalEntry visible={modalVisible} onClose={handleCloseModal} />
+          {/* Sección baja: Pregunta y botones */}
+          <View style={styles.footerSection}>
+            {/* Botones superiores */}
+            <View style={styles.buttonsRow}>
+              {categories.slice(0, 3).map((category) => (
+                <TouchableOpacity
+                  key={category.id}
+                  style={[
+                    styles.squareButton,
+                    { backgroundColor: category.color },
+                  ]}
+                  onPress={() =>
+                    navigation.navigate("Entry", { category: category.name })
+                  }
+                >
+                  <Image source={category.image} style={styles.buttonImage} />
+                  <Text style={styles.buttonText}>{category.emotion}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            {/* Botones inferiores */}
+            <View style={styles.buttonsRow}>
+              {categories.slice(3, 6).map((category) => (
+                <TouchableOpacity
+                  key={category.id}
+                  style={[
+                    styles.squareButton,
+                    { backgroundColor: category.color },
+                  ]}
+                  onPress={() =>
+                    navigation.navigate("Entry", { category: category.name })
+                  }
+                >
+                  <Image source={category.image} style={styles.buttonImage} />
+                  <Text style={styles.buttonText}>{category.emotion}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
         </View>
       </ImageBackground>
       <SideBarMenu
@@ -318,38 +372,46 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    alignItems: "center",
     paddingHorizontal: 20,
+    backgroundColor: "transparent",
+  },
+  headerAnimated: {
+    // Permite la animación del header
   },
   headerContainer: {
-    marginTop: 50,
+    marginTop: 80,
+    alignItems: "center",
   },
   greetingText: {
     fontSize: 28,
     fontWeight: "bold",
-    color: "#333",
+    color: "#000",
   },
   dateText: {
     fontSize: 16,
-    color: "#333",
+    color: "#000",
     marginTop: 5,
   },
-  /* Sección Inferior Translucida */
-  translucentBackground: {
+  menuButton: {
     position: "absolute",
-    bottom: 70, // Ajusta según necesidad
-    left: 0,
-    right: 0,
-    padding: 20,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
+    top: 50,
+    left: 20,
+    zIndex: 1,
+    margin: 10,
+  },
+  /* Sección Inferior */
+  footerSection: {
+    position: "absolute",
+    bottom: 20,
+    left: 20,
+    right: 20,
     alignItems: "center",
-    justifyContent: "center",
   },
   questionContainer: {
-    width: "100%",
-    marginBottom: 20,
+    marginBottom: 15,
     alignItems: "center",
+    justifyContent: "center",
+    width: "100%",
   },
   questionBackground: {
     backgroundColor: "rgba(0, 0, 0, 0.7)", // Fondo oscuro y translúcido
@@ -357,6 +419,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     borderRadius: 10,
     alignItems: "center",
+    width: "100%",
   },
   generatedQuestionText: {
     fontSize: 16,
@@ -364,73 +427,45 @@ const styles = StyleSheet.create({
     color: "#FFF",
     textAlign: "center",
   },
-  /* Botón Redondo "Nuevo Instante" */
-  roundButtonContainer: {
-    width: "100%",
-    alignItems: "center",
-  },
-  roundButton: {
-    width: viewportWidth * 0.8, // 80% del ancho de la pantalla
-    height: 60,
-    borderRadius: 30,
-    alignItems: "center",
-    justifyContent: "center",
+  /* Botones */
+  buttonsRow: {
     flexDirection: "row",
-    backgroundColor: "#FFD700",
+    justifyContent: "space-between",
+    marginBottom: 10,
+    width: "100%",
+  },
+  squareButton: {
+    width: viewportWidth * 0.22, // Botones cuadrados
+    height: viewportWidth * 0.22,
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 35, // Ajuste de borderRadius para modernizar
+    // Shadow for iOS
     shadowColor: "#000",
-    shadowOffset: { width: 2, height: 2 },
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 4,
+    // Elevation for Android
     elevation: 5,
+    backgroundColor: "#fff",
   },
-  roundButtonText: {
-    fontSize: 18,
-    color: "#000",
-    fontWeight: "bold",
-    marginLeft: 10,
+  buttonImage: {
+    width: "60%",
+    height: "60%",
+    resizeMode: "contain",
+  },
+  buttonText: {
+    marginTop: 5,
+    fontSize: 14,
+    color: "#333333",
+    textAlign: "center",
+    fontWeight: "600",
   },
   /* Estilos de carga */
   loadingContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-  },
-  /* Botones superiores */
-  topButtonsContainer: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    marginTop: 20,
-    width: "100%",
-  },
-  /* Botones inferiores */
-  bottomButtonsContainer: {
-    position: "absolute",
-    bottom: 70,
-    width: "100%",
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "space-around",
-  },
-  squareButton: {
-    width: viewportWidth * 0.20, // Botones cuadrados
-    height: viewportWidth * 0.20,
-    backgroundColor: "#FFD700",
-    justifyContent: "center",
-    alignItems: "center",
-    margin: 3,
-    marginBottom: 20,
-    borderRadius: 10,
-    shadowColor: "#000",
-    shadowOffset: { width: 2, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  squareButtonText: {
-    fontSize: 40,
-    fontWeight: "bold",
-    color: "#000",
-    textAlign: "center",
   },
 });
 

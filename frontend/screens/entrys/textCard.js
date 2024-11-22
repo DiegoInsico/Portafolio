@@ -1,93 +1,95 @@
 // TextCard.js
+
 import React from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
-import { MaterialIcons } from "@expo/vector-icons";
 import PropTypes from "prop-types";
-import { emotionToEmoji } from "../../utils/emotionUtils";
 
 const TextCard = ({ entry, onPress }) => {
-  if (!entry) return null;
+  const { categoria, nickname, fechaCreacion, color, texto, emociones } = entry;
 
-  const formattedFechaCreacion =
-    entry.fechaCreacion?.toDate()?.toLocaleDateString("es-ES") || "";
-  const { texto, emociones } = entry;
-
-  const renderEmotions = (emotions) => {
-    if (!emotions || emotions.length === 0) return null;
-    return emotions.map((emotion, index) => (
-      <Text key={index} style={styles.emoji}>
-        {emotionToEmoji(emotion)}
-      </Text>
-    ));
-  };
+  // Formatear la fecha de creación
+  const formattedFechaCreacion = fechaCreacion
+    ? fechaCreacion.toDate().toLocaleDateString("es-ES", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      })
+    : "";
 
   return (
-    <Pressable onPress={onPress} style={styles.card}>
-      {/* Emociones */}
-      <View style={styles.emotionContainer}>{renderEmotions(emociones)}</View>
-
-      {/* Contenido */}
-      <View style={styles.content}>
-        {texto && (
-          <Text style={styles.text} numberOfLines={3} ellipsizeMode="tail">
+    <Pressable onPress={onPress} style={[styles.card, { backgroundColor: color }]}>
+      <View style={styles.header}>
+        <Text style={styles.tipoText}>{categoria}</Text>
+      </View>
+      <View style={styles.apodoContainer}>
+        <Text style={styles.apodoText}>{nickname}</Text>
+      </View>
+      <View style={styles.contenidoContainer}>
+        {texto ? (
+          <Text style={styles.texto} numberOfLines={3} ellipsizeMode="tail">
             {texto}
           </Text>
-        )}
-        {formattedFechaCreacion && (
-          <Text style={styles.date}>{formattedFechaCreacion}</Text>
-        )}
+        ) : null}
       </View>
-
-      {/* Icono de flecha */}
-      <MaterialIcons name="arrow-forward-ios" size={20} color="#ccc" />
+      <View style={styles.footer}>
+        <Text style={styles.fechaText}>{formattedFechaCreacion}</Text>
+      </View>
     </Pressable>
   );
 };
 
 TextCard.propTypes = {
   entry: PropTypes.shape({
+    categoria: PropTypes.string.isRequired,
+    nickname: PropTypes.string.isRequired,
+    fechaCreacion: PropTypes.object.isRequired,
+    color: PropTypes.string.isRequired,
     texto: PropTypes.string,
     emociones: PropTypes.arrayOf(PropTypes.string),
-    fechaCreacion: PropTypes.object,
   }).isRequired,
   onPress: PropTypes.func.isRequired,
 };
 
 const styles = StyleSheet.create({
   card: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#ffffff",
     borderRadius: 12,
     padding: 15,
     marginVertical: 8,
     marginHorizontal: 16,
-    shadowColor: "#000000",
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
-    elevation: 3,
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 5,
   },
-  emotionContainer: {
-    flexDirection: "column", // Cambiado a columna para apilar emojis
-    marginRight: 12,
-    alignItems: "center", // Opcional, centra los emojis
+  header: {
+    marginBottom: 10,
   },
-  content: {
-    flex: 1,
-  },
-  text: {
-    fontSize: 16,
-    color: "#333333",
-    marginBottom: 8,
-  },
-  date: {
-    fontSize: 14,
-    color: "#888888",
-  },
-  emoji: {
+  tipoText: {
     fontSize: 20,
-    marginVertical: 2, // Espaciado vertical entre emojis
+    fontWeight: "bold",
+    color: "#fff",
+  },
+  apodoContainer: {
+    marginBottom: 10,
+  },
+  apodoText: {
+    fontSize: 16,
+    color: "#fff",
+  },
+  contenidoContainer: {
+    marginBottom: 10,
+  },
+  texto: {
+    fontSize: 16,
+    color: "#fff",
+  },
+  footer: {
+    alignItems: "flex-end",
+  },
+  fechaText: {
+    fontSize: 14,
+    color: "#fff",
   },
 });
 

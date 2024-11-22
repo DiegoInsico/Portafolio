@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { View, StyleSheet } from "react-native";
 
-import SideBar from "./sideBar"; // Menú desplegable
+import SideBar from "./sideBarMenu"; // Menú desplegable
 import Home from "../../screens/home/home"; // Pantalla Home
-import ListEntry from "../../screens/entrys/listEntry"; // Pantalla ListEntry
+import ListEntry from "../../screens/entrys/ListEntry"; // Pantalla ListEntry
 
 function AppNavigator({ navigation, user }) {
   const [sidebarVisible, setSidebarVisible] = useState(false);
@@ -49,6 +49,10 @@ function AppNavigator({ navigation, user }) {
         navigateToSoporte={() => {
           handleToggleSidebar();
           navigation.navigate("Soporte");
+        }}
+        navigateToEntryDetail={() => {
+          handleToggleSidebar();
+          navigation.navigate("Detalle");
         }}
         handleSignOut={() => {
           handleToggleSidebar();
