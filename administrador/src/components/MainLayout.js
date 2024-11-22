@@ -61,6 +61,15 @@ const MainLayout = ({ children, isAuthenticated, currentUser }) => {
                   Ver Gráficos
                 </NavLink>
                 <NavLink
+                  to="/monitor/storage/storageUsage"
+                  className={({ isActive }) =>
+                    `main-layout-link ${isActive ? "main-layout-link-active" : ""}`
+                  }
+                >
+                  <BarChart className="main-layout-icon" />
+                  almacenaje
+                </NavLink>
+                <NavLink
                   to="/monitor/SoulmatePage"
                   className={({ isActive }) =>
                     `main-layout-link ${isActive ? "main-layout-link-active" : ""}`
@@ -77,15 +86,6 @@ const MainLayout = ({ children, isAuthenticated, currentUser }) => {
                 >
                   <BugReport className="main-layout-icon" />
                   Página de Testeo
-                </NavLink>
-                <NavLink
-                  to="/monitor/users/userActivity"
-                  className={({ isActive }) =>
-                    `main-layout-link ${isActive ? "main-layout-link-active" : ""}`
-                  }
-                >
-                  <People className="main-layout-icon" />
-                  Gestión de Usuarios
                 </NavLink>
                 <NavLink
                   to="/system/inbox"

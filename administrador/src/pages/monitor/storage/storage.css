@@ -1,79 +1,28 @@
 .storage-container {
-  max-width: 1200px;
-  max-height: 80vh; /* Limita la altura para permitir desplazamiento cuando sea necesario */
-  margin: 0 auto;
   padding: 20px;
-  overflow-y: auto; /* Permite el desplazamiento vertical */
-  font-family: Arial, sans-serif;
-  background-color: #1e1e2f; /* Fondo oscuro */
-  color: #f0e6d2; /* Texto dorado claro */
-  scrollbar-width: thin; /* Solo para navegadores compatibles */
-  scrollbar-color: #1e1e2f #2c2c3a; /* Color del thumb y del fondo de la barra en navegadores compatibles */
-}
-
-/* Estilos para ocultar la barra de desplazamiento en Chrome, Edge y Safari */
-.storage-container::-webkit-scrollbar {
-  width: 0;
-  height: 0;
-}
-
-/* Si deseas mostrar la barra solo al hacer scroll, puedes agregar un hover */
-.storage-container:hover::-webkit-scrollbar {
-  width: 8px;
-}
-
-.storage-container:hover::-webkit-scrollbar-thumb {
-  background-color: #555; /* Color del thumb cuando el scroll está activo */
-  border-radius: 10px;
-}
-
-/* h2 {
-  text-align: center;
-  color: #f0e6d2; 
-  margin-bottom: 20px;
-} */
-
-.chart-container {
-  width: 100%;
-  height: auto;
-  background-color: #2c2c3a; /* Fondo oscuro del gráfico */
-  padding: 20px;
-  border-radius: 10px;
-}
-
-.chart-container canvas {
-  width: 100% !important;
-  height: auto !important;
+  background: #f9f9f9;
 }
 
 .filter-buttons {
   margin-bottom: 20px;
-  display: flex;
-  gap: 10px;
-  justify-content: center;
 }
 
 .filter-button {
   padding: 10px 15px;
-  background-color: #f0ad4e;
-  color: white;
+  margin-right: 10px;
   border: none;
-  border-radius: 5px;
+  background: #e0e0e0;
   cursor: pointer;
-  transition: background-color 0.3s;
+  border-radius: 5px;
 }
 
 .filter-button.active {
-  background-color: #ec971f;
-}
-
-.filter-button:hover {
-  background-color: #d58512;
+  background: #0366d6;
+  color: white;
 }
 
 .file-info-table {
   margin-top: 20px;
-  color: #f0e6d2;
 }
 
 .file-info-table table {
@@ -81,12 +30,20 @@
   border-collapse: collapse;
 }
 
-.file-info-table td, .file-info-table th {
+.file-info-table th,
+.file-info-table td {
+  border: 1px solid #ddd;
   padding: 10px;
-  border-bottom: 1px solid #444;
+  text-align: left;
 }
 
-.file-info-table h3 {
-  color: #f0a500;
-  margin-bottom: 10px;
+.file-info-table th {
+  background: #0366d6;
+  color: white;
+}
+
+.error-message {
+  color: red;
+  font-weight: bold;
+  margin-top: 20px;
 }

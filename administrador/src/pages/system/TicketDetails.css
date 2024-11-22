@@ -1,190 +1,23 @@
 .ticket-details-container {
-  display: grid;
-  grid-template-areas: 
-    "header header header"
-    "assign chat ready"
-    "info chat nothing"
-    "ntng input send-btn";
-  grid-template-columns: 1fr 2fr 0.3fr;
-  grid-template-rows: 0.1fr auto auto auto;
-  gap: 10px;
-  margin-top:80px;
-  margin-left: 5%;
-  background-color: #f0f2f53b;
-  width: 90vw;
-  height: 80vh;
-  backdrop-filter: blur(5px);
-  border-radius: 20px;
-  font-family: 'Roboto', sans-serif;
-  padding: 10px;
-  color: #333;
+  padding: 20px;
 }
 
-
-.ticket-header {
-  grid-area: header;
-  display: flex;
-  background-color: #ffffff7c; 
-  color: black;
-  border-radius: 20px;
-  backdrop-filter: blur(5px);
-  justify-content: space-between;
-  align-items: center;
-  margin: 0;
-  width: 100%;
-  z-index: 2;
-  /* border-bottom: 1px solid #ff9900;  */
+.ticket-messages {
+  margin-top: 20px;
 }
 
-.ticket-header h5{
-  color: black;
-  text-align: center;
-  border-radius: 20px;
-  font-size: 20px;
-  margin-left: 15px;
-}
-
-.ticket-btn-close {
-  /* background: none; */
-  border: none;
-  width: 80px;
-  margin-right: 10px;
-  background-color: rgb(202, 62, 62);
-  border-radius: 30px;
-  font-size: 1.2rem;
-  cursor: pointer;
-  color: #fff;
-}
-
-.ticket-btn-close:hover{
-  transition: 0.3s;
-  background-color: red;
-}
-
-.ticket-assignment-section {
-  grid-area: assign;
-  display: flex;
-  flex-direction: column;
-}
-
-.ticket-assign-select {
-  width: 100%;
-  margin-top: 5px;
-  background-color: #ffffff88;
-  font-size: 15px;
-  padding: 5px;
-}
-
-
-.ticket-assign-button {
-  grid-area: assign-btn;
-  align-self: start;
-  padding: 5px 10px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  background-color: #1976d2;
-  color: white;
-}
-
-
-.ticket-assign-button:hover{
- background-color: blueviolet;
-}
-
-.ticket-description-section {
-  grid-area: info;
-  background-color: #ffffff88;
-  padding: 10px;
-  border-radius: 10px;
-  height: 100%;
-}
-
-.ticket-description-section p{
-  text-align: left;
-  color: black;
-  /* align-items: flex-start; */
-}
-
-.ticket-chat-section {
-  grid-area: chat;
-  background-color: #ffffff;
-  padding: 10px;
-  border-radius: 10px;
+.messages-list {
+  max-height: 300px;
   overflow-y: auto;
-  max-height: 100%;
+  border: 1px solid #ddd;
+  padding: 10px;
 }
 
-.ticket-message-item {
-  display: flex;
+.message-item {
   margin-bottom: 10px;
 }
 
-.ticket-user-message .ticket-message-bubble {
-  background-color: rgb(245, 212, 253);
-  margin-right: auto;
-}
-
-.ticket-message-bubble p{
-  color: black;
-  text-align: left;
-}
-
-.ticket-admin-message .ticket-message-bubble {
-  background-color: #c5cdff;
-  margin-left: auto;
-}
-
-.ticket-message-sender{
-  color: red;
-}
-
-.ticket-message-bubble {
-  padding: 10px;
-  border-radius: 10px;
-  max-width: 70%;
-}
-
-.ticket-send-message-bar {
-  grid-area: input;
-  display: flex;
-}
-
-.ticket-message-input {
-  grid-area: input;
-  width: 100%;
-  padding: 10px;
-
-  border: 1px solid #ddd;
-  border-radius: 25px;
-  resize: none;
-}
-
-.ticket-send-button {
-  grid-area: send-btn;
-  padding: 5px 10px;
-  border: none;
-  width: 80px;
-  border-radius: 25px;
-  cursor: pointer;
-  background-color: #1976d2;
-  color: white;
-  margin-left: 10px;
-}
-
-.ticket-mark-solved-section {
-  grid-area: ready;
-  margin-top: 10px;
-  text-align: center;
-}
-
-.ticket-mark-solved-button {
-  padding: 5px 10px;
-  border: none;
-  width: 100px;
-  border-radius: 15px;
-  cursor: pointer;
-  background-color: #5ab900;
-  color: white;
-  font-size: 15px;
+.message-timestamp {
+  font-size: 0.8em;
+  color: gray;
 }
