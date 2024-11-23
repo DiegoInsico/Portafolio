@@ -3,6 +3,8 @@ import { fetchUsageData, fetchStorageData } from "./graphs/dataService";
 import ExportButtons from "./graphs/exportButtons";
 import { Bar, Pie, Line } from "react-chartjs-2";
 import "./graphs.css";
+import Modal from "./graphs/modal";
+
 import {
   Chart as ChartJS,
   BarElement,
@@ -26,7 +28,8 @@ const Graphics = () => {
   const [chartData, setChartData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedChart, setSelectedChart] = useState("weeklyUsage");
-
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalContent, setModalContent] = useState(null);
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
@@ -63,6 +66,12 @@ const Graphics = () => {
 
     loadData();
   }, []);
+
+  const handleButtonClick = (chartType) => {
+    setSelectedChart(chartType);
+    setModalContent(`Detalles del gráfico: ${chartType}`);
+    setIsModalOpen(true);
+  };
 
   if (loading) {
     return (
@@ -161,6 +170,43 @@ const Graphics = () => {
     }
   };
 
+  const getWeeklyUsageDetails = () => {
+    const { countryData, emotionData } = chartData; // Datos de países y emociones
+    const mostFrequentEmotion = Object.keys(emotionData.datasets[0].data).reduce((a, b) =>
+      emotionData.datasets[0].data[a] > emotionData.datasets[0].data[b] ? a : b
+    );
+
+    const details = `
+      País con mayor actividad: ${
+        Object.keys(countryData.datasets[0].data)[0]
+      } 
+      Emoción más frecuente: ${mostFrequentEmotion}
+    `;
+    return details;
+  };
+
+  const getHourlyUsageDetails = () => {
+    const { hourlyRangeData, emotionData } = chartData;
+    const mostFrequentRange = Object.keys(hourlyRangeData.datasets[0].data).reduce((a, b) =>
+      hourlyRangeData.datasets[0].data[a] > hourlyRangeData.datasets[0].data[b] ? a : b
+    );
+
+    const mostFrequentEmotion = Object.keys(emotionData.datasets[0].data).reduce((a, b) =>
+      emotionData.datasets[0].data[a] > emotionData.datasets[0].data[b] ? a : b
+    );
+
+    const details = `
+      Rango de horas con mayor actividad: ${mostFrequentRange}
+      Emoción más frecuente durante este rango: ${mostFrequentEmotion}
+    `;
+    return details;
+  };
+
+  const handleOpenModal = (content) => {
+    setModalContent(content);
+    setIsModalOpen(true);
+  };
+
   if (loading) {
     return (
       <div className="graph-loading-container">
@@ -172,44 +218,62 @@ const Graphics = () => {
   return (
     <div className="graph-container">
       <h2>Gráficos de Uso</h2>
-      <div className="graph-filter-buttons">
-        <button onClick={() => setSelectedChart("weeklyUsage")}>
-          Uso Semanal
-        </button>
-        <button onClick={() => setSelectedChart("hourlyRange")}>
-          Rangos de Horas
-        </button>
-        <button onClick={() => setSelectedChart("emotionData")}>
-          Emociones
-        </button>
-        <button onClick={() => setSelectedChart("zodiacSignData")}>
-          Signos Zodiacales
-        </button>
-        <button onClick={() => setSelectedChart("categoryUsageData")}>
-          Categorías
-        </button>
-        <button onClick={() => setSelectedChart("dailyCreationsData")}>
-          Creaciones Diarias
-        </button>
-        <button onClick={() => setSelectedChart("countryData")}>
-          País
-        </button>
-        <button onClick={() => setSelectedChart("premiumUserData")}>
-          Usuarios Premium
-        </button>
-        <button onClick={() => setSelectedChart("verifiedUsers")}>
-          Usuarios Verificados
-        </button>
-        <button onClick={() => setSelectedChart("notifications")}>
-          Notificaciones
-        </button>
-        <button onClick={() => setSelectedChart("storageUsage")}>
-          Uso de Almacenamiento
-        </button>
-      </div>
+        <button>descargar xlxs</button>
+      <div className="graph-grid">
+        <div className="graph-item">
+        <button onClick={() => handleOpenModal(getWeeklyUsageDetails())}>
+        Ver mas detlalle</button>
+          <Bar data={chartData.weeklyData} options={{ maintainAspectRatio: true }} />
+        </div>
+        <div className="graph-item">
+        <button onClick={() => handleOpenModal(getHourlyUsageDetails())}>
+        Ver mas detlalle</button>
+          <Bar data={chartData.hourlyRangeData} options={{ maintainAspectRatio: true }} />
+        </div>
+        <div className="graph-item">
+        <button onClick={() => handleOpenModal("Detalles de Emociones")}>
+          Ver mas detlalle</button>
+          <Pie data={chartData.emotionData} options={{ maintainAspectRatio: true }} />
+        </div>
+        <div className="graph-item">
+        <button onClick={() => handleOpenModal("Detalles de Signos Zodiacales")}>
 
-      <div className="graph-section">{!loading && renderChart()}</div>
-      <ExportButtons data={chartData} />
+          Ver mas detlalle</button>
+          <Pie data={chartData.zodiacSignData} options={{ maintainAspectRatio: true }} />
+        </div>
+        <div className="graph-item">
+        <button onClick={() => handleOpenModal("Detalles de Categorías")}>
+
+          Ver mas detlalle</button>
+          <Bar data={chartData.categoryUsageData} options={{ maintainAspectRatio: true }} />
+        </div>
+        <div className="graph-item">
+        <button onClick={() => handleOpenModal("Detalles de Creaciones Diarias")}>
+        Ver mas detlalle</button>
+          <Line data={chartData.dailyCreationsData} options={{ maintainAspectRatio: true }} />
+        </div>
+        <div className="graph-item">
+        <button onClick={() => handleOpenModal("Pais y Ciudades")}>
+
+          Ver mas detlalle</button>
+          <Pie data={chartData.countryData} options={{ maintainAspectRatio: true }} />
+        </div>
+        <div className="graph-item">
+        <button onClick={() => handleOpenModal("Usuarios verificados")}>
+          Ver mas detlalle</button>
+          <Pie data={chartData.verifiedUserData} options={{ maintainAspectRatio: true }} />
+        </div>
+        <div className="graph-item">
+        <button onClick={() => handleOpenModal("Almacenamiento")}>
+          Ver mas detlalle</button>
+          <Bar data={chartData.storageUsageData} options={{ maintainAspectRatio: true }} />
+        </div>
+      </div>
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        content={modalContent}
+      />
     </div>
   );
 };
