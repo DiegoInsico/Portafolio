@@ -23,6 +23,9 @@ import Clouster from "./pages/monitor/clouster";
 import PrivateRoute from "./components/PrivateRoute";
 import TicketDetails from "./pages/system/TicketDetails";
 import RolManagment from "./pages/rol/rolManagment";
+import UserHeatmap from "./pages/monitor/graphs/userHeatmap";
+import "leaflet/dist/leaflet.css";
+
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(
@@ -101,6 +104,7 @@ const AppRoutes = ({
 
             {/* Gráficos */}
             <Route path="/monitor/graphics" element={<Graphics />} />
+            <Route path="/monitor/graphs/userHeatmap" element={<UserHeatmap />} />
 
             {/* Almacenamiento y Sistema */}
             <Route

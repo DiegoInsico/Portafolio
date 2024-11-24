@@ -1,3 +1,9 @@
+// 
+// necesito encontrar la diferencia de este con el
+// original y porque este si carga y el otro no xd
+
+
+
 import React, { useState, useEffect } from "react";
 import { fetchUsageData } from "./graphs/dataService";
 import { Bar, Pie, Line } from "react-chartjs-2";
@@ -108,39 +114,54 @@ const Graphics = () => {
           <UserHeatmap />
         </div>
 
-        {/* Gráfica de Categorías Más Usadas */}
+        {/* Categorías Más Usadas */}
         <div className="graph-item">
           <h3>Categorías Más Usadas</h3>
           {renderGraph(chartData.categoryUsageData, "Bar")}
           <button
             onClick={() =>
-              handleOpenModal(renderGraph(chartData.categoryUsageData, "Bar"))
+              handleOpenModal(
+                <div>
+                  <h3>Categorías Más Usadas</h3>
+                  {renderGraph(chartData.categoryUsageData, "Bar")}
+                </div>
+              )
             }
           >
             Ver más detalle
           </button>
         </div>
 
-        {/* Gráfica de Uso Semanal */}
+        {/* Uso Semanal */}
         <div className="graph-item">
           <h3>Uso Semanal</h3>
           {renderGraph(chartData.weeklyData, "Line")}
           <button
             onClick={() =>
-              handleOpenModal(renderGraph(chartData.weeklyData, "Line"))
+              handleOpenModal(
+                <div>
+                  <h3>Uso Semanal</h3>
+                  {renderGraph(chartData.weeklyData, "Line")}
+                </div>
+              )
             }
           >
             Ver más detalle
           </button>
         </div>
 
-        {/* Gráfica de Distribución Geográfica */}
+        {/* Otros gráficos */}
         <div className="graph-item">
           <h3>Distribución Geográfica</h3>
           {renderGraph(chartData.countryData, "Pie")}
           <button
             onClick={() =>
-              handleOpenModal(renderGraph(chartData.countryData, "Pie"))
+              handleOpenModal(
+                <div>
+                  <h3>Distribución Geográfica</h3>
+                  {renderGraph(chartData.countryData, "Pie")}
+                </div>
+              )
             }
           >
             Ver más detalle

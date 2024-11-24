@@ -8,7 +8,7 @@ import {
   BarChart,
   MusicNote,
   BugReport,
-  People,
+  Map,
   Inbox,
   ManageAccounts,
   Menu,
@@ -103,17 +103,17 @@ const MainLayout = ({ children, isAuthenticated, currentUser }) => {
                     {!isSidebarCollapsed && <span>Almacenaje</span>}
                   </NavLink>
                   <NavLink
-                    to="/monitor/SoulmatePage"
+                    to="/monitor/graphs/userHeatmap"
                     className={({ isActive }) =>
                       `main-layout-link ${
                         isActive ? "main-layout-link-active" : ""
                       }`
                     }
-                    title="Lista de Emociones y Canciones"
+                    title="Mapa de calor usuarios"
                   >
-                    <MusicNote className="main-layout-icon" />
+                    <Map className="main-layout-icon" />
                     {!isSidebarCollapsed && (
-                      <span>Lista de Emociones y Canciones</span>
+                      <span>Mapa de usuarios</span>
                     )}
                   </NavLink>
                   <NavLink

@@ -249,6 +249,26 @@ export const fetchDailyActivityData = async () => {
   };
 };
 
+export const getEntriesWithEmotions = async () => {
+  const snapshot = await getDocs(collection(db, "entradas"));
+  const data = snapshot.docs.map((doc) => {
+    const entry = doc.data();
+    const { emociones = [], categoria, color } = entry;
+
+    return {
+      lat: entry.lat || null, // Asegurar valores válidos o null
+      lng: entry.lng || null,
+      emociones,
+      categoria,
+      color,
+    };
+  });
+
+  // Filtrar documentos que no tienen coordenadas válidas
+  return data.filter((item) => item.lat !== null && item.lng !== null);
+};
+
+
 // Función para obtener datos de almacenamiento
 export const fetchStorageData = async () => {
   const storage = getStorage();
