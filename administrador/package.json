@@ -22,6 +22,7 @@
     "react-modal": "^3.16.1",
     "react-router-dom": "^6.27.0",
     "react-scripts": "5.0.1",
+    "react-simple-maps": "^3.0.0",
     "react-toastify": "^10.0.6",
     "react-window": "^1.8.10",
     "styled": "^1.0.0",

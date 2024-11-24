@@ -6,6 +6,7 @@ import {
   query,
   Timestamp,
   where,
+
 } from "firebase/firestore";
 import { db } from "../../../firebase";
 import { getMetadata, getStorage, listAll, ref } from "firebase/storage";
@@ -18,6 +19,26 @@ const isCacheValid = () => {
   const expirationTime = localStorage.getItem(CACHE_EXPIRATION_KEY);
   return expirationTime && new Date().getTime() < Number(expirationTime);
 };
+
+
+// Función para calcular la edad
+const calculateAge = (birthDate) => {
+  const today = new Date();
+  const birthDateObj = new Date(birthDate);
+  let age = today.getFullYear() - birthDateObj.getFullYear();
+  const monthDifference = today.getMonth() - birthDateObj.getMonth();
+
+  if (
+    monthDifference < 0 ||
+    (monthDifference === 0 && today.getDate() < birthDateObj.getDate())
+  ) {
+    age--;
+  }
+  
+
+  return age;
+};
+
 
 // Función para obtener el signo zodiacal
 const getZodiacSign = (birthDate) => {
@@ -43,22 +64,6 @@ const getZodiacSign = (birthDate) => {
   return "Capricornio";
 };
 
-// Función para calcular la edad
-const calculateAge = (birthDate) => {
-  const today = new Date();
-  const birthDateObj = new Date(birthDate);
-  let age = today.getFullYear() - birthDateObj.getFullYear();
-  const monthDifference = today.getMonth() - birthDateObj.getMonth();
-
-  if (
-    monthDifference < 0 ||
-    (monthDifference === 0 && today.getDate() < birthDateObj.getDate())
-  ) {
-    age--;
-  }
-
-  return age;
-};
 
 // Función para obtener datos del dashboard
 export const fetchDashboardData = async () => {
@@ -248,42 +253,50 @@ export const fetchDailyActivityData = async () => {
 export const fetchStorageData = async () => {
   const storage = getStorage();
   const storageRef = ref(storage, "/");
-  const storageData = { Imagen: 0, Video: 0, Audio: 0, Texto: 0 };
+  const storageData = {
+    Imagen: { count: 0, size: 0 },
+    Video: { count: 0, size: 0 },
+    Audio: { count: 0, size: 0 },
+    Texto: { count: 0, size: 0 },
+  };
 
   try {
-    const fileList = await listAll(storageRef);
+    const folderList = await listAll(storageRef);
 
-    for (const folder of fileList.prefixes) {
+    for (const folder of folderList.prefixes) {
       const folderRef = ref(storage, folder.fullPath);
-      const folderList = await listAll(folderRef);
+      const fileList = await listAll(folderRef);
 
-      for (const file of folderList.items) {
+      for (const file of fileList.items) {
         const metadata = await getMetadata(file);
         const contentType = metadata.contentType;
+        const size = metadata.size; // Tamaño en bytes
 
         if (contentType.startsWith("image/")) {
-          storageData.Imagen += 1;
+          storageData.Imagen.count += 1;
+          storageData.Imagen.size += size;
         } else if (contentType.startsWith("video/")) {
-          storageData.Video += 1;
+          storageData.Video.count += 1;
+          storageData.Video.size += size;
         } else if (
           contentType.startsWith("audio/") ||
           contentType === "application/ogg"
         ) {
-          storageData.Audio += 1;
+          storageData.Audio.count += 1;
+          storageData.Audio.size += size;
+        } else if (contentType.startsWith("text/")) {
+          storageData.Texto.count += 1;
+          storageData.Texto.size += size;
         }
       }
     }
-
-    const entriesCollection = collection(db, "entradas");
-    const entriesSnapshot = await getDocs(entriesCollection);
-    const textEntriesCount = entriesSnapshot.docs.filter(
-      (doc) => doc.data().texto
-    ).length;
-
-    storageData.Texto = textEntriesCount;
   } catch (error) {
     console.error("Error al obtener datos de almacenamiento:", error);
-    throw new Error("Error al obtener datos de almacenamiento.");
+  }
+
+  // Convertir tamaños a MB
+  for (const key in storageData) {
+    storageData[key].size = (storageData[key].size / (1024 * 1024)).toFixed(2); // Convertir a MB
   }
 
   return storageData;
@@ -367,17 +380,21 @@ export const fetchUsageData = async () => {
     const data = doc.data();
 
     if (data.birthDate) {
+      // 1. Calcular la edad
       const birthDateMs = data.birthDate.seconds * 1000;
       const age = calculateAge(birthDateMs);
+      const ageGroup = `${Math.floor(age / 10) * 10}s`;
       ageGroups[age] = (ageGroups[age] || 0) + 1;
-
+  
+      // 2. Obtener el signo zodiacal con base en la fecha de nacimiento
       const zodiac = getZodiacSign(birthDateMs);
       zodiacSigns[zodiac] = (zodiacSigns[zodiac] || 0) + 1;
     } else {
-      // Contar usuarios sin fecha de nacimiento
+      // Si no hay fecha de nacimiento, agrupar como "Desconocido"
       ageGroups["Undefined"] = (ageGroups["Undefined"] || 0) + 1;
     }
 
+    
     if (data.isPremium) premiumCount++;
     else nonPremiumCount++;
 

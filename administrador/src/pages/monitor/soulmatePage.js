@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { db } from "../../firebase";
 import { collection, getDocs } from "firebase/firestore";
-import "./styles.css";
 import Container from "../../components/container";
 import { Bar, Pie } from 'react-chartjs-2';
 
