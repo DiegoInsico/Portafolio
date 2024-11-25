@@ -1,25 +1,22 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import "./Dashboard.css"; // Archivo de estilos actualizado
-import Container from "../components/container";
+import "./Dashboard.css";
 import { collection, getDocs, query, where, orderBy } from "firebase/firestore";
 import { db } from "../firebase";
 import { Timestamp } from "firebase/firestore";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { MapContainer, TileLayer } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import UserHeatmap from "./monitor/graphs/userHeatmap";
 import {
   BarChart,
   Bar,
   LineChart,
-  Line,
   XAxis,
   YAxis,
   CartesianGrid,
-  Pie,
 } from "recharts";
+import { Line } from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import "chart.js/auto";
 
@@ -51,8 +48,7 @@ const Dashboard = () => {
 
   const showUnansweredTicketAlert = (ticket) => {
     toast.warn(
-      `Ticket sin respuesta desde ${ticket.lastUpdate.toLocaleDateString()} (${
-        ticket.diffInDays
+      `Ticket sin respuesta desde ${ticket.lastUpdate.toLocaleDateString()} (${ticket.diffInDays
       } días)`,
       {
         position: "top-right",
@@ -131,23 +127,19 @@ const Dashboard = () => {
       snapshot.forEach((doc) => {
         const data = doc.data();
 
-        // Verifica si existe un campo de fecha en los datos del documento
-        const dateField = data.fecha || new Date(); // Cambia "fecha" por el nombre del campo de fecha en tus documentos
-        const date = new Date(dateField).toLocaleDateString(); // Convierte a una fecha legible
+        // Usa fecha o predeterminada
+        const dateField = data.fecha
+          ? new Date(data.fecha.seconds * 1000)
+          : new Date();
+        const date = dateField.toLocaleDateString();
 
-        const level = data.nivel || "Sin Nivel"; // Nivel del usuario
+        const level = data.nivel || "Sin Nivel";
 
-        if (!levelData[date]) {
-          levelData[date] = {};
-        }
+        if (!levelData[date]) levelData[date] = {};
+        if (!levelData[date][level]) levelData[date][level] = 0;
 
-        if (!levelData[date][level]) {
-          levelData[date][level] = 0;
-        }
-
-        levelData[date][level] += 1; // Incrementa el conteo por nivel y fecha
+        levelData[date][level] += 1;
       });
-
       // Procesar datos para el gráfico
       const labels = Object.keys(levelData); // Fechas únicas
       const datasets = [];
@@ -710,22 +702,26 @@ const Dashboard = () => {
       <div className="info-section">
         <h1>Informacion</h1>
         <div className="card" onClick={() => handleModalOpen("activeUsers")}>
-          Usuarios Activos: {stats.activeUsers}
+          <h3>Usuarios Activos</h3>
+          <p>{stats.activeUsers}</p>
         </div>
         <div
           className="card"
           onClick={() => handleModalOpen("entriesUploaded")}
         >
-          Entradas Subidas: {stats.entriesUploaded}
+          <h3>Entradas Subidas</h3>
+          <p>{stats.entriesUploaded}</p>
         </div>
         <div
           className="card"
           onClick={() => handleModalOpen("dailyUserActivity")}
         >
-          Actividad Diaria: {stats.dailyUserActivity}
+          <h3>Actividad Diaria</h3>
+          <p>{stats.dailyUserActivity}</p>
         </div>
         <div className="card" onClick={() => handleModalOpen("lastActivity")}>
-          Última Actividad: {stats.lastActivity}
+          <h3>Última Actividad</h3>
+          <p>{stats.lastActivity}</p>
         </div>
       </div>
 
@@ -881,15 +877,15 @@ const Dashboard = () => {
         )}
       </div>
 
-        {/* visualizamos el mapa desde otra page */}
+      {/* visualizamos el mapa desde otra page */}
       <div className="map-section">
         <h1>Mapa de Usuarios</h1>
-        <div style={{ height: "300px", width: "100%" }}>
+        <div style={{ height: "100%", width: "100%" }}>
           <UserHeatmap />
         </div>
       </div>
 
-        {/* niveles de seguridad de los users */}
+      {/* niveles de seguridad de los users */}
       <div className="charts-section">
         <h1>Niveles de Seguridad de los Usuarios</h1>
         {chartData ? (
@@ -898,27 +894,12 @@ const Dashboard = () => {
             options={{
               responsive: true,
               plugins: {
-                legend: {
-                  position: "top",
-                },
-                tooltip: {
-                  enabled: true,
-                },
+                legend: { position: "top" },
+                tooltip: { enabled: true },
               },
               scales: {
-                x: {
-                  title: {
-                    display: true,
-                    text: "Fechas",
-                  },
-                },
-                y: {
-                  title: {
-                    display: true,
-                    text: "Cantidad",
-                  },
-                  beginAtZero: true,
-                },
+                x: { title: { display: true, text: "Fechas" } },
+                y: { title: { display: true, text: "Cantidad" }, beginAtZero: true },
               },
             }}
           />

@@ -1,18 +1,23 @@
-.inbox-main-container {
+.inbox-container {
   padding: 20px;
+  background-color: #f0f2f5;
+  width: 80%; /* Asegura que ocupe todo el ancho del contenedor */
+  box-sizing: border-box; /* Incluye padding en el cálculo del ancho */
 }
 
-.inbox-ticket-table {
+
+.inbox-header {
+  color: #333;
+  margin-bottom: 20px;
+}
+.data-grid-container {
+  flex: 1; /* Permite que el DataGrid se expanda para llenar el espacio */
   width: 100%;
-  border-collapse: collapse;
+  align-items: center;
 }
 
-.inbox-ticket-table th,
-.inbox-ticket-table td {
-  border: 1px solid #ddd;
-  padding: 8px;
-}
-
-.inbox-ticket-table th {
-  background-color: #f4f4f4;
+@media (max-width: 768px) {
+  .data-grid-container {
+    height: 400px; /* Reducir la altura en pantallas pequeñas */
+  }
 }

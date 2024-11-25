@@ -3,7 +3,7 @@
   grid-template-areas:
     "tickets info music"
     "map map charts";
-  grid-template-columns: 2fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr;
   grid-template-rows: auto 1fr;
   gap: 20px;
   padding: 20px;
@@ -22,12 +22,49 @@
   overflow-y: auto;
 }
 
+.tickets-section::-webkit-scrollbar {
+  width: 5px;
+  background-color: #ffffff; /* Fondo oscuro del scroll */
+}
+
+.tickets-section::-webkit-scrollbar-thumb {
+  background-color: #afafaf; /* Pulgar del scroll */
+  border-radius: 5px;
+}
+
+.tickets-section::-webkit-scrollbar-thumb:hover {
+  background-color: #777777;
+}
+
 .info-section {
   grid-area: info;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
   border: 1px solid #ddd;
   border-radius: 8px;
   padding: 20px;
   background-color: #fff;
+}
+
+.card{
+  /* background-color: rgba(225, 0, 0, 0.495); */
+  backdrop-filter: blur(5px);
+  border-radius: 10px;
+  border: 1px solid #00000025;
+  width: 100px;
+  height: 140px;
+  text-align: center;
+  margin: 0;
+}
+
+.info-section h1{
+  font-size: 5;
+}
+
+.card p{
+  font: 8px;
 }
 
 .music-section {
@@ -53,6 +90,12 @@
   padding: 20px;
   background-color: #fff;
 }
+
+.charts-section canvas{
+  height: 180px !important;
+}
+
+
 
 .popup {
   position: fixed;
