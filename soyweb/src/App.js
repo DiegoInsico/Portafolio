@@ -5,16 +5,18 @@ import Navbar from './components/NavBar/navBar';
 import Home from './page/home/home'
 import Prueba from './page/prueba';
 import AlbumPage from './page/album/pageAlbum';
+import DocumentManager from './page/organizes/pageOrganize';
 import LoginPage from './page/auth/login';
 import RegisterPage from './page/auth/register';
 import ProtectedRoute from './components/protectedRoute';
 import { AuthProvider } from './page/auth/authContext'; // Importa el AuthProvider
+import "./App.css";
 
 const ProtectedLayout = ({ children }) => (
-  <>
-    <Navbar />  {/* Navbar solo se muestra en rutas protegidas */}
+  <div className="protected-layout">
+    <Navbar />
     {children}
-  </>
+  </div>
 );
 
 function App() {
@@ -53,6 +55,16 @@ function App() {
               <ProtectedRoute>
                 <ProtectedLayout>
                   <AlbumPage />
+                </ProtectedLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/organize"
+            element={
+              <ProtectedRoute>
+                <ProtectedLayout>
+                  <DocumentManager />
                 </ProtectedLayout>
               </ProtectedRoute>
             }

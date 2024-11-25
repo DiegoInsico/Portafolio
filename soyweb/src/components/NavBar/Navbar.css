@@ -1,90 +1,111 @@
-/* src/components/Navbar.css */
-
 .navbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 15px 30px;
-    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.9), transparent);
     position: fixed;
     top: 0;
     width: 100%;
+    padding: 10px 20px;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.9), transparent);
     color: white;
-    font-family: Arial, sans-serif;
     z-index: 1000;
-    box-sizing: border-box;
+    transition: transform 0.3s ease-in-out, background 0.3s ease-in-out;
+    display: flex;
+    justify-content: center;
+}
+
+.navbar--hidden {
+    transform: translateY(-100%);
+}
+
+.navbar-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+    padding-bottom: 20px;
+    width: 100%;
+    max-width: 1200px;
 }
 
 .navbar-brand {
-    font-size: 2rem;
-    color: white;
+    font-size: 2.5rem;
     font-weight: bold;
+    color: white;
     text-decoration: none;
-    margin-right: 20px;
-    /* Espacio entre el logo y los enlaces */
+    transition: color 0.3s ease;
 }
 
-.navbar-center {
+.navbar-brand:hover {
+    color: #f0a500;
+}
+
+.navbar-links {
     display: flex;
     gap: 20px;
-    justify-content: center;
-    flex-grow: 1;
-    /* Hace que el contenedor central ocupe el espacio disponible */
 }
 
-.navbar-center a {
+.navbar-links a {
+    font-size: 1.5rem;
     color: white;
     text-decoration: none;
-    font-size: 1rem;
+    position: relative;
+    padding: 5px 0;
+    transition: color 0.3s ease;
 }
 
-.navbar-center a:hover {
-    text-decoration: underline;
+.navbar-links a::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 0%;
+    height: 2px;
+    background: #f0a500;
+    transition: width 0.3s ease;
+}
+
+.navbar-links a:hover {
+    color: #f0a500;
+}
+
+.navbar-links a:hover::after {
+    width: 100%;
 }
 
 .navbar-actions {
     display: flex;
     gap: 15px;
+    justify-content: flex-end;
 }
 
-.navbar-actions a,
 .logout-button {
+    font-size: 1.5rem;
     color: white;
-    text-decoration: none;
-    font-size: 1rem;
     background: none;
-    border: none;
+    border: 1px solid white;
+    padding: 5px 15px;
+    border-radius: 5px;
     cursor: pointer;
+    transition: background 0.3s ease, color 0.3s ease;
 }
 
 .logout-button:hover {
-    text-decoration: underline;
+    background: white;
+    color: black;
 }
 
 @media (max-width: 768px) {
-    .navbar {
+    .navbar-content {
         flex-direction: column;
-        align-items: center;
-        padding: 10px;
+        gap: 10px;
+        text-align: center;
     }
 
-    .navbar-brand {
-        font-size: 1.5rem;
-        margin-bottom: 10px;
-    }
-
-    .navbar-center,
-    .navbar-actions {
+    .navbar-links {
         flex-direction: column;
-        align-items: center;
-        width: 100%;
         gap: 10px;
     }
 
-    .navbar-center a,
-    .navbar-actions a,
     .logout-button {
-        text-align: center;
-        font-size: 0.9rem;
+        padding: 10px 20px;
+        width: 100%;
     }
 }

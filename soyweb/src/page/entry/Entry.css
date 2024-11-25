@@ -1,110 +1,67 @@
-/* src/entry/EntriesManager.css */
-
-/* General Layout */
-.entries-manager {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    padding: 16px;
-    border-radius: 10px;
-    background-color: #fff;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    height: 100%;
-    overflow-y: auto;
-}
-
-.entries-selector h3 {
-    margin-bottom: 12px;
-    font-size: 18px;
-    color: #333;
-    text-align: center;
-}
-
-.entries-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    /* Aumenta el ancho mínimo */
-    gap: 16px;
-    /* Aumenta el espacio entre tarjetas */
-    padding: 8px;
-}
-
-/* Ajustes para entry-card-wrapper */
-.entry-card-wrapper {
-    position: relative;
-    cursor: pointer;
-    border: 2px solid transparent;
-    border-radius: 8px;
-    transition: border 0.3s, transform 0.2s;
-    width: 100%;
-    min-height: 100px;
-    /* Aumenta la altura mínima */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    box-sizing: border-box;
-    /* Asegura que padding y border se incluyan en el tamaño total */
-    padding: 8px;
-    /* Añade padding interno */
-    background-color: #fafafa;
-    /* Fondo ligero para mejor visualización */
-}
-
-.entry-card-wrapper:hover {
-    border: 2px solid #3498db;
-    transform: scale(1.02);
-}
-
-.selected-overlay {
-    position: absolute;
-    top: 8px;
-    right: 8px;
-    background-color: rgba(52, 152, 219, 0.8);
-    color: #fff;
-    border-radius: 50%;
-    width: 24px;
-    height: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    font-size: 14px;
-}
-
-/* Asegurar que el contenido de la tarjeta no se desborde */
-.entry-card-wrapper p {
-    margin: 0;
-    font-size: 14px;
-    /* Aumenta el tamaño de fuente para mejor legibilidad */
-    color: #333;
-    text-align: center;
-    word-wrap: break-word;
-    /* Permite que las palabras largas se dividan */
+.wrapper {
     overflow: hidden;
-    text-overflow: ellipsis;
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    /* Limita a 3 líneas */
-    -webkit-box-orient: vertical;
+    position: relative;
+    width: 100%;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-    .entries-grid {
-        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-        /* Ajusta para pantallas más pequeñas */
-    }
+.inner {
+    display: flex;
+    transition: transform 0.5s ease;
+    will-change: transform;
+    width: 500px;
+}
 
-    .entry-card-wrapper {
-        min-height: 80px;
-        /* Ajusta la altura mínima para dispositivos móviles */
-    }
+.entry-card {
+    flex: 0 0 calc(100% / 3);
+    max-width: calc(100% / 3);
+    height: 350px;
+    box-sizing: border-box;
+    padding: 10px;
+    border-radius: 12px;
+    background-color: #fff;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 
-    .entry-card-wrapper p {
-        font-size: 12px;
-        /* Reduce el tamaño de fuente en móviles */
-        -webkit-line-clamp: 2;
-        /* Limita a 2 líneas en móviles */
-    }
+.entry-card {
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.card:hover {
+    transform: scale(1.5);
+}
+
+.entry-card.highlight {
+    transform: scale(1.5);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    border: 2px solid #007bff;
+    z-index: 10;
+}
+
+.arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 2rem;
+    color: #333;
+    cursor: pointer;
+    z-index: 10;
+    user-select: none;
+    opacity: 0.7;
+    transition: opacity 0.3s;
+}
+
+.left-arrow {
+    left: 10px;
+}
+
+.right-arrow {
+    right: 10px;
+}
+
+.arrow:hover {
+    opacity: 1;
 }

@@ -1,10 +1,13 @@
 /* src/album/CreateAlbum.css */
 
 .create-album-container {
-    z-index: 10;
-    padding: 16px;
     position: relative;
-    margin-left: 70%;
+    padding: 16px;
+    background-color: #ffffff;
+    /* Añadido fondo blanco */
+    width: 100%;
+    box-sizing: border-box;
+    z-index: 10;
 }
 
 .create-album-container h2 {

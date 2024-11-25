@@ -118,6 +118,7 @@
 /* Nueva Clase para la Sección de Entradas */
 .entries-section {
     flex: 1;
+    width: 100%;
     /* Menor proporción */
     display: flex;
     flex-direction: column;
@@ -161,4 +162,46 @@
 
 .save-album-btn{
     height: 100px;
+}
+
+/* Opciones del Contenedor */
+.options-container {
+    position: fixed;
+    top: 0; /* Alinea con el top del sidebar */
+    left: 250px; /* Ancho del sidebar cuando está expandido */
+    width: 400px; /* Ajusta según tus necesidades */
+    height: 100%; /* Para que coincida en altura con el sidebar */
+    background-color: #fff;
+    z-index: 9;
+    overflow-y: auto;
+    transition: left 0.3s ease;
+}
+
+.options-container.collapsed {
+    left: 60px; /* Ancho del sidebar cuando está colapsado */
+}
+
+/* Ajustes para responsive si es necesario */
+@media (max-width: 768px) {
+    .options-container {
+        left: 0;
+        width: 100%;
+        height: auto;
+        position: absolute;
+        top: 60px; /* Ajusta según la altura de tu menú en móviles */
+        z-index: 999; /* Asegúrate de que esté encima de otros elementos */
+    }
+}
+.draggable-entry{
+    justify-content: center;
+    height: 200px;
+    width: 180px;
+    border: 10px;
+    border-radius: 10px;
+    border:#333;
+    background-color: aqua;
+
+}
+.entry-content{
+    justify-content: flex-end;
 }

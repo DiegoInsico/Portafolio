@@ -1,3 +1,5 @@
+// src/firebase.js
+
 import { initializeApp } from "firebase/app";
 import {
     getAuth,
@@ -12,13 +14,15 @@ import {
     getDocs,
     query,
     where,
-    Timestamp,  // Importar Timestamp
-    addDoc,     // Importar addDoc
-    doc,        // Importar doc
-    updateDoc,  // Importar updateDoc
-    deleteDoc,   // Importar deleteDoc
-    getDoc
+    Timestamp,
+    addDoc,
+    doc,
+    updateDoc,
+    deleteDoc,
+    getDoc,
+    setDoc
 } from "firebase/firestore";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 // Configuración de Firebase
 const firebaseConfig = {
@@ -34,8 +38,10 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+const storage = getStorage(app);
 
-// Función para obtener Beneficiarios
+// **Funciones Existentes**
+
 export const getBeneficiarios = async () => {
     try {
         const beneficiariosCollection = collection(db, 'beneficiarios');
@@ -51,7 +57,6 @@ export const getBeneficiarios = async () => {
     }
 };
 
-// Función para obtener Usuarios
 export const getUsers = async () => {
     try {
         const usersCollection = collection(db, 'users');
@@ -67,7 +72,6 @@ export const getUsers = async () => {
     }
 };
 
-// Función para obtener Mensajes Programados
 export const getMensajesProgramados = async () => {
     try {
         const mensajesCollection = collection(db, 'mensajesProgramados');
@@ -83,22 +87,6 @@ export const getMensajesProgramados = async () => {
     }
 };
 
-// Función para obtener Testigos
-export const getTestigos = async () => {
-    try {
-        const testigosCollection = collection(db, 'testigo');
-        const snapshot = await getDocs(testigosCollection);
-
-        return snapshot.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data()
-        }));
-    } catch (error) {
-        console.error("Error al obtener testigos:", error);
-        throw error;
-    }
-};
-
 // Función para iniciar sesión y guardar la sesión en localStorage
 export const signIn = async (email, password) => {
     try {
@@ -108,6 +96,7 @@ export const signIn = async (email, password) => {
         console.log('Usuario autenticado y token guardado');
     } catch (error) {
         console.error("Error al iniciar sesión:", error);
+        throw error;
     }
 };
 
@@ -120,6 +109,7 @@ export const createUser = async (email, password) => {
         console.log('Usuario creado y autenticado:', user.uid);
     } catch (error) {
         console.error("Error al crear usuario:", error);
+        throw error;
     }
 };
 
@@ -131,9 +121,11 @@ export const signOutUser = async () => {
         console.log('Usuario ha cerrado sesión');
     } catch (error) {
         console.error("Error al cerrar sesión:", error);
+        throw error;
     }
 };
 
+// Funciones relacionadas con álbumes
 export const getAlbums = async (userId) => {
     try {
         const albumsCollection = collection(db, 'users', userId, 'albums');
@@ -177,6 +169,7 @@ export const updateAlbum = async (userId, albumId, updatedData) => {
         throw error;
     }
 };
+
 export const deleteAlbum = async (userId, albumId) => {
     try {
         const albumDocRef = doc(db, 'users', userId, 'albums', albumId);
@@ -188,7 +181,7 @@ export const deleteAlbum = async (userId, albumId) => {
     }
 };
 
-// Función para obtener las entradas desde Firestore
+// Funciones relacionadas con entradas
 export const getEntries = async (userId) => {
     try {
         const entriesCollection = collection(db, 'entradas');
@@ -286,4 +279,113 @@ export const setAlbumBgColor = async (userId, albumId, color) => {
     }
 };
 
-export { auth, db };
+// Funciones para documentos
+export const addDocument = async (userId, { title, texto, testigo }) => {
+    try {
+        const documentCollection = collection(db, "documentos");
+        const newDocument = {
+            userId,
+            title,
+            texto,
+            testigo,
+            createdAt: Timestamp.now(),
+        };
+        const docRef = await addDoc(documentCollection, newDocument);
+        console.log("Documento creado con ID:", docRef.id);
+        return { id: docRef.id, ...newDocument };
+    } catch (error) {
+        console.error("Error al agregar documento:", error);
+        throw error;
+    }
+};
+
+export const editDocument = async (documentId, updatedData) => {
+    try {
+        const docRef = doc(db, "documentos", documentId);
+        await updateDoc(docRef, updatedData);
+        console.log("Documento actualizado con éxito:", documentId);
+    } catch (error) {
+        console.error("Error al actualizar el documento:", error);
+        throw error;
+    }
+};
+
+// Función para obtener los documentos de un usuario específico
+export const getDocuments = async (userId) => {
+    try {
+        const documentsCollection = collection(db, "documentos");
+        const q = query(documentsCollection, where("userId", "==", userId));
+        const snapshot = await getDocs(q);
+        return snapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+        }));
+    } catch (error) {
+        console.error("Error al obtener documentos:", error);
+        throw error;
+    }
+};
+
+export const getTestigos = async (userId) => {
+    try {
+        const testigosCollection = collection(db, "testigos");
+        const q = query(testigosCollection, where("userId", "==", userId));
+        const snapshot = await getDocs(q);
+
+        return snapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+        }));
+    } catch (error) {
+        console.error("Error al obtener testigos:", error);
+        throw error;
+    }
+};
+
+// **Nueva Función para Obtener un Usuario por ID**
+export const getUserById = async (userId) => {
+    try {
+        const userDocRef = doc(db, 'users', userId);
+        const userDoc = await getDoc(userDocRef);
+        if (userDoc.exists()) {
+            return { id: userDoc.id, ...userDoc.data() };
+        } else {
+            console.log("No existe el usuario con el ID proporcionado.");
+            return null;
+        }
+    } catch (error) {
+        console.error("Error al obtener el usuario:", error);
+        throw error;
+    }
+};
+
+// **Subir PDF directamente a Firebase Storage**
+export const uploadPdfToStorage = async (userId, pdfBlob) => {
+    try {
+        // Crea una referencia en Storage
+        const pdfRef = ref(storage, `pdfs/${userId}/documento.pdf`);
+        // Sube el archivo
+        await uploadBytes(pdfRef, pdfBlob, { contentType: "application/pdf" });
+        // Obtén la URL del archivo subido
+        const pdfUrl = await getDownloadURL(pdfRef);
+        return pdfUrl;
+    } catch (error) {
+        console.error("Error al subir el PDF a Storage:", error);
+        throw error;
+    }
+};
+
+// **Guardar la URL en Firestore**
+export const savePdfUrlInFirestore = async (userId, pdfUrl) => {
+    try {
+        const pdfDocRef = doc(db, "pdfs", userId);
+        await setDoc(pdfDocRef, { url: pdfUrl, createdAt: new Date() }, { merge: true });
+        console.log("URL del PDF guardada en Firestore.");
+    } catch (error) {
+        console.error("Error al guardar la URL del PDF en Firestore:", error);
+        throw error;
+    }
+};
+
+// Exportar auth, db y storage para su uso en otros componentes
+export { auth, db, storage };

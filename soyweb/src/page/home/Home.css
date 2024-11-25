@@ -1,6 +1,7 @@
 /* src/pages/Home.css */
 
 .main {
+    margin-top: 0px;
     width: 100%;
     /* Eliminar overflow-x: hidden para permitir desplazamiento horizontal en hijos */
     overflow-x: visible;
@@ -46,6 +47,7 @@
 .home {
     height: 100vh;
     display: flex;
+    padding-top: 20px;
     flex-direction: column;
     align-items: center;
     justify-content: center;
@@ -85,157 +87,6 @@
 .home p {
     font-size: 1.2rem;
     max-width: 600px;
-    margin-top: 20px;
-    line-height: 1.6;
-    color: rgba(255, 255, 255, 0.8);
-    /* Texto ligeramente transparente */
-    position: relative;
-    z-index: 2;
-    /* Encima del filtro oscuro */
-    font-family: 'Arial', sans-serif;
-}
-
-.historia {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding-top: 100px;
-    max-width: 100%;
-    height: 100vh;
-    background: url('../../../public/fondo3.jpg') center/cover no-repeat;
-    /* Imagen de fondo */
-    position: relative;
-    color: white;
-    text-align: center;
-}
-
-.historia::before,
-.historia::after {
-    z-index: 1;
-    /* Mantén el blur en el fondo */
-}
-
-.historia::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    /* Filtro oscuro sobre la imagen de fondo */
-    backdrop-filter: blur(5px);
-    /* Difumina la imagen para un efecto elegante */
-    z-index: 1;
-}
-
-.historia h1 {
-    font-size: 4rem;
-    font-weight: 300;
-    letter-spacing: 5px;
-    margin: 0;
-    font-family: 'Georgia', serif;
-    /* Fuente elegante */
-    position: relative;
-    z-index: 2;
-    /* Encima del filtro oscuro */
-}
-
-.historia p {
-    font-size: 1.2rem;
-    max-width: 600px;
-    margin-top: 20px;
-    line-height: 1.6;
-    color: rgba(255, 255, 255, 0.8);
-    /* Texto ligeramente transparente */
-    position: relative;
-    z-index: 2;
-    /* Encima del filtro oscuro */
-    font-family: 'Arial', sans-serif;
-}
-
-.history-line-card {
-    background-color: rgba(255, 255, 255, 0.9);
-    /* Fondo blanco semitransparente */
-    border-radius: 15px;
-    box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.2);
-    width: 80%;
-    max-width: 1200px;
-    padding: 50px;
-    text-align: center;
-    position: relative;
-    z-index: 3;
-    /* Asegura que esté por encima del blur */
-    margin: 0 auto;
-    /* Centra el contenedor horizontalmente */
-}
-
-.album {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding-top: 100px;
-    height: 100%;
-    background: url('../../../public/fondo2.jpg') center/cover no-repeat;
-    /* Imagen de fondo */
-    position: relative;
-    color: white;
-    text-align: center;
-}
-
-.AlbumCard{
-    z-index: 10;
-}
-
-.album,
-.ordena {
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    background-position: center;
-    background-size: cover;
-    position: relative;
-    color: white;
-    text-align: center;
-}
-
-.album::before,
-.ordena::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    /* Filtro oscuro sobre la imagen de fondo */
-    backdrop-filter: blur(5px);
-    /* Difumina la imagen para un efecto elegante */
-    z-index: 1;
-}
-
-.album h1,
-.ordena h1 {
-    font-size: 4rem;
-    font-weight: 300;
-    letter-spacing: 5px;
-    margin: 0;
-    font-family: 'Georgia', serif;
-    /* Fuente elegante */
-    position: relative;
-    z-index: 2;
-    /* Encima del filtro oscuro */
-}
-
-.album p,
-.ordena p {
-    font-size: 1.2rem;
-    max-width: 600px;
-    margin-top: 20px;
     line-height: 1.6;
     color: rgba(255, 255, 255, 0.8);
     /* Texto ligeramente transparente */

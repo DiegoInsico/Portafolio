@@ -1,0 +1,75 @@
+/* Contenedor general */
+.add-document-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    /* Espaciado uniforme entre elementos */
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+    font-family: Arial, sans-serif;
+    color: #333;
+    /* Texto gris oscuro */
+}
+
+/* Título del formulario */
+.add-document-container h2 {
+    font-size: 20px;
+    font-weight: bold;
+    color: #333;
+    /* Gris oscuro */
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+/* Inputs y textarea */
+.add-document-container input,
+.add-document-container select,
+.add-document-container textarea {
+    width: 100%;
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    /* Borde gris claro */
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    /* Fondo claro */
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+    /* Sombra sutil interna */
+    transition: border-color 0.3s ease;
+}
+
+.add-document-container input:focus,
+.add-document-container select:focus,
+.add-document-container textarea:focus {
+    border-color: #6b705c;
+    /* Resaltar al enfocar */
+    outline: none;
+}
+
+/* Botón de guardar */
+.add-document-container button {
+    background-color: #6b705c;
+    /* Color principal */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 15px;
+    font-size: 16px;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.add-document-container button:disabled {
+    background-color: #ccc;
+    /* Botón desactivado */
+    cursor: not-allowed;
+}
+
+.add-document-container button:hover:not(:disabled) {
+    background-color: #a5a58d;
+    /* Color más claro al pasar el ratón */
+    transform: translateY(-2px);
+    /* Efecto de elevación */
+}

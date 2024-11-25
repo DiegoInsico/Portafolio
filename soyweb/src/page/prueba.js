@@ -1,23 +1,25 @@
-import React from 'react';
-import { useAuth } from '../page/auth/authContext'; // Hook para obtener el usuario autenticado
-import useEntries from './entry/useEntries';
-import SideMenu from './album/sideMenu';
-import './Prueba.css';
+import React, { useContext } from 'react';
+import EntriesManager from './entry/entry';  // Asegúrate de importar correctamente el componente
+import { useAuth } from './auth/authContext'; // Asegúrate de tener este contexto configurado
+import DocumentManager from './organizes/pageOrganize';
 
-const Prueba = () => {
-    const { currentUser } = useAuth(); // Obtén el usuario autenticado
-    const { entries, loading } = useEntries(currentUser); // Usa las entradas del usuario
+const Pruebas = () => {
+    // Obtener el usuario autenticado desde el contexto de autenticación
+    const { currentUser } = useAuth();
 
-    if (loading) {
-        return <div>Cargando entradas...</div>;
+    // Verifica si hay un usuario autenticado
+    if (!currentUser) {
+        return <p>No estás autenticado. Inicia sesión para continuar.</p>;
     }
 
+    
+
     return (
-        <div className="testing-page">
-            <h1>Ambiente de Pruebas</h1>
-            <SideMenu />
+        <div className="test-container">
+            <DocumentManager />
+            
         </div>
     );
 };
 
-export default Prueba;
+export default Pruebas;
