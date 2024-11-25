@@ -24,22 +24,12 @@ import {
 } from "firebase/firestore";
 import { db } from "../../utils/firebase";
 import { FontAwesome } from "@expo/vector-icons";
-import ModalEntry from "../entrys/modalEntry";
 import { AuthContext } from "../../context/AuthContext";
 import SideBarMenu from "../../components/navigation/sideBarMenu";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons"; // Para los íconos de búsqueda
+import { categoryColors } from "../../utils/categoryColors"; // Importa categoryColors
 
 const { width: viewportWidth } = Dimensions.get("window");
-
-// Mapeo de categorías a colores pastel de planetas
-const categoryColors = {
-  Alegria: "#FFE4B5", // Moccasin (Sol)
-  Tristeza: "#B0C4DE", // LightSteelBlue (Neptuno)
-  Ira: "#FFB6C1", // LightPink (Marte)
-  Miedo: "#FFDAB9", // PeachPuff (Venus)
-  Idea: "#98FB98", // PaleGreen (Tierra)
-  Consejo: "#FFE4C4", // Bisque (Júpiter)
-};
 
 const Home = ({ navigation }) => {
   const [question, setQuestion] = useState("");
@@ -247,13 +237,13 @@ const Home = ({ navigation }) => {
         translucent
       />
       <ImageBackground
-        source={require("../../assets/background/fondo2.webp")}
+        source={require("../../assets/background/fondo2.webp")} // Asegúrate de tener esta imagen en la ruta indicada
         style={styles.background}
         resizeMode="cover"
       >
         {/* Botón para abrir el menú */}
         <TouchableOpacity style={styles.menuButton} onPress={toggleMenu}>
-          <FontAwesome name="bars" size={24} color="#fff" />
+          <FontAwesome name="bars" size={24} color="#000" />
         </TouchableOpacity>
 
         <View style={styles.container}>
@@ -385,11 +375,11 @@ const styles = StyleSheet.create({
   greetingText: {
     fontSize: 28,
     fontWeight: "bold",
-    color: "#000",
+    color: "#000", // Ajustado para mejor contraste sobre el fondo
   },
   dateText: {
     fontSize: 16,
-    color: "#000",
+    color: "#000", // Ajustado para mejor contraste sobre el fondo
     marginTop: 5,
   },
   menuButton: {
@@ -447,7 +437,6 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     // Elevation for Android
     elevation: 5,
-    backgroundColor: "#fff",
   },
   buttonImage: {
     width: "60%",

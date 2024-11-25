@@ -1,4 +1,4 @@
-// AppNavigator.js
+// src/navigation/AppNavigator.js
 
 import React, { useContext } from "react";
 import { createStackNavigator } from "@react-navigation/stack";
@@ -6,17 +6,17 @@ import { Image, StyleSheet } from "react-native";
 
 // Importar pantallas
 import MainTabs from "./MainTabs";
-import UserProfile from "../../screens/user/userProfile";
+import UserProfile from "../../screens/user/userProfile"; // Ruta corregida
 import Testigos from "../../screens/user/Testigos";
 import Beneficiarios from "../../screens/user/Beneficiarios";
 import SettingsScreen from "../../screens/settings/SettingsScreen";
-import SecuritySettings from "../../components/security/SecurittySettings";
+import SecuritySettings from "../../components/security/SecurittySettings"; // Asegúrate que el nombre del archivo sea correcto
 import Login from "../../screens/auth/login";
 import Registro from "../../screens/auth/register";
 import RequestPasswordReset from "../../screens/auth/resetPass";
 import ProgramarMensaje from "../../screens/entrys/ProgramarMensaje";
 import Suscripcion from "../../screens/suscripcion/Suscripcion";
-import Soporte from "../../screens/soporte/Soporte"; // Importar la nueva pantalla
+import Soporte from "../../screens/soporte/Soporte";
 import CrearTicket from "../../screens/soporte/CrearTicket";
 import ListaTickets from "../../screens/soporte/ListaTickets";
 import DetalleTicket from "../../screens/soporte/DetalleTicket";
@@ -25,6 +25,7 @@ import ListEntry from "../../screens/entrys/ListEntry";
 import { AuthContext } from "../../context/AuthContext";
 import EntryScreen from "../../screens/entrys/EntryScreen";
 import EntryDetailScreen from "../../screens/entrys/EntryDetailScreen";
+import ReflexionListScreen from "../../screens/entrys/ReflexionListScreen";
 
 const Stack = createStackNavigator();
 
@@ -95,12 +96,12 @@ export default function AppNavigator() {
           />
           <Stack.Screen
             name="SecuritySettings"
-            component={SecuritySettings} // Agrega SecuritySettings aquí
+            component={SecuritySettings} // Asegúrate que el nombre del archivo sea correcto
             options={{ title: "Configuración de Seguridad" }}
           />
           <Stack.Screen
             name="ProgramarMensaje"
-            component={ProgramarMensaje} // Agrega SecuritySettings aquí
+            component={ProgramarMensaje}
             options={{ title: "Programar un Mensaje" }}
           />
           <Stack.Screen
@@ -149,6 +150,11 @@ export default function AppNavigator() {
             name="EntryDetailScreen"
             component={EntryDetailScreen}
             options={{ title: "Detalle" }}
+          />
+          <Stack.Screen
+            name="ReflexionListScreen"
+            component={ReflexionListScreen}
+            options={{ title: "Reflexion List" }}
           />
         </>
       ) : (

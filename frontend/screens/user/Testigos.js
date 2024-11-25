@@ -155,7 +155,7 @@ const Testigos = () => {
 
   return (
     <ImageBackground
-      source={require("../../assets/background/config.jpg")}
+      source={require("../../assets/background/config.webp")}
       style={styles.backgroundImage}
     >
       <ScrollView contentContainerStyle={styles.container}>
@@ -253,24 +253,25 @@ const styles = StyleSheet.create({
   },
   container: {
     flexGrow: 1,
-    paddingTop: 70, // Igual que headerStyle.height
+    paddingTop: 70,
     padding: 20,
-    backgroundColor: "rgba(44, 62, 80, 0.5)", // Overlay oscuro para mejorar la legibilidad
+    backgroundColor: "rgba(0, 0, 0, 0.2)", // Overlay oscuro
   },
   header: {
-    fontSize: 24,
+    fontSize: 26,
     fontWeight: "bold",
     textAlign: "center",
     marginBottom: 20,
-    color: "#FFD700",
+    color: "#FFFFFF", // Texto blanco
   },
   input: {
     borderWidth: 1,
-    borderColor: "#FFD700",
-    borderRadius: 8,
-    padding: 10,
-    marginBottom: 10,
-    backgroundColor: "#FFF",
+    borderColor: "#CCCCCC",
+    borderRadius: 10,
+    padding: 12,
+    marginBottom: 15,
+    backgroundColor: "#FFFFFF", // Fondo blanco
+    fontSize: 16,
   },
   form: {
     marginBottom: 30,
@@ -278,75 +279,97 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 16,
     marginBottom: 5,
-    color: "#FFD700",
+    color: "#FFFFFF",
+    fontWeight: "600",
   },
   imagePicker: {
     alignItems: "center",
+    justifyContent: "center",
     marginVertical: 10,
     padding: 10,
-    borderColor: "#FFD700",
+    borderColor: "#FFFFFF",
     borderWidth: 1,
-    borderRadius: 8,
+    borderRadius: 12,
+    backgroundColor: "transparent",
   },
   imagePickerText: {
-    color: "#FFD700",
-    fontWeight: "bold",
+    color: "#FFFFFF",
+    fontWeight: "600",
   },
   imagePreview: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
+    width: 100,
+    height: 100,
+    borderRadius: 50,
     marginTop: 10,
+    borderWidth: 2,
+    borderColor: "#FFFFFF",
   },
   subheader: {
-    fontSize: 20,
-    color: "#FFD700",
+    fontSize: 22,
+    color: "#FFFFFF",
     fontWeight: "bold",
     marginVertical: 15,
+    textAlign: "center",
   },
   card: {
-    backgroundColor: "#4B4E6D",
-    padding: 15,
-    borderRadius: 8,
-    marginBottom: 10,
+    backgroundColor: "#333333", // Fondo oscuro para tarjetas
+    padding: 20,
+    borderRadius: 15,
+    marginBottom: 15,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
+    shadowOpacity: 0.5,
+    shadowRadius: 6,
+    elevation: 5,
   },
   name: {
-    fontSize: 18,
-    color: "#FFD700",
+    fontSize: 20,
+    color: "#FFFFFF", // Texto blanco
     fontWeight: "bold",
+    marginBottom: 5,
   },
   email: {
     fontSize: 16,
-    color: "#F0E4C2",
+    color: "#CCCCCC", // Texto gris claro
+    marginBottom: 5,
   },
   phone: {
     fontSize: 14,
-    color: "#F0E4C2",
+    color: "#AAAAAA", // Texto gris más oscuro
   },
   buttonGroup: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginTop: 10,
+    marginTop: 15,
+  },
+  buttonIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "#444444", // Botón gris oscuro
+    alignItems: "center",
+    justifyContent: "center",
+    marginHorizontal: 5,
+  },
+  buttonIconText: {
+    color: "#FFFFFF",
+    fontWeight: "bold",
+    fontSize: 18,
   },
   loading: {
     flex: 1,
     justifyContent: "center",
   },
   uploadCertificateButton: {
-    backgroundColor: "#1E90FF",
+    backgroundColor: "#444444", // Fondo gris oscuro
     padding: 15,
-    borderRadius: 8,
+    borderRadius: 12,
     marginBottom: 20,
-    width: '100%',
-    alignItems: 'center',
+    alignItems: "center",
   },
   uploadCertificateButtonText: {
-    color: '#FFF',
-    fontWeight: 'bold',
+    color: "#FFFFFF",
+    fontWeight: "600",
     fontSize: 16,
   },
 });

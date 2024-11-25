@@ -38,27 +38,19 @@ import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import uuid from "react-native-uuid";
 import SegmentedControl from "@react-native-segmented-control/segmented-control";
 import { Video } from "expo-av";
+import { categoryColors } from "../../utils/categoryColors"; // Importa categoryColors
 
-// Definir una paleta de colores moderna
+// Definir una paleta de colores moderna y armoniosa
 const COLORS = {
-  primary: "#000", // Morado suave
-  secondary: "#FFD700", // Dorado brillante
-  background: "#F0F4F8", // Azul muy claro
+  primary: "#4A90E2", // Azul vibrante
+  secondary: "#50E3C2", // Verde menta
+  background: "#F5F7FA", // Gris muy claro
   surface: "#FFFFFF", // Blanco puro
-  error: "#FF4B4B", // Rojo vibrante
-  text: "#333333", // Gris oscuro para texto
-  placeholder: "#A0AEC0", // Gris claro para placeholders
-  border: "#CBD5E0", // Gris muy claro para bordes
-  delete: "#FF4B4B", // Rojo vibrante para eliminar
-};
-
-const categoryColors = {
-  Alegria: "#FFE4B5", // Moccasin (Sol)
-  Tristeza: "#B0C4DE", // LightSteelBlue (Neptuno)
-  Ira: "#FFB6C1", // LightPink (Marte)
-  Miedo: "#FFDAB9", // PeachPuff (Venus)
-  Idea: "#98FB98", // PaleGreen (Tierra)
-  Consejo: "#FFE4C4", // Bisque (Júpiter)
+  error: "#E74C3C", // Rojo intenso
+  text: "#2C3E50", // Azul oscuro para texto
+  placeholder: "#95A5A6", // Gris medio para placeholders
+  border: "#DCDCDC", // Gris claro para bordes
+  delete: "#E74C3C", // Rojo intenso para eliminar
 };
 
 // URL de la imagen de fondo
@@ -210,7 +202,7 @@ const EntryScreen = ({ navigation, route }) => {
 
     // Comprobamos el límite de entradas por nivel
     const userEntriesQuery = query(
-      collection(db, "entradas"),
+      collection(db, "entries"),
       where("userId", "==", user.uid),
       where("nivel", "==", nivel)
     );
@@ -241,10 +233,8 @@ const EntryScreen = ({ navigation, route }) => {
       (selectedType === "Audio" && !audioUri) ||
       (selectedType === "Galería" &&
         !media &&
-        galeriaSubType === "Texto" &&
-        !texto &&
-        galeriaSubType === "Audio" &&
-        !audioUri) ||
+        (galeriaSubType === "Texto" || galeriaSubType === "Audio") &&
+        (!texto && !audioUri)) ||
       (selectedType === "Spotify" && !cancion)
     ) {
       Alert.alert(
@@ -337,15 +327,14 @@ const EntryScreen = ({ navigation, route }) => {
         cancion: cancionData || null,
         media: mediaURL || null,
         mediaType: mediaType || null,
-        color, // Color asignado automáticamente según la categoría
+        color: categoryColors[categoria] || COLORS.surface, // Asignar color basado en la categoría
         baul,
         fechaCreacion: serverTimestamp(),
         fechaRecuerdo: enableRecuerdoDate ? selectedDate : null,
         emociones,
         nivel,
         isProtected: nivel === "2" || nivel === "3",
-    };
-    
+      };
 
       const docRef = await addDoc(collection(db, "entradas"), nuevaEntrada);
       await updateDoc(docRef, { id: docRef.id });
@@ -377,7 +366,7 @@ const EntryScreen = ({ navigation, route }) => {
     setBaul(false);
     setEnableRecuerdoDate(false);
     setGaleriaSubType("Texto");
-};
+  };
 
   const onChangeDate = (event, selectedDateValue) => {
     const currentDate = selectedDateValue || new Date();
@@ -445,7 +434,7 @@ const EntryScreen = ({ navigation, route }) => {
               }}
               tintColor={COLORS.secondary}
               style={styles.segmentedControl}
-              fontStyle={{ color: COLORS.primary }}
+              fontStyle={{ color: COLORS.text }}
               activeFontStyle={{ color: COLORS.surface, fontWeight: "700" }}
             />
 
@@ -517,7 +506,7 @@ const EntryScreen = ({ navigation, route }) => {
                   }}
                   tintColor={COLORS.secondary}
                   style={styles.subSegmentedControl}
-                  fontStyle={{ color: COLORS.primary }}
+                  fontStyle={{ color: COLORS.text }}
                   activeFontStyle={{ color: COLORS.surface, fontWeight: "700" }}
                 />
 
@@ -719,9 +708,9 @@ const pickerSelectStyles = StyleSheet.create({
     borderWidth: 1,
     borderColor: COLORS.border,
     borderRadius: 8,
-    color: "black",
+    color: COLORS.text,
     paddingRight: 30,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.surface,
     width: "100%",
     marginBottom: 15,
   },
@@ -732,9 +721,9 @@ const pickerSelectStyles = StyleSheet.create({
     borderWidth: 1,
     borderColor: COLORS.border,
     borderRadius: 8,
-    color: "black",
+    color: COLORS.text,
     paddingRight: 30,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.surface,
     width: "100%",
     marginBottom: 15,
   },
@@ -756,7 +745,7 @@ const styles = StyleSheet.create({
   },
   scrollContainer: {
     padding: 20,
-    backgroundColor: "rgba(255, 255, 255, 0.3)", // Fondo semi-transparente para destacar el contenido
+    backgroundColor: "rgba(255, 255, 255, 0.9)", // Fondo semi-transparente más claro
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     paddingBottom: 40, // Espacio extra para evitar que los botones queden ocultos
@@ -769,8 +758,8 @@ const styles = StyleSheet.create({
     color: COLORS.primary,
   },
   label: {
-    marginTop: 2,
-    marginBottom: 2,
+    marginTop: 10,
+    marginBottom: 5,
     fontWeight: "600",
     color: COLORS.text,
     fontSize: 16,
@@ -782,7 +771,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 12,
     textAlignVertical: "top",
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.surface,
     color: COLORS.text,
     width: "100%",
     marginBottom: 15,
@@ -794,7 +783,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 12,
     textAlignVertical: "top",
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.surface,
     height: 120,
     width: "100%",
     marginBottom: 15,
@@ -802,18 +791,22 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   segmentedControl: {
-    marginBottom: 5,
+    marginBottom: 15,
     width: "100%",
     height: 45,
     borderRadius: 30,
     backgroundColor: COLORS.surface,
+    borderColor: COLORS.border,
+    borderWidth: 1,
   },
   subSegmentedControl: {
-    marginBottom: 10,
+    marginBottom: 15,
     width: "100%",
     height: 40,
     borderRadius: 20,
     backgroundColor: COLORS.surface,
+    borderColor: COLORS.border,
+    borderWidth: 1,
   },
   botonContainer: {
     flexDirection: "row",
@@ -828,6 +821,11 @@ const styles = StyleSheet.create({
     marginRight: 10,
     alignItems: "center",
     justifyContent: "center",
+    shadowColor: COLORS.primary,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 5,
   },
   botonCancelar: {
     backgroundColor: COLORS.error,
@@ -837,6 +835,11 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     alignItems: "center",
     justifyContent: "center",
+    shadowColor: COLORS.error,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 5,
   },
   botonTexto: {
     color: COLORS.surface,
@@ -852,6 +855,8 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     backgroundColor: "#e0e0e0",
     marginBottom: 15,
+    borderWidth: 1,
+    borderColor: COLORS.border,
   },
   mediaPreview: {
     width: "100%",
@@ -881,10 +886,15 @@ const styles = StyleSheet.create({
     width: "100%",
     height: 200,
     borderRadius: 12,
-    backgroundColor: "rgba(255, 255, 255, 0.6)",
+    backgroundColor: "rgba(255, 255, 255, 0.8)",
     borderWidth: 2,
     borderColor: COLORS.secondary,
     borderStyle: "dashed",
+    shadowColor: COLORS.secondary,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
   },
   galleryButtonText: {
     marginTop: 15,
@@ -918,6 +928,11 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 10,
     marginBottom: 12,
+    shadowColor: COLORS.border,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
   },
   trackImage: {
     width: 60,

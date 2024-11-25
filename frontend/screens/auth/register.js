@@ -16,6 +16,7 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
 } from "react-native";
+import { Picker } from "@react-native-picker/picker"; // Importa Picker
 import { createUserWithEmailAndPassword, updateProfile, signOut } from "firebase/auth"; // <--- Importa signOut
 import { auth, db } from "../../utils/firebase";
 import { Formik } from "formik";
@@ -23,6 +24,11 @@ import * as Yup from "yup";
 import { Ionicons } from "@expo/vector-icons";
 import { doc, setDoc } from "firebase/firestore"; // Importa setDoc para Firestore
 import DateTimePicker from "@react-native-community/datetimepicker";
+
+// Importa listas de países, ciudades y comunas
+import { countries } from "../../utils/countries";
+import { cities } from "../../utils/cities";
+import { comunas } from "../../utils/comunas";
 
 // Función para mapear códigos de error a mensajes amigables
 const getErrorMessage = (error) => {
@@ -61,6 +67,16 @@ const RegisterSchema = Yup.object().shape({
   fechaNacimiento: Yup.date()
     .max(new Date(), "La fecha de nacimiento no puede ser futura")
     .required("La fecha de nacimiento es obligatoria"),
+  pais: Yup.string()
+    .required("El país es obligatorio"),
+  ciudad: Yup.string()
+    .required("La ciudad es obligatoria"),
+  comuna: Yup.string()
+    .when('pais', {
+      is: (val) => val === 'Chile',
+      then: Yup.string().required("La comuna es obligatoria para Chile"),
+      otherwise: Yup.string().notRequired(),
+    }),
 });
 
 export default function Registro({ navigation }) {
@@ -91,6 +107,9 @@ export default function Registro({ navigation }) {
         isPremium: false,
         createdAt: new Date(),
         birthDate: values.fechaNacimiento, // Añadimos la fecha de nacimiento
+        pais: values.pais, // Añadimos el país
+        ciudad: values.ciudad, // Añadimos la ciudad
+        comuna: values.pais === "Chile" ? values.comuna : "", // Añadimos la comuna solo si el país es Chile
       });
 
       // Cerrar la sesión del usuario recién registrado
@@ -146,6 +165,9 @@ export default function Registro({ navigation }) {
               contrasena: "",
               confirmarContrasena: "",
               fechaNacimiento: new Date(), // Valor inicial válido
+              pais: "", // Nuevo campo País
+              ciudad: "", // Nuevo campo Ciudad
+              comuna: "", // Nuevo campo Comuna (para Chile)
             }}
             validationSchema={RegisterSchema}
             onSubmit={handleRegister}
@@ -314,6 +336,88 @@ export default function Registro({ navigation }) {
                   />
                 )}
 
+                {/* Campo País */}
+                <Text style={styles.label}>País</Text>
+                <View style={styles.inputContainer}>
+                  <Ionicons
+                    name="flag"
+                    size={20}
+                    color="#FFD700"
+                    style={styles.iconStyle}
+                  />
+                  <Picker
+                    selectedValue={values.pais}
+                    onValueChange={(itemValue) => {
+                      setFieldValue("pais", itemValue);
+                      setFieldValue("ciudad", ""); // Resetear ciudad al cambiar país
+                      setFieldValue("comuna", ""); // Resetear comuna al cambiar país
+                    }}
+                    style={styles.picker}
+                    mode="dropdown"
+                  >
+                    {countries.map((country) => (
+                      <Picker.Item key={country.value} label={country.label} value={country.value} />
+                    ))}
+                  </Picker>
+                </View>
+                {touched.pais && errors.pais && (
+                  <Text style={styles.errorText}>{errors.pais}</Text>
+                )}
+
+                {/* Campo Ciudad */}
+                <Text style={styles.label}>Ciudad</Text>
+                <View style={styles.inputContainer}>
+                  <Ionicons
+                    name="home"
+                    size={20}
+                    color="#FFD700"
+                    style={styles.iconStyle}
+                  />
+                  <Picker
+                    selectedValue={values.ciudad}
+                    onValueChange={(itemValue) => setFieldValue("ciudad", itemValue)}
+                    style={styles.picker}
+                    mode="dropdown"
+                    enabled={values.pais !== ""}
+                  >
+                    {values.pais && cities[values.pais].map((city) => (
+                      <Picker.Item key={city.value} label={city.label} value={city.value} />
+                    ))}
+                  </Picker>
+                </View>
+                {touched.ciudad && errors.ciudad && (
+                  <Text style={styles.errorText}>{errors.ciudad}</Text>
+                )}
+
+                {/* Campo Comuna (solo para Chile) */}
+                {values.pais === "Chile" && (
+                  <>
+                    <Text style={styles.label}>Comuna</Text>
+                    <View style={styles.inputContainer}>
+                      <Ionicons
+                        name="list"
+                        size={20}
+                        color="#FFD700"
+                        style={styles.iconStyle}
+                      />
+                      <Picker
+                        selectedValue={values.comuna}
+                        onValueChange={(itemValue) => setFieldValue("comuna", itemValue)}
+                        style={styles.picker}
+                        mode="dropdown"
+                        enabled={values.ciudad !== ""}
+                      >
+                        {values.ciudad && comunas[values.ciudad].map((comuna) => (
+                          <Picker.Item key={comuna.value} label={comuna.label} value={comuna.value} />
+                        ))}
+                      </Picker>
+                    </View>
+                    {touched.comuna && errors.comuna && (
+                      <Text style={styles.errorText}>{errors.comuna}</Text>
+                    )}
+                  </>
+                )}
+
                 {/* Botón de Registro */}
                 <TouchableOpacity
                   style={[
@@ -434,8 +538,8 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: "#2C3E50",
-    fontSize: 16,
     fontWeight: "700",
+    fontSize: 16,
     fontFamily: "Poppins_700Bold",
   },
   footerLink: {

@@ -7,8 +7,6 @@ import { NavigationContainer } from "@react-navigation/native";
 import SplashScreen from "./components/ui/SplashScreen";
 import AppNavigator from "./components/navigation/AppNavigator";
 
-import ModalEntry from "./screens/entrys/modalEntry";
-
 import { AuthProvider, AuthContext } from "./context/AuthContext"; // Importar AuthContext
 
 // Importar Provider de React Native Paper
@@ -66,7 +64,6 @@ const Main = () => {
   return (
     <View style={styles.container}>
       <AppNavigator />
-      <ModalEntry visible={modalVisible} onClose={closeModalEntry} />
     </View>
   );
 };

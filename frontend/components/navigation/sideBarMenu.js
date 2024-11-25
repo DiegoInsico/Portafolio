@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -6,9 +6,13 @@ import {
   StyleSheet,
   Animated,
   TouchableWithoutFeedback,
+  Image,
 } from "react-native";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import PropTypes from "prop-types";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../../utils/firebase";
+import { getAuth } from "firebase/auth";
 
 export default function SideBarMenu({
   isVisible,
@@ -24,8 +28,28 @@ export default function SideBarMenu({
   handleSignOut,
 }) {
   const slideAnim = new Animated.Value(-300); // Posición inicial fuera de la pantalla
+  const [userData, setUserData] = useState(null);
 
-  React.useEffect(() => {
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const auth = getAuth();
+        const userId = auth.currentUser?.uid;
+        if (userId) {
+          const userDoc = await getDoc(doc(db, "users", userId));
+          if (userDoc.exists()) {
+            setUserData(userDoc.data());
+          }
+        }
+      } catch (error) {
+        console.error("Error al obtener datos del usuario:", error);
+      }
+    };
+
+    fetchUserData();
+  }, []);
+
+  useEffect(() => {
     Animated.timing(slideAnim, {
       toValue: isVisible ? 0 : -300, // Se muestra o se esconde
       duration: 300,
@@ -44,35 +68,49 @@ export default function SideBarMenu({
 
       {/* Menú deslizante */}
       <Animated.View
-        style={[styles.menuContainer, { transform: [{ translateX: slideAnim }] }]}
+        style={[
+          styles.menuContainer,
+          { transform: [{ translateX: slideAnim }] },
+        ]}
       >
-        <View style={styles.menuHeader}>
-          <Text style={styles.headerText}>Menú</Text>
-        </View>
+        {/* Perfil del usuario */}
+        {userData && (
+          <View style={styles.profileContainer}>
+            <Image
+              source={{ uri: userData.photoURL }}
+              style={styles.profileImage}
+              resizeMode="cover"
+            />
+            <Text style={styles.userName}>{userData.displayName}</Text>
+            <Text style={styles.userEmail}>{userData.email}</Text>
+          </View>
+        )}
 
+        {/* Opciones del menú */}
         <View style={styles.menuContent}>
           <TouchableOpacity style={styles.menuItem} onPress={navigateToHome}>
-            <FontAwesome name="home" size={24} color="#fff" />
+            <FontAwesome name="home" size={24} color="#000" />
             <Text style={styles.menuText}>Inicio</Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.menuItem} onPress={navigateToEntries}>
-            <FontAwesome name="tasks" size={24} color="#fff" />
+            <FontAwesome name="tasks" size={24} color="#000" />
             <Text style={styles.menuText}>Entradas</Text>
           </TouchableOpacity>
 
+          {/* Línea divisoria */}
+          <View style={styles.divider} />
+
           <TouchableOpacity style={styles.menuItem} onPress={navigateToProfile}>
-            <FontAwesome name="user" size={24} color="#fff" />
+            <FontAwesome name="user" size={24} color="#000" />
             <Text style={styles.menuText}>Perfil</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.menuItem} onPress={navigateToSettings}>
-            <FontAwesome name="cog" size={24} color="#fff" />
-            <Text style={styles.menuText}>Configuración</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.menuItem} onPress={navigateToTestigos}>
-            <FontAwesome name="users" size={24} color="#fff" />
+          <TouchableOpacity
+            style={styles.menuItem}
+            onPress={navigateToTestigos}
+          >
+            <FontAwesome name="users" size={24} color="#000" />
             <Text style={styles.menuText}>Testigos</Text>
           </TouchableOpacity>
 
@@ -80,7 +118,7 @@ export default function SideBarMenu({
             style={styles.menuItem}
             onPress={navigateToBeneficiarios}
           >
-            <FontAwesome name="heart" size={24} color="#fff" />
+            <FontAwesome name="heart" size={24} color="#000" />
             <Text style={styles.menuText}>Beneficiarios</Text>
           </TouchableOpacity>
 
@@ -88,17 +126,28 @@ export default function SideBarMenu({
             style={styles.menuItem}
             onPress={navigateToProgramarMensaje}
           >
-            <FontAwesome name="clock-o" size={24} color="#fff" />
+            <FontAwesome name="clock-o" size={24} color="#000" />
             <Text style={styles.menuText}>Programar Mensaje</Text>
           </TouchableOpacity>
 
+          {/* Línea divisoria */}
+          <View style={styles.divider} />
+
+          <TouchableOpacity
+            style={styles.menuItem}
+            onPress={navigateToSettings}
+          >
+            <FontAwesome name="cog" size={24} color="#000" />
+            <Text style={styles.menuText}>Configuración</Text>
+          </TouchableOpacity>
+
           <TouchableOpacity style={styles.menuItem} onPress={navigateToSoporte}>
-            <FontAwesome name="ticket" size={24} color="#fff" />
+            <FontAwesome name="ticket" size={24} color="#000" />
             <Text style={styles.menuText}>Soporte</Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.menuItem} onPress={handleSignOut}>
-            <FontAwesome name="sign-out" size={24} color="#fff" />
+            <FontAwesome name="sign-out" size={24} color="#000" />
             <Text style={styles.menuText}>Cerrar Sesión</Text>
           </TouchableOpacity>
         </View>
@@ -133,34 +182,44 @@ const styles = StyleSheet.create({
   },
   overlay: {
     flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.6)", // Fondo oscuro y translúcido
+    backgroundColor: "rgba(0, 0, 0, 0.4)", // Fondo translúcido más claro
   },
   menuContainer: {
     position: "absolute",
     top: 0,
     left: 0,
     bottom: 0,
-    width: 300,
-    backgroundColor: "#1E1E2C",
+    width: 280,
+    backgroundColor: "#FFFFFF", // Fondo blanco
     zIndex: 1001,
     paddingVertical: 20,
     paddingHorizontal: 15,
     borderTopRightRadius: 20,
     borderBottomRightRadius: 20,
     shadowColor: "#000",
-    shadowOffset: { width: 4, height: 4 },
-    shadowOpacity: 0.4,
-    shadowRadius: 6,
-    elevation: 10,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 5,
   },
-  menuHeader: {
-    marginBottom: 20,
+  profileContainer: {
     alignItems: "center",
+    marginBottom: 20,
   },
-  headerText: {
-    fontSize: 20,
-    color: "#FFD700",
+  profileImage: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    marginBottom: 10,
+  },
+  userName: {
+    fontSize: 18,
     fontWeight: "bold",
+    color: "#000",
+  },
+  userEmail: {
+    fontSize: 14,
+    color: "#888",
   },
   menuContent: {
     flex: 1,
@@ -169,21 +228,27 @@ const styles = StyleSheet.create({
   menuItem: {
     flexDirection: "row",
     alignItems: "center",
-    paddingVertical: 15,
+    paddingVertical: 12,
     paddingHorizontal: 10,
     marginVertical: 5,
-    backgroundColor: "#2A2D3E",
-    borderRadius: 10,
+    backgroundColor: "#F9F9F9", // Fondo gris claro
+    borderRadius: 8,
     shadowColor: "#000",
-    shadowOffset: { width: 2, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 5,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 2,
   },
   menuText: {
     marginLeft: 15,
     fontSize: 16,
-    color: "#FFF",
-    fontWeight: "600",
+    color: "#000", // Texto negro
+    fontWeight: "500",
+  },
+  divider: {
+    height: 1,
+    backgroundColor: "#E0E0E0", // Color gris claro
+    marginVertical: 10,
+    width: "100%", // Ajusta al ancho del contenedor
   },
 });

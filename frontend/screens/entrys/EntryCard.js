@@ -1,3 +1,5 @@
+// EntryCard.js
+
 import React from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
@@ -56,7 +58,7 @@ const EntryCard = ({ entry, onPress }) => {
 
         {/* Contenido a la derecha del ícono */}
         <View style={styles.content}>
-          {/* Encabezado con categoría, candado y fecha */}
+          {/* Encabezado con categoría y candado */}
           <View style={styles.header}>
             <Text style={styles.category}>{categoria}</Text>
             <Icon name="lock" size={24} color={getLockIconColor()} style={styles.lockIcon} />
@@ -95,6 +97,7 @@ const styles = StyleSheet.create({
   },
   icon: {
     marginRight: 16,
+    color: "#000",
   },
   content: {
     flex: 1,
@@ -107,7 +110,7 @@ const styles = StyleSheet.create({
   category: {
     fontSize: 18,
     fontWeight: "bold",
-    color: "#fff",
+    color: "#000",
     flex: 1,
   },
   lockIcon: {
@@ -115,17 +118,17 @@ const styles = StyleSheet.create({
   },
   fechaText: {
     fontSize: 14,
-    color: "#ccc",
+    color: "#000",
     marginVertical: 4,
   },
   divider: {
     height: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#000",
     marginVertical: 8,
   },
   nickname: {
     fontSize: 16,
-    color: "#fff",
+    color: "#000",
   },
 });
 

@@ -1,6 +1,6 @@
 // ProgramarMensaje.js
 
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext } from "react";
 import {
   View,
   Text,
@@ -12,24 +12,24 @@ import {
   Platform,
   SafeAreaView,
   ActivityIndicator,
-} from 'react-native';
+} from "react-native";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
-import { Picker } from '@react-native-picker/picker';
+import { Picker } from "@react-native-picker/picker";
 import * as ImagePicker from "expo-image-picker";
-import { db } from '../../utils/firebase';
-import { collection, addDoc, getDocs, Timestamp } from 'firebase/firestore';
+import { db } from "../../utils/firebase";
+import { collection, addDoc, getDocs, Timestamp } from "firebase/firestore";
 import { MaterialIcons } from "@expo/vector-icons";
-import { Video } from 'expo-av';
-import { AuthContext } from '../../context/AuthContext';
-import PremiumMessage from './../suscripcion/PremiumMessage'; 
-import { commonStyles } from '../../styles/commonStyles.js'; // Asegúrate de ajustar la ruta según tu estructura
-import PropTypes from 'prop-types'; // Asegúrate de importar PropTypes
+import { Video } from "expo-av";
+import { AuthContext } from "../../context/AuthContext";
+import PremiumMessage from "./../suscripcion/PremiumMessage";
+import { COLORS } from "../../utils/colors"; // Importa los colores centralizados
+import PropTypes from "prop-types"; // Asegúrate de importar PropTypes
 
 const ProgramarMensaje = ({ navigation }) => {
   const { user, isPremium, loading } = useContext(AuthContext);
 
   const [beneficiarios, setBeneficiarios] = useState([]);
-  const [selectedBeneficiary, setSelectedBeneficiary] = useState('');
+  const [selectedBeneficiary, setSelectedBeneficiary] = useState("");
   const [date, setDate] = useState(new Date());
   const [isDatePickerVisible, setIsDatePickerVisible] = useState(false);
   const [media, setMedia] = useState(null);
@@ -39,7 +39,7 @@ const ProgramarMensaje = ({ navigation }) => {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#FFD700" />
+        <ActivityIndicator size="large" color={COLORS.primary} />
       </View>
     );
   }
@@ -51,7 +51,10 @@ const ProgramarMensaje = ({ navigation }) => {
         <Text style={styles.messageText}>
           Debes iniciar sesión para acceder a esta funcionalidad.
         </Text>
-        <TouchableOpacity onPress={() => navigation.navigate('Login')} style={styles.button}>
+        <TouchableOpacity
+          onPress={() => navigation.navigate("Login")}
+          style={styles.button}
+        >
           <Text style={styles.buttonText}>Ir a Iniciar Sesión</Text>
         </TouchableOpacity>
       </View>
@@ -67,16 +70,16 @@ const ProgramarMensaje = ({ navigation }) => {
   useEffect(() => {
     const fetchBeneficiarios = async () => {
       try {
-        const beneficiariosCollection = collection(db, 'beneficiarios');
+        const beneficiariosCollection = collection(db, "beneficiarios");
         const beneficiariosSnapshot = await getDocs(beneficiariosCollection);
-        const beneficiariosList = beneficiariosSnapshot.docs.map(doc => ({
+        const beneficiariosList = beneficiariosSnapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
         }));
         setBeneficiarios(beneficiariosList);
       } catch (error) {
-        console.error('Error al obtener beneficiarios:', error);
-        Alert.alert('Error', 'No se pudieron cargar los beneficiarios.');
+        console.error("Error al obtener beneficiarios:", error);
+        Alert.alert("Error", "No se pudieron cargar los beneficiarios.");
       }
     };
     fetchBeneficiarios();
@@ -105,8 +108,11 @@ const ProgramarMensaje = ({ navigation }) => {
   const grabarVideo = async () => {
     try {
       const { status } = await ImagePicker.requestCameraPermissionsAsync();
-      if (status !== 'granted') {
-        Alert.alert('Permiso necesario', 'Se necesitan permisos para grabar video.');
+      if (status !== "granted") {
+        Alert.alert(
+          "Permiso necesario",
+          "Se necesitan permisos para grabar video."
+        );
         return;
       }
 
@@ -133,20 +139,25 @@ const ProgramarMensaje = ({ navigation }) => {
 
   const handleSaveMessage = async () => {
     if (!selectedBeneficiary || !media) {
-      Alert.alert('Error', 'Por favor completa todos los campos.');
+      Alert.alert("Error", "Por favor completa todos los campos.");
       return;
     }
 
-    const selectedBeneficiaryData = beneficiarios.find(b => b.id === selectedBeneficiary);
+    const selectedBeneficiaryData = beneficiarios.find(
+      (b) => b.id === selectedBeneficiary
+    );
     const email = selectedBeneficiaryData?.email;
 
     if (!email) {
-      Alert.alert('Error', 'El beneficiario seleccionado no tiene un correo electrónico asociado.');
+      Alert.alert(
+        "Error",
+        "El beneficiario seleccionado no tiene un correo electrónico asociado."
+      );
       return;
     }
 
     try {
-      await addDoc(collection(db, 'mensajesProgramados'), {
+      await addDoc(collection(db, "mensajesProgramados"), {
         userId: user.uid,
         beneficiarioId: selectedBeneficiary,
         email: email,
@@ -155,17 +166,17 @@ const ProgramarMensaje = ({ navigation }) => {
         mediaType: mediaType, // 'video'
         enviado: false,
       });
-      Alert.alert('Éxito', 'Mensaje programado correctamente.');
+      Alert.alert("Éxito", "Mensaje programado correctamente.");
       resetStates();
       navigation.goBack();
     } catch (error) {
-      console.error('Error al programar el mensaje:', error);
-      Alert.alert('Error', 'No se pudo programar el mensaje.');
+      console.error("Error al programar el mensaje:", error);
+      Alert.alert("Error", "No se pudo programar el mensaje.");
     }
   };
 
   const resetStates = () => {
-    setSelectedBeneficiary('');
+    setSelectedBeneficiary("");
     setDate(new Date());
     setMedia(null);
     setMediaType(null);
@@ -188,44 +199,85 @@ const ProgramarMensaje = ({ navigation }) => {
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.container}>
         <ImageBackground
-          source={require('../../assets/background/mensaje.jpg')} // Asegúrate de tener esta imagen en tu carpeta assets
+          source={require("../../assets/background/mensaje.webp")} // Asegúrate de tener esta imagen en tu carpeta assets
           style={styles.backgroundImage}
           resizeMode="cover"
         >
           {/* Superposición para mejorar la legibilidad */}
           <View style={styles.overlay} />
           <View style={styles.content}>
+            {/* Título */}
             <Text style={styles.title}>Programar Mensaje de Video</Text>
 
             {/* Seleccionar Beneficiario */}
-            <Text style={styles.label}>Selecciona un beneficiario:</Text>
-            <View style={styles.pickerContainer}>
-              <Picker
-                selectedValue={selectedBeneficiary}
-                onValueChange={(itemValue) => setSelectedBeneficiary(itemValue)}
-                style={styles.picker}
-                dropdownIconColor="#FFD700"
+            <View style={styles.beneficiaryDateRow}>
+              {/* Seleccionar Beneficiario */}
+              <View style={styles.pickerContainer}>
+                <Picker
+                  selectedValue={selectedBeneficiary}
+                  onValueChange={(itemValue) =>
+                    setSelectedBeneficiary(itemValue)
+                  }
+                  style={styles.picker}
+                  dropdownIconColor={COLORS.primary}
+                >
+                  <Picker.Item label="Selecciona un beneficiario" value="" />
+                  {beneficiarios.map((beneficiary) => (
+                    <Picker.Item
+                      key={beneficiary.id}
+                      label={beneficiary.name}
+                      value={beneficiary.id}
+                    />
+                  ))}
+                </Picker>
+              </View>
+
+              {/* Fecha y Hora de Envío */}
+              <TouchableOpacity
+                onPress={showDatePickerModal}
+                style={styles.dateIconContainer}
               >
-                <Picker.Item label="Selecciona un beneficiario" value="" />
-                {beneficiarios.map(beneficiary => (
-                  <Picker.Item
-                    key={beneficiary.id}
-                    label={beneficiary.name}
-                    value={beneficiary.id}
-                  />
-                ))}
-              </Picker>
+                <MaterialIcons
+                  name="calendar-today"
+                  size={28}
+                  color={COLORS.primary}
+                />
+              </TouchableOpacity>
+
+              <DateTimePickerModal
+                isVisible={isDatePickerVisible}
+                mode="datetime"
+                onConfirm={handleConfirm}
+                onCancel={hideDatePicker}
+                is24Hour={true}
+                display={Platform.OS === "ios" ? "spinner" : "default"}
+                minimumDate={new Date()}
+              />
             </View>
 
             {/* Seleccionar o Grabar Video */}
             <Text style={styles.label}>Selecciona o graba un video:</Text>
             <View style={styles.videoButtonsContainer}>
-              <TouchableOpacity style={styles.videoButton} onPress={seleccionarVideo}>
-                <MaterialIcons name="video-library" size={30} color="#FFD700" />
+              <TouchableOpacity
+                style={styles.videoButton}
+                onPress={seleccionarVideo}
+              >
+                <MaterialIcons
+                  name="video-library"
+                  size={30}
+                  color={COLORS.surface}
+                />
                 <Text style={styles.videoButtonText}>Subir Video</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.videoButton} onPress={grabarVideo}>
-                <MaterialIcons name="videocam" size={30} color="#FFD700" />
+              <TouchableOpacity
+                style={styles.videoButton}
+                onPress={grabarVideo}
+              >
+                <MaterialIcons
+                  name="videocam"
+                  size={30}
+                  color={COLORS.surface}
+                />
                 <Text style={styles.videoButtonText}>Grabar Video</Text>
               </TouchableOpacity>
             </View>
@@ -244,38 +296,31 @@ const ProgramarMensaje = ({ navigation }) => {
                   style={styles.mediaPreview}
                   useNativeControls
                 />
-                <TouchableOpacity style={styles.deleteButton} onPress={eliminarMedia}>
-                  <MaterialIcons name="delete" size={24} color="#E74C3C" />
+                <TouchableOpacity
+                  style={styles.deleteButton}
+                  onPress={eliminarMedia}
+                >
+                  <MaterialIcons
+                    name="delete"
+                    size={24}
+                    color={COLORS.delete}
+                  />
                 </TouchableOpacity>
               </View>
             )}
 
-            {/* Seleccionar Fecha y Hora */}
-            <Text style={styles.label}>Fecha y hora de envío:</Text>
-            <TouchableOpacity
-              style={styles.dateButton}
-              onPress={showDatePickerModal}
-            >
-              <Text style={styles.dateButtonText}>
-                {date.toLocaleDateString()} {date.toLocaleTimeString()}
-              </Text>
-            </TouchableOpacity>
-
-            <DateTimePickerModal
-              isVisible={isDatePickerVisible}
-              mode="datetime"
-              onConfirm={handleConfirm}
-              onCancel={hideDatePicker}
-              is24Hour={true}
-              display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-            />
-
             {/* Botones de Guardar y Cancelar */}
             <View style={styles.buttonContainer}>
-              <TouchableOpacity style={styles.saveButton} onPress={handleSaveMessage}>
+              <TouchableOpacity
+                style={styles.saveButton}
+                onPress={handleSaveMessage}
+              >
                 <Text style={styles.buttonText}>Guardar</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.cancelButtonMain} onPress={() => navigation.goBack()}>
+              <TouchableOpacity
+                style={styles.cancelButton}
+                onPress={() => navigation.goBack()}
+              >
                 <Text style={styles.buttonText}>Cancelar</Text>
               </TouchableOpacity>
             </View>
@@ -295,162 +340,117 @@ ProgramarMensaje.propTypes = {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#1E1E1E', // Fondo oscuro para contraste
+    backgroundColor: COLORS.background,
+    paddingTop: 70,
   },
   container: {
     flexGrow: 1,
   },
   backgroundImage: {
-    flex: 1,
-    width: '100%',
-    height: '100%',
-    justifyContent: 'center',
-    alignItems: 'center',
+
+    width: "100%",
+    height: "100%",
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0, 0, 0, 0.3)', // Superposición semi-transparente para mejorar la legibilidad
+    backgroundColor: "rgba(255, 255, 255, 0.25)", // Overlay claro
   },
   content: {
     padding: 20,
     alignItems: "center",
-    width: '100%',
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  centerContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-  },
-  messageText: {
-    fontSize: 18,
-    textAlign: 'center',
-    color: '#FFD700',
-    marginBottom: 20,
-  },
-  button: {
-    backgroundColor: '#FFD700',
-    padding: 15,
-    borderRadius: 8,
-    width: '80%',
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  saveButton: {
-    backgroundColor: "#FFD700", // Fondo dorado
-    padding: 10,
-    borderRadius: 8,
-    flex: 1,
-    marginRight: 5,
-    alignItems: 'center',
-  },
-  cancelButtonMain: {
-    backgroundColor: "#E74C3C", // Fondo rojo para contraste
-    padding: 10,
-    borderRadius: 8,
-    flex: 1,
-    marginLeft: 5,
-    alignItems: 'center',
-  },
-  buttonText: {
-    color: '#1E1E1E',
-    fontWeight: 'bold',
-    fontSize: 16,
+    width: "100%",
   },
   title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#FFD700", // Color dorado
+    fontSize: 22,
+    fontWeight: "600",
+    color: COLORS.text,
     marginBottom: 20,
-    alignSelf: 'flex-start',
-    textShadowColor: 'rgba(0, 0, 0, 0.75)',
-    textShadowOffset: { width: -1, height: 1 },
-    textShadowRadius: 10,
+    alignSelf: "flex-start",
   },
-  label: {
-    fontSize: 16,
-    color: "#FFD700", // Color dorado
-    marginBottom: 10,
-    alignSelf: 'flex-start',
-    textShadowColor: 'rgba(0, 0, 0, 0.75)',
-    textShadowOffset: { width: -1, height: 1 },
-    textShadowRadius: 10,
+  beneficiaryDateRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    width: "100%",
+    marginBottom: 20,
   },
   pickerContainer: {
-    marginBottom: 20,
+    flex: 3, // 75% del ancho
+    marginRight: 10,
     borderWidth: 1,
-    borderColor: "#FFD700", // Bordes dorados
-    borderRadius: 8,
-    width: "100%",
-    backgroundColor: 'rgba(255,255,255,0.1)', // Fondo semi-transparente oscuro
+    borderColor: COLORS.border,
+    borderRadius: 12,
+    backgroundColor: COLORS.surface,
   },
   picker: {
-    height: 40,
-    color: "#FFD700", // Texto dorado
+    height: 50,
+    color: COLORS.text,
+    backgroundColor: COLORS.surface,
   },
-  pickerItem: {
-    color: '#FFD700', // Color dorado en items
+  dateIconContainer: {
+    flex: 1, // 25% del ancho
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    borderRadius: 12,
+    backgroundColor: COLORS.surface,
+    height: 50,
   },
   videoButtonsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '100%',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
     marginBottom: 20,
   },
   videoButton: {
     flex: 1,
-    backgroundColor: 'rgba(255, 215, 0, 0.8)', // Fondo dorado semi-transparente
-    padding: 15,
-    borderRadius: 8,
-    alignItems: 'center',
+    backgroundColor: COLORS.secondary,
+    padding: 12,
+    borderRadius: 12,
+    alignItems: "center",
     marginHorizontal: 5,
   },
   videoButtonText: {
-    color: "#1E1E1E", // Texto oscuro para contraste
-    fontWeight: "bold",
+    color: COLORS.surface,
+    fontWeight: "600",
     marginTop: 5,
   },
   mediaContainer: {
     width: "100%",
     alignItems: "center",
     marginBottom: 20,
-    position: 'relative',
   },
   mediaPreview: {
     width: "100%",
     height: 200,
-    borderRadius: 10,
-  },
-  deleteButton: {
-    position: "absolute",
-    top: 10,
-    right: 10,
-    backgroundColor: "rgba(255,255,255,0.8)",
-    borderRadius: 15,
-    padding: 5,
-  },
-  dateButton: {
-    padding: 12,
-    borderRadius: 8,
-    backgroundColor: "rgba(255, 215, 0, 0.8)", // Fondo dorado semi-transparente
-    alignItems: "center",
-    marginBottom: 20,
-    width: "100%",
-  },
-  dateButtonText: {
-    fontSize: 16,
-    color: "#1E1E1E", // Texto oscuro para contraste
-    fontWeight: "bold",
+    borderRadius: 12,
+    backgroundColor: COLORS.background,
   },
   buttonContainer: {
     flexDirection: "row",
     marginTop: 10,
     width: "100%",
+  },
+  saveButton: {
+    backgroundColor: COLORS.primary,
+    padding: 15,
+    borderRadius: 8,
+    flex: 1,
+    alignItems: "center",
+    marginRight: 5,
+  },
+  cancelButton: {
+    backgroundColor: COLORS.delete,
+    padding: 15,
+    borderRadius: 8,
+    flex: 1,
+    alignItems: "center",
+    marginLeft: 5,
+  },
+  buttonText: {
+    color: COLORS.surface,
+    fontWeight: "600",
+    fontSize: 16,
   },
 });
 

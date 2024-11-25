@@ -1,5 +1,3 @@
-// ListEntry.js
-
 import React, { useEffect, useState } from "react";
 import {
   FlatList,
@@ -13,24 +11,28 @@ import {
   TextInput,
   TouchableOpacity,
   Alert,
+  Modal,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import { listenToEntries, listenToBeneficiaries, db } from "../../utils/firebase";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
-import EntryCard from "./EntryCard"; // Asegúrate de que la ruta sea correcta
+import EntryCard from "./EntryCard";
 import { useNavigation } from "@react-navigation/native";
-import Icon from "react-native-vector-icons/MaterialCommunityIcons"; // Para el ícono de búsqueda y candado
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
 const ListEntry = () => {
   const [entries, setEntries] = useState([]);
   const [beneficiaries, setBeneficiaries] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [selectedLevel, setSelectedLevel] = useState("1"); // 1: Restringido, 2: Rojo, 3: Confidencial
+  const [selectedLevel, setSelectedLevel] = useState("1");
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredEntries, setFilteredEntries] = useState([]);
   const [userPasswords, setUserPasswords] = useState({ level2Password: "", level3Password: "" });
+  const [passwordModalVisible, setPasswordModalVisible] = useState(false);
+  const [inputPassword, setInputPassword] = useState("");
+  const [isLevelUnlocked, setIsLevelUnlocked] = useState({ level2: false, level3: false });
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -85,32 +87,43 @@ const ListEntry = () => {
   }, [entries, searchQuery, selectedLevel]);
 
   const handleLevelChange = (level) => {
-    setSelectedLevel(level);
+    if (level === "2" && !isLevelUnlocked.level2) {
+      setPasswordModalVisible(true);
+    } else if (level === "3" && !isLevelUnlocked.level3) {
+      setPasswordModalVisible(true);
+    } else {
+      setSelectedLevel(level);
+    }
+  };
+
+  const handlePasswordSubmit = () => {
+    if (
+      (selectedLevel === "2" && inputPassword === userPasswords.level2Password) ||
+      (selectedLevel === "3" && inputPassword === userPasswords.level3Password)
+    ) {
+      Alert.alert("Éxito", "Nivel desbloqueado correctamente.");
+      setIsLevelUnlocked((prev) => ({
+        ...prev,
+        [`level${selectedLevel}`]: true,
+      }));
+      setPasswordModalVisible(false);
+      setInputPassword("");
+      setSelectedLevel(selectedLevel); // Cambiar al nivel seleccionado
+    } else {
+      Alert.alert("Error", "Contraseña incorrecta. Intenta nuevamente.");
+    }
   };
 
   const getBackgroundImage = (level) => {
     switch (level) {
       case "1":
-        return require("../../assets/background/level1.webp"); // Reemplaza con la ruta correcta
+        return require("../../assets/background/level1.webp");
       case "2":
-        return require("../../assets/background/level1.webp"); // Reemplaza con la ruta correcta
+        return require("../../assets/background/level1.webp");
       case "3":
-        return require("../../assets/background/level1.webp"); // Reemplaza con la ruta correcta
+        return require("../../assets/background/level1.webp");
       default:
-        return require("../../assets/background/level1.webp"); // Imagen por defecto
-    }
-  };
-
-  const getLockIconColor = (level) => {
-    switch (level) {
-      case "1":
-        return "#00BFFF"; // Celeste
-      case "2":
-        return "#FF0000"; // Rojo
-      case "3":
-        return "#000000"; // Negro
-      default:
-        return "#FFFFFF"; // Blanco por defecto
+        return require("../../assets/background/level1.webp");
     }
   };
 
@@ -132,7 +145,7 @@ const ListEntry = () => {
         resizeMode="cover"
       >
         <View style={styles.overlay}>
-          {/* Barra de búsqueda modernizada */}
+          {/* Barra de búsqueda */}
           <View style={styles.searchContainer}>
             <Icon name="magnify" size={24} color="#333333" style={styles.searchIcon} />
             <TextInput
@@ -141,18 +154,15 @@ const ListEntry = () => {
               placeholderTextColor="#888888"
               value={searchQuery}
               onChangeText={setSearchQuery}
-              accessible={true}
-              accessibilityLabel="Barra de búsqueda"
-              accessibilityHint="Permite buscar entradas por texto, emociones o fecha de creación"
             />
             {searchQuery.length > 0 && (
-              <TouchableOpacity onPress={() => setSearchQuery("")} accessible={true} accessibilityLabel="Limpiar búsqueda" accessibilityHint="Limpia el texto de búsqueda">
+              <TouchableOpacity onPress={() => setSearchQuery("")}>
                 <Icon name="close-circle" size={24} color="#333333" style={styles.searchIcon} />
               </TouchableOpacity>
             )}
           </View>
 
-          {/* Selector de Nivel actualizado */}
+          {/* Selector de Nivel */}
           <View style={styles.levelSelector}>
             <Text style={styles.label}>Nivel:</Text>
             <View style={styles.pickerContainer}>
@@ -161,8 +171,6 @@ const ListEntry = () => {
                 onValueChange={(itemValue) => handleLevelChange(itemValue)}
                 style={styles.picker}
                 mode="dropdown"
-                accessibilityLabel="Selector de nivel"
-                accessibilityHint="Selecciona el nivel de las entradas que deseas ver"
               >
                 <Picker.Item label="Restringido" value="1" />
                 <Picker.Item label="Rojo" value="2" />
@@ -172,11 +180,8 @@ const ListEntry = () => {
             <Icon
               name="lock"
               size={24}
-              color={getLockIconColor(selectedLevel)}
+              color={selectedLevel === "1" ? "#00BFFF" : selectedLevel === "2" ? "#FF0000" : "#000000"}
               style={styles.lockIcon}
-              accessible={true}
-              accessibilityLabel={`Icono de nivel ${selectedLevel}`}
-              accessibilityHint="Indica el nivel de seguridad de las entradas seleccionadas"
             />
           </View>
 
@@ -193,7 +198,7 @@ const ListEntry = () => {
                 <EntryCard
                   entry={item}
                   onPress={() =>
-                    navigation.navigate("EntryDetailScreen", { // Asegúrate de usar "EntryDetailScreen"
+                    navigation.navigate("EntryDetailScreen", {
                       item,
                       beneficiaries,
                     })
@@ -202,18 +207,50 @@ const ListEntry = () => {
               )}
               ListEmptyComponent={
                 <Text style={styles.message}>
-                  No hay entradas disponibles para el nivel seleccionado
+                  No hay entradas disponibles para el nivel seleccionado.
                 </Text>
               }
               contentContainerStyle={styles.listContainer}
-              showsVerticalScrollIndicator={false}
             />
           )}
         </View>
       </ImageBackground>
+
+      {/* Modal para Contraseñas */}
+      <Modal visible={passwordModalVisible} transparent animationType="slide">
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Introduce la Contraseña</Text>
+            <TextInput
+              style={styles.passwordInput}
+              placeholder="Contraseña"
+              placeholderTextColor="#888888"
+              secureTextEntry
+              value={inputPassword}
+              onChangeText={setInputPassword}
+            />
+            <View style={styles.modalButtons}>
+              <TouchableOpacity
+                style={styles.modalButton}
+                onPress={handlePasswordSubmit}
+              >
+                <Text style={styles.modalButtonText}>Aceptar</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.cancelButton]}
+                onPress={() => {
+                  setPasswordModalVisible(false);
+                  setInputPassword("");
+                }}
+              >
+                <Text style={styles.modalButtonText}>Cancelar</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
-
 };
 
 const styles = StyleSheet.create({

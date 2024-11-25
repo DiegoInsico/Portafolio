@@ -1,7 +1,15 @@
-// SettingsScreen.js
-
 import React, { useEffect, useState } from "react";
-import { View, Text, Switch, TouchableOpacity, StyleSheet, ScrollView, Alert, Platform } from "react-native";
+import {
+  View,
+  Text,
+  Switch,
+  TouchableOpacity,
+  StyleSheet,
+  ScrollView,
+  Alert,
+  Platform,
+} from "react-native";
+import { MaterialIcons, Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import * as LocalAuthentication from "expo-local-authentication";
 import * as Notifications from "expo-notifications";
@@ -25,8 +33,8 @@ const SettingsScreen = () => {
       if (status !== "granted") {
         Alert.alert("Permiso requerido", "Las notificaciones no están habilitadas");
       }
-      
-      if (Platform.OS === 'android') {
+
+      if (Platform.OS === "android") {
         await Notifications.setNotificationChannelAsync("default", {
           name: "default",
           importance: Notifications.AndroidImportance.MAX,
@@ -42,7 +50,10 @@ const SettingsScreen = () => {
   const toggleBiometricAuth = async () => {
     const compatible = await LocalAuthentication.hasHardwareAsync();
     if (!compatible) {
-      Alert.alert("Biometría no disponible", "Este dispositivo no admite autenticación biométrica");
+      Alert.alert(
+        "Biometría no disponible",
+        "Este dispositivo no admite autenticación biométrica"
+      );
       return;
     }
 
@@ -83,61 +94,82 @@ const SettingsScreen = () => {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.contentContainer} style={styles.scrollView}>
+    <ScrollView contentContainerStyle={styles.contentContainer}>
+      {/* Seguridad */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Seguridad</Text>
         <TouchableOpacity
           style={styles.optionButton}
           onPress={() => navigation.navigate("SecuritySettings")}
         >
+          <MaterialIcons name="lock" size={24} color="#333" />
           <Text style={styles.optionText}>Configurar Contraseñas</Text>
         </TouchableOpacity>
         <View style={styles.settingItem}>
-          <Text style={styles.label}>Habilitar Autenticación Biométrica</Text>
+          <View style={styles.settingLabel}>
+            <Ionicons name="finger-print" size={24} color="#333" />
+            <Text style={styles.label}>Autenticación Biométrica</Text>
+          </View>
           <Switch
             value={biometricEnabled}
             onValueChange={toggleBiometricAuth}
             trackColor={{ false: "#767577", true: "#4CAF50" }}
-            thumbColor={biometricEnabled ? "#FFD700" : "#f4f3f4"}
+            thumbColor={biometricEnabled ? "#FFFFFF" : "#f4f3f4"}
           />
         </View>
       </View>
 
+      {/* Notificaciones */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Notificaciones</Text>
         <View style={styles.settingItem}>
-          <Text style={styles.label}>Activar Recordatorios</Text>
+          <View style={styles.settingLabel}>
+            <Ionicons name="notifications" size={24} color="#333" />
+            <Text style={styles.label}>Activar Recordatorios</Text>
+          </View>
           <Switch
             value={notificationsEnabled}
             onValueChange={toggleNotifications}
             trackColor={{ false: "#767577", true: "#4CAF50" }}
-            thumbColor={notificationsEnabled ? "#FFD700" : "#f4f3f4"}
+            thumbColor={notificationsEnabled ? "#FFFFFF" : "#f4f3f4"}
           />
         </View>
       </View>
 
+      {/* Apariencia */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Apariencia</Text>
-        <View style={styles.optionRow}>
-          <Text style={styles.optionText}>Tema de Color</Text>
-          <Text style={styles.optionDetail}>Oscuro</Text>
-        </View>
-        <View style={styles.optionRow}>
-          <Text style={styles.optionText}>Tamaño de Fuente</Text>
-          <Text style={styles.optionDetail}>Mediano</Text>
-        </View>
+        <TouchableOpacity style={styles.optionRow}>
+          <Ionicons name="color-palette" size={24} color="#333" />
+          <View>
+            <Text style={styles.optionText}>Tema</Text>
+            <Text style={styles.optionDetail}>Claro</Text>
+          </View>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.optionRow}>
+          <Ionicons name="text" size={24} color="#333" />
+          <View>
+            <Text style={styles.optionText}>Tamaño de Fuente</Text>
+            <Text style={styles.optionDetail}>Mediano</Text>
+          </View>
+        </TouchableOpacity>
       </View>
 
+      {/* Privacidad y Datos */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Privacidad y Datos</Text>
         <TouchableOpacity style={styles.optionButton}>
-          <Text style={styles.optionText}>Copia de Seguridad de Datos</Text>
+          <MaterialIcons name="backup" size={24} color="#333" />
+          <Text style={styles.optionText}>Copia de Seguridad</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.optionButton}
           onPress={() => Alert.alert("Eliminar cuenta", "¿Estás seguro?")}
         >
-          <Text style={styles.optionText}>Eliminar Cuenta y Datos</Text>
+          <MaterialIcons name="delete" size={24} color="#FF5555" />
+          <Text style={[styles.optionText, { color: "#FF5555" }]}>
+            Eliminar Cuenta
+          </Text>
         </TouchableOpacity>
       </View>
     </ScrollView>
@@ -145,67 +177,82 @@ const SettingsScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  scrollView: {
-    flex: 1,
-    backgroundColor: "#2C3E50",
-  },
   contentContainer: {
-    paddingTop: 70, // Igual que headerStyle.height
+    paddingTop: 70,
     paddingBottom: 20,
     paddingHorizontal: 20,
     flexGrow: 1,
+    backgroundColor: "#FFFFFF", // Fondo blanco
   },
   section: {
     marginBottom: 30,
   },
   sectionTitle: {
-    fontSize: 18,
-    color: "#FFD700",
+    fontSize: 20,
+    color: "#333333", // Gris oscuro
     fontWeight: "bold",
-    marginBottom: 10,
+    marginBottom: 15,
+    textAlign: "center",
   },
   optionButton: {
-    backgroundColor: "#4B4E6D",
-    padding: 15,
-    borderRadius: 8,
-    marginBottom: 10,
+    flexDirection: "row",
     alignItems: "center",
+    backgroundColor: "#F9F9F9", // Fondo claro
+    padding: 15,
+    borderRadius: 12,
+    marginBottom: 10,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 2,
-    elevation: 3,
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
   },
   optionText: {
     fontSize: 16,
-    color: "#F0E4C2",
+    color: "#333333",
+    fontWeight: "500",
+    marginLeft: 10,
   },
   settingItem: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    backgroundColor: "#4B4E6D",
+    backgroundColor: "#F9F9F9",
     padding: 15,
-    borderRadius: 8,
-    marginBottom: 8,
+    borderRadius: 12,
+    marginBottom: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  settingLabel: {
+    flexDirection: "row",
+    alignItems: "center",
   },
   label: {
     fontSize: 16,
-    color: "#F0E4C2",
+    color: "#333333",
+    marginLeft: 10,
   },
   optionRow: {
     flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "center",
-    backgroundColor: "#4B4E6D",
+    justifyContent: "space-between",
+    backgroundColor: "#F9F9F9",
     padding: 15,
-    borderRadius: 8,
-    marginBottom: 8,
+    borderRadius: 12,
+    marginBottom: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
   },
   optionDetail: {
-    fontSize: 16,
-    color: "#F0E4C2",
-    fontWeight: "600",
+    fontSize: 14,
+    color: "#555555",
   },
 });
 
