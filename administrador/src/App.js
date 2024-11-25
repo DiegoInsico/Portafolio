@@ -95,7 +95,7 @@ const AppRoutes = ({
         {isAuthenticated ? (
           <>
             {/* Página de Testeo */}
-            <Route path="/Test" element={<Test />} />
+            <Route path="/test/test" element={<Test />} />
             <Route path="/monitor/clouster" element={<Clouster />} />
 
             <Route path="/dashboard" element={<Dashboard />} />

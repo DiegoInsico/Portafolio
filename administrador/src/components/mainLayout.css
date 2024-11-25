@@ -115,12 +115,14 @@
   flex: 1;
   padding: 2rem;
   overflow-y: auto;
-  transition: margin-left 0.3s ease;
+  margin-left: 210px; /* Espacio para la barra lateral expandida */
+  transition: margin-left 0.3s ease; /* Transición suave al colapsar */
 }
 
 .main-layout-sidebar.collapsed + .main-layout-content {
-  margin-left: -20%;
+  margin-left: 50px; /* Espacio para la barra lateral colapsada */
 }
+
 
 /* Vista de login */
 .main-layout-login {

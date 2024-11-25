@@ -117,7 +117,7 @@ const MainLayout = ({ children, isAuthenticated, currentUser }) => {
                     )}
                   </NavLink>
                   <NavLink
-                    to="/test"
+                    to="/test/test"
                     className={({ isActive }) =>
                       `main-layout-link ${
                         isActive ? "main-layout-link-active" : ""

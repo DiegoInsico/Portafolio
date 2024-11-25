@@ -1,81 +1,90 @@
-import React from 'react';
-import styled from 'styled-components';
+import React, { useEffect, useState } from "react";
+import { Line } from "react-chartjs-2";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "../../firebase"; // Asegúrate de que esta ruta sea correcta
+import "chart.js/auto";
 
-const Button = () => {
+const Test = () => {
+  const [chartData, setChartData] = useState(null);
+
+  useEffect(() => {
+    async function fetchData() {
+      const entriesCollection = collection(db, "entradas");
+      const snapshot = await getDocs(entriesCollection);
+
+      const levelData = {};
+
+      snapshot.forEach((doc) => {
+        const data = doc.data();
+
+        // Usa fecha o predeterminada
+        const dateField = data.fecha
+          ? new Date(data.fecha.seconds * 1000)
+          : new Date();
+        const date = dateField.toLocaleDateString();
+
+        const level = data.nivel || "Sin Nivel";
+
+        if (!levelData[date]) levelData[date] = {};
+        if (!levelData[date][level]) levelData[date][level] = 0;
+
+        levelData[date][level] += 1;
+      });
+
+      const labels = Object.keys(levelData);
+      const datasets = [];
+
+      const levels = new Set();
+      Object.values(levelData).forEach((dateLevels) => {
+        Object.keys(dateLevels).forEach((level) => levels.add(level));
+      });
+
+      levels.forEach((level) => {
+        const data = labels.map((date) => levelData[date][level] || 0);
+        datasets.push({
+          label: `Nivel ${level}`,
+          data,
+          borderColor: `rgba(${Math.random() * 255}, ${Math.random() * 255}, ${
+            Math.random() * 255
+          }, 1)`,
+          backgroundColor: `rgba(${Math.random() * 255}, ${Math.random() * 255}, ${
+            Math.random() * 255
+          }, 0.5)`,
+        });
+      });
+
+      setChartData({
+        labels,
+        datasets,
+      });
+    }
+
+    fetchData();
+  }, []);
+
   return (
-    <StyledWrapper>
-      <button>
-        <div>
-          <span>
-            <p>Hover Me</p><p>:)</p>
-          </span>
-        </div>
-        <div>
-          <span>
-            <p>Thanks</p><p>:D</p>
-          </span>
-        </div>
-      </button>
-    </StyledWrapper>
+    <div style={{ padding: "20px", textAlign: "center" }}>
+      <h1>Niveles de Seguridad de los Usuarios</h1>
+      {chartData ? (
+        <Line
+          data={chartData}
+          options={{
+            responsive: true,
+            plugins: {
+              legend: { position: "top" },
+              tooltip: { enabled: true },
+            },
+            scales: {
+              x: { title: { display: true, text: "Fechas" } },
+              y: { title: { display: true, text: "Cantidad" }, beginAtZero: true },
+            },
+          }}
+        />
+      ) : (
+        <p>Cargando datos...</p>
+      )}
+    </div>
   );
-}
+};
 
-const StyledWrapper = styled.div`
-  button {
-   outline: 0;
-   border: 0;
-   display: flex;
-   flex-direction: column;
-   width: 100%;
-   max-width: 140px;
-   height: 50px;
-   border-radius: 0.5em;
-   box-shadow: 0 0.625em 1em 0 rgba(30, 143, 255, 0.35);
-   overflow: hidden;
-  }
-
-  button div {
-   transform: translateY(0px);
-   width: 100%;
-  }
-
-  button,
-  button div {
-   transition: 0.6s cubic-bezier(.16,1,.3,1);
-  }
-
-  button div span {
-   display: flex;
-   align-items: center;
-   justify-content: space-between;
-   height: 50px;
-   padding: 0.75em 1.125em;
-  }
-
-  button div:nth-child(1) {
-   background-color: #1e90ff;
-  }
-
-  button div:nth-child(2) {
-   background-color: #21dc62;
-  }
-
-  button:hover {
-   box-shadow: 0 0.625em 1em 0 rgba(33, 220, 98, 0.35);
-  }
-
-  button:hover div {
-   transform: translateY(-50px);
-  }
-
-  button p {
-   font-size: 17px;
-   font-weight: bold;
-   color: #ffffff;
-  }
-
-  button:active {
-   transform: scale(0.95);
-  }`;
-
-export default Button;
+export default Test;

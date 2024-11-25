@@ -1,191 +1,66 @@
-/* Contenedor principal del Dashboard */
-.dashboard-container {
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
-  padding: 2rem;
-  background-color: #f9f9f9;
-  border-radius: 0.5rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-/* Estadísticas generales */
-.dashboard-stats h1 {
-  font-size: 1.75rem;
-  font-weight: bold;
-  margin-bottom: 1rem;
-  color: #333;
-}
-
-.dashboard-cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1rem;
-}
-
-.card {
-  background-color: #ffffff;
-  border-radius: 0.5rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  padding: 1.5rem;
-  text-align: center;
-  font-size: 1rem;
-  color: #333;
-  font-weight: bold;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-}
-
-/* Artistas más escuchados */
-.dashboard-music h2 {
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: #444;
-}
-
-.song-card {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin: 1rem 0;
-  padding: 1rem;
-  background-color: #ffffff;
-  border-radius: 0.5rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease;
-}
-
-.song-card:hover {
-  transform: translateY(-3px);
-}
-
-.song-card img {
-  width: 50px;
-  height: 50px;
-  border-radius: 0.25rem;
-  object-fit: cover;
-}
-
-.song-card p {
-  margin: 0;
-  font-size: 1rem;
-  color: #333;
-}
-
-/* Gráficos */
-.dashboard-charts {
-  padding: 1rem;
-  background-color: #ffffff;
-  border-radius: 0.5rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.dashboard-charts h2 {
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: #444;
-  margin-bottom: 1rem;
-}
-
-.dashboard-grid {
+.main-dashboard {
   display: grid;
   grid-template-areas:
-    "stats stats"
-    "music charts"
-    "tickets charts";
-  grid-template-columns: 2fr 1fr;
-  gap: 2rem;
+    "tickets info music"
+    "map map charts";
+  grid-template-columns: 2fr 1fr 1fr;
+  grid-template-rows: auto 1fr;
+  gap: 20px;
+  padding: 20px;
+  width: 100%;
+  height: calc(100vh - 60px);
+  box-sizing: border-box;
+  background-color: #f9f9f9;
 }
 
-.dashboard-charts button {
-  margin: 0.5rem;
-  padding: 0.75rem 1.25rem;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 0.375rem;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.3s ease;
+.tickets-section {
+  grid-area: tickets;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
+  background-color: #fff;
+  overflow-y: auto;
 }
 
-.dashboard-charts button:hover {
-  background-color: #0056b3;
-  transform: translateY(-2px);
+.info-section {
+  grid-area: info;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
+  background-color: #fff;
 }
 
-.dashboard-charts button:active {
-  transform: translateY(0);
+.music-section {
+  grid-area: music;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
+  background-color: #fff;
 }
 
-/* Tickets abiertos */
-.dashboard-tickets {
-  padding: 1rem;
-  background-color: #ffffff;
-  border-radius: 0.5rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+.map-section {
+  grid-area: map;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
+  background-color: #fff;
 }
 
-.dashboard-tickets h2 {
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: #444;
-  margin-bottom: 1rem;
+.charts-section {
+  grid-area: charts;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
+  background-color: #fff;
 }
 
-.dashboard-tickets p {
-  margin: 0.5rem 0;
-  font-size: 1rem;
-  color: #555;
-}
-
-/* Responsividad */
-@media (max-width: 768px) {
-  .dashboard-container {
-    padding: 1rem;
-  }
-
-  .dashboard-cards {
-    grid-template-columns: 1fr;
-  }
-
-  .dashboard-charts button {
-    font-size: 0.875rem;
-    padding: 0.5rem 1rem;
-  }
-}
-
-.dashboard-loading{
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  background-color: rgba(0, 0, 0, 0.8);
-  color: white;
-  padding: 1rem;
-  border-radius: 0.5rem;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  z-index: 10;
-  font-size: 1rem;
-  font-weight: bold;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-
-/* Ventana emergente */
 .popup {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5); /* Fondo semi-transparente */
   display: flex;
   justify-content: center;
   align-items: center;
@@ -193,24 +68,61 @@
 }
 
 .popup-content {
-  background-color: #ffffff;
-  padding: 2rem;
-  border-radius: 0.5rem;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  text-align: center;
+  background-color: white;
+  border-radius: 8px;
+  z-index: 10;
+  padding: 20px;
+  width: 80%; /* Ancho del modal */
+  max-width: 700px; /* Máximo ancho */
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  position: relative;
 }
 
 .popup-close {
-  margin-top: 1rem;
-  padding: 0.5rem 1rem;
-  background-color: #007bff;
-  color: white;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: transparent;
   border: none;
-  border-radius: 0.375rem;
+  font-size: 16px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
 }
 
-.popup-close:hover {
-  background-color: #0056b3;
+.modal-title {
+  font-size: 20px;
+  margin-bottom: 15px;
+  font-weight: bold;
+}
+
+.modal-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+}
+
+.modal-table th, .modal-table td {
+  padding: 10px;
+  text-align: left;
+  border: 1px solid #ddd;
+}
+
+.data-summary {
+  margin-top: 15px;
+  font-size: 14px;
+  text-align: right;
+  color: #555;
+}
+
+.charts-section {
+  grid-area: charts;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
+  background-color: #fff;
+  text-align: center;
+}
+
+.charts-section canvas {
+  max-width: 100%;
+  height: auto;
 }
