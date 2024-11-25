@@ -1,0 +1,134 @@
+/* src/components/LineaDeTiempo.css */
+
+.linea-de-tiempo-container {
+    position: relative;
+    width: 80%;
+    margin: 0 auto;
+    padding: 50px 0;
+  }
+  
+  .evento {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  
+  .evento-fecha {
+    font-size: 1.2em;
+    color: #555;
+    margin-bottom: 10px;
+  }
+  
+  .evento-contenido {
+    background: #f9f9f9;
+    padding: 20px;
+    border-radius: 10px;
+    width: 100%;
+    max-width: 600px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .evento-contenido img {
+    max-width: 100%;
+    border-radius: 10px;
+    margin-top: 10px;
+  }
+  
+  /* Línea de tiempo visual */
+  .linea-vertical {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    transform: translateX(-50%);
+    width: 4px;
+    height: 100%;
+    background: #ddd;
+  }
+  
+  .punto {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 20px;
+    height: 100px;
+  }
+  
+  .circulo {
+    width: 16px;
+    height: 16px;
+    background: #3498db;
+    border-radius: 50%;
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  
+  .linea {
+    position: absolute;
+    top: 16px;
+    left: 50%;
+    width: 2px;
+    height: 84px;
+    background: #3498db;
+  }
+
+  /* Modal */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0,0,0,0.75);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .modal {
+    background: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    position: relative;
+    max-width: 500px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+  
+  .cerrar-modal {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 1.5em;
+    cursor: pointer;
+  }
+
+  /* Filtros */
+.filtros {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+  
+  .filtros button {
+    margin: 0 10px;
+    padding: 10px 20px;
+    border: none;
+    background: #eee;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background 0.3s;
+  }
+  
+  .filtros button.activo,
+  .filtros button:hover {
+    background: #3498db;
+    color: #fff;
+  }
+  
+  
