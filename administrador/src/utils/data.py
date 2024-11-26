@@ -2,7 +2,7 @@ import firebase_admin
 from firebase_admin import credentials, firestore
 
 # Ruta al archivo de credenciales JSON (asegúrate de que esté en la misma carpeta que este script)
-CREDENTIALS_PATH = "credencial.json"
+CREDENTIALS_PATH = "cred.json"
 
 # Archivo de salida
 OUTPUT_FILE = "firebase_data_output.txt"
