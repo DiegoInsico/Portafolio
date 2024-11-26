@@ -2,7 +2,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/NavBar/navBar';
-import Home from './page/home/home'
+import Home from './page/home/home';
 import Prueba from './page/prueba';
 import AlbumPage from './page/album/pageAlbum';
 import DocumentManager from './page/organizes/pageOrganize';
@@ -10,6 +10,7 @@ import LoginPage from './page/auth/login';
 import RegisterPage from './page/auth/register';
 import ProtectedRoute from './components/protectedRoute';
 import { AuthProvider } from './page/auth/authContext'; // Importa el AuthProvider
+import LineaDeTiempo from './page/history/LineaDeTiempo'; // Importa LineaDeTiempo
 import "./App.css";
 
 const ProtectedLayout = ({ children }) => (
@@ -21,14 +22,11 @@ const ProtectedLayout = ({ children }) => (
 
 function App() {
   return (
-    <AuthProvider> {/* Envuelve toda la aplicación con AuthProvider */}
+    <AuthProvider>
       <Router>
         <Routes>
-          {/* Rutas de autenticación sin Navbar */}
           <Route path="/auth/login" element={<LoginPage />} />
           <Route path="/auth/register" element={<RegisterPage />} />
-
-          {/* Ruta protegida para Home envuelta en ProtectedLayout */}
           <Route
             path="/"
             element={
@@ -69,10 +67,22 @@ function App() {
               </ProtectedRoute>
             }
           />
+          {/* Nueva ruta para Línea de Tiempo */}
+          <Route
+            path="/linea-tiempo"
+            element={
+              <ProtectedRoute>
+                <ProtectedLayout>
+                  <LineaDeTiempo />
+                </ProtectedLayout>
+              </ProtectedRoute>
+            }
+          />
         </Routes>
       </Router>
     </AuthProvider>
   );
 }
+
 
 export default App;

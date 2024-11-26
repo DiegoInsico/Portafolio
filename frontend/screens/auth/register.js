@@ -16,35 +16,48 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
 } from "react-native";
-import { Picker } from "@react-native-picker/picker"; // Importa Picker
-import { createUserWithEmailAndPassword, updateProfile, signOut } from "firebase/auth"; // <--- Importa signOut
+import { Picker } from "@react-native-picker/picker"; // Asegúrate de que Picker esté instalado correctamente
+import {
+  createUserWithEmailAndPassword,
+  updateProfile,
+  signOut,
+} from "firebase/auth";
 import { auth, db } from "../../utils/firebase";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import { Ionicons } from "@expo/vector-icons";
-import { doc, setDoc } from "firebase/firestore"; // Importa setDoc para Firestore
+import { doc, setDoc } from "firebase/firestore";
 import DateTimePicker from "@react-native-community/datetimepicker";
 
-// Importa listas de países, ciudades y comunas
-import { countries } from "../../utils/countries";
-import { cities } from "../../utils/cities";
-import { comunas } from "../../utils/comunas";
+import { useFonts } from "expo-font";
+import {
+  Poppins_400Regular,
+  Poppins_700Bold,
+} from "@expo-google-fonts/poppins";
+
+// Definir las listas de países directamente dentro de Registro.js
+const countries = [
+  { label: "Chile", value: "Chile" },
+  { label: "Argentina", value: "Argentina" },
+  { label: "Perú", value: "Peru" },
+  // Agrega más países según sea necesario
+];
 
 // Función para mapear códigos de error a mensajes amigables
 const getErrorMessage = (error) => {
   switch (error.code) {
-    case 'auth/email-already-in-use':
-      return 'El correo electrónico ya está en uso. Por favor, inicia sesión o utiliza otro correo.';
-    case 'auth/invalid-email':
-      return 'El correo electrónico ingresado no es válido.';
-    case 'auth/operation-not-allowed':
-      return 'El registro de usuarios está deshabilitado. Por favor, contacta al soporte.';
-    case 'auth/weak-password':
-      return 'La contraseña es demasiado débil. Debe tener al menos 6 caracteres, incluyendo una letra y un número.';
-    case 'auth/network-request-failed':
-      return 'Fallo en la conexión de red. Por favor, verifica tu conexión e intenta nuevamente.';
+    case "auth/email-already-in-use":
+      return "El correo electrónico ya está en uso. Por favor, inicia sesión o utiliza otro correo.";
+    case "auth/invalid-email":
+      return "El correo electrónico ingresado no es válido.";
+    case "auth/operation-not-allowed":
+      return "El registro de usuarios está deshabilitado. Por favor, contacta al soporte.";
+    case "auth/weak-password":
+      return "La contraseña es demasiado débil. Debe tener al menos 6 caracteres, incluyendo una letra y un número.";
+    case "auth/network-request-failed":
+      return "Fallo en la conexión de red. Por favor, verifica tu conexión e intenta nuevamente.";
     default:
-      return 'Ocurrió un error inesperado. Por favor, intenta nuevamente.';
+      return "Ocurrió un error inesperado. Por favor, intenta nuevamente.";
   }
 };
 
@@ -67,16 +80,7 @@ const RegisterSchema = Yup.object().shape({
   fechaNacimiento: Yup.date()
     .max(new Date(), "La fecha de nacimiento no puede ser futura")
     .required("La fecha de nacimiento es obligatoria"),
-  pais: Yup.string()
-    .required("El país es obligatorio"),
-  ciudad: Yup.string()
-    .required("La ciudad es obligatoria"),
-  comuna: Yup.string()
-    .when('pais', {
-      is: (val) => val === 'Chile',
-      then: Yup.string().required("La comuna es obligatoria para Chile"),
-      otherwise: Yup.string().notRequired(),
-    }),
+  pais: Yup.string().required("El país es obligatorio"),
 });
 
 export default function Registro({ navigation }) {
@@ -84,6 +88,21 @@ export default function Registro({ navigation }) {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
+
+  // Cargar fuentes
+  const [fontsLoaded] = useFonts({
+    Poppins_400Regular,
+    Poppins_700Bold,
+  });
+
+  // Mostrar indicador de carga mientras se cargan las fuentes
+  if (!fontsLoaded) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#FFD700" />
+      </View>
+    );
+  }
 
   const handleRegister = async (values, actions) => {
     setIsSubmitting(true);
@@ -108,8 +127,6 @@ export default function Registro({ navigation }) {
         createdAt: new Date(),
         birthDate: values.fechaNacimiento, // Añadimos la fecha de nacimiento
         pais: values.pais, // Añadimos el país
-        ciudad: values.ciudad, // Añadimos la ciudad
-        comuna: values.pais === "Chile" ? values.comuna : "", // Añadimos la comuna solo si el país es Chile
       });
 
       // Cerrar la sesión del usuario recién registrado
@@ -166,8 +183,6 @@ export default function Registro({ navigation }) {
               confirmarContrasena: "",
               fechaNacimiento: new Date(), // Valor inicial válido
               pais: "", // Nuevo campo País
-              ciudad: "", // Nuevo campo Ciudad
-              comuna: "", // Nuevo campo Comuna (para Chile)
             }}
             validationSchema={RegisterSchema}
             onSubmit={handleRegister}
@@ -312,7 +327,11 @@ export default function Registro({ navigation }) {
                   >
                     <Text style={styles.datePickerText}>
                       {values.fechaNacimiento
-                        ? values.fechaNacimiento.toDateString()
+                        ? values.fechaNacimiento.toLocaleDateString("es-ES", {
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
+                          })
                         : "Selecciona una fecha"}
                     </Text>
                   </TouchableOpacity>
@@ -323,7 +342,7 @@ export default function Registro({ navigation }) {
 
                 {showDatePicker && (
                   <DateTimePicker
-                    value={values.fechaNacimiento}
+                    value={values.fechaNacimiento || new Date()}
                     mode="date"
                     display="default"
                     onChange={(event, selectedDate) => {
@@ -348,74 +367,24 @@ export default function Registro({ navigation }) {
                   <Picker
                     selectedValue={values.pais}
                     onValueChange={(itemValue) => {
+                      console.log("País seleccionado:", itemValue);
                       setFieldValue("pais", itemValue);
-                      setFieldValue("ciudad", ""); // Resetear ciudad al cambiar país
-                      setFieldValue("comuna", ""); // Resetear comuna al cambiar país
                     }}
                     style={styles.picker}
                     mode="dropdown"
                   >
+                    <Picker.Item label="Selecciona un país" value="" />
                     {countries.map((country) => (
-                      <Picker.Item key={country.value} label={country.label} value={country.value} />
+                      <Picker.Item
+                        key={country.value}
+                        label={country.label}
+                        value={country.value}
+                      />
                     ))}
                   </Picker>
                 </View>
                 {touched.pais && errors.pais && (
                   <Text style={styles.errorText}>{errors.pais}</Text>
-                )}
-
-                {/* Campo Ciudad */}
-                <Text style={styles.label}>Ciudad</Text>
-                <View style={styles.inputContainer}>
-                  <Ionicons
-                    name="home"
-                    size={20}
-                    color="#FFD700"
-                    style={styles.iconStyle}
-                  />
-                  <Picker
-                    selectedValue={values.ciudad}
-                    onValueChange={(itemValue) => setFieldValue("ciudad", itemValue)}
-                    style={styles.picker}
-                    mode="dropdown"
-                    enabled={values.pais !== ""}
-                  >
-                    {values.pais && cities[values.pais].map((city) => (
-                      <Picker.Item key={city.value} label={city.label} value={city.value} />
-                    ))}
-                  </Picker>
-                </View>
-                {touched.ciudad && errors.ciudad && (
-                  <Text style={styles.errorText}>{errors.ciudad}</Text>
-                )}
-
-                {/* Campo Comuna (solo para Chile) */}
-                {values.pais === "Chile" && (
-                  <>
-                    <Text style={styles.label}>Comuna</Text>
-                    <View style={styles.inputContainer}>
-                      <Ionicons
-                        name="list"
-                        size={20}
-                        color="#FFD700"
-                        style={styles.iconStyle}
-                      />
-                      <Picker
-                        selectedValue={values.comuna}
-                        onValueChange={(itemValue) => setFieldValue("comuna", itemValue)}
-                        style={styles.picker}
-                        mode="dropdown"
-                        enabled={values.ciudad !== ""}
-                      >
-                        {values.ciudad && comunas[values.ciudad].map((comuna) => (
-                          <Picker.Item key={comuna.value} label={comuna.label} value={comuna.value} />
-                        ))}
-                      </Picker>
-                    </View>
-                    {touched.comuna && errors.comuna && (
-                      <Text style={styles.errorText}>{errors.comuna}</Text>
-                    )}
-                  </>
                 )}
 
                 {/* Botón de Registro */}
@@ -449,6 +418,12 @@ export default function Registro({ navigation }) {
 }
 
 const styles = StyleSheet.create({
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#2C3E50",
+  },
   background: {
     flex: 1,
     width: "100%",
@@ -558,5 +533,18 @@ const styles = StyleSheet.create({
   datePickerText: {
     color: "#FFD700",
     fontSize: 16,
+  },
+  label: {
+    color: "#FFD700",
+    fontSize: 14,
+    marginBottom: 5,
+    marginLeft: 10,
+    fontFamily: "Poppins_600SemiBold",
+  },
+  picker: {
+    flex: 1,
+    height: 50,
+    color: "#FFD700",
+    backgroundColor: "rgba(255, 255, 255, 0.1)",
   },
 });

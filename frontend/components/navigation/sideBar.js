@@ -28,6 +28,7 @@ export default function SideBar({
   navigateToBeneficiarios,
   navigateToProgramarMensaje,
   navigateToSoporte, // Nueva función de navegación para Soporte
+  handleSignOut
 }) {
   const { user, userData, loading } = useContext(AuthContext);
   const [selected, setSelected] = useState("");

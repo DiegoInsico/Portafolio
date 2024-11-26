@@ -329,7 +329,7 @@ const EntryDetailScreen = () => {
                       mode="text"
                       onPress={handleRemoveBeneficiary}
                       style={styles.button}
-                      icon="trash"
+                      icon="trash-can"
                       color="#E74C3C"
                     >
                       Eliminar

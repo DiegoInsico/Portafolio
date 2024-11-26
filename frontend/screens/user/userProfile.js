@@ -22,10 +22,7 @@ import { doc, updateDoc, getDoc, deleteDoc } from "firebase/firestore";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { FontAwesome, Ionicons } from "@expo/vector-icons";
 
-// Importa listas de países, ciudades y comunas
-import { countries } from "../../utils/countries";
-import { cities } from "../../utils/cities";
-import { comunas } from "../../utils/comunas";
+
 
 const UserProfile = () => {
   const [user, setUser] = useState(null);

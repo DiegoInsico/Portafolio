@@ -384,12 +384,6 @@ const EntryScreen = ({ navigation, route }) => {
       style={styles.background}
       resizeMode="cover"
     >
-      <SafeAreaView style={styles.safeArea}>
-        <StatusBar
-          barStyle="light-content"
-          translucent={false}
-          backgroundColor="transparent"
-        />
 
         <KeyboardAvoidingView
           style={styles.keyboardAvoidingView}
@@ -668,9 +662,9 @@ const EntryScreen = ({ navigation, route }) => {
             <RNPickerSelect
               onValueChange={(value) => setNivel(value)}
               items={[
-                { label: "Nivel 1 - General", value: "1" },
-                { label: "Nivel 2 - Privado", value: "2" },
-                { label: "Nivel 3 - Profundo", value: "3" },
+                { label: "Nivel 1 - General", value: 1 },
+                { label: "Nivel 2 - Privado", value: 2 },
+                { label: "Nivel 3 - Profundo", value: 3 },
               ]}
               placeholder={{
                 label: "Selecciona el nivel de privacidad",
@@ -694,7 +688,6 @@ const EntryScreen = ({ navigation, route }) => {
             </View>
           </ScrollView>
         </KeyboardAvoidingView>
-      </SafeAreaView>
     </ImageBackground>
   );
 };
@@ -703,8 +696,6 @@ const EntryScreen = ({ navigation, route }) => {
 const pickerSelectStyles = StyleSheet.create({
   inputIOS: {
     fontSize: 16,
-    paddingVertical: 14,
-    paddingHorizontal: 12,
     borderWidth: 1,
     borderColor: COLORS.border,
     borderRadius: 8,
@@ -716,8 +707,6 @@ const pickerSelectStyles = StyleSheet.create({
   },
   inputAndroid: {
     fontSize: 16,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
     borderWidth: 1,
     borderColor: COLORS.border,
     borderRadius: 8,
@@ -735,27 +724,23 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
   },
-  safeArea: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.3)", // Superposición ligera para mejorar la legibilidad
-    marginTop: 60,
-  },
   keyboardAvoidingView: {
     flex: 1,
   },
   scrollContainer: {
+    paddingTop: 80,
     padding: 20,
-    backgroundColor: "rgba(255, 255, 255, 0.9)", // Fondo semi-transparente más claro
+    backgroundColor: "rgba(255, 255, 255, 0.1)", // Fondo semi-transparente más claro
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
-    paddingBottom: 40, // Espacio extra para evitar que los botones queden ocultos
+    paddingBottom: 20, // Espacio extra para evitar que los botones queden ocultos
   },
   titulo: {
     fontSize: 26,
     fontWeight: "800",
     marginBottom: 20,
     textAlign: "center",
-    color: COLORS.primary,
+    color: "#000",
   },
   label: {
     marginTop: 10,

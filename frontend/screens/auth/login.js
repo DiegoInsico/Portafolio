@@ -193,11 +193,11 @@ export default function Login({ navigation }) {
 
                   {/* Enlaces adicionales */}
                   <View style={styles.linksContainer}>
-                    <TouchableOpacity onPress={() => navigation.navigate("RequestPasswordReset")}>
+                    <TouchableOpacity onPress={() => navigation.navigate("ResetPassword")}>
                       <Text style={styles.linkText}>¿Has olvidado tu contraseña?</Text>
                     </TouchableOpacity>
 
-                    <TouchableOpacity onPress={() => navigation.navigate("Registro")}>
+                    <TouchableOpacity onPress={() => navigation.navigate("Register")}>
                       <Text style={styles.linkText}>¿No tienes una cuenta? Regístrate</Text>
                     </TouchableOpacity>
                   </View>

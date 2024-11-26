@@ -57,6 +57,67 @@ export const getBeneficiarios = async () => {
     }
 };
 
+// Función para obtener las entradas de un usuario específico
+export const getEntradas = async (userId) => {
+    try {
+        const entradasCollection = collection(db, 'entradas');
+        const q = query(entradasCollection, where("userId", "==", userId));
+        const snapshot = await getDocs(q);
+
+        return snapshot.docs.map(doc => {
+            const data = doc.data();
+
+            // Formateo de fecha para fechaCreacion y fechaRecuerdo
+            if (data.fechaCreacion && data.fechaCreacion.toDate) {
+                const fecha = data.fechaCreacion.toDate();
+                data.fechaCreacion = `${fecha.getDate()}/${fecha.getMonth() + 1}/${fecha.getFullYear()}`;
+            }
+            if (data.fechaRecuerdo && data.fechaRecuerdo.toDate) {
+                const fechaRecuerdo = data.fechaRecuerdo.toDate();
+                data.fechaRecuerdo = `${fechaRecuerdo.getDate()}/${fechaRecuerdo.getMonth() + 1}/${fechaRecuerdo.getFullYear()}`;
+            }
+
+            // Definir valores predeterminados para los campos
+            return {
+                id: doc.id,
+                audio: data.audio || null,
+                baul: data.baul || false,
+                cancion: data.cancion || null,
+                categoria: data.categoria || '',
+                color: data.color || '#000000',
+                emociones: data.emociones || [],
+                fechaCreacion: data.fechaCreacion || null,
+                fechaRecuerdo: data.fechaRecuerdo || null,
+                isProtected: data.isProtected || false,
+                media: data.media || null,
+                mediaType: data.mediaType || null,
+                nickname: data.nickname || '',
+                nivel: data.nivel || '1',
+                texto: data.texto || '',
+                userId: data.userId || ''
+            };
+        });
+    } catch (error) {
+        console.error("Error fetching entries:", error);
+        throw error;
+    }
+};
+
+// Función para obtener reflexiones de una entrada
+export const getReflexiones = async (userId, entradaId) => {
+    try {
+        const reflexionesCollection = collection(db, 'entradas', entradaId, 'reflexiones');
+        const snapshot = await getDocs(reflexionesCollection);
+        return snapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+        })).map(reflexion => reflexion.texto); // Asumiendo que cada reflexión tiene un campo 'texto'
+    } catch (error) {
+        console.error("Error al obtener reflexiones:", error);
+        return [];
+    }
+};
+
 export const getUsers = async () => {
     try {
         const usersCollection = collection(db, 'users');
@@ -182,10 +243,19 @@ export const deleteAlbum = async (userId, albumId) => {
 };
 
 // Funciones relacionadas con entradas
-export const getEntries = async (userId) => {
+export const getEntries = async (userId, nivel = null) => {
     try {
-        const entriesCollection = collection(db, 'entradas');
-        const q = query(entriesCollection, where("userId", "==", userId));
+        const entradasCollection = collection(db, 'entradas');
+        let q;
+        if (nivel) {
+            q = query(
+                entradasCollection, 
+                where("userId", "==", userId),
+                where("nivel", "==", nivel)
+            );
+        } else {
+            q = query(entradasCollection, where("userId", "==", userId));
+        }
         const snapshot = await getDocs(q);
 
         return snapshot.docs.map(doc => {
@@ -215,6 +285,7 @@ export const getEntries = async (userId) => {
                 isProtected: data.isProtected || false,
                 media: data.media || null,
                 mediaType: data.mediaType || null,
+                nickname: data.nickname || '',
                 nivel: data.nivel || '1',
                 texto: data.texto || '',
                 userId: data.userId || ''
@@ -383,6 +454,23 @@ export const savePdfUrlInFirestore = async (userId, pdfUrl) => {
         console.log("URL del PDF guardada en Firestore.");
     } catch (error) {
         console.error("Error al guardar la URL del PDF en Firestore:", error);
+        throw error;
+    }
+};
+
+// **Añadir Reflexión a una Entrada**
+export const addReflexion = async (userId, entradaId, texto) => {
+    try {
+        const reflexionesCollection = collection(db, 'entradas', entradaId, 'reflexiones');
+        const newReflexion = {
+            texto,
+            createdAt: Timestamp.now(),
+        };
+        const docRef = await addDoc(reflexionesCollection, newReflexion);
+        console.log("Reflexión añadida con ID:", docRef.id);
+        return { id: docRef.id, ...newReflexion };
+    } catch (error) {
+        console.error("Error al añadir reflexión:", error);
         throw error;
     }
 };

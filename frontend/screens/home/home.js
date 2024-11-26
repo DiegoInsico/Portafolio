@@ -1,4 +1,4 @@
-// Home.js
+// src/screens/Home.js
 
 import React, { useEffect, useRef, useState, useContext } from "react";
 import {
@@ -25,9 +25,10 @@ import {
 import { db } from "../../utils/firebase";
 import { FontAwesome } from "@expo/vector-icons";
 import { AuthContext } from "../../context/AuthContext";
-import SideBarMenu from "../../components/navigation/sideBarMenu";
+import SideBarMenu from "../../components/navigation/sideBarMenu"; // Asegúrate de que la ruta es correcta
 import Icon from "react-native-vector-icons/MaterialCommunityIcons"; // Para los íconos de búsqueda
 import { categoryColors } from "../../utils/categoryColors"; // Importa categoryColors
+import { signOutUser } from "../../utils/firebase";
 
 const { width: viewportWidth } = Dimensions.get("window");
 
@@ -55,6 +56,18 @@ const Home = ({ navigation }) => {
 
   const toggleMenu = () => {
     setMenuVisible((prev) => !prev);
+  };
+
+  const handleSignOutAndToggle = async () => {
+    try {
+      await signOutUser(); // Asegúrate de importar signOutUser correctamente
+      toggleMenu();
+      Alert.alert("Éxito", "Has cerrado sesión correctamente.");
+      // La navegación a la pantalla de Login se manejará automáticamente mediante AuthContext
+    } catch (error) {
+      console.error("Error al cerrar sesión:", error);
+      Alert.alert("Error", "Hubo un problema al cerrar sesión.");
+    }
   };
 
   const getGreeting = () => {
@@ -324,7 +337,7 @@ const Home = ({ navigation }) => {
         }}
         navigateToProfile={() => {
           toggleMenu();
-          navigation.navigate("Profile");
+          navigation.navigate("UserProfile");
         }}
         navigateToSettings={() => {
           toggleMenu();
@@ -346,10 +359,7 @@ const Home = ({ navigation }) => {
           toggleMenu();
           navigation.navigate("Soporte");
         }}
-        handleSignOut={() => {
-          toggleMenu();
-          console.log("Cerrando sesión...");
-        }}
+        handleSignOut={handleSignOutAndToggle} // Asegúrate de pasar la función correcta
       />
     </>
   );

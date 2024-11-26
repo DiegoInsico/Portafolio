@@ -1,9 +1,11 @@
-import React, { useState } from "react";
-import { View, StyleSheet } from "react-native";
+// AppNavigator.js
 
-import SideBar from "./sideBarMenu"; // Menú desplegable
+import React, { useState } from "react";
+import { View, StyleSheet, Alert } from "react-native";
+import SideBar from "./sideBarMenu"; // Asegúrate de que la ruta sea correcta
 import Home from "../../screens/home/home"; // Pantalla Home
 import ListEntry from "../../screens/entrys/ListEntry"; // Pantalla ListEntry
+import { getAuth } from "firebase/auth";
 
 function AppNavigator({ navigation, user }) {
   const [sidebarVisible, setSidebarVisible] = useState(false);
@@ -12,12 +14,35 @@ function AppNavigator({ navigation, user }) {
     setSidebarVisible((prev) => !prev);
   };
 
+  // Función para cerrar sesión
+  const handleSignOut = async () => {
+    try {
+      const auth = getAuth();
+      await auth.signOut();
+      // Navegar a la pantalla de inicio de sesión después de cerrar sesión
+      navigation.reset({
+        index: 0,
+        routes: [{ name: "Login" }],
+      });
+      console.log("Usuario ha cerrado sesión exitosamente.");
+    } catch (error) {
+      console.error("Error al cerrar sesión:", error);
+      Alert.alert("Error", "Hubo un problema al cerrar sesión. Por favor, intenta de nuevo.");
+    }
+  };
+
+  // Función que se pasará al SideBar para manejar el cierre de sesión
+  const handleSignOutAndToggle = () => {
+    handleToggleSidebar(); // Cierra el menú lateral
+    handleSignOut();       // Realiza el cierre de sesión
+  };
+
   return (
     <View style={styles.container}>
       {/* Renderizar el SideBar (menú desplegable) */}
       <SideBar
         isVisible={sidebarVisible}
-        toggleSidebar={handleToggleSidebar}
+        toggleMenu={handleToggleSidebar}
         navigateToHome={() => {
           handleToggleSidebar();
           navigation.navigate("Home");
@@ -54,10 +79,7 @@ function AppNavigator({ navigation, user }) {
           handleToggleSidebar();
           navigation.navigate("Detalle");
         }}
-        handleSignOut={() => {
-          handleToggleSidebar();
-          console.log("Cerrando sesión...");
-        }}
+        handleSignOut={handleSignOutAndToggle} // Pasar la función correcta
         user={user}
       />
 

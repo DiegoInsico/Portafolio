@@ -1,9 +1,14 @@
 // src/entry/useEntries.js
 
 import { useState, useEffect } from 'react';
-import { getEntries, getAlbumEntries, getAlbumBackground, updateAlbumEntriesInDB } from '../../firebase'; // Asegúrate de ajustar la ruta si es necesario
+import { 
+    getEntries, 
+    getAlbumEntries, 
+    getAlbumBackground, 
+    updateAlbumEntriesInDB 
+} from '../../firebase'; // Asegúrate de ajustar la ruta si es necesario
 
-const useEntries = (currentUser, selectedAlbum) => {
+const useEntries = (currentUser, selectedAlbum, nivel = null) => {
     const [entries, setEntries] = useState([]);
     const [albumEntries, setAlbumEntries] = useState([]);
     const [albumBackground, setAlbumBackground] = useState('#ffffff');
@@ -14,9 +19,9 @@ const useEntries = (currentUser, selectedAlbum) => {
             if (currentUser) {
                 console.log("Usuario actual:", currentUser.uid);
                 try {
-                    // Obtener todas las entradas del usuario
-                    const allEntries = await getEntries(currentUser.uid);
-                    console.log("Todas las entradas obtenidas:", allEntries);
+                    // Obtener todas las entradas del usuario o filtradas por nivel
+                    const allEntries = await getEntries(currentUser.uid, nivel);
+                    console.log("Entradas obtenidas:", allEntries);
                     setEntries(allEntries);
 
                     if (selectedAlbum) {
@@ -46,7 +51,7 @@ const useEntries = (currentUser, selectedAlbum) => {
         };
 
         fetchEntries();
-    }, [currentUser, selectedAlbum]);
+    }, [currentUser, selectedAlbum, nivel]);
 
     const updateAlbumEntries = async (modifyAlbumFn, albumId, newEntriesIds) => {
         try {

@@ -1,3 +1,5 @@
+// src/navigation/SideBarMenu.js
+
 import React, { useEffect, useState } from "react";
 import {
   View,
@@ -12,9 +14,9 @@ import FontAwesome from "react-native-vector-icons/FontAwesome";
 import PropTypes from "prop-types";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../utils/firebase";
-import { getAuth } from "firebase/auth";
+import { getAuth } from "firebase/auth"; // Importar getAuth
 
-export default function SideBarMenu({
+const SideBarMenu = ({
   isVisible,
   toggleMenu,
   navigateToHome,
@@ -26,7 +28,7 @@ export default function SideBarMenu({
   navigateToProgramarMensaje,
   navigateToSoporte,
   handleSignOut,
-}) {
+}) => {
   const slideAnim = new Animated.Value(-300); // Posición inicial fuera de la pantalla
   const [userData, setUserData] = useState(null);
 
@@ -47,7 +49,7 @@ export default function SideBarMenu({
     };
 
     fetchUserData();
-  }, []);
+  }, [isVisible]);
 
   useEffect(() => {
     Animated.timing(slideAnim, {
@@ -154,7 +156,7 @@ export default function SideBarMenu({
       </Animated.View>
     </View>
   );
-}
+};
 
 SideBarMenu.propTypes = {
   isVisible: PropTypes.bool.isRequired,
@@ -252,3 +254,5 @@ const styles = StyleSheet.create({
     width: "100%", // Ajusta al ancho del contenedor
   },
 });
+
+export default SideBarMenu;

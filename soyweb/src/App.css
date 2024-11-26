@@ -17,3 +17,13 @@ body {
   min-height: 100vh;
   top: 0px;
 }
+
+.app-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh; /* Ocupa toda la altura de la ventana */
+  background-color: #e0e0e0; /* Color de fondo opcional */
+  padding: 20px; /* Espaciado opcional */
+  box-sizing: border-box;
+}

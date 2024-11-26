@@ -1,6 +1,7 @@
+// src/components/Navbar.js
 import React, { useState, useEffect } from 'react';
-import { Link as ScrollLink } from 'react-scroll';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom'; // Para navegar entre rutas
+import { useNavigate } from 'react-router-dom'; // Para la funcionalidad de logout
 import { signOutUser } from '../../firebase';
 import './Navbar.css';
 
@@ -47,9 +48,9 @@ const Navbar = () => {
                 </Link>
                 <div className="navbar-links">
                     <Link to="/prueba">Pruebas</Link>
-                    <ScrollLink to="historia" smooth={true} duration={500}>Historia de vida</ScrollLink>
                     <Link to="/album">Tu álbum</Link>
                     <Link to="/organize">Ordena tu vida</Link>
+                    <Link to="/linea-tiempo">Línea de Tiempo</Link> {/* Nuevo enlace */}
                 </div>
                 <div className="navbar-actions">
                     <button onClick={handleLogout} className="logout-button">Cerrar sesión</button>

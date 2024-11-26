@@ -1,8 +1,15 @@
+// src/utils/firebase.js
+
 import { initializeApp } from "firebase/app";
-import { initializeAuth, getReactNativePersistence, signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
+import {
+  initializeAuth,
+  getReactNativePersistence,
+  signInWithEmailAndPassword,
+  signOut,
+} from "firebase/auth";
 import { getFirestore, collection, getDocs, onSnapshot, query, where, orderBy } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // Configuración de Firebase
 const firebaseConfig = {
@@ -26,46 +33,29 @@ const auth = initializeAuth(app, {
 const db = getFirestore(app);
 const storage = getStorage(app);
 
-// Función para iniciar sesión y guardar la sesión
+// Función para iniciar sesión
 export const signIn = async (email, password) => {
   try {
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
-
-    // Guardar el ID token del usuario en AsyncStorage
-    await AsyncStorage.setItem('userToken', user.uid);
-
-    console.log('Usuario autenticado y token guardado');
+    console.log("Usuario autenticado:", user.uid);
+    return user;
   } catch (error) {
     console.error("Error al iniciar sesión:", error);
+    throw error;
   }
 };
 
-// Recuperar el estado de autenticación
-export const checkAuthState = async () => {
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      console.log('Usuario autenticado:', user.uid);
-      // Redirigir al usuario o permitir acceso
-    } else {
-      console.log('No hay sesión activa');
-      // Redirigir a la pantalla de inicio de sesión
-    }
-  });
-};
-
-// Escuchar el estado de autenticación de Firebase
-onAuthStateChanged(auth, async (user) => {
-  if (user) {
-    console.log('Usuario autenticado automáticamente:', user.uid);
-    // Almacenar el estado de sesión
-    await AsyncStorage.setItem('userToken', user.uid);
-  } else {
-    console.log('Usuario no autenticado');
-    // Eliminar la sesión si el usuario cierra sesión
-    await AsyncStorage.removeItem('userToken');
+// Función para cerrar sesión
+export const signOutUser = async () => {
+  try {
+    await signOut(auth);
+    console.log("Usuario ha cerrado sesión exitosamente.");
+  } catch (error) {
+    console.error("Error al cerrar sesión:", error);
+    throw error;
   }
-});
+};
 
 // Función para obtener las entradas desde Firestore
 export const getEntries = async () => {
@@ -81,22 +71,26 @@ export const getEntries = async () => {
     console.log("User ID:", user.uid);
 
     // Obtener solo las entradas del usuario actual
-    const entriesCollection = collection(db, 'entradas');
+    const entriesCollection = collection(db, "entradas");
     const q = query(entriesCollection, where("userId", "==", user.uid));
     const snapshot = await getDocs(q);
 
     console.log("Fetched entries count:", snapshot.size);
 
-    return snapshot.docs.map(doc => {
+    return snapshot.docs.map((doc) => {
       const data = doc.data();
       // Convertir los campos de fecha a un formato legible si es necesario
       if (data.fechaCreacion && data.fechaCreacion.toDate) {
         const fecha = data.fechaCreacion.toDate();
-        data.fechaCreacion = `${fecha.getDate()}/${fecha.getMonth() + 1}/${fecha.getFullYear()}`;
+        data.fechaCreacion = `${fecha.getDate()}/${
+          fecha.getMonth() + 1
+        }/${fecha.getFullYear()}`;
       }
       if (data.fechaRecuerdo && data.fechaRecuerdo.toDate) {
         const fechaRecuerdo = data.fechaRecuerdo.toDate();
-        data.fechaRecuerdo = `${fechaRecuerdo.getDate()}/${fechaRecuerdo.getMonth() + 1}/${fechaRecuerdo.getFullYear()}`;
+        data.fechaRecuerdo = `${fechaRecuerdo.getDate()}/${
+          fechaRecuerdo.getMonth() + 1
+        }/${fechaRecuerdo.getFullYear()}`;
       }
       return { id: doc.id, ...data };
     });
@@ -106,6 +100,7 @@ export const getEntries = async () => {
   }
 };
 
+// Función para escuchar entradas en tiempo real
 export const listenToEntries = (callback) => {
   const unsubscribe = onAuthStateChanged(auth, (user) => {
     if (!user) {
@@ -113,48 +108,75 @@ export const listenToEntries = (callback) => {
       return;
     }
 
-    const entriesCollection = collection(db, 'entradas');
-    const q = query(entriesCollection, where("userId", "==", user.uid), orderBy("fechaCreacion", "desc"));
+    const entriesCollection = collection(db, "entradas");
+    const q = query(
+      entriesCollection,
+      where("userId", "==", user.uid),
+      orderBy("fechaCreacion", "desc")
+    );
 
-    return onSnapshot(q, (snapshot) => {
-      const entries = snapshot.docs.map(doc => {
-        const data = doc.data();
-        console.log("Data del documento:", data);
+    const unsubscribeSnapshot = onSnapshot(
+      q,
+      (snapshot) => {
+        const entries = snapshot.docs.map((doc) => {
+          const data = doc.data();
+          console.log("Data del documento:", data);
 
-        // Formatear fechas
-        if (data.fechaCreacion && data.fechaCreacion.toDate) {
-          const fecha = data.fechaCreacion.toDate();
-          data.fechaCreacionFormatted = `${fecha.getDate().toString().padStart(2, '0')}/${(fecha.getMonth() + 1).toString().padStart(2, '0')}/${fecha.getFullYear()}`;
-        }
+          // Formatear fechas
+          if (data.fechaCreacion && data.fechaCreacion.toDate) {
+            const fecha = data.fechaCreacion.toDate();
+            data.fechaCreacionFormatted = `${fecha
+              .getDate()
+              .toString()
+              .padStart(2, "0")}/${(fecha.getMonth() + 1)
+              .toString()
+              .padStart(2, "0")}/${fecha.getFullYear()}`;
+          }
 
-        if (data.fechaRecuerdo && data.fechaRecuerdo.toDate) {
-          const fechaRecuerdo = data.fechaRecuerdo.toDate();
-          data.fechaRecuerdoFormatted = `${fechaRecuerdo.getDate().toString().padStart(2, '0')}/${(fechaRecuerdo.getMonth() + 1).toString().padStart(2, '0')}/${fechaRecuerdo.getFullYear()}`;
-        }
+          if (data.fechaRecuerdo && data.fechaRecuerdo.toDate) {
+            const fechaRecuerdo = data.fechaRecuerdo.toDate();
+            data.fechaRecuerdoFormatted = `${fechaRecuerdo
+              .getDate()
+              .toString()
+              .padStart(2, "0")}/${(fechaRecuerdo.getMonth() + 1)
+              .toString()
+              .padStart(2, "0")}/${fechaRecuerdo.getFullYear()}`;
+          }
 
-        return { id: doc.id, ...data };
-      });
+          return { id: doc.id, ...data };
+        });
 
-      callback(entries);
-    }, (error) => {
-      console.error("Error al escuchar las entradas:", error);
-    });
+        callback(entries);
+      },
+      (error) => {
+        console.error("Error al escuchar las entradas:", error);
+      }
+    );
+
+    return unsubscribeSnapshot;
   });
 
   return () => unsubscribe();
 };
 
+// Función para escuchar beneficiarios
 export const listenToBeneficiaries = (userId, callback) => {
   const beneficiariesRef = collection(db, "beneficiarios");
   const q = query(beneficiariesRef, where("userId", "==", userId));
 
-  return onSnapshot(q, (querySnapshot) => {
-    const beneficiaries = [];
-    querySnapshot.forEach((doc) => {
-      beneficiaries.push({ id: doc.id, ...doc.data() });
-    });
-    callback(beneficiaries);
-  });
+  return onSnapshot(
+    q,
+    (querySnapshot) => {
+      const beneficiaries = [];
+      querySnapshot.forEach((doc) => {
+        beneficiaries.push({ id: doc.id, ...doc.data() });
+      });
+      callback(beneficiaries);
+    },
+    (error) => {
+      console.error("Error al escuchar los beneficiarios:", error);
+    }
+  );
 };
 
 export { auth, db, storage };
