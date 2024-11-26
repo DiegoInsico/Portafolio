@@ -7,14 +7,15 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 const EntryCard = ({ entry, onPress }) => {
   const { categoria, nickname, color, nivel, fechaCreacion } = entry;
 
-  // Formatear la fecha de creación
-  const formattedFechaCreacion = fechaCreacion
-    ? fechaCreacion.toDate().toLocaleDateString("es-ES", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      })
-    : "";
+  // Verifica si fechaCreacion es un objeto Date válido
+  const formattedFechaCreacion =
+    fechaCreacion instanceof Date && !isNaN(fechaCreacion.getTime())
+      ? fechaCreacion.toLocaleDateString("es-ES", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        })
+      : "";
 
   // Función para obtener el ícono del contenido basado en el tipo
   const getMediaIcon = () => {
@@ -51,17 +52,30 @@ const EntryCard = ({ entry, onPress }) => {
   };
 
   return (
-    <Pressable onPress={onPress} style={[styles.card, { backgroundColor: color || "#4B4E6D" }]}>
+    <Pressable
+      onPress={onPress}
+      style={[styles.card, { backgroundColor: color || "#4B4E6D" }]}
+    >
       <View style={styles.row}>
         {/* Ícono del contenido */}
-        <Icon name={getMediaIcon()} size={50} color="#fff" style={styles.icon} />
+        <Icon
+          name={getMediaIcon()}
+          size={50}
+          color="#fff"
+          style={styles.icon}
+        />
 
         {/* Contenido a la derecha del ícono */}
         <View style={styles.content}>
           {/* Encabezado con categoría y candado */}
           <View style={styles.header}>
             <Text style={styles.category}>{categoria}</Text>
-            <Icon name="lock" size={24} color={getLockIconColor()} style={styles.lockIcon} />
+            <Icon
+              name="lock"
+              size={24}
+              color={getLockIconColor()}
+              style={styles.lockIcon}
+            />
           </View>
 
           {/* Fecha debajo del encabezado */}
@@ -77,6 +91,7 @@ const EntryCard = ({ entry, onPress }) => {
     </Pressable>
   );
 };
+
 
 const styles = StyleSheet.create({
   card: {

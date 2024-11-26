@@ -69,7 +69,7 @@ const EntryScreen = ({ navigation, route }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [spotifyResults, setSpotifyResults] = useState([]);
   const [cancion, setCancion] = useState(null);
-  const [nivel, setNivel] = useState("1");
+  const [nivel, setNivel] = useState("1"); // Asegúrate de que sea una cadena
   const [enableRecuerdoDate, setEnableRecuerdoDate] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -200,16 +200,19 @@ const EntryScreen = ({ navigation, route }) => {
       return;
     }
 
+    const nivelComoCadena = nivel.toString();
+
     // Comprobamos el límite de entradas por nivel
     const userEntriesQuery = query(
-      collection(db, "entries"),
+      collection(db, "entradas"),
       where("userId", "==", user.uid),
-      where("nivel", "==", nivel)
+      where("nivel", "==", nivelComoCadena) // Usar la cadena aquí
     );
     const userEntriesSnapshot = await getDocs(userEntriesQuery);
 
-    const limites = { 1: 50, 2: 10, 3: 4 };
-    if (userEntriesSnapshot.size >= limites[nivel]) {
+
+    const limites = { "1": 50, "2": 10, "3": 4 };
+    if (userEntriesSnapshot.size >= limites[nivelComoCadena]) {
       Alert.alert(
         "Límite alcanzado",
         "Has alcanzado el límite de entradas para este nivel."
@@ -234,7 +237,8 @@ const EntryScreen = ({ navigation, route }) => {
       (selectedType === "Galería" &&
         !media &&
         (galeriaSubType === "Texto" || galeriaSubType === "Audio") &&
-        (!texto && !audioUri)) ||
+        !texto &&
+        !audioUri) ||
       (selectedType === "Spotify" && !cancion)
     ) {
       Alert.alert(
@@ -332,8 +336,8 @@ const EntryScreen = ({ navigation, route }) => {
         fechaCreacion: serverTimestamp(),
         fechaRecuerdo: enableRecuerdoDate ? selectedDate : null,
         emociones,
-        nivel,
-        isProtected: nivel === "2" || nivel === "3",
+        nivel: nivelComoCadena, // Asegura que sea una cadena
+        isProtected: nivelComoCadena === "2" || nivelComoCadena === "3",
       };
 
       const docRef = await addDoc(collection(db, "entradas"), nuevaEntrada);
@@ -384,310 +388,308 @@ const EntryScreen = ({ navigation, route }) => {
       style={styles.background}
       resizeMode="cover"
     >
-
-        <KeyboardAvoidingView
-          style={styles.keyboardAvoidingView}
-          behavior={Platform.OS === "ios" ? "padding" : "height"}
-          keyboardVerticalOffset={60} // Ajusta este valor según la altura de tu header
+      <KeyboardAvoidingView
+        style={styles.keyboardAvoidingView}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        keyboardVerticalOffset={60} // Ajusta este valor según la altura de tu header
+      >
+        <ScrollView
+          contentContainerStyle={styles.scrollContainer}
+          keyboardShouldPersistTaps="handled"
         >
-          <ScrollView
-            contentContainerStyle={styles.scrollContainer}
-            keyboardShouldPersistTaps="handled"
-          >
-            {/* Título */}
-            <Text style={styles.titulo}>Crear Nueva Entrada</Text>
+          {/* Título */}
+          <Text style={styles.titulo}>Crear Nueva Entrada</Text>
 
-            {/* Campo de Apodo */}
-            <Text style={styles.label}>Apodo de la Entrada</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Ingresa un apodo"
-              placeholderTextColor={COLORS.placeholder}
-              value={nickname}
-              onChangeText={setNickname}
-            />
+          {/* Campo de Apodo */}
+          <Text style={styles.label}>Apodo de la Entrada</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Ingresa un apodo"
+            placeholderTextColor={COLORS.placeholder}
+            value={nickname}
+            onChangeText={setNickname}
+          />
 
-            {/* Selector de Tipo usando SegmentedControl */}
-            <SegmentedControl
-              values={["Galería", "Spotify", "Texto", "Audio"]}
-              selectedIndex={["Galería", "Spotify", "Texto", "Audio"].indexOf(
-                selectedType
-              )}
-              onChange={(event) => {
-                const index = event.nativeEvent.selectedSegmentIndex;
-                const type = ["Galería", "Spotify", "Texto", "Audio"][index];
-                setSelectedType(type);
-                // Resetear campos relacionados al tipo
-                setMedia(null);
-                setMediaType(null);
-                setCancion(null);
-                setAudioUri(null);
-                setTexto("");
-                setSpotifyResults([]);
-                setGaleriaSubType("Texto");
-              }}
-              tintColor={COLORS.secondary}
-              style={styles.segmentedControl}
-              fontStyle={{ color: COLORS.text }}
-              activeFontStyle={{ color: COLORS.surface, fontWeight: "700" }}
-            />
+          {/* Selector de Tipo usando SegmentedControl */}
+          <SegmentedControl
+            values={["Galería", "Spotify", "Texto", "Audio"]}
+            selectedIndex={["Galería", "Spotify", "Texto", "Audio"].indexOf(
+              selectedType
+            )}
+            onChange={(event) => {
+              const index = event.nativeEvent.selectedSegmentIndex;
+              const type = ["Galería", "Spotify", "Texto", "Audio"][index];
+              setSelectedType(type);
+              // Resetear campos relacionados al tipo
+              setMedia(null);
+              setMediaType(null);
+              setCancion(null);
+              setAudioUri(null);
+              setTexto("");
+              setSpotifyResults([]);
+              setGaleriaSubType("Texto");
+            }}
+            tintColor={COLORS.secondary}
+            style={styles.segmentedControl}
+            fontStyle={{ color: COLORS.text }}
+            activeFontStyle={{ color: COLORS.surface, fontWeight: "700" }}
+          />
 
-            {/* Renderizar contenido basado en el tipo seleccionado */}
-            {selectedType === "Galería" && (
-              <>
-                {/* Selector de Medios */}
-                {media && mediaType === "image" && (
-                  <View style={styles.mediaContainer}>
-                    <Image
-                      source={{ uri: media.uri }}
-                      style={styles.mediaPreview}
-                    />
-                    <Pressable
-                      style={styles.eliminarIcono}
-                      onPress={eliminarMedia}
-                    >
-                      <MaterialIcons name="close" size={24} color="#fff" />
-                    </Pressable>
-                  </View>
-                )}
-                {media && mediaType === "video" && (
-                  <View style={styles.mediaContainer}>
-                    <Video
-                      source={{ uri: media.uri }}
-                      rate={1.0}
-                      volume={1.0}
-                      isMuted={false}
-                      resizeMode="cover"
-                      shouldPlay={false}
-                      isLooping
-                      style={styles.mediaPreview}
-                      useNativeControls
-                    />
-                    <Pressable
-                      style={styles.eliminarIcono}
-                      onPress={eliminarMedia}
-                    >
-                      <MaterialIcons name="close" size={24} color="#fff" />
-                    </Pressable>
-                  </View>
-                )}
-                {!media && (
-                  <TouchableOpacity
-                    style={styles.galleryButton}
-                    onPress={seleccionarMedia}
+          {/* Renderizar contenido basado en el tipo seleccionado */}
+          {selectedType === "Galería" && (
+            <>
+              {/* Selector de Medios */}
+              {media && mediaType === "image" && (
+                <View style={styles.mediaContainer}>
+                  <Image
+                    source={{ uri: media.uri }}
+                    style={styles.mediaPreview}
+                  />
+                  <Pressable
+                    style={styles.eliminarIcono}
+                    onPress={eliminarMedia}
                   >
-                    <Entypo name="image" size={50} color={COLORS.secondary} />
-                    <Text style={styles.galleryButtonText}>
-                      Seleccionar Media
-                    </Text>
-                  </TouchableOpacity>
-                )}
+                    <MaterialIcons name="close" size={24} color="#fff" />
+                  </Pressable>
+                </View>
+              )}
+              {media && mediaType === "video" && (
+                <View style={styles.mediaContainer}>
+                  <Video
+                    source={{ uri: media.uri }}
+                    rate={1.0}
+                    volume={1.0}
+                    isMuted={false}
+                    resizeMode="cover"
+                    shouldPlay={false}
+                    isLooping
+                    style={styles.mediaPreview}
+                    useNativeControls
+                  />
+                  <Pressable
+                    style={styles.eliminarIcono}
+                    onPress={eliminarMedia}
+                  >
+                    <MaterialIcons name="close" size={24} color="#fff" />
+                  </Pressable>
+                </View>
+              )}
+              {!media && (
+                <TouchableOpacity
+                  style={styles.galleryButton}
+                  onPress={seleccionarMedia}
+                >
+                  <Entypo name="image" size={50} color={COLORS.secondary} />
+                  <Text style={styles.galleryButtonText}>
+                    Seleccionar Media
+                  </Text>
+                </TouchableOpacity>
+              )}
 
-                {/* Subtipo para Galería: Texto o Audio */}
-                <Text style={styles.label}>Añadir:</Text>
-                <SegmentedControl
-                  values={["Texto", "Audio"]}
-                  selectedIndex={["Texto", "Audio"].indexOf(galeriaSubType)}
-                  onChange={(event) => {
-                    const index = event.nativeEvent.selectedSegmentIndex;
-                    const subtype = ["Texto", "Audio"][index];
-                    setGaleriaSubType(subtype);
-                    if (subtype === "Texto") {
-                      setAudioUri(null);
-                    } else {
-                      setTexto("");
-                    }
-                  }}
-                  tintColor={COLORS.secondary}
-                  style={styles.subSegmentedControl}
-                  fontStyle={{ color: COLORS.text }}
-                  activeFontStyle={{ color: COLORS.surface, fontWeight: "700" }}
-                />
+              {/* Subtipo para Galería: Texto o Audio */}
+              <Text style={styles.label}>Añadir:</Text>
+              <SegmentedControl
+                values={["Texto", "Audio"]}
+                selectedIndex={["Texto", "Audio"].indexOf(galeriaSubType)}
+                onChange={(event) => {
+                  const index = event.nativeEvent.selectedSegmentIndex;
+                  const subtype = ["Texto", "Audio"][index];
+                  setGaleriaSubType(subtype);
+                  if (subtype === "Texto") {
+                    setAudioUri(null);
+                  } else {
+                    setTexto("");
+                  }
+                }}
+                tintColor={COLORS.secondary}
+                style={styles.subSegmentedControl}
+                fontStyle={{ color: COLORS.text }}
+                activeFontStyle={{ color: COLORS.surface, fontWeight: "700" }}
+              />
 
-                {/* Campo de Texto o Audio para Galería */}
-                {galeriaSubType === "Texto" ? (
-                  <View style={styles.textoContainer}>
-                    <TextInput
-                      style={styles.inputTexto}
-                      multiline
-                      numberOfLines={4}
-                      placeholder="Añade un comentario"
-                      placeholderTextColor={COLORS.placeholder}
-                      value={texto}
-                      onChangeText={setTexto}
-                      scrollEnabled={true}
-                    />
-                  </View>
-                ) : (
-                  <View style={styles.audioModeContainer}>
-                    <AudioRecorder
-                      onRecordingComplete={manejarGrabacionCompleta}
-                    />
-                    {audioUri && (
-                      <View style={styles.audioPreview}>
-                        <Text style={styles.audioText}>Audio Grabado</Text>
-                        <Pressable onPress={eliminarAudio}>
-                          <MaterialIcons
-                            name="close"
-                            size={20}
-                            color={COLORS.delete}
-                          />
-                        </Pressable>
-                      </View>
-                    )}
-                  </View>
-                )}
-              </>
-            )}
+              {/* Campo de Texto o Audio para Galería */}
+              {galeriaSubType === "Texto" ? (
+                <View style={styles.textoContainer}>
+                  <TextInput
+                    style={styles.inputTexto}
+                    multiline
+                    numberOfLines={4}
+                    placeholder="Añade un comentario"
+                    placeholderTextColor={COLORS.placeholder}
+                    value={texto}
+                    onChangeText={setTexto}
+                    scrollEnabled={true}
+                  />
+                </View>
+              ) : (
+                <View style={styles.audioModeContainer}>
+                  <AudioRecorder
+                    onRecordingComplete={manejarGrabacionCompleta}
+                  />
+                  {audioUri && (
+                    <View style={styles.audioPreview}>
+                      <Text style={styles.audioText}>Audio Grabado</Text>
+                      <Pressable onPress={eliminarAudio}>
+                        <MaterialIcons
+                          name="close"
+                          size={20}
+                          color={COLORS.delete}
+                        />
+                      </Pressable>
+                    </View>
+                  )}
+                </View>
+              )}
+            </>
+          )}
 
-            {selectedType === "Spotify" && (
-              <>
-                {/* Campo de búsqueda para Spotify */}
-                {!cancion && (
-                  <View style={styles.spotifyContainer}>
-                    <TextInput
-                      style={styles.input}
-                      placeholder="Buscar canción en Spotify"
-                      placeholderTextColor={COLORS.placeholder}
-                      value={searchQuery}
-                      onChangeText={(text) => {
-                        setSearchQuery(text);
-                        if (text.length > 2) {
-                          buscarCancionesSpotify(text);
-                        } else {
-                          setSpotifyResults([]);
-                        }
-                      }}
-                    />
+          {selectedType === "Spotify" && (
+            <>
+              {/* Campo de búsqueda para Spotify */}
+              {!cancion && (
+                <View style={styles.spotifyContainer}>
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Buscar canción en Spotify"
+                    placeholderTextColor={COLORS.placeholder}
+                    value={searchQuery}
+                    onChangeText={(text) => {
+                      setSearchQuery(text);
+                      if (text.length > 2) {
+                        buscarCancionesSpotify(text);
+                      } else {
+                        setSpotifyResults([]);
+                      }
+                    }}
+                  />
 
-                    {/* Mostrar resultados de Spotify */}
-                    {searchQuery.length > 2 && spotifyResults.length > 0 && (
-                      <View style={styles.spotifyResultsContainer}>
-                        <ScrollView style={styles.spotifyResults}>
-                          {spotifyResults.map((track) => (
-                            <Pressable
-                              key={track.id}
-                              onPress={() => {
-                                setCancion({
-                                  id: track.id,
-                                  name: track.name,
-                                  artist: track.artists[0].name,
-                                  albumImage: track.album.images[0].url,
-                                });
-                                setSearchQuery("");
-                                setSpotifyResults([]);
-                              }}
-                            >
-                              <View style={styles.trackContainer}>
-                                <Image
-                                  source={{
-                                    uri: track.album.images[0].url,
-                                  }}
-                                  style={styles.trackImage}
-                                />
-                                <View style={styles.trackInfo}>
-                                  <Text style={styles.trackName}>
-                                    {track.name}
-                                  </Text>
-                                  <Text style={styles.trackArtist}>
-                                    {track.artists[0].name}
-                                  </Text>
-                                </View>
+                  {/* Mostrar resultados de Spotify */}
+                  {searchQuery.length > 2 && spotifyResults.length > 0 && (
+                    <View style={styles.spotifyResultsContainer}>
+                      <ScrollView style={styles.spotifyResults}>
+                        {spotifyResults.map((track) => (
+                          <Pressable
+                            key={track.id}
+                            onPress={() => {
+                              setCancion({
+                                id: track.id,
+                                name: track.name,
+                                artist: track.artists[0].name,
+                                albumImage: track.album.images[0].url,
+                              });
+                              setSearchQuery("");
+                              setSpotifyResults([]);
+                            }}
+                          >
+                            <View style={styles.trackContainer}>
+                              <Image
+                                source={{
+                                  uri: track.album.images[0].url,
+                                }}
+                                style={styles.trackImage}
+                              />
+                              <View style={styles.trackInfo}>
+                                <Text style={styles.trackName}>
+                                  {track.name}
+                                </Text>
+                                <Text style={styles.trackArtist}>
+                                  {track.artists[0].name}
+                                </Text>
                               </View>
-                            </Pressable>
-                          ))}
-                        </ScrollView>
-                      </View>
-                    )}
-                  </View>
-                )}
+                            </View>
+                          </Pressable>
+                        ))}
+                      </ScrollView>
+                    </View>
+                  )}
+                </View>
+              )}
 
-                {/* Vista Previa de Canción de Spotify */}
-                {cancion && (
-                  <View style={styles.mediaContainer}>
-                    <Image
-                      source={{ uri: cancion.albumImage }}
-                      style={styles.trackImageSelect}
-                    />
-                    <Text style={styles.trackNameSelect}>{cancion.name}</Text>
-                    <Text style={styles.trackArtistSelect}>
-                      {cancion.artist}
-                    </Text>
-                    <Pressable
-                      style={styles.eliminarIcono}
-                      onPress={eliminarCancion}
-                    >
-                      <MaterialIcons name="close" size={24} color="#fff" />
-                    </Pressable>
-                  </View>
-                )}
-              </>
-            )}
+              {/* Vista Previa de Canción de Spotify */}
+              {cancion && (
+                <View style={styles.mediaContainer}>
+                  <Image
+                    source={{ uri: cancion.albumImage }}
+                    style={styles.trackImageSelect}
+                  />
+                  <Text style={styles.trackNameSelect}>{cancion.name}</Text>
+                  <Text style={styles.trackArtistSelect}>{cancion.artist}</Text>
+                  <Pressable
+                    style={styles.eliminarIcono}
+                    onPress={eliminarCancion}
+                  >
+                    <MaterialIcons name="close" size={24} color="#fff" />
+                  </Pressable>
+                </View>
+              )}
+            </>
+          )}
 
-            {selectedType === "Texto" && (
-              <View style={styles.textoContainer}>
-                <TextInput
-                  style={styles.inputTexto}
-                  multiline
-                  numberOfLines={4}
-                  placeholder="Añade un comentario"
-                  placeholderTextColor={COLORS.placeholder}
-                  value={texto}
-                  onChangeText={setTexto}
-                  scrollEnabled={true}
-                />
-              </View>
-            )}
-
-            {selectedType === "Audio" && (
-              <View style={styles.audioModeContainer}>
-                <AudioRecorder onRecordingComplete={manejarGrabacionCompleta} />
-                {audioUri && (
-                  <View style={styles.audioPreview}>
-                    <Text style={styles.audioText}>Audio Grabado</Text>
-                    <Pressable onPress={eliminarAudio}>
-                      <MaterialIcons
-                        name="close"
-                        size={20}
-                        color={COLORS.delete}
-                      />
-                    </Pressable>
-                  </View>
-                )}
-              </View>
-            )}
-
-            {/* Nivel de profundidad */}
-            <Text style={styles.label}>Nivel de profundidad</Text>
-            <RNPickerSelect
-              onValueChange={(value) => setNivel(value)}
-              items={[
-                { label: "Nivel 1 - General", value: 1 },
-                { label: "Nivel 2 - Privado", value: 2 },
-                { label: "Nivel 3 - Profundo", value: 3 },
-              ]}
-              placeholder={{
-                label: "Selecciona el nivel de privacidad",
-                value: null,
-              }}
-              style={pickerSelectStyles}
-              value={nivel}
-            />
-
-            {/* Botones de Acción */}
-            <View style={styles.botonContainer}>
-              <Pressable style={[styles.botonGuardar]} onPress={handleGuardar}>
-                <Text style={styles.botonTexto}>Guardar</Text>
-              </Pressable>
-              <Pressable
-                style={[styles.botonCancelar]}
-                onPress={() => navigation.goBack()}
-              >
-                <Text style={styles.botonTexto}>Cancelar</Text>
-              </Pressable>
+          {selectedType === "Texto" && (
+            <View style={styles.textoContainer}>
+              <TextInput
+                style={styles.inputTexto}
+                multiline
+                numberOfLines={4}
+                placeholder="Añade un comentario"
+                placeholderTextColor={COLORS.placeholder}
+                value={texto}
+                onChangeText={setTexto}
+                scrollEnabled={true}
+              />
             </View>
-          </ScrollView>
-        </KeyboardAvoidingView>
+          )}
+
+          {selectedType === "Audio" && (
+            <View style={styles.audioModeContainer}>
+              <AudioRecorder onRecordingComplete={manejarGrabacionCompleta} />
+              {audioUri && (
+                <View style={styles.audioPreview}>
+                  <Text style={styles.audioText}>Audio Grabado</Text>
+                  <Pressable onPress={eliminarAudio}>
+                    <MaterialIcons
+                      name="close"
+                      size={20}
+                      color={COLORS.delete}
+                    />
+                  </Pressable>
+                </View>
+              )}
+            </View>
+          )}
+
+          {/* Nivel de profundidad */}
+          <Text style={styles.label}>Nivel de profundidad</Text>
+          <RNPickerSelect
+            onValueChange={(value) => setNivel(value)}
+            items={[
+              // Después:
+              { label: "Restringido", value: "1" },
+              { label: "Confidencial", value: "2" },
+              { label: "Secreto", value: "3" },
+            ]}
+            placeholder={{
+              label: "Selecciona el nivel de privacidad",
+              value: null,
+            }}
+            style={pickerSelectStyles}
+            value={nivel}
+          />
+
+          {/* Botones de Acción */}
+          <View style={styles.botonContainer}>
+            <Pressable style={[styles.botonGuardar]} onPress={handleGuardar}>
+              <Text style={styles.botonTexto}>Guardar</Text>
+            </Pressable>
+            <Pressable
+              style={[styles.botonCancelar]}
+              onPress={() => navigation.goBack()}
+            >
+              <Text style={styles.botonTexto}>Cancelar</Text>
+            </Pressable>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </ImageBackground>
   );
 };

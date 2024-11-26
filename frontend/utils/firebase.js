@@ -57,7 +57,6 @@ export const signOutUser = async () => {
   }
 };
 
-// Función para obtener las entradas desde Firestore
 export const getEntries = async () => {
   try {
     const user = auth.currentUser;
@@ -70,32 +69,58 @@ export const getEntries = async () => {
 
     console.log("User ID:", user.uid);
 
-    // Obtener solo las entradas del usuario actual
+    // Obtener solo las entradas del usuario actual y ordenarlas por fechaCreacion
     const entriesCollection = collection(db, "entradas");
-    const q = query(entriesCollection, where("userId", "==", user.uid));
+    const q = query(
+      entriesCollection,
+      where("userId", "==", user.uid),
+      orderBy("fechaCreacion", "desc") // Agregar ordenación por fechaCreacion
+    );
     const snapshot = await getDocs(q);
 
     console.log("Fetched entries count:", snapshot.size);
 
     return snapshot.docs.map((doc) => {
       const data = doc.data();
-      // Convertir los campos de fecha a un formato legible si es necesario
+      // Convertir los campos de fecha a objetos Date
       if (data.fechaCreacion && data.fechaCreacion.toDate) {
-        const fecha = data.fechaCreacion.toDate();
-        data.fechaCreacion = `${fecha.getDate()}/${
-          fecha.getMonth() + 1
-        }/${fecha.getFullYear()}`;
+        data.fechaCreacion = data.fechaCreacion.toDate();
+      } else {
+        data.fechaCreacion = null;
       }
       if (data.fechaRecuerdo && data.fechaRecuerdo.toDate) {
-        const fechaRecuerdo = data.fechaRecuerdo.toDate();
-        data.fechaRecuerdo = `${fechaRecuerdo.getDate()}/${
-          fechaRecuerdo.getMonth() + 1
-        }/${fechaRecuerdo.getFullYear()}`;
+        data.fechaRecuerdo = data.fechaRecuerdo.toDate();
+      } else {
+        data.fechaRecuerdo = null;
       }
       return { id: doc.id, ...data };
     });
   } catch (error) {
     console.error("Error fetching entries:", error);
+    throw error;
+  }
+};
+
+export const getBeneficiarios = async () => {
+  try {
+    const user = auth.currentUser;
+
+    // Verificar si el usuario está autenticado
+    if (!user) {
+      console.log("No user is logged in");
+      throw new Error("No user is logged in");
+    }
+
+    const beneficiariesCollection = collection(db, "beneficiarios");
+    const q = query(beneficiariesCollection, where("userId", "==", user.uid));
+    const snapshot = await getDocs(q);
+
+    return snapshot.docs.map((doc) => {
+      const data = doc.data();
+      return { id: doc.id, ...data };
+    });
+  } catch (error) {
+    console.error("Error fetching beneficiaries:", error);
     throw error;
   }
 };

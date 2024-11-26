@@ -6,33 +6,11 @@
   <component name="ChangeListManager">
     <list default="true" id="2137b152-a29a-4d26-8781-e8af1c953a9c" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/App.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/App.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/components/navigation/AppNavigator.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/components/navigation/AppNavigator.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/components/navigation/MainTabs.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/components/navigation/MainTabs.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/components/navigation/sideBarMenu.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/components/navigation/sideBarMenu.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/context/AuthContext.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/context/AuthContext.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/screens/auth/login.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/screens/auth/login.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/screens/auth/register.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/screens/auth/register.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/screens/entrys/EntryDetailScreen.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/screens/entrys/EntryDetailScreen.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/screens/entrys/EntryCard.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/screens/entrys/EntryCard.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/screens/entrys/EntryScreen.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/screens/entrys/EntryScreen.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/screens/home/home.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/screens/home/home.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/screens/entrys/listEntry.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/screens/entrys/listEntry.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/screens/user/userProfile.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/screens/user/userProfile.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/utils/cities.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/utils/comunas.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/utils/countries.js" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/utils/firebase.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/utils/firebase.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/soyweb/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/soyweb/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/soyweb/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/soyweb/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/soyweb/public/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/soyweb/public/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/soyweb/src/App.css" beforeDir="false" afterPath="$PROJECT_DIR$/soyweb/src/App.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/soyweb/src/App.js" beforeDir="false" afterPath="$PROJECT_DIR$/soyweb/src/App.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/soyweb/src/components/NavBar/navBar.js" beforeDir="false" afterPath="$PROJECT_DIR$/soyweb/src/components/NavBar/navBar.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/soyweb/src/firebase.js" beforeDir="false" afterPath="$PROJECT_DIR$/soyweb/src/firebase.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/soyweb/src/page/entry/useEntries.js" beforeDir="false" afterPath="$PROJECT_DIR$/soyweb/src/page/entry/useEntries.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/soyweb/src/page/history/LineaDeTiempo.css" beforeDir="false" afterPath="$PROJECT_DIR$/soyweb/src/page/history/LineaDeTiempo.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/soyweb/src/page/history/LineaDeTiempo.js" beforeDir="false" afterPath="$PROJECT_DIR$/soyweb/src/page/history/LineaDeTiempo.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

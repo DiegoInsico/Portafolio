@@ -1,8 +1,9 @@
+// ListEntry.js
+
 import React, { useEffect, useState } from "react";
 import {
   FlatList,
   Text,
-  Pressable,
   StyleSheet,
   View,
   ActivityIndicator,
@@ -14,7 +15,7 @@ import {
   Modal,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
-import { listenToEntries, listenToBeneficiaries, db } from "../../utils/firebase";
+import { getEntries, getBeneficiarios, db } from "../../utils/firebase";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import EntryCard from "./EntryCard";
@@ -29,37 +30,64 @@ const ListEntry = () => {
   const [selectedLevel, setSelectedLevel] = useState("1");
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredEntries, setFilteredEntries] = useState([]);
-  const [userPasswords, setUserPasswords] = useState({ level2Password: "", level3Password: "" });
+  const [userPasswords, setUserPasswords] = useState({
+    level2Password: "",
+    level3Password: "",
+  });
   const [passwordModalVisible, setPasswordModalVisible] = useState(false);
   const [inputPassword, setInputPassword] = useState("");
-  const [isLevelUnlocked, setIsLevelUnlocked] = useState({ level2: false, level3: false });
+  const [isLevelUnlocked, setIsLevelUnlocked] = useState({
+    level2: false,
+    level3: false,
+  });
+  const [pendingLevel, setPendingLevel] = useState(null); // Nueva variable de estado
   const navigation = useNavigation();
 
   useEffect(() => {
     const auth = getAuth();
-    const unsubscribeAuth = onAuthStateChanged(auth, async (user) => {
+    const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
       if (user) {
         setIsAuthenticated(true);
 
-        // Obtener las contraseñas de los niveles desde Firestore
-        const userDocRef = doc(db, "users", user.uid);
-        const userDoc = await getDoc(userDocRef);
-        if (userDoc.exists()) {
-          const { level2Password, level3Password } = userDoc.data();
-          setUserPasswords({ level2Password, level3Password });
-        }
+        const fetchData = async () => {
+          // Obtener las contraseñas de los niveles desde Firestore
+          const userDocRef = doc(db, "users", user.uid);
+          const userDoc = await getDoc(userDocRef);
+          if (userDoc.exists()) {
+            const { level2Password, level3Password } = userDoc.data();
+            setUserPasswords({ level2Password, level3Password });
+          }
 
-        const unsubscribeEntries = listenToEntries((fetchedEntries) => {
-          setEntries(fetchedEntries);
-          setIsLoading(false);
-        });
-        const unsubscribeBeneficiaries = listenToBeneficiaries(user.uid, (fetchedBeneficiaries) => {
-          setBeneficiaries(fetchedBeneficiaries);
-        });
-        return () => {
-          unsubscribeEntries && unsubscribeEntries();
-          unsubscribeBeneficiaries && unsubscribeBeneficiaries();
+          // Obtener las entradas
+          try {
+            const entriesData = await getEntries(); // Sin pasar user.uid
+            console.log("Fetched entries count:", entriesData.length);
+
+            // Convertir 'nivel' a cadena y asignar valor por defecto si es undefined o null
+            const entriesWithNivelAsString = entriesData.map((entry) => ({
+              ...entry,
+              nivel:
+                entry.nivel !== undefined && entry.nivel !== null
+                  ? entry.nivel.toString()
+                  : "1", // Asignar "1" si 'nivel' es undefined o null
+            }));
+            setEntries(entriesWithNivelAsString);
+            setIsLoading(false);
+          } catch (error) {
+            console.error("Error al obtener entradas:", error);
+            setIsLoading(false);
+          }
+
+          // Obtener los beneficiarios
+          try {
+            const beneficiariesData = await getBeneficiarios(); // Sin pasar parámetros
+            setBeneficiaries(beneficiariesData);
+          } catch (error) {
+            console.error("Error al obtener beneficiarios:", error);
+          }
         };
+
+        fetchData();
       } else {
         setIsAuthenticated(false);
         setEntries([]);
@@ -70,27 +98,37 @@ const ListEntry = () => {
     return unsubscribeAuth;
   }, []);
 
+
   useEffect(() => {
-    const filtered = entries.filter(
-      (entry) =>
-        entry.nivel === selectedLevel &&
-        (entry.texto?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          entry.emociones?.some((emotion) =>
-            emotion.toLowerCase().includes(searchQuery.toLowerCase())
-          ) ||
-          (entry.fechaCreacion &&
-            new Date(entry.fechaCreacion.seconds * 1000)
-              .toLocaleDateString("es-ES")
-              .includes(searchQuery)))
-    );
+    const filtered = entries.filter((entry) => {
+      const entryNivel =
+        entry.nivel !== undefined && entry.nivel !== null
+          ? entry.nivel.toString()
+          : "1"; // Asegurar que 'entryNivel' sea una cadena
+
+      const matchesLevel = entryNivel === selectedLevel;
+
+      const matchesSearch =
+        entry.texto?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        entry.emociones?.some((emotion) =>
+          emotion.toLowerCase().includes(searchQuery.toLowerCase())
+        ) ||
+        (entry.fechaCreacion instanceof Date &&
+          entry.fechaCreacion
+            .toLocaleDateString("es-ES")
+            .includes(searchQuery));
+      return matchesLevel && matchesSearch;
+    });
     setFilteredEntries(filtered);
   }, [entries, searchQuery, selectedLevel]);
 
   const handleLevelChange = (level) => {
     if (level === "2" && !isLevelUnlocked.level2) {
       setPasswordModalVisible(true);
+      setPendingLevel(level); // Establecer pendingLevel
     } else if (level === "3" && !isLevelUnlocked.level3) {
       setPasswordModalVisible(true);
+      setPendingLevel(level); // Establecer pendingLevel
     } else {
       setSelectedLevel(level);
     }
@@ -98,17 +136,18 @@ const ListEntry = () => {
 
   const handlePasswordSubmit = () => {
     if (
-      (selectedLevel === "2" && inputPassword === userPasswords.level2Password) ||
-      (selectedLevel === "3" && inputPassword === userPasswords.level3Password)
+      (pendingLevel === "2" && inputPassword === userPasswords.level2Password) ||
+      (pendingLevel === "3" && inputPassword === userPasswords.level3Password)
     ) {
       Alert.alert("Éxito", "Nivel desbloqueado correctamente.");
       setIsLevelUnlocked((prev) => ({
         ...prev,
-        [`level${selectedLevel}`]: true,
+        [`level${pendingLevel}`]: true,
       }));
       setPasswordModalVisible(false);
       setInputPassword("");
-      setSelectedLevel(selectedLevel); // Cambiar al nivel seleccionado
+      setSelectedLevel(pendingLevel); // Cambiar al nivel seleccionado
+      setPendingLevel(null); // Restablecer pendingLevel
     } else {
       Alert.alert("Error", "Contraseña incorrecta. Intenta nuevamente.");
     }
@@ -147,7 +186,12 @@ const ListEntry = () => {
         <View style={styles.overlay}>
           {/* Barra de búsqueda */}
           <View style={styles.searchContainer}>
-            <Icon name="magnify" size={24} color="#333333" style={styles.searchIcon} />
+            <Icon
+              name="magnify"
+              size={24}
+              color="#333333"
+              style={styles.searchIcon}
+            />
             <TextInput
               style={styles.searchInput}
               placeholder="Buscar entradas..."
@@ -157,7 +201,12 @@ const ListEntry = () => {
             />
             {searchQuery.length > 0 && (
               <TouchableOpacity onPress={() => setSearchQuery("")}>
-                <Icon name="close-circle" size={24} color="#333333" style={styles.searchIcon} />
+                <Icon
+                  name="close-circle"
+                  size={24}
+                  color="#333333"
+                  style={styles.searchIcon}
+                />
               </TouchableOpacity>
             )}
           </View>
@@ -173,14 +222,20 @@ const ListEntry = () => {
                 mode="dropdown"
               >
                 <Picker.Item label="Restringido" value="1" />
-                <Picker.Item label="Rojo" value="2" />
-                <Picker.Item label="Confidencial" value="3" />
+                <Picker.Item label="Confidencial" value="2" />
+                <Picker.Item label="Secreto" value="3" />
               </Picker>
             </View>
             <Icon
               name="lock"
               size={24}
-              color={selectedLevel === "1" ? "#00BFFF" : selectedLevel === "2" ? "#FF0000" : "#000000"}
+              color={
+                selectedLevel === "1"
+                  ? "#00BFFF"
+                  : selectedLevel === "2"
+                  ? "#FF0000"
+                  : "#000000"
+              }
               style={styles.lockIcon}
             />
           </View>
@@ -241,6 +296,7 @@ const ListEntry = () => {
                 onPress={() => {
                   setPasswordModalVisible(false);
                   setInputPassword("");
+                  setPendingLevel(null); // Restablecer pendingLevel
                 }}
               >
                 <Text style={styles.modalButtonText}>Cancelar</Text>
@@ -342,6 +398,41 @@ const styles = StyleSheet.create({
     marginTop: 20,
     fontSize: 16,
     color: "#fff",
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    backgroundColor: "rgba(0,0,0,0.5)",
+  },
+  modalContent: {
+    marginHorizontal: 20,
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    padding: 20,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 10,
+  },
+  passwordInput: {
+    borderWidth: 1,
+    borderColor: "#cccccc",
+    borderRadius: 8,
+    padding: 10,
+    marginBottom: 20,
+    color: "#333333",
+  },
+  modalButtons: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+  },
+  modalButton: {
+    marginLeft: 10,
+  },
+  modalButtonText: {
+    color: "#007AFF",
+    fontSize: 16,
   },
 });
 
