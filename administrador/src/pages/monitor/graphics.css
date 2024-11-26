@@ -1,21 +1,95 @@
 .graphics-container {
   display: grid;
-  grid-template-columns: repeat(3, 1fr); /* Tres columnas de tamaño igual */
-  gap: 20px; /* Espacio entre los elementos */
-  padding: 20px; /* Espaciado alrededor de la grid */
+  grid-template-columns: repeat(3, 1fr); 
+  gap: 20px;
+  padding: 20px;
 }
 
 .chart-item {
-  background-color: #f9f9f9; /* Fondo claro */
-  border: 1px solid #ddd; /* Borde suave */
-  border-radius: 8px; /* Bordes redondeados */
-  padding: 20px; /* Espaciado interno */
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Sombra para separar visualmente */
-  text-align: center; /* Centra el texto */
-  max-width: 70%; /* Evita desbordes */
+  background-color: #f9f9f9;
+  border: 1px solid #ddd; 
+  border-radius: 8px; 
+  padding: 20px; 
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  max-width: 100%;
 }
 
+
 .chart-item canvas {
-  max-width: 100%; /* Asegura que los gráficos sean responsivos */
-  height: auto; /* Mantiene la relación de aspecto */
+  max-width: 100%; 
+  height: auto; 
 }
+
+
+
+
+/* Solo para los tickets */
+.ticket-graphics-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+.ticket-title {
+  margin-bottom: 20px;
+  text-align: center;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.ticket-charts-container {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  margin-bottom: 40px;
+}
+
+.ticket-chart-item {
+  width: 120px;
+  text-align: center;
+}
+
+.ticket-chart-label {
+  margin-top: 10px;
+  font-size: 16px;
+}
+
+.ticket-table-container {
+  width: 100%;
+  max-width: 800px;
+  overflow-x: auto;
+}
+
+.ticket-tickets-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  text-align: left;
+}
+
+.ticket-tickets-table th,
+.ticket-tickets-table td {
+  border: 1px solid #ddd;
+  padding: 10px;
+}
+
+.ticket-tickets-table th {
+  background-color: #f4f4f4;
+}
+
+.ticket-details-button {
+  padding: 5px 10px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.ticket-details-button:hover {
+  background-color: #45a049;
+}
+

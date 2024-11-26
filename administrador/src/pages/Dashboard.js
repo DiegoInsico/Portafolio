@@ -19,6 +19,8 @@ import {
 import { Line } from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import "chart.js/auto";
+import TicketsChart from "./monitor/graphs/tickets";
+import UserContext from "./monitor/context/usercontext";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -689,14 +691,7 @@ const Dashboard = () => {
   return (
     <div className="main-dashboard">
       <div className="tickets-section">
-        <h1>Tickets Pendientes</h1>
-        {openTickets.length > 0 ? (
-          openTickets.map((ticket) => (
-            <p key={ticket.id}>{`${ticket.subject} - ${ticket.displayName}`}</p>
-          ))
-        ) : (
-          <p>No hay tickets abiertos en este momento.</p>
-        )}
+      <TicketsChart/>
       </div>
 
       <div className="info-section">
@@ -888,24 +883,8 @@ const Dashboard = () => {
       {/* niveles de seguridad de los users */}
       <div className="charts-section">
         <h1>Niveles de Seguridad de los Usuarios</h1>
-        {chartData ? (
-          <Line
-            data={chartData}
-            options={{
-              responsive: true,
-              plugins: {
-                legend: { position: "top" },
-                tooltip: { enabled: true },
-              },
-              scales: {
-                x: { title: { display: true, text: "Fechas" } },
-                y: { title: { display: true, text: "Cantidad" }, beginAtZero: true },
-              },
-            }}
-          />
-        ) : (
-          <p>Cargando datos...</p>
-        )}
+      <UserContext/>
+
       </div>
     </div>
   );

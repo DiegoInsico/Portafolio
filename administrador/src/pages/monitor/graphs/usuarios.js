@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Bar, Pie } from "react-chartjs-2";
 import { collection, getDocs } from "firebase/firestore";
-import { db } from "../../../firebase"; // Ajusta esta ruta según tu estructura
+import { db } from "../../../firebase";
 import "chart.js/auto";
 
 // Función para calcular la edad
@@ -13,8 +13,8 @@ const calculateAge = (birthDate) => {
 
 const UsuariosChart = () => {
   const [ageChartData, setAgeChartData] = useState(null);
-  const [notificationChartData, setNotificationChartData] = useState(null);
-  const [registrationTimeChartData, setRegistrationTimeChartData] = useState(null);
+  const [locationChartData, setLocationChartData] = useState(null);
+  const [deceasedChartData, setDeceasedChartData] = useState(null);
 
   useEffect(() => {
     async function fetchData() {
@@ -22,8 +22,8 @@ const UsuariosChart = () => {
       const snapshot = await getDocs(usersCollection);
 
       const ageCounts = {};
-      const notificationsCounts = { Activas: 0, "No Activas": 0 };
-      const registrationTimes = [];
+      const locationCounts = { Pais: {}, Ciudad: {}, Comuna: {} };
+      const deceasedCounts = { Difuntos: 0, "No Difuntos": 0 };
 
       snapshot.forEach((doc) => {
         const data = doc.data();
@@ -36,18 +36,25 @@ const UsuariosChart = () => {
           ageCounts[age] += 1;
         }
 
-        // Procesar notificaciones
-        if (data.notificationsEnabled) {
-          notificationsCounts["Activas"] += 1;
-        } else {
-          notificationsCounts["No Activas"] += 1;
-        }
+        // Procesar ubicación
+        const pais = data.country || "Indefinido";
+        const ciudad = data.city || "Indefinida";
+        const comuna = data.comuna || "Indefinida";
 
-        // Tiempo de registro
-        const createdAt = data.createdAt ? new Date(data.createdAt.seconds * 1000) : null;
-        if (createdAt) {
-          const timeRegistered = Math.floor((Date.now() - createdAt.getTime()) / (1000 * 60 * 60 * 24)); // días
-          registrationTimes.push(timeRegistered);
+        if (!locationCounts.Pais[pais]) locationCounts.Pais[pais] = 0;
+        locationCounts.Pais[pais] += 1;
+
+        if (!locationCounts.Ciudad[ciudad]) locationCounts.Ciudad[ciudad] = 0;
+        locationCounts.Ciudad[ciudad] += 1;
+
+        if (!locationCounts.Comuna[comuna]) locationCounts.Comuna[comuna] = 0;
+        locationCounts.Comuna[comuna] += 1;
+
+        // Procesar difuntos
+        if (data.isDeceased) {
+          deceasedCounts.Difuntos += 1;
+        } else {
+          deceasedCounts["No Difuntos"] += 1;
         }
       });
 
@@ -65,27 +72,53 @@ const UsuariosChart = () => {
         ],
       });
 
-      setNotificationChartData({
-        labels: ["Activas", "No Activas"],
-        datasets: [
-          {
-            label: "Notificaciones Activas vs. No Activas",
-            data: Object.values(notificationsCounts),
-            backgroundColor: ["rgba(75, 192, 192, 0.5)", "rgba(255, 159, 64, 0.5)"],
-            borderColor: ["rgba(75, 192, 192, 1)", "rgba(255, 159, 64, 1)"],
-            borderWidth: 1,
-          },
-        ],
+      setLocationChartData({
+        pais: {
+          labels: Object.keys(locationCounts.Pais),
+          datasets: [
+            {
+              label: "Distribución por País",
+              data: Object.values(locationCounts.Pais),
+              backgroundColor: "rgba(75, 192, 192, 0.5)",
+              borderColor: "rgba(75, 192, 192, 1)",
+              borderWidth: 1,
+            },
+          ],
+        },
+        ciudad: {
+          labels: Object.keys(locationCounts.Ciudad),
+          datasets: [
+            {
+              label: "Distribución por Ciudad",
+              data: Object.values(locationCounts.Ciudad),
+              backgroundColor: "rgba(153, 102, 255, 0.5)",
+              borderColor: "rgba(153, 102, 255, 1)",
+              borderWidth: 1,
+            },
+          ],
+        },
+        comuna: {
+          labels: Object.keys(locationCounts.Comuna),
+          datasets: [
+            {
+              label: "Distribución por Comuna",
+              data: Object.values(locationCounts.Comuna),
+              backgroundColor: "rgba(255, 159, 64, 0.5)",
+              borderColor: "rgba(255, 159, 64, 1)",
+              borderWidth: 1,
+            },
+          ],
+        },
       });
 
-      setRegistrationTimeChartData({
-        labels: registrationTimes.map((_, index) => `Usuario ${index + 1}`),
+      setDeceasedChartData({
+        labels: ["Difuntos", "No Difuntos"],
         datasets: [
           {
-            label: "Días Registrados",
-            data: registrationTimes,
-            backgroundColor: "rgba(153, 102, 255, 0.5)",
-            borderColor: "rgba(153, 102, 255, 1)",
+            label: "Estado de Difuntos",
+            data: Object.values(deceasedCounts),
+            backgroundColor: ["rgba(255, 99, 132, 0.5)", "rgba(54, 162, 235, 0.5)"],
+            borderColor: ["rgba(255, 99, 132, 1)", "rgba(54, 162, 235, 1)"],
             borderWidth: 1,
           },
         ],
@@ -117,10 +150,30 @@ const UsuariosChart = () => {
         <p>Cargando datos...</p>
       )}
 
-      <h2>Notificaciones Activas vs. No Activas</h2>
-      {notificationChartData ? (
+      <h2>Distribución por País</h2>
+      {locationChartData && locationChartData.pais ? (
+        <Bar
+          data={locationChartData.pais}
+          options={{
+            responsive: true,
+            plugins: {
+              legend: { position: "top" },
+              tooltip: { enabled: true },
+            },
+            scales: {
+              x: { title: { display: true, text: "País" } },
+              y: { title: { display: true, text: "Cantidad" }, beginAtZero: true },
+            },
+          }}
+        />
+      ) : (
+        <p>Cargando datos...</p>
+      )}
+
+      <h2>Estado de Difuntos</h2>
+      {deceasedChartData ? (
         <Pie
-          data={notificationChartData}
+          data={deceasedChartData}
           options={{
             responsive: true,
             plugins: {
@@ -133,10 +186,11 @@ const UsuariosChart = () => {
         <p>Cargando datos...</p>
       )}
 
-      <h2>Tiempo de Registro de Usuarios (en días)</h2>
-      {registrationTimeChartData ? (
+      {/* Gráficos adicionales: Ciudad y Comuna */}
+      <h2>Distribución por Ciudad</h2>
+      {locationChartData && locationChartData.ciudad ? (
         <Bar
-          data={registrationTimeChartData}
+          data={locationChartData.ciudad}
           options={{
             responsive: true,
             plugins: {
@@ -144,8 +198,28 @@ const UsuariosChart = () => {
               tooltip: { enabled: true },
             },
             scales: {
-              x: { title: { display: true, text: "Usuarios" } },
-              y: { title: { display: true, text: "Días Registrados" }, beginAtZero: true },
+              x: { title: { display: true, text: "Ciudad" } },
+              y: { title: { display: true, text: "Cantidad" }, beginAtZero: true },
+            },
+          }}
+        />
+      ) : (
+        <p>Cargando datos...</p>
+      )}
+
+      <h2>Distribución por Comuna</h2>
+      {locationChartData && locationChartData.comuna ? (
+        <Bar
+          data={locationChartData.comuna}
+          options={{
+            responsive: true,
+            plugins: {
+              legend: { position: "top" },
+              tooltip: { enabled: true },
+            },
+            scales: {
+              x: { title: { display: true, text: "Comuna" } },
+              y: { title: { display: true, text: "Cantidad" }, beginAtZero: true },
             },
           }}
         />

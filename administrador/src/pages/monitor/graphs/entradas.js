@@ -347,10 +347,6 @@ const EntradasChart = () => {
         <Pie data={audioChartData} options={{ responsive: true }} />
       )}
 
-      <h2>Tendencia de Creación de Entradas</h2>
-      {dateTrendChartData && (
-        <Line data={dateTrendChartData} options={{ responsive: true }} />
-      )}
       <h2>Distribución de Colores</h2>
       {colorChartData && (
         <Bar data={colorChartData} options={{ responsive: true }} />
