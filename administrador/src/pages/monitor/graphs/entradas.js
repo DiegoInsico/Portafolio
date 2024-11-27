@@ -283,7 +283,7 @@ const EntradasChart = () => {
         <Pie data={baulChartData} options={{ responsive: true }} />
       )}
 
-      <h2>Entradas por Categoría</h2>
+      {/* <h2>Entradas por Categoría</h2>
       {categoryChartData && (
         <Bar data={categoryChartData} options={{ responsive: true }} />
       )}
@@ -291,17 +291,17 @@ const EntradasChart = () => {
       <h2>Entradas por Emoción</h2>
       {emotionChartData && (
         <Bar data={emotionChartData} options={{ responsive: true }} />
-      )}
+      )} */}
 
       <h2>Tendencia de Creación de Entradas</h2>
       {dateTrendChartData && (
         <Line data={dateTrendChartData} options={{ responsive: true }} />
       )}
 
-      <h2>Entradas por Nivel</h2>
+      {/* <h2>Entradas por Nivel</h2>
       {levelChartData && (
         <Bar data={levelChartData} options={{ responsive: true }} />
-      )}
+      )} */}
 
       <h2>Entradas Protegidas vs No Protegidas</h2>
       {protectedChartData && (

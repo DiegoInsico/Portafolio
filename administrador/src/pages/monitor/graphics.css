@@ -3,7 +3,7 @@
   grid-template-areas:
     "left-panel nivel-seguridad user-context"
     "relation-charts relation-charts relation-charts";
-  grid-template-columns: 1fr 1fr 1fr; /* Proporciones iguales en la fila superior */
+  grid-template-columns: 0.5fr 1fr 1fr; /* Proporciones iguales en la fila superior */
   grid-template-rows: auto auto;
   gap: 20px;
   padding: 20px;
