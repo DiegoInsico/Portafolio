@@ -1,12 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
-import { auth } from "../firebase";
+import { auth, db } from "../firebase";
 import TopBar from "./TopBar";
 import {
   Home,
   ListAlt,
   BarChart,
-  MusicNote,
   BugReport,
   Map,
   Inbox,
@@ -14,9 +13,11 @@ import {
   Menu,
 } from "@mui/icons-material";
 import "./mainLayout.css";
+import { doc, getDoc } from "firebase/firestore";
 
 const MainLayout = ({ children, isAuthenticated, currentUser }) => {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [userDetails, setUserDetails] = useState(null);
 
   const handleLogout = () => {
     auth.signOut().catch((error) => {
@@ -28,13 +29,30 @@ const MainLayout = ({ children, isAuthenticated, currentUser }) => {
     setIsSidebarCollapsed(!isSidebarCollapsed);
   };
 
+  useEffect(() => {
+    const fetchUserDetails = async () => {
+      if (currentUser) {
+        const userRef = doc(db, "users", currentUser.uid); // Supongamos que `uid` está en currentUser
+        const userSnapshot = await getDoc(userRef);
+        if (userSnapshot.exists()) {
+          setUserDetails(userSnapshot.data());
+        }
+      }
+    };
+
+    fetchUserDetails();
+  }, [currentUser]);
+
   return (
     <div className={`main-layout ${isSidebarCollapsed ? "collapsed" : ""}`}>
       <div className="main-layout-container">
         {isAuthenticated ? (
           <>
             {/* Barra superior */}
-            <TopBar currentUser={currentUser} handleLogout={handleLogout} />
+            <TopBar
+              currentUser={{ ...currentUser, ...userDetails }}
+              handleLogout={handleLogout}
+            />
 
             <div className="main-layout-wrapper">
               {/* Barra lateral izquierda */}
@@ -162,7 +180,6 @@ const MainLayout = ({ children, isAuthenticated, currentUser }) => {
           </>
         ) : (
           <div className="main-layout-login-wrapper">{children}</div>
-
         )}
       </div>
     </div>

@@ -6,7 +6,11 @@ const TopBar = ({ currentUser, handleLogout }) => {
     <header className="topbar-container">
       {/* Usuario */}
       <div className="topbar-user">
-        <span>{currentUser?.displayName || "Invitado"}</span>
+        <span>
+          {currentUser?.isAdmin
+            ? `Administrador actual: ${currentUser.displayName}`
+            : currentUser?.displayName || "Invitado"}
+        </span>
       </div>
 
       {/* Título */}
