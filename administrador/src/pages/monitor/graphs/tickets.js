@@ -4,7 +4,7 @@ import "react-circular-progressbar/dist/styles.css";
 import { collection, getDocs } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import { db } from "../../../firebase"; // Ajusta la ruta según tu proyecto
-
+import './css/ticket.css'
 const mapUserIdsToDisplayNames = async () => {
   const userMap = {};
 
@@ -90,11 +90,11 @@ const TicketsChart = () => {
   };
 
   return (
-    <div className="ticket-graphics-container">
-      <h2 className="title">Porcentaje de Tickets por Estado</h2>
-      <div className="ticket-charts-container">
+    <div className="ticket-container">
+      <h2 className="ticket-title">Porcentaje de Tickets por Estado</h2>
+      <div className="ticket-charts">
         {statusData.map((item, index) => (
-          <div key={index} className="chart-item">
+          <div key={index} className="ticket-chart-item">
             <CircularProgressbar
               value={item.porcentaje}
               text={`${item.porcentaje}%`}
@@ -113,10 +113,10 @@ const TicketsChart = () => {
           </div>
         ))}
       </div>
-
-      <h2 className="ticket-title">Tickets Abiertos</h2>
-      <div className="ticket-able-container">
-        <table className="ticket-tickets-table">
+  
+      <h2 className="ticket-subtitle">Tickets Abiertos</h2>
+      <div className="ticket-table-container">
+        <table className="ticket-table">
           <thead>
             <tr>
               <th>Asignado A</th>
@@ -146,6 +146,7 @@ const TicketsChart = () => {
       </div>
     </div>
   );
+  
 };
 
 export default TicketsChart;

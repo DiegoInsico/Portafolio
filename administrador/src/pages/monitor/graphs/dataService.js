@@ -3,6 +3,7 @@ import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../../firebase";
 import { Bar, Pie, Scatter } from "react-chartjs-2";
 import "chart.js/auto";
+import './css/resumen.css'
 
 const RelationCharts = () => {
   const [data, setData] = useState(null);
@@ -122,21 +123,17 @@ const RelationCharts = () => {
   };
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h2>Dashboard de Usuarios</h2>
-
-      <div style={{ marginBottom: "30px" }}>
-        <h3>Documentos por Usuario</h3>
+    <div className="resume-container">
+      <div className="resume-section">
+        <h3 className="resume-chart-title">Documentos por Usuario</h3>
         <Bar data={barChartData} />
       </div>
-
-      <div style={{ marginBottom: "30px" }}>
-        <h3>Distribución de Documentos</h3>
+      <div className="resume-section">
+        <h3 className="resume-chart-title">Distribución de Documentos</h3>
         <Pie data={pieChartData} />
       </div>
-
-      <div style={{ marginBottom: "30px" }}>
-        <h3>Relación entre Edad y Testigos</h3>
+      <div className="resume-section">
+        <h3 className="resume-chart-title">Relación entre Edad y Testigos</h3>
         <Scatter
           data={scatterChartData}
           options={{
@@ -149,6 +146,9 @@ const RelationCharts = () => {
       </div>
     </div>
   );
+  
+  
+  
 };
 
 export default RelationCharts;

@@ -1,0 +1,23 @@
+.map-container {
+    margin: 0 auto; /* Centra el mapa */
+    height: 500px; /* Ajusta la altura según tu diseño */
+    width: 100%; /* Usa un porcentaje para evitar que se salga del contenedor */
+    max-width: 1200px; /* Limita el ancho máximo */
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .leaflet-container {
+    height: 100%;
+    width: 100%;
+  }
+  
+  .dashboard-section { /* Contenedor general */
+    display: flex;
+    justify-content: center; /* Centra el contenido */
+    align-items: center;
+    flex-direction: column;
+  }
+  

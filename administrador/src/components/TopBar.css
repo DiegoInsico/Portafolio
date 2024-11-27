@@ -66,3 +66,26 @@
   font-size: 1rem;
   font-weight: 600;
 }
+.button-secondary {
+  background-color: #f4f4f4; /* Color de fondo claro */
+  color: #333; /* Color del texto */
+  border: 1px solid #ddd; /* Borde del botón */
+  padding: 8px 16px; /* Espaciado interno */
+  font-size: 14px; /* Tamaño del texto */
+  border-radius: 4px; /* Bordes redondeados */
+  cursor: pointer; /* Cambiar el cursor al pasar el mouse */
+  transition: all 0.3s ease; /* Transición suave */
+  margin-right: 16px; /* Separación del borde derecho */
+}
+
+/* Hover (al pasar el mouse) */
+.button-secondary:hover {
+  background-color: #f34b4b; /* Fondo más oscuro */
+  border-color: #ccc; /* Borde más oscuro */
+}
+
+/* Estado activo */
+.button-secondary:active {
+  background-color: #e41d1d;
+  border-color: #bbb;
+}

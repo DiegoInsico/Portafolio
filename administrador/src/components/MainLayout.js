@@ -67,16 +67,16 @@ const MainLayout = ({ children, isAuthenticated, currentUser }) => {
                     {!isSidebarCollapsed && <span>Dashboard</span>}
                   </NavLink>
                   <NavLink
-                    to="/entradas"
+                    to="/Alertas"
                     className={({ isActive }) =>
                       `main-layout-link ${
                         isActive ? "main-layout-link-active" : ""
                       }`
                     }
-                    title="Datos de Entradas"
+                    title="Alertas"
                   >
                     <ListAlt className="main-layout-icon" />
-                    {!isSidebarCollapsed && <span>Datos de Entradas</span>}
+                    {!isSidebarCollapsed && <span>Alertas</span>}
                   </NavLink>
                   <NavLink
                     to="/monitor/graphics"
@@ -85,10 +85,10 @@ const MainLayout = ({ children, isAuthenticated, currentUser }) => {
                         isActive ? "main-layout-link-active" : ""
                       }`
                     }
-                    title="Ver Gráficos"
+                    title="Graficos Tipificados"
                   >
                     <BarChart className="main-layout-icon" />
-                    {!isSidebarCollapsed && <span>Ver Gráficos</span>}
+                    {!isSidebarCollapsed && <span>Graficos Tipificados</span>}
                   </NavLink>
                   <NavLink
                     to="/monitor/storage/storageUsage"
@@ -97,11 +97,12 @@ const MainLayout = ({ children, isAuthenticated, currentUser }) => {
                         isActive ? "main-layout-link-active" : ""
                       }`
                     }
-                    title="Almacenaje"
+                    title="Graficos masivos"
                   >
                     <BarChart className="main-layout-icon" />
-                    {!isSidebarCollapsed && <span>Almacenaje</span>}
+                    {!isSidebarCollapsed && <span>Graficos Masivos</span>}
                   </NavLink>
+
                   <NavLink
                     to="/monitor/graphs/userHeatmap"
                     className={({ isActive }) =>
@@ -112,9 +113,7 @@ const MainLayout = ({ children, isAuthenticated, currentUser }) => {
                     title="Mapa de calor usuarios"
                   >
                     <Map className="main-layout-icon" />
-                    {!isSidebarCollapsed && (
-                      <span>Mapa de usuarios</span>
-                    )}
+                    {!isSidebarCollapsed && <span>Mapa de usuarios</span>}
                   </NavLink>
                   <NavLink
                     to="/test/test"
@@ -162,7 +161,8 @@ const MainLayout = ({ children, isAuthenticated, currentUser }) => {
             </div>
           </>
         ) : (
-          <div className="main-layout-login">{children}</div>
+          <div className="main-layout-login-wrapper">{children}</div>
+
         )}
       </div>
     </div>

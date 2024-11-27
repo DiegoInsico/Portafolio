@@ -6,7 +6,6 @@ import "chart.js/auto";
 
 const EntradasChart = () => {
   const [baulChartData, setBaulChartData] = useState(null);
-  const [nicknameChartData, setNicknameChartData] = useState(null);
   const [categoryChartData, setCategoryChartData] = useState(null);
   const [emotionChartData, setEmotionChartData] = useState(null);
   const [dateTrendChartData, setDateTrendChartData] = useState(null);
@@ -116,20 +115,7 @@ const EntradasChart = () => {
           },
         ],
       });
-
-      setNicknameChartData({
-        labels: Object.keys(nicknames),
-        datasets: [
-          {
-            label: "Entradas por Nickname",
-            data: Object.values(nicknames),
-            backgroundColor: "#2196F3",
-            borderColor: "#1976D2",
-            borderWidth: 1,
-          },
-        ],
-      });
-
+      
       setCategoryChartData({
         labels: Object.keys(categories),
         datasets: [
@@ -295,11 +281,6 @@ const EntradasChart = () => {
       <h2>Entradas con/sin Baúl</h2>
       {baulChartData && (
         <Pie data={baulChartData} options={{ responsive: true }} />
-      )}
-
-      <h2>Entradas por Nickname</h2>
-      {nicknameChartData && (
-        <Bar data={nicknameChartData} options={{ responsive: true }} />
       )}
 
       <h2>Entradas por Categoría</h2>

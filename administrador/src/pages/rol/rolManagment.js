@@ -26,9 +26,10 @@ const RolManagement = () => {
   });
   const [displayForm, setDisplayForm] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [error, setError] = useState("");
 
-  // Definir la función fetchUsers
+  // Función para cargar usuarios
   const fetchUsers = async () => {
     try {
       const usersSnapshot = await getDocs(collection(db, "users"));
@@ -48,6 +49,7 @@ const RolManagement = () => {
     fetchUsers();
   }, []);
 
+  // Crear usuario
   const handleCreateUser = async () => {
     if (!formData.displayName || !formData.email || !formData.password) {
       setError("Todos los campos son obligatorios.");
@@ -61,46 +63,48 @@ const RolManagement = () => {
         createdAt: new Date(),
       });
       setDisplayForm(false);
-      fetchUsers(); // Actualizar usuarios
+      fetchUsers();
     } catch (error) {
       console.error("Error al crear usuario:", error);
     }
   };
 
+  // Editar usuario
   const handleEditUser = async () => {
     try {
-      await updateDoc(editingUser.ref, {
-        ...formData,
-      });
+      await updateDoc(editingUser.ref, { ...formData });
       setEditingUser(null);
       setDisplayForm(false);
-      fetchUsers(); // Actualizar usuarios
+      fetchUsers();
     } catch (error) {
       console.error("Error al modificar usuario:", error);
     }
   };
 
+  // Eliminar usuario
   const handleDeleteUser = async () => {
     try {
       await deleteDoc(editingUser.ref);
       setEditingUser(null);
-      setDisplayForm(false);
-      fetchUsers(); // Actualizar usuarios
+      setShowDeleteConfirm(false);
+      fetchUsers();
     } catch (error) {
       console.error("Error al eliminar usuario:", error);
     }
   };
 
+  // Banear/Desbanear usuario
   const handleToggleBan = async (userId, isBanned) => {
     try {
       const userDoc = doc(db, "users", userId);
       await updateDoc(userDoc, { isBanned: !isBanned });
-      fetchUsers(); // Actualizar usuarios
+      fetchUsers();
     } catch (error) {
       console.error("Error al banear/desbanear usuario:", error);
     }
   };
 
+  // Mostrar detalles del usuario
   const handleUserClick = (user) => {
     setSelectedUser(user);
   };
@@ -108,6 +112,8 @@ const RolManagement = () => {
   return (
     <Container>
       <div className="rol-management-container">
+        <h1 className="rol-management-title">Gestión de Roles y Usuarios</h1>
+        {/* Botón Crear Usuario */}
         <button
           className="rol-create-button"
           onClick={() => {
@@ -125,9 +131,7 @@ const RolManagement = () => {
         >
           Crear Usuario
         </button>
-
-        <h1>Gestión de Roles y Usuarios</h1>
-
+        {/* Lista de usuarios */}
         <UserList
           users={users}
           onEdit={(user) => {
@@ -141,54 +145,101 @@ const RolManagement = () => {
             });
             setDisplayForm(true);
           }}
+          onDelete={(user) => {
+            setEditingUser(user);
+            setShowDeleteConfirm(true); // Mostrar confirmación
+          }}
           onToggleBan={handleToggleBan}
           onView={handleUserClick}
         />
 
-        {displayForm && (
-          <UserForm
-            formData={formData}
-            onChange={(e) =>
-              setFormData({ ...formData, [e.target.name]: e.target.value })
-            }
-            onSubmit={editingUser ? handleEditUser : handleCreateUser}
-            onDelete={editingUser ? handleDeleteUser : null}
-            isEditing={!!editingUser}
-            error={error}
-          />
+        {/* Modal para creación/edición */}
+        <UserForm
+          isOpen={displayForm}
+          formData={formData}
+          onChange={(e) =>
+            setFormData({ ...formData, [e.target.name]: e.target.value })
+          }
+          onSubmit={editingUser ? handleEditUser : handleCreateUser}
+          onDelete={editingUser ? handleDeleteUser : null}
+          onClose={() => setDisplayForm(false)}
+          isEditing={!!editingUser}
+          error={error}
+        />
+
+        {/* Modal de confirmación de eliminación */}
+        {showDeleteConfirm && (
+          <div className="modal">
+            <div className="modal-content">
+              <h3>¿Estás seguro de eliminar este usuario?</h3>
+              <p>{editingUser?.displayName}</p>
+              <div className="modal-actions">
+                <button className="confirm-button" onClick={handleDeleteUser}>
+                  Sí, eliminar
+                </button>
+                <button
+                  className="cancel-button"
+                  onClick={() => setShowDeleteConfirm(false)}
+                >
+                  Cancelar
+                </button>
+              </div>
+            </div>
+          </div>
         )}
 
+        {/* Modal para ver detalles del usuario */}
         {selectedUser && (
-          <div className="user-summary-section">
-            <h2>Información del Usuario</h2>
-            <div className="user-summary-details">
-              <img
-                src={selectedUser.photoURL || "/path/to/default-image.jpg"}
-                alt="Perfil"
-                className="user-profile-pic"
-              />
-              <p>
-                <strong>Nombre:</strong> {selectedUser.displayName}
-              </p>
-              <p>
-                <strong>Correo:</strong> {selectedUser.email}
-              </p>
-              <p>
-                <strong>Teléfono:</strong> {selectedUser.phoneNumber || "No disponible"}
-              </p>
-              <p>
-                <strong>Rol:</strong>{" "}
-                {selectedUser.role === "admin" ? "Administrador" : "Usuario"}
-              </p>
-              <p>
-                <strong>Bio:</strong> {selectedUser.bio || "No disponible"}
-              </p>
-              <p>
-                <strong>Fecha de Registro:</strong>{" "}
-                {selectedUser.createdAt
-                  ? selectedUser.createdAt.toDate().toLocaleDateString()
-                  : "No disponible"}
-              </p>
+          <div className="modal">
+            <div className="modal-content user-details-modal">
+              <button
+                className="close-modal"
+                onClick={() => setSelectedUser(null)}
+              >
+                ×
+              </button>
+              <h2>Detalles del Usuario</h2>
+              <div className="user-details">
+                <img
+                  src={selectedUser.photoURL || "/path/to/default-image.jpg"}
+                  alt="Perfil"
+                  className="user-profile-pic"
+                />
+                <p>
+                  <strong>Nombre:</strong> {selectedUser.displayName}
+                </p>
+                <p>
+                  <strong>Email:</strong> {selectedUser.email}
+                </p>
+                <p>
+                  <strong>Teléfono:</strong>{" "}
+                  {selectedUser.phoneNumber || "No disponible"}
+                </p>
+                <p>
+                  <strong>País:</strong> {selectedUser.pais || "No disponible"}
+                </p>
+                <p>
+                  <strong>Ciudad:</strong>{" "}
+                  {selectedUser.ciudad || "No disponible"}
+                </p>
+                <p>
+                  <strong>Comuna:</strong>{" "}
+                  {selectedUser.comuna || "No disponible"}
+                </p>
+                <p>
+                  <strong>Administrador:</strong>{" "}
+                  {selectedUser.isAdmin ? "Sí" : "No"}
+                </p>
+                <p>
+                  <strong>Bio:</strong> {selectedUser.bio || "No disponible"}
+                </p>
+                <p>
+                  <strong>Fecha de Registro:</strong>{" "}
+                  {selectedUser.createdAt
+                    ? selectedUser.createdAt.toDate().toLocaleDateString()
+                    : "No disponible"}
+                </p>
+              </div>
             </div>
           </div>
         )}

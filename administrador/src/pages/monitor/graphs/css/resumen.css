@@ -1,0 +1,27 @@
+.resume-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 20px; /* Espaciado entre gráficos */
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.resume-section {
+    flex: 0 1 32%; /* Asegura que los gráficos ocupen un tercio del espacio */
+    max-width: 32%; /* Limita el ancho máximo para que no se desborden */
+    background-color: #f9f9f9;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    box-sizing: border-box; /* Incluye padding y border en el tamaño */
+}
+
+.resume-chart-title {
+    font-size: 14px;
+    font-weight: bold;
+    margin-bottom: 8px;
+    text-align: center;
+}

@@ -1,5 +1,6 @@
 import { collection, getDocs } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
+import { getUserContext } from "./../graphs/dataService"; // Ruta hacia el archivo dataService.js
 
 import "./../graphics.css"; // Opcional: estilos adicionales
 import { db } from "../../../firebase";
@@ -10,6 +11,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import { addDays } from "date-fns";
 
 const UserContext = () => {
+  const [userContext, setUserContext] = useState([]);
   const [chartData, setChartData] = useState(null);
   const [summary, setSummary] = useState({});
   const [startDate, setStartDate] = useState(new Date());

@@ -8,15 +8,11 @@ import {
   Navigate,
 } from "react-router-dom";
 import Dashboard from "./pages/Dashboard";
-import Entradas from "./pages/Entradas";
-import GestionUsuarios from "./pages/GestionUsuarios";
-import Graphics from "./pages/monitor/graphics";
+import Alertas from "./pages/Alertas";
 import LoginPage from "./pages/LoginPage";
 import MainLayout from "./components/MainLayout";
 import { auth } from "./firebase";
-import StorageUsage from "./pages/monitor/storage/storageUsage";
 import Notifications from "./pages/system/notifications";
-import SoulmatePage from "./pages/monitor/soulmatePage";
 import Inbox from "./pages/system/inbox";
 import Test from "./pages/test/test";
 import Clouster from "./pages/monitor/clouster";
@@ -25,7 +21,8 @@ import TicketDetails from "./pages/system/TicketDetails";
 import RolManagment from "./pages/rol/rolManagment";
 import UserHeatmap from "./pages/monitor/graphs/userHeatmap";
 import "leaflet/dist/leaflet.css";
-
+import GraphicsContext from "./pages/monitor/graphics";
+import Graphics from "./pages/monitor/storage/storageUsage";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(
@@ -67,80 +64,86 @@ function App() {
       localStorage.removeItem("currentUser");
     });
   };
+
   return (
     <Router>
-      <AppRoutes
-        isAuthenticated={isAuthenticated}
-        currentUser={currentUser}
-        handleLogin={handleLogin}
-        handleLogout={handleLogout}
-      />
-    </Router>
-  );
-}
-
-const AppRoutes = ({
-  isAuthenticated,
-  currentUser,
-  handleLogin,
-  handleLogout,
-}) => {
-  return (
-    <MainLayout isAuthenticated={isAuthenticated} currentUser={currentUser}>
       <Routes>
-        {/* Ruta de Login */}
-        <Route path="/login" element={<LoginPage onLogin={handleLogin} />} />
+        {/* Ruta para login */}
+        <Route
+          path="/login"
+          element={
+            isAuthenticated ? (
+              <Navigate to="/dashboard" replace />
+            ) : (
+              <LoginPage onLogin={handleLogin} />
+            )
+          }
+        />
 
-        {/* Rutas Protegidas */}
-        {isAuthenticated ? (
-          <>
-            {/* Página de Testeo */}
-            <Route path="/test/test" element={<Test />} />
-            <Route path="/monitor/clouster" element={<Clouster />} />
-
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/entradas" element={<Entradas />} />
-            <Route path="/gestion-usuarios" element={<GestionUsuarios />} />
-
-            {/* Gráficos */}
-            <Route path="/monitor/graphics" element={<Graphics />} />
-            <Route path="/monitor/graphs/userHeatmap" element={<UserHeatmap />} />
-
-            {/* Almacenamiento y Sistema */}
-            <Route
-              path="/monitor/storage/storageUsage"
-              element={<StorageUsage />}
-            />
-            <Route path="/system/notifications" element={<Notifications />} />
-            <Route path="/rol/RolManagment" element={<RolManagment />} />
-
-            {/* Ruta Protegida con PrivateRoute para Soporte */}
-            <Route path="/system/inbox" element={<Inbox />} />
-
-
-            <Route path="/ticket/:ticketId" element={<TicketDetails />} />
-
-            <Route path="/monitor/SoulmatePage" element={<SoulmatePage />} />
-          </>
-        ) : (
-          // Redirige a Login si no está autenticado
-          <Route path="*" element={<Navigate to="/login" />} />
+        {/* Rutas protegidas */}
+        {isAuthenticated && (
+          <Route
+            path="*"
+            element={
+              <MainLayout
+                isAuthenticated={isAuthenticated}
+                currentUser={currentUser}
+              >
+                <Routes>
+                  {/* Dashboard y páginas principales */}
+                  <Route path="/dashboard" element={<Dashboard />} />
+                  <Route
+                    path="/Alertas"
+                    element={<Alertas />}
+                  />
+                  <Route path="/test/test" element={<Test />} />
+                  <Route path="/monitor/clouster" element={<Clouster />} />
+                  <Route path="/monitor/graphics" element={<GraphicsContext />} />
+                  <Route
+                    path="/monitor/graphs/userHeatmap"
+                    element={<UserHeatmap />}
+                  />
+                  <Route
+                    path="/monitor/storage/storageUsage"
+                    element={<Graphics />}
+                  />
+                  <Route path="/system/notifications" element={<Notifications />} />
+                  <Route
+                    path="/rol/RolManagment"
+                    element={<RolManagment />}/>
+                  <Route path="/system/inbox" element={<Inbox />} />
+                  <Route path="/ticket/:ticketId" element={<TicketDetails />} />
+                </Routes>
+              </MainLayout>
+            }
+          />
         )}
 
-        {/* Redirigir al login en caso de que la ruta principal no esté autenticado */}
+        {/* Redirección inicial según autenticación */}
         <Route
           path="/"
           element={
             isAuthenticated ? (
-              <Navigate to="/dashboard" />
+              <Navigate to="/dashboard" replace />
             ) : (
-              <Navigate to="/login" />
+              <Navigate to="/login" replace />
             )
           }
         />
+
+        {/* Ruta por defecto */}
+        <Route
+          path="*"
+          element={
+            <Navigate
+              to={isAuthenticated ? "/dashboard" : "/login"}
+              replace
+            />
+          }
+        />
       </Routes>
-    </MainLayout>
+    </Router>
   );
-};
+}
 
 export default App;

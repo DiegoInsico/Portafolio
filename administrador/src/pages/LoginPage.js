@@ -18,7 +18,11 @@ const LoginPage = ({ onLogin }) => {
     setLoading(true);
 
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
       const user = userCredential.user;
 
       // Verificar el rol del usuario en Firestore
@@ -46,52 +50,58 @@ const LoginPage = ({ onLogin }) => {
 
   return (
     <div className="login-container">
-      <div className="login-box">
-        <h1 className="login-title">Iniciar Sesión</h1>
-        <form onSubmit={handleLogin}>
-          <div className="form-group">
-            <label htmlFor="email" className="login-label">
-              Correo Electrónico
-            </label>
-            <input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="login-input"
-              placeholder="E-mail"
-              aria-label="Correo Electrónico"
-            />
-          </div>
-          <div className="form-group">
-            <label htmlFor="password" className="login-label">
-              Contraseña
-            </label>
-            <input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              className="login-input"
-              placeholder="Contraseña"
-              aria-label="Contraseña"
-            />
-          </div>
-          <button
-            type="submit"
-            className={`login-button button-primary ${loading ? "loading" : ""}`}
-            disabled={loading}
-          >
-            {loading ? "Cargando..." : "Iniciar Sesión"}
-          </button>
-          {error && <p className="login-error">{error}</p>}
-        </form>
-        <p className="login-footer">Página en desarrollo</p>
+      <div className="login-content">
+        <div className="login-box">
+          <h1 className="login-title">Soy</h1>
+          <p className="login-subtitle">Bienvenido al sistema de administración</p>
+  
+          <form onSubmit={handleLogin}>
+            <div className="form-group">
+              <label htmlFor="email" className="login-label">
+                Correo Electrónico
+              </label>
+              <input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className="login-input"
+                placeholder="E-mail"
+                aria-label="Correo Electrónico"
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="password" className="login-label">
+                Contraseña
+              </label>
+              <input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                className="login-input"
+                placeholder="Contraseña"
+                aria-label="Contraseña"
+              />
+            </div>
+            <button
+              type="submit"
+              className={`login-button button-primary ${loading ? "loading" : ""}`}
+              disabled={loading}
+            >
+              {loading ? "Cargando..." : "Iniciar Sesión"}
+            </button>
+            {error && <p className="login-error">{error}</p>}
+          </form>
+          <p className="login-footer">Página en desarrollo</p>
+        </div>
+        <div className="login-image"></div>
       </div>
     </div>
   );
+  
 };
 
 export default LoginPage;

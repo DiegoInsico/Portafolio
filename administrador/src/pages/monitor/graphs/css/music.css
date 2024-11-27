@@ -1,0 +1,54 @@
+.music-section {
+    margin: 20px;
+    text-align: center;
+  }
+  
+  .music-title {
+    font-size: 24px;
+    margin-bottom: 20px;
+    font-weight: bold;
+  }
+  
+  .music-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    padding: 20px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    max-width: 400px; /* Ajusta el tamaño máximo del contenedor */
+    margin: 0 auto; /* Centra el contenedor */
+  }
+  
+  .music-image {
+    width: 100%; /* Se ajusta al ancho del contenedor */
+    max-width: 350px; /* Tamaño máximo de la imagen */
+    height: auto; /* Mantiene la proporción */
+    aspect-ratio: 16/9; /* Relación de aspecto más ancha */
+    border-radius: 8px; /* Bordes redondeados */
+    object-fit: cover; /* Cubre el contenedor sin deformarse */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .music-info {
+    text-align: center;
+  }
+  
+  .music-artist,
+  .music-song {
+    font-size: 16px;
+    margin: 5px 0;
+    font-weight: normal;
+    color: #333;
+  }
+  
+  .music-message {
+    font-size: 16px;
+    color: #777;
+    margin-top: 20px;
+  }
+  

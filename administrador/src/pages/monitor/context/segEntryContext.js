@@ -4,7 +4,7 @@ import { Line } from "react-chartjs-2";
 import { db } from "../../../firebase";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-
+import './css/segEntryContext.css'
 const NivelSeguridad = () => {
   const [lineChartData, setLineChartData] = useState(null);
   const [tableData, setTableData] = useState([]);
@@ -167,56 +167,55 @@ const NivelSeguridad = () => {
   }, [startDate, endDate]);
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h2>Tendencia de Creación de Entradas</h2>
-      <div style={{ textAlign: "center", marginBottom: "20px" }}>
-        <label>Fecha de Inicio:</label>
+    <div className="security-level-container">
+      <h2 className="security-level-title">Niveles de Seguridad de los Usuarios</h2>
+  
+      <div className="date-picker-container">
+        <label className="date-picker-label">Fecha de Inicio:</label>
         <DatePicker
           selected={startDate}
           onChange={(date) => setStartDate(date)}
           dateFormat="dd/MM/yyyy"
+          className="date-picker-input"
         />
-        <label style={{ marginLeft: "10px" }}>Fecha de Fin:</label>
+        <label className="date-picker-label">Fecha de Fin:</label>
         <DatePicker
           selected={endDate}
           onChange={(date) => setEndDate(date)}
           dateFormat="dd/MM/yyyy"
+          className="date-picker-input"
         />
       </div>
+  
       {lineChartData ? (
-        <Line
-          data={lineChartData}
-          options={{
-            responsive: true,
-            plugins: {
-              legend: { position: "top" },
-            },
-            scales: {
-              x: { title: { display: true, text: "Fecha" } },
-              y: { title: { display: true, text: "Cantidad" }, beginAtZero: true },
-            },
-          }}
-        />
+        <div className="chart-container">
+          <Line
+            data={lineChartData}
+            options={{
+              responsive: true,
+              plugins: {
+                legend: { position: "top" },
+              },
+              scales: {
+                x: { title: { display: true, text: "Fecha" } },
+                y: { title: { display: true, text: "Cantidad" }, beginAtZero: true },
+              },
+            }}
+          />
+        </div>
       ) : (
-        <p>Cargando datos...</p>
+        <p className="loading-message">Cargando datos...</p>
       )}
-
-      <h2>Detalle de Entradas</h2>
-      <table
-        style={{
-          width: "100%",
-          border: "1px solid #ccc",
-          textAlign: "left",
-          marginTop: "20px",
-        }}
-      >
+  
+      <h2 className="table-title">Detalle de Entradas</h2>
+      <table className="entries-table">
         <thead>
           <tr>
             <th>Nivel</th>
             <th>Ubicación</th>
             <th>Cantidad Entradas</th>
             <th>Promedio Edad</th>
-            <th>Promedio Signo</th>
+            <th>Signo Más Común</th>
           </tr>
         </thead>
         <tbody>
@@ -233,6 +232,7 @@ const NivelSeguridad = () => {
       </table>
     </div>
   );
+  
 };
 
 export default NivelSeguridad;

@@ -1,75 +1,87 @@
-/* LoginPage.css */
-
+/* Contenedor principal */
 .login-container {
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
+  background-color: #f4f4f4;
+  margin: 0;
+  padding: 0;
 }
 
-.login-box {
-  background-color: rgba(255, 255, 255, 0.9);
-  padding: 2rem;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+/* Contenedor dividido en dos columnas */
+.login-content {
+  display: flex;
+  flex-direction: row;
   width: 100%;
-  max-width: 400px;
-  color: #333;
+  max-width: 1400px;
+  height: 90%;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
 }
 
-.login-title h1 {
-  font-size: 1.8rem;
-  text-align: center;
-  margin-bottom: 1.5rem;
-  color: #333;
+
+/* Sección del formulario */
+.login-box {
+  flex: 1;
+  padding: 3rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background-color: #ffffff;
 }
 
-.form-group {
+.login-title {
+  font-size: 2.5rem;
+  font-weight: bold;
   margin-bottom: 1rem;
+  color: #333;
 }
 
-.login-label {
-  display: block;
-  margin-bottom: 0.5rem;
-  font-size: 0.9rem;
-  color: #333;
+.login-subtitle {
+  font-size: 1.2rem;
+  margin-bottom: 2rem;
+  color: #555;
 }
 
 .login-input {
   width: 100%;
-  padding: 0.8rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
   font-size: 1rem;
-  outline: none;
-  transition: border-color 0.3s ease;
-}
-
-.login-input:focus {
-  border-color: #42a5f5;
+  border: 1px solid #ddd;
+  border-radius: 5px;
 }
 
 .login-button {
   width: 100%;
-  margin-top: 1rem;
-  font-size: 1rem;
+  padding: 1rem;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #fff;
+  background-color: #b71c1c;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
-.login-button.loading {
-  background: #9e9e9e !important;
-  cursor: not-allowed;
-}
-
-.login-error {
-  color: #e53935;
-  font-size: 0.9rem;
-  margin-top: 1rem;
-  text-align: center;
+.login-button:hover {
+  background-color: #d32f2f;
 }
 
 .login-footer {
   text-align: center;
   margin-top: 1rem;
-  font-size: 0.9rem;
-  color: #666;
+  color: #888;
+}
+
+/* Sección de la imagen */
+.login-image {
+  flex: 1;
+  background-image: url('../img/undraw_moonlight_-5-ksn.svg'); /* Reemplaza con la ruta real de tu imagen */
+  background-size: cover;
+  background-position: center;
 }
