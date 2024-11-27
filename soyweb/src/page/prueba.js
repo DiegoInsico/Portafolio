@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import EntriesManager from './entry/entry';  // Asegúrate de importar correctamente el componente
+import Carousel from './entry/entry';
 import { useAuth } from './auth/authContext'; // Asegúrate de tener este contexto configurado
 import DocumentManager from './organizes/pageOrganize';
 
@@ -16,8 +16,7 @@ const Pruebas = () => {
 
     return (
         <div className="test-container">
-            <DocumentManager />
-            
+            <Carousel currentUser={currentUser}/>
         </div>
     );
 };

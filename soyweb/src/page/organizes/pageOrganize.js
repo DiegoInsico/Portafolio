@@ -242,6 +242,7 @@ const DocumentManager = () => {
     return (
         <div className="main-container">
             {/* Hero Section */}
+
             <section className="hero-section">
                 <div className="hero-left">
                     <h1>Ordena </h1>
@@ -288,6 +289,7 @@ const DocumentManager = () => {
                         {!isAdding && isEditing && selectedDocument && (
                             <EditDocument
                                 document={selectedDocument}
+                                currentUser={currentUser}
                                 onCancel={() => setIsEditing(false)}
                                 onSave={handleUpdateDocument}
                             />
@@ -295,7 +297,7 @@ const DocumentManager = () => {
                         {!isAdding && !isEditing && selectedDocument && (
                             <div className="document-details">
                                 <h2>{selectedDocument.title}</h2>
-                                <p>{selectedDocument.texto}</p>
+                                <p dangerouslySetInnerHTML={{ __html: selectedDocument.texto.replace(/\n/g, '<br>') }}></p>
                                 <p>
                                     <strong>Testigo:</strong> {selectedDocument.testigo}
                                 </p>

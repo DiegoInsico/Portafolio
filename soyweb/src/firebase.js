@@ -243,19 +243,10 @@ export const deleteAlbum = async (userId, albumId) => {
 };
 
 // Funciones relacionadas con entradas
-export const getEntries = async (userId, nivel = null) => {
+export const getEntries = async (user) => {
     try {
         const entradasCollection = collection(db, 'entradas');
-        let q;
-        if (nivel) {
-            q = query(
-                entradasCollection, 
-                where("userId", "==", userId),
-                where("nivel", "==", nivel)
-            );
-        } else {
-            q = query(entradasCollection, where("userId", "==", userId));
-        }
+        const q = query(entradasCollection, where("userId", "==", user.uid)); // Usa user.uid en lugar de user
         const snapshot = await getDocs(q);
 
         return snapshot.docs.map(doc => {
@@ -414,6 +405,9 @@ export const getTestigos = async (userId) => {
         const q = query(testigosCollection, where("userId", "==", userId));
         const snapshot = await getDocs(q);
 
+        console.log("Consulta realizada para el userId:", userId);
+        console.log("Cantidad de testigos obtenidos:", snapshot.size);
+
         return snapshot.docs.map((doc) => ({
             id: doc.id,
             ...doc.data(),
@@ -423,6 +417,7 @@ export const getTestigos = async (userId) => {
         throw error;
     }
 };
+
 
 // **Nueva Función para Obtener un Usuario por ID**
 export const getUserById = async (userId) => {

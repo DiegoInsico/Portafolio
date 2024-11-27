@@ -1,83 +1,69 @@
 import React, { useState, useEffect } from 'react';
-import './Entry.css';
+import Slider from 'react-slick';
+import { getEntries } from '../../firebase'; // Asegúrate de que este método funcione
 import EntryCard from './entryMapper/entryCard';
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 
-const EntriesManager = ({ entries, onEntryClick }) => {
-    const [currentIndex, setCurrentIndex] = useState(entries.length); // Inicia en la primera copia
-    const [isPaused, setIsPaused] = useState(false); // Pausa el movimiento cuando el mouse está encima
-    const [index, setIndex] = useState(0);
+const Carousel = ({ currentUser }) => {
+    const [entries, setEntries] = useState([]);
+    const [currentIndex, setCurrentIndex] = useState(0);
 
-    // Duplicamos las entradas para crear el efecto de bucle infinito
-    const extendedEntries = [...entries, ...entries, ...entries]; // Tres copias para la ilusión
-
-    const handleTransitionEnd = () => {
-        // Rebota al final o al inicio si llega a los extremos duplicados
-        if (currentIndex === 0) {
-            setCurrentIndex(entries.length); // Rebota al final duplicado
-        } else if (currentIndex === extendedEntries.length - 1) {
-            setCurrentIndex(entries.length - 1); // Rebota al inicio duplicado
-        }
-    };
-
-    // Desplazamiento automático
+    // Obtener las entradas de Firestore
     useEffect(() => {
-        if (!isPaused) {
-            const interval = setInterval(() => {
-                moveRight();
-            }, 2100); // Desplazamiento automático cada 3 segundos
-            return () => clearInterval(interval);
-        }
-    }, [currentIndex, isPaused]);
+        const fetchEntries = async () => {
+            try {
+                const entriesData = await getEntries(currentUser);
+                setEntries(entriesData);
+            } catch (error) {
+                console.error("Error fetching entries:", error);
+            }
+        };
+        fetchEntries();
+    }, [currentUser]);
 
-    const moveLeft = () => {
-        setCurrentIndex((prev) => prev - 1);
-    };
-
-    const moveRight = () => {
-        setCurrentIndex((prev) => prev + 1);
+    // Configuración de react-slick
+    const settings = {
+        centerMode: true,  // Muestra la tarjeta central más grande
+        infinite: true,    // Carrusel infinito
+        centerPadding: '0', // No agrega relleno a los lados de la tarjeta central
+        slidesToShow: 5,   // Muestra 5 tarjetas
+        speed: 500,        // Velocidad de transición
+        focusOnSelect: true, // Permite seleccionar la tarjeta al hacer clic
+        arrows: true,      // Muestra las flechas
+        beforeChange: (current, next) => {
+            setCurrentIndex(next);  // Cambia el índice cuando se cambia la tarjeta
+        },
+        responsive: [
+            {
+                breakpoint: 1024,
+                settings: {
+                    slidesToShow: 3
+                }
+            },
+            {
+                breakpoint: 600,
+                settings: {
+                    slidesToShow: 1
+                }
+            }
+        ]
     };
 
     return (
-        <div
-            className="entries-manager"
-            onMouseEnter={() => setIsPaused(true)} // Pausa el movimiento al pasar el mouse
-            onMouseLeave={() => setIsPaused(false)} // Reanuda el movimiento al quitar el mouse
-        >
-            <div className="entries-selector">
-                <h3>Entradas Disponibles</h3>
-                <div className="wrapper">
-                    <div className="arrow left-arrow" onClick={moveLeft}>
-                        &lt;
-                    </div>
+        <div className="carousel-container">
+            <Slider {...settings}>
+                {entries.map((entry, index) => (
                     <div
-                        className="inner"
-                        style={{
-                            transform: `translateX(-${currentIndex * (100 / 3)}%)`,
-                            transition: 'transform 0.5s ease',
-                        }}
-                        onTransitionEnd={handleTransitionEnd}
+                        key={entry.id}
+                        className={`carousel-item ${index === currentIndex ? 'center' : ''}`} // Aplica la clase 'center' a la tarjeta en el centro
                     >
-                        {extendedEntries.map((entry, index) => {
-                            // Resalta cada 6 entradas
-                            const isHighlighted = (index % 3 === 0);
-
-                            return (
-                                <EntryCard
-                                    key={`${entry.id}-${index}`} // Asegura un key único para cada entrada
-                                    entry={entry}
-                                    onClick={onEntryClick}
-                                    className={isHighlighted ? 'highlight' : ''} // Clase condicional
-                                />
-                            );
-                        })}
+                        <EntryCard entry={entry} onClick={(entry) => console.log(entry)} />
                     </div>
-                    <div className="arrow right-arrow" onClick={moveRight}>
-                        &gt;
-                    </div>
-                </div>
-            </div>
+                ))}
+            </Slider>
         </div>
     );
 };
 
-export default EntriesManager;
+export default Carousel;

@@ -19,11 +19,25 @@
     align-items: center;
     /* Centra horizontalmente */
     text-align: center;
-    transition: transform 0.3s ease;
+    transition: transform 0.3s ease, opacity 0.3s ease;
     overflow: hidden;
     /* Evita que el contenido sobresalga */
 }
 
+/* Efecto cuando la tarjeta está en el centro */
+.entry-card.center {
+    transform: scale(1.2);
+    /* Aumenta el tamaño de la tarjeta */
+    opacity: 1;
+}
+
+/* Tarjetas que no están en el centro */
+.entry-card:not(.center) {
+    opacity: 0.6;
+    transform: scale(0.8);
+}
+
+/* Efecto hover */
 .entry-card:hover {
     transform: scale(1.05);
 }

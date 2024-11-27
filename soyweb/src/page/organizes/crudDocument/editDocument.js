@@ -13,11 +13,11 @@ const EditDocument = ({ document, onCancel, onSave, currentUser }) => {
 
     // Cargar la lista de testigos desde Firebase
     useEffect(() => {
-        const fetchTestigos = async () => {
+        const fetchTestigos = async () => { // Nombre correcto de la función dentro del useEffect
             if (!currentUser) return;
 
             try {
-                const fetchedTestigos = await getTestigos(currentUser.uid);
+                const fetchedTestigos = await getTestigos(currentUser.uid); // Llamada a `getTestigos`
                 setTestigos(fetchedTestigos);
 
                 // Preseleccionar el testigo del documento si existe
@@ -35,8 +35,9 @@ const EditDocument = ({ document, onCancel, onSave, currentUser }) => {
             }
         };
 
-        fetchTestigos();
+        fetchTestigos(); // Aquí asegúrate de que el nombre de la función sea consistente
     }, [currentUser, document.testigo]);
+
 
     const handleSave = async () => {
         if (!title || !selectedTestigo || !texto) {
@@ -62,6 +63,11 @@ const EditDocument = ({ document, onCancel, onSave, currentUser }) => {
             setLoading(false);
         }
     };
+
+    console.log("Document Testigo:", document.testigo);
+    console.log("Fetched Testigos:", testigos);
+
+    console.log("UID del usuario actual:", currentUser?.uid);
 
     return (
         <div className="edit-document-container">
