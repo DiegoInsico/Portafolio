@@ -1,186 +1,60 @@
-/* Contenedor de documentos en rejilla */
-/* Cabecera de la tarjeta */
-.document-header {
+/* src/components/crudDocument/ListDocument.css */
+
+.documents-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.document-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 5px;
+    padding: 15px 20px;
+    background-color: #ffffff;
+    border: 1px solid #bdc3c7;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
 }
 
-/* Botones de acción en la izquierda */
-.document-actions-left {
-    display: flex;
-    gap: 10px;
+.document-item:hover {
+    background-color: #f0f0f0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* Título alineado a la derecha */
-.document-title {
-    font-size: 22px;
-    font-weight: bold;
-    text-align: left;
+.document-item.selected {
+    background-color: #d1ecf1;
+    border-color: #bee5eb;
+}
+
+.document-info h4 {
     margin: 0;
-    color: #000;
-}
-
-/* Contenido del documento */
-.document-content {
     font-size: 18px;
-    color: #4a4a4a;
+    color: #2c3e50;
+    font-family: 'Merriweather', serif;
 }
 
-/* Detalles del documento */
-.document-details {
-    font-size: 18px;
-    color: #333;
+.document-info p {
+    margin: 5px 0 0 0;
+    font-size: 14px;
+    color: #555555;
+    font-family: 'Roboto', sans-serif;
 }
 
-.document-details span {
-    font-weight: bold;
-}
-
-/* Estilo para el grid */
-.documents-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
-    padding: 10px;
-    justify-items: center;
-}
-
-.document-card {
-    background-color: #78b4a5;
-    border: 1px solid #d3cbb8;
-    border-radius: 8px;
-    padding: 20px;
-    width: 100%;
-    max-width: 450px;
-    color: #4a4a4a;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.document-card:hover {
-    transform: scale(1.05);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-}
-
-/* Rejilla responsiva */
-@media (max-width: 1024px) {
-    .documents-grid {
-        grid-template-columns: repeat(3, 1fr);
-    }
-}
-
-@media (max-width: 768px) {
-    .documents-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-@media (max-width: 480px) {
-    .documents-grid {
-        grid-template-columns: 1fr;
-    }
-}
-
-
-.pdf-button-container {
-    margin-bottom: 20px;
-    text-align: center;
-}
-
-.generate-pdf-button {
-    padding: 10px 20px;
-    background-color: #4caf50;
+.delete-button {
+    background-color: #e74c3c;
     color: white;
     border: none;
     border-radius: 5px;
+    padding: 8px 12px;
     cursor: pointer;
-    font-size: 16px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    font-size: 14px;
+    font-weight: bold;
 }
 
-.generate-pdf-button:hover {
-    background-color: #45a049;
-}
-
-/* Estilos para la superposición del modal */
-.modal-confirm {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    /* Fondo semitransparente */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-    /* Asegura que el modal esté por encima de otros elementos */
-}
-
-/* Estilos para el contenido del modal */
-.modal-content-confirm {
-    background: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    position: relative;
-    width: 90%;
-    max-width: 500px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-    text-align: center;
-}
-
-/* Estilos para el input de carga de imagen */
-.signature-upload {
-    margin: 15px 0;
-}
-
-/* Estilos para la vista previa de la firma */
-.signature-preview img {
-    max-width: 100%;
-    height: auto;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-}
-
-/* Estilos para los botones en el modal */
-.modal-actions-confirm {
-    display: flex;
-    justify-content: space-around;
-    margin-top: 20px;
-}
-
-.modal-actions-confirm button {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 16px;
-}
-
-.modal-actions-confirm button:disabled {
-    background-color: #ccc;
-    cursor: not-allowed;
-}
-
-.modal-actions-confirm button:not(:disabled) {
-    background-color: #007bff;
-    color: #fff;
-}
-
-.modal-actions-confirm button:not(:disabled):hover {
-    background-color: #0056b3;
-}
-
-/* Estilos para la vista previa de la firma */
-.signature-preview {
-    margin-top: 10px;
-}
-
-/* Opcional: Estilos para el título del modal */
-.modal-content-confirm h2 {
-    margin-bottom: 10px;
+.delete-button:hover {
+    background-color: #c0392b;
+    transform: translateY(-2px);
 }

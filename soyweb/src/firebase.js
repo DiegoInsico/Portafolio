@@ -381,6 +381,17 @@ export const editDocument = async (documentId, updatedData) => {
     }
 };
 
+export const deleteDocument = async (documentId) => {
+    try {
+        const docRef = doc(db, "documentos", documentId);
+        await deleteDoc(docRef);
+        console.log("Documento eliminado con éxito:", documentId);
+    } catch (error) {
+        console.error("Error al eliminar el documento:", error);
+        throw error;
+    }
+};
+
 // Función para obtener los documentos de un usuario específico
 export const getDocuments = async (userId) => {
     try {
