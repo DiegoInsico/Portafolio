@@ -1,147 +1,153 @@
 /* Mensajes.css */
 .scroll-container {
-    scroll-snap-type: y mandatory;
-    overflow-y: scroll;
-    height: 100vh;
-    scroll-behavior: smooth; /* Desplazamiento suave */
-    background-color: #121212; /* Color oscuro */
-    justify-content: center;
-    align-items: center;
-  }
-  
+  scroll-snap-type: y mandatory;
+  overflow-y: scroll;
+  height: 100vh;
+  scroll-behavior: smooth; /* Desplazamiento suave */
+  background-color: #121212; /* Color oscuro */
+  justify-content: center;
+  align-items: center;
+}
+
 /* Contenedor Principal */
 .banner-container {
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-    overflow: hidden;
-  }
-  
-  .banner-page {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between; /* Separar elementos izquierda y derecha */
-    align-items: flex-end; /* Alinear contenido al fondo */
-    background-image: url('../../../public/lineavida.webp');
-    background-size: cover;
-    background-position: center;
-    min-height: 80vh;
-    margin: 10vh 15%; /* Márgenes superior/inferior y laterales */
-    border-radius: 90px;
-    padding: 0 5%;
-    width: 60%;
-    position: relative;
-    overflow: hidden;
-  }
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
 
-  /* Contenedor Izquierdo */
+.banner-page {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between; /* Separar elementos izquierda y derecha */
+  align-items: flex-end; /* Alinear contenido al fondo */
+  background-image: url("../../../public/lineavida.webp");
+  background-size: cover;
+  background-position: center;
+  min-height: 80vh;
+  margin: 10vh 15%; /* Márgenes superior/inferior y laterales */
+  border-radius: 90px;
+  padding: 0 5%;
+  width: 60%;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Contenedor Izquierdo */
 .banner-content-left {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start; /* Texto alineado a la izquierda */
-    z-index: 2;
-    margin-bottom: 150px;
-    position: relative;
-  }
-  
-  .banner-content-left h1 {
-    font-size: 6rem;
-    color: #ffffff; /* Texto blanco */
-    font-weight: bold;
-    margin: 20px 0;
-  }
-  
-  /* Contenedor Derecho */
-  .banner-content-right {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end; /* Texto alineado a la derecha */
-    margin-bottom: 100px;
-    max-width: 40%;
-    z-index: 2;
-    position: relative;
-    color: #ffffff; /* Texto blanco */
-  }
-  
-  .banner-content-right p {
-    font-size: 1.6rem;
-    line-height: 1.6;
-    text-align: right; /* Texto alineado a la derecha */
-    margin: 10px 0;
-  }
-  
-  /* Hero Section */
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; /* Texto alineado a la izquierda */
+  z-index: 2;
+  margin-bottom: 150px;
+  position: relative;
+}
 
-  .banner-section {
-    height: 100vh;
-    flex: 0 0 80%; /* Cada sección ocupa el 80% del alto del viewport */
-    scroll-snap-align: center; /* Centra el elemento en la vista */
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-    text-align: center;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-  }
-  
-  .mensajes-container {
-    display: flex;
-    flex-direction: column;
-    overflow-y: auto;
-    height: calc(100vh - 100px); /* Ajuste para incluir hero-section */
-    padding: 1rem;
-    gap: 1rem; /* Espaciado entre los mensajes */
-  }  
-  
-  .mensaje-item {
-    scroll-snap-align: start;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 150px; /* Asegura un tamaño mínimo */
-    width: 100%;
-    max-width: 400px;
-    margin: 0 auto;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    padding: 1.5rem;
-    background-color: #f9f9f9;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  }
-  
-  .mensaje-content h3 {
-    margin: 0 0 0.5rem;
-  }
-  
-  .mensaje-content p {
-    margin: 0.2rem 0;
-    font-size: 0.9rem;
-  }
-  
-  .mensaje-media {
-    width: 100%;
-    max-width: 400px;
-    margin-bottom: 1rem;
-  }
-  
-  .mensaje-video {
-    width: 100%;
-    border-radius: 8px;
-  }
-  
-  /* Efectos de scroll */
-  .mensajes-container {
-    scroll-behavior: smooth;
-  }
-  
-  .mensajes-loading,
-  .mensajes-error,
-  .no-messages {
-    text-align: center;
-    margin-top: 2rem;
-  }
-  
+.banner-content-left h1 {
+  font-size: 6rem;
+  color: #ffffff; /* Texto blanco */
+  font-weight: bold;
+  margin: 20px 0;
+}
+
+/* Contenedor Derecho */
+.banner-content-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end; /* Texto alineado a la derecha */
+  margin-bottom: 100px;
+  max-width: 40%;
+  z-index: 2;
+  position: relative;
+  color: #ffffff; /* Texto blanco */
+}
+
+.banner-content-right p {
+  font-size: 1.6rem;
+  line-height: 1.6;
+  text-align: right; /* Texto alineado a la derecha */
+  margin: 10px 0;
+}
+
+/* Hero Section */
+
+.banner-section {
+  height: 100vh;
+  flex: 0 0 80%; /* Cada sección ocupa el 80% del alto del viewport */
+  scroll-snap-align: center; /* Centra el elemento en la vista */
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.mensajes-container {
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  height: calc(100vh - 100px); /* Ajuste para incluir hero-section */
+  padding: 1rem;
+  gap: 1rem; /* Espaciado entre los mensajes */
+}
+
+.mensaje-video {
+  width: 100%;
+  max-width: 600px;
+  height: auto;
+  border-radius: 8px;
+}
+
+.mensaje-item {
+  margin-bottom: 20px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  padding: 20px;
+  background-color: #f9f9f9;
+}
+
+.mensaje-content {
+  margin-top: 10px;
+}
+
+.mensaje-content h3 {
+  margin: 0 0 0.5rem;
+}
+
+.mensaje-content p {
+  margin: 0.2rem 0;
+  font-size: 0.9rem;
+}
+
+.mensaje-media {
+  width: 100%;
+  max-width: 400px;
+  margin-bottom: 1rem;
+}
+
+.mensaje-video {
+  width: 100%;
+  border-radius: 8px;
+}
+
+/* Efectos de scroll */
+.mensajes-container {
+  scroll-behavior: smooth;
+}
+
+.mensajes-loading,
+.mensajes-error,
+.no-messages {
+  text-align: center;
+  margin-top: 2rem;
+}
+
+.fecha-envio {
+  font-size: 0.9rem;
+  color: #888;
+}

@@ -98,7 +98,6 @@ const ListEntry = () => {
     return unsubscribeAuth;
   }, []);
 
-
   useEffect(() => {
     const filtered = entries.filter((entry) => {
       const entryNivel =
