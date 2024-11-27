@@ -318,17 +318,18 @@ export const getAlbumBackground = async (userId, albumId) => {
 };
 
 // Función para actualizar las entradas de un álbum en la base de datos
-export const updateAlbumEntriesInDB = async (userId, albumId, newEntriesIds) => {
+export const updateAlbumEntriesInDB = async (userId, albumId, entriesData) => {
     try {
         const albumDocRef = doc(db, 'users', userId, 'albums', albumId);
-        await updateDoc(albumDocRef, { entries: newEntriesIds });
+
+        // Aquí actualizamos el álbum con las entradas y sus posiciones
+        await updateDoc(albumDocRef, { entries: entriesData });
         console.log("Entradas del álbum actualizadas correctamente");
     } catch (error) {
         console.error("Error al actualizar las entradas del álbum:", error);
         throw error;
     }
 };
-
 // Función para actualizar el color de fondo de un álbum
 export const setAlbumBgColor = async (userId, albumId, color) => {
     try {

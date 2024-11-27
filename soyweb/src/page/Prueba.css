@@ -1,9 +1,4 @@
 .test-container {
-    display: flex;
-    flex-direction: column;
     align-items: center; /* Centra el contenido horizontalmente */
-    width: 70%;
-    padding: 16px;
-    box-sizing: border-box; /* Asegúrate de incluir padding en el ancho total */
-    margin-top: 60px;
+    margin-top: 5%;
 }

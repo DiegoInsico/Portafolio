@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import Slider from 'react-slick';
-import { getEntries } from '../../firebase'; // Asegúrate de que este método funcione
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Navigation, Pagination } from 'swiper/modules';
+import { getEntries } from '../../firebase';
 import EntryCard from './entryMapper/entryCard';
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
 
-const Carousel = ({ currentUser }) => {
+const Carousel = ({ currentUser, onEntrySelect, selectedEntries }) => {
     const [entries, setEntries] = useState([]);
-    const [currentIndex, setCurrentIndex] = useState(0);
+    const [activeIndex, setActiveIndex] = useState(0); // Índice de la tarjeta activa
 
-    // Obtener las entradas de Firestore
     useEffect(() => {
         const fetchEntries = async () => {
             try {
@@ -22,46 +23,43 @@ const Carousel = ({ currentUser }) => {
         fetchEntries();
     }, [currentUser]);
 
-    // Configuración de react-slick
-    const settings = {
-        centerMode: true,  // Muestra la tarjeta central más grande
-        infinite: true,    // Carrusel infinito
-        centerPadding: '0', // No agrega relleno a los lados de la tarjeta central
-        slidesToShow: 5,   // Muestra 5 tarjetas
-        speed: 500,        // Velocidad de transición
-        focusOnSelect: true, // Permite seleccionar la tarjeta al hacer clic
-        arrows: true,      // Muestra las flechas
-        beforeChange: (current, next) => {
-            setCurrentIndex(next);  // Cambia el índice cuando se cambia la tarjeta
-        },
-        responsive: [
-            {
-                breakpoint: 1024,
-                settings: {
-                    slidesToShow: 3
-                }
-            },
-            {
-                breakpoint: 600,
-                settings: {
-                    slidesToShow: 1
-                }
-            }
-        ]
-    };
-
     return (
         <div className="carousel-container">
-            <Slider {...settings}>
+            <Swiper
+                className="my-swiper"
+                modules={[Navigation, Pagination]}
+                spaceBetween={10}
+                slidesPerView={5}
+                loop={true} // Habilita el bucle infinito
+                centeredSlides={true} // Siempre centra la tarjeta activa
+                onSlideChange={(swiper) => setActiveIndex(swiper.realIndex)} // Actualiza el índice activo
+                navigation
+                pagination={{ clickable: true }}
+                breakpoints={{
+                    1024: {
+                        slidesPerView: 5,
+                    },
+                    768: {
+                        slidesPerView: 3,
+                    },
+                    480: {
+                        slidesPerView: 2,
+                    },
+                    0: {
+                        slidesPerView: 1,
+                    },
+                }}
+            >
                 {entries.map((entry, index) => (
-                    <div
-                        key={entry.id}
-                        className={`carousel-item ${index === currentIndex ? 'center' : ''}`} // Aplica la clase 'center' a la tarjeta en el centro
-                    >
-                        <EntryCard entry={entry} onClick={(entry) => console.log(entry)} />
-                    </div>
+                    <SwiperSlide key={entry.id}>
+                        <EntryCard
+                            entry={entry}
+                            onClick={() => onEntrySelect(entry)}
+                            isSelected={selectedEntries.some(e => e.id === entry.id)}
+                        />
+                    </SwiperSlide>
                 ))}
-            </Slider>
+            </Swiper>
         </div>
     );
 };

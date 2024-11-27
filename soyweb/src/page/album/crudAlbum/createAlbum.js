@@ -1,4 +1,4 @@
-// src/album/CreateAlbum.jsx
+// src/album/crudAlbum/CreateAlbum.jsx
 
 import React, { useState, useEffect } from 'react';
 import { getBeneficiarios } from '../../../firebase';
@@ -6,58 +6,44 @@ import './CreateAlbum.css';
 
 const CreateAlbum = ({ onCreate }) => {
     const [albumName, setAlbumName] = useState('');
+    const [beneficiarioId, setBeneficiarioId] = useState('');
     const [beneficiarios, setBeneficiarios] = useState([]);
-    const [selectedBeneficiario, setSelectedBeneficiario] = useState('');
 
     useEffect(() => {
         const fetchBeneficiarios = async () => {
-            try {
-                const fetchedBeneficiarios = await getBeneficiarios();
-                setBeneficiarios(fetchedBeneficiarios);
-            } catch (error) {
-                console.error("Error al obtener beneficiarios:", error);
-            }
+            const data = await getBeneficiarios();
+            setBeneficiarios(data);
         };
         fetchBeneficiarios();
     }, []);
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        if (albumName.trim() === '' || selectedBeneficiario === '') {
-            alert("Por favor, ingresa un nombre y selecciona un beneficiario.");
-            return;
-        }
-        onCreate(albumName, selectedBeneficiario);
+        onCreate(albumName, beneficiarioId);
     };
 
     return (
-        <div className="create-album-container">
-            <h2>Crear Nuevo Álbum</h2>
+        <div className="create-album">
+            <h2>Crear Collage</h2>
             <form onSubmit={handleSubmit}>
                 <input
                     type="text"
-                    placeholder="Nombre del nuevo álbum"
                     value={albumName}
                     onChange={(e) => setAlbumName(e.target.value)}
-                    className="create-album-input"
+                    placeholder="Nombre del Collage"
                 />
-                <label htmlFor="beneficiario-select">Selecciona un Beneficiario:</label>
                 <select
-                    id="beneficiario-select"
-                    value={selectedBeneficiario}
-                    onChange={(e) => setSelectedBeneficiario(e.target.value)}
-                    className="beneficiario-select"
+                    value={beneficiarioId}
+                    onChange={(e) => setBeneficiarioId(e.target.value)}
                 >
-                    <option value="">--Selecciona--</option>
+                    <option value="">Selecciona un beneficiario</option>
                     {beneficiarios.map(beneficiario => (
                         <option key={beneficiario.id} value={beneficiario.id}>
-                            {beneficiario.nombre} {/* Ajusta según la estructura de beneficiario */}
+                            {beneficiario.nombre}
                         </option>
                     ))}
                 </select>
-                <button type="submit" className="create-album-button">
-                    Crear Álbum
-                </button>
+                <button type="submit">Crear Collage</button>
             </form>
         </div>
     );

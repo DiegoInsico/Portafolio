@@ -1,132 +1,73 @@
 /* Contenedor principal del carrusel */
 .carousel-container {
-    position: relative;
+    /* Elimina estas líneas */
+    /* position: fixed; */
+    /* top: 0; */
+    /* left: 0; */
     width: 100%;
-    max-width: 1000px;
-    /* Controla el tamaño máximo del carrusel */
-    margin: 0 auto;
-    overflow: hidden;
+    background: white;
+    z-index: 1000;
+    padding: 10px 0;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Estilos de Swiper */
+.my-swiper {
+    width: 100%;
+}
+
+.my-swiper-slide {
     display: flex;
     justify-content: center;
     align-items: center;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    opacity: 0.6;
+    /* Tarjetas no activas */
 }
 
-/* Carrusel (el contenedor de las tarjetas) */
-.carousel {
-    display: flex;
-    justify-content: space-evenly;
-    /* Asegura que las tarjetas estén distribuidas uniformemente */
-    align-items: center;
-    transition: transform 0.5s ease-in-out;
-    width: 100%;
-}
-
-/* Estilo de cada tarjeta */
-.carousel-item {
-    flex: 0 0 180px;
-    /* Establece un ancho fijo para cada tarjeta */
-    margin: 0 10px;
-    /* Ajusta la distancia entre las tarjetas */
-    opacity: 0.7;
-    /* Inicialmente las tarjetas tienen opacidad reducida */
-    text-align: center;
-    transition: opacity 0.3s, transform 0.3s ease-in-out;
-}
-
-/* Efecto para la tarjeta central (la más destacada) */
-.carousel-item.center {
+.my-swiper-slide.highlighted-slide {
+    transform: scale(1.2);
+    /* Escala para resaltar */
     opacity: 1;
-    /* La tarjeta central tiene opacidad máxima */
-    transform: scale(1.1);
-    /* Aumenta el tamaño de la tarjeta central */
+    /* Totalmente visible */
     z-index: 10;
-    /* Asegura que la tarjeta central esté encima de las otras */
+    /* Sobre las demás tarjetas */
 }
 
-/* Flechas de navegación */
-.carousel-button {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    background-color: rgba(255, 255, 255, 0.7);
-    /* Fondo transparente blanco para mejor visibilidad */
-    border: none;
-    font-size: 40px;
-    padding: 10px;
-    cursor: pointer;
-    color: #228291;
-    /* Color azul */
-    border-radius: 50%;
-    z-index: 100;
-    /* Asegura que las flechas estén encima de las tarjetas */
-    transition: background-color 0.3s ease;
-}
-
-.carousel-button:hover {
-    background-color: rgba(255, 255, 255, 1);
-    /* Color de fondo más opaco al pasar el mouse */
-}
-
-/* Ubicación de las flechas */
-.carousel-button.prev {
-    left: 10px;
-    /* Posiciona la flecha a la izquierda */
-}
-
-.carousel-button.next {
-    right: 10px;
-    /* Posiciona la flecha a la derecha */
-}
-
-/* Estilo de las tarjetas de la entrada */
+/* Ajustes de tamaño para las tarjetas */
 .entry-card {
-    width: 100%;
-    height: 200px;
-    box-sizing: border-box;
-    padding: 10px;
-    background-color: #fff;
-    /* Fondo blanco para las tarjetas */
+    width: 100px;
+    height: 100px;
+    background-color: #ffffff;
+    border: 1px solid #ddd;
     border-radius: 8px;
-    /* Bordes redondeados */
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-    /* Sombra suave */
-    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: transform 0.3s ease;
 }
 
-/* Hover en las tarjetas */
-.entry-card:hover {
-    transform: translateY(-5px);
-    /* Efecto de elevar la tarjeta al hacer hover */
-    box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.2);
-    /* Sombra más prominente */
+.my-swiper-button-next,
+.my-swiper-button-prev {
+    color: #228291;
 }
 
-.noselect {
-    user-select: none;
-    /* Evitar selección de texto */
+.my-swiper-pagination-bullet {
+    background: #228291;
 }
 
-/* Asegura que el carrusel sea responsivo */
-@media (max-width: 1024px) {
-    .carousel-item {
-        flex: 0 0 150px;
-        /* Tarjetas más pequeñas en pantallas medianas */
-    }
-
-    .carousel-button {
-        font-size: 30px;
-        /* Tamaño más pequeño para las flechas */
+/* Responsividad */
+@media (max-width: 768px) {
+    .entry-card {
+        width: 80px;
+        height: 80px;
     }
 }
 
-@media (max-width: 600px) {
-    .carousel-item {
-        flex: 0 0 120px;
-        /* Tarjetas aún más pequeñas en pantallas pequeñas */
-    }
-
-    .carousel-button {
-        font-size: 25px;
-        /* Tamaño de las flechas aún más pequeño */
+@media (max-width: 480px) {
+    .entry-card {
+        width: 60px;
+        height: 60px;
     }
 }

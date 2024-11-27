@@ -15,6 +15,8 @@ import EditDocument from "./crudDocument/editDocument";
 import ConfirmDeleteModal from "./crudDocument/deleteDocument"; // Importa el nuevo modal
 import { jsPDF } from "jspdf";
 import "./PageOrganize.css";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../../firebase";
 
 const DocumentManager = () => {
     const { currentUser } = useAuth();

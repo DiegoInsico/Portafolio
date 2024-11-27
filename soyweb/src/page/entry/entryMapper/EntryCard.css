@@ -1,9 +1,7 @@
 .entry-card {
     margin-top: 5px;
     margin-bottom: 5px;
-    flex: 0 0 calc(100% / 3);
-    /* Divide las cards equitativamente */
-    max-width: calc(100% / 3);
+    width: 200px;
     height: 200px;
     /* Altura uniforme para todas las cards */
     box-sizing: border-box;
@@ -62,6 +60,11 @@
 .entry-title {
     font-size: 16px;
     font-weight: bold;
+}
+
+.entry-card.selected {
+    border: 2px solid #007bff;
+    /* O cualquier otro estilo que prefieras */
 }
 
 .entry-subtitle {
