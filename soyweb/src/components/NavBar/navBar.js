@@ -1,13 +1,16 @@
 // src/components/Navbar.js
+
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom'; // Para navegar entre rutas
 import { useNavigate } from 'react-router-dom'; // Para la funcionalidad de logout
 import { signOutUser } from '../../firebase';
+import { FaBook, FaPhotoVideo, FaTasks, FaClock, FaEnvelope, FaBars, FaTimes } from 'react-icons/fa'; // Importa iconos opcionales
 import './Navbar.css';
 
 const Navbar = () => {
     const [showNavbar, setShowNavbar] = useState(true);
     const [lastScrollY, setLastScrollY] = useState(0);
+    const [menuActive, setMenuActive] = useState(false); // Estado para el menú hamburguesa
     const navigate = useNavigate();
 
     const handleLogout = async () => {
@@ -40,20 +43,54 @@ const Navbar = () => {
         }
     }, [lastScrollY]);
 
+    const toggleMenu = () => {
+        setMenuActive(!menuActive);
+    };
+
+    const closeMenu = () => {
+        setMenuActive(false);
+    };
+
     return (
         <nav className={`navbar ${showNavbar ? '' : 'navbar--hidden'}`}>
-            <div className="navbar-content">
-                <Link to="/" className="navbar-brand">
-                    Soy
+            <div className="navbar-container">
+                <Link to="/" className="navbar-brand" onClick={closeMenu}>
+                    {/* Puedes reemplazar el texto "Soy" por un logo si lo deseas */}
+                    <span className="brand-logo">Soy</span>
                 </Link>
-                <div className="navbar-links">
-                    <Link to="/prueba">Pruebas</Link>
-                    <Link to="/album">Tu álbum</Link>
-                    <Link to="/organize">Ordena tu vida</Link>
-                    <Link to="/linea-tiempo">Línea de Tiempo</Link> {/* Nuevo enlace */}
-                </div>
+                <ul className={`navbar-links ${menuActive ? 'active' : ''}`}>
+                    <li>
+                        <Link to="/prueba" onClick={closeMenu}>
+                            <FaBook className="icon" /> Pruebas
+                        </Link>
+                    </li>
+                    <li>
+                        <Link to="/album" onClick={closeMenu}>
+                            <FaPhotoVideo className="icon" /> Tu Álbum
+                        </Link>
+                    </li>
+                    <li>
+                        <Link to="/organize" onClick={closeMenu}>
+                            <FaTasks className="icon" /> Ordena tu Vida
+                        </Link>
+                    </li>
+                    <li>
+                        <Link to="/linea-tiempo" onClick={closeMenu}>
+                            <FaClock className="icon" /> Línea de Tiempo
+                        </Link>
+                    </li>
+                    <li>
+                        <Link to="/mensajes" onClick={closeMenu}>
+                            <FaEnvelope className="icon" /> Tus Mensajes
+                        </Link> {/* Nuevo enlace agregado */}
+                    </li>
+                </ul>
                 <div className="navbar-actions">
-                    <button onClick={handleLogout} className="logout-button">Cerrar sesión</button>
+                    <button onClick={handleLogout} className="logout-button">Cerrar Sesión</button>
+                    <div className="menu-toggle" onClick={toggleMenu} aria-label="Toggle Menu" role="button" tabIndex={0}
+                        onKeyPress={(e) => { if (e.key === 'Enter') toggleMenu(); }}>
+                        {menuActive ? <FaTimes className="hamburger-icon" /> : <FaBars className="hamburger-icon" />}
+                    </div>
                 </div>
             </div>
         </nav>

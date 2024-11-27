@@ -1,111 +1,203 @@
+/* src/components/Navbar.css */
+
+/* ============================ */
+/* VARIABLES CSS */
+:root {
+    /* Paleta de colores oscura */
+    --color-principal: #1f1f1f; /* Gris oscuro para fondo */
+    --color-secundario: #ffffff; /* Blanco para texto principal */
+    --color-fondo: #121212; /* Negro casi puro para la navbar */
+    --color-overlay: rgba(0, 0, 0, 0.6); /* Negro semi-transparente */
+    --color-hover: #333333; /* Gris medio para hover */
+    --color-activo: #bb86fc; /* Lavanda para elementos activos */
+    --color-cerrar: #cf6679; /* Rojo suave para botones de cierre */
+    --color-cerrar-hover: #d75c78; /* Rojo más claro para hover */
+    --color-texto: #ffffff; /* Blanco para texto */
+    --color-subtexto: #bbbbbb; /* Gris claro para subtexto */
+    --fuente-principal: 'Roboto', sans-serif; /* Fuente moderna */
+    --fuente-secundaria: 'Open Sans', sans-serif; /* Fuente complementaria */
+    --navbar-height: 60px; /* Altura de la navbar */
+    --transition-duration: 0.3s; /* Duración de las transiciones */
+}
+
+/* ============================ */
+/* NAVBAR */
 .navbar {
     position: fixed;
     top: 0;
     width: 100%;
-    padding: 10px 20px;
-    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.9), transparent);
-    color: white;
-    z-index: 1000;
-    transition: transform 0.3s ease-in-out, background 0.3s ease-in-out;
-    display: flex;
-    justify-content: center;
+    background-color: var(--color-fondo);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    z-index: 1001;
+    transition: top var(--transition-duration) ease-in-out;
 }
 
 .navbar--hidden {
-    transform: translateY(-100%);
+    top: -100px; /* Oculta la navbar moviéndola hacia arriba */
 }
 
-.navbar-content {
+/* Contenedor principal de la navbar */
+.navbar-container {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: 10px;
-    padding-bottom: 20px;
-    width: 100%;
+    height: var(--navbar-height);
     max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
 }
 
+/* Marca / Logo */
 .navbar-brand {
-    font-size: 2.5rem;
-    font-weight: bold;
-    color: white;
     text-decoration: none;
-    transition: color 0.3s ease;
+    color: var(--color-secundario);
+    font-size: 1.8rem;
+    font-weight: bold;
+    font-family: var(--fuente-secundaria);
+    display: flex;
+    align-items: center;
 }
 
-.navbar-brand:hover {
-    color: #f0a500;
+.brand-logo {
+    /* Puedes agregar estilos adicionales para el logo */
+    /* Por ejemplo, si usas una imagen: */
+    /* background-image: url('/path-to-logo.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    width: 40px;
+    height: 40px;
+    display: inline-block;
+    margin-right: 10px; */
 }
 
+/* Enlaces de la navbar */
 .navbar-links {
+    list-style: none;
     display: flex;
     gap: 20px;
 }
 
-.navbar-links a {
-    font-size: 1.5rem;
-    color: white;
-    text-decoration: none;
+.navbar-links li {
     position: relative;
-    padding: 5px 0;
-    transition: color 0.3s ease;
 }
 
-.navbar-links a::after {
-    content: '';
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    width: 0%;
-    height: 2px;
-    background: #f0a500;
-    transition: width 0.3s ease;
-}
-
-.navbar-links a:hover {
-    color: #f0a500;
-}
-
-.navbar-links a:hover::after {
-    width: 100%;
-}
-
-.navbar-actions {
+.navbar-links a {
+    text-decoration: none;
+    color: var(--color-texto);
+    font-size: 1rem;
+    font-family: var(--fuente-principal);
+    padding: 8px 12px;
+    border-radius: 4px;
+    transition: background-color var(--transition-duration), color var(--transition-duration);
     display: flex;
-    gap: 15px;
-    justify-content: flex-end;
+    align-items: center;
 }
 
+.navbar-links a:hover,
+.navbar-links a:focus {
+    background-color: var(--color-hover);
+    color: var(--color-secundario);
+}
+
+/* Iconos dentro de los enlaces */
+.navbar-links a .icon {
+    margin-right: 8px;
+    font-size: 1.2rem;
+    vertical-align: middle;
+}
+
+/* Botón de Cerrar Sesión */
 .logout-button {
-    font-size: 1.5rem;
-    color: white;
-    background: none;
-    border: 1px solid white;
-    padding: 5px 15px;
-    border-radius: 5px;
+    background-color: var(--color-activo);
+    color: var(--color-fondo);
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
     cursor: pointer;
-    transition: background 0.3s ease, color 0.3s ease;
+    font-size: 1rem;
+    font-family: var(--fuente-principal);
+    transition: background-color var(--transition-duration), transform var(--transition-duration);
 }
 
-.logout-button:hover {
-    background: white;
-    color: black;
+.logout-button:hover,
+.logout-button:focus {
+    background-color: var(--color-hover);
+    transform: translateY(-2px);
 }
 
+/* Menú Hamburguesa */
+.menu-toggle {
+    display: none; /* Oculto por defecto, se mostrará en pantallas pequeñas */
+    cursor: pointer;
+    margin-left: 20px;
+}
+
+.hamburger-icon {
+    color: var(--color-texto);
+    font-size: 1.5rem;
+    transition: color var(--transition-duration);
+}
+
+.menu-toggle:hover .hamburger-icon,
+.menu-toggle:focus .hamburger-icon {
+    color: var(--color-activo);
+}
+
+/* ============================ */
+/* RESPONSIVIDAD */
+
+/* Menú para pantallas pequeñas */
 @media (max-width: 768px) {
-    .navbar-content {
-        flex-direction: column;
-        gap: 10px;
-        text-align: center;
+    .navbar-container {
+        flex-wrap: wrap;
+        height: auto;
     }
 
+    /* Ocultar los enlaces y mostrar el botón de menú */
     .navbar-links {
         flex-direction: column;
-        gap: 10px;
+        width: 100%;
+        display: none; /* Ocultos por defecto */
+        background-color: var(--color-fondo);
+        border-top: 1px solid #333;
+        transition: max-height var(--transition-duration) ease-in-out;
+        overflow: hidden;
+        max-height: 0;
     }
 
-    .logout-button {
-        padding: 10px 20px;
+    .navbar-links.active {
+        display: flex; /* Mostrar cuando está activo */
+        max-height: 500px; /* Valor suficientemente alto para mostrar todos los enlaces */
+    }
+
+    /* Mostrar el botón de menú */
+    .menu-toggle {
+        display: block; /* Mostrar en pantallas pequeñas */
+    }
+
+    /* Ajustar los enlaces para que ocupen todo el ancho */
+    .navbar-links li {
         width: 100%;
+    }
+
+    .navbar-links a {
+        width: 100%;
+        padding: 12px 20px;
+    }
+
+    /* Alinear el botón de cerrar sesión */
+    .navbar-actions {
+        width: 100%;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        margin-top: 10px;
+    }
+}
+
+/* Ocultar el botón de menú en pantallas grandes */
+@media (min-width: 769px) {
+    .menu-toggle {
+        display: none;
     }
 }

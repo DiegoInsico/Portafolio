@@ -82,7 +82,7 @@ Ejemplos de Preguntas:
   async generateEmotion(text: string): Promise<string[]> {
     try {
       const prompt = `
-        Analiza el siguiente texto y determina las emociones de el mismo, como "alegría", "tristeza", "amor", "nostalgia". No agregues explicaciones, solo responde con las emociones separadas por comas.
+        Analiza el siguiente texto y determina las emociones presentes, como 'alegría', 'tristeza', 'amor', 'nostalgia', entre otras. Responde únicamente con las emociones identificadas, separadas por comas y utilizando términos naturales y comunes para describirlas.
         Texto: "${text}"
       `;
 
