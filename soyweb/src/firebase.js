@@ -288,64 +288,50 @@ export const deleteAlbum = async (userId, albumId) => {
 };
 
 // Funciones relacionadas con entradas
-export const getEntries = async (userId, nivel = null) => {
-  try {
-    const entradasCollection = collection(db, "entradas");
-    let q;
-    if (nivel) {
-      q = query(
-        entradasCollection,
-        where("userId", "==", userId),
-        where("nivel", "==", nivel)
-      );
-    } else {
-      q = query(entradasCollection, where("userId", "==", userId));
-    }
-    const snapshot = await getDocs(q);
 
-    return snapshot.docs.map((doc) => {
-      const data = doc.data();
+export const getEntries = async (user) => {
+    try {
+        const entradasCollection = collection(db, 'entradas');
+        const q = query(entradasCollection, where("userId", "==", user.uid)); // Usa user.uid en lugar de user
+        const snapshot = await getDocs(q);
 
-      data.fechaCreacion = data.fechaCreacion
-      ? data.fechaCreacion.toDate
-        ? data.fechaCreacion.toDate()
-        : new Date(data.fechaCreacion)
-      : null;
-    
-    data.fechaRecuerdo = data.fechaRecuerdo
-      ? data.fechaRecuerdo.toDate
-        ? data.fechaRecuerdo.toDate()
-        : new Date(data.fechaRecuerdo)
-      : null;
+        return snapshot.docs.map(doc => {
+            const data = doc.data();
 
-      // Asegurar que 'nivel' es una cadena
-      data.nivel = data.nivel ? data.nivel.toString() : "1";
+            // Formateo de fecha para fechaCreacion y fechaRecuerdo
+            if (data.fechaCreacion && data.fechaCreacion.toDate) {
+                const fecha = data.fechaCreacion.toDate();
+                data.fechaCreacion = `${fecha.getDate()}/${fecha.getMonth() + 1}/${fecha.getFullYear()}`;
+            }
+            if (data.fechaRecuerdo && data.fechaRecuerdo.toDate) {
+                const fechaRecuerdo = data.fechaRecuerdo.toDate();
+                data.fechaRecuerdo = `${fechaRecuerdo.getDate()}/${fechaRecuerdo.getMonth() + 1}/${fechaRecuerdo.getFullYear()}`;
+            }
 
-      // Definir valores predeterminados para los campos
-      return {
-        id: doc.id,
-        audio: data.audio || null,
-        baul: data.baul || false,
-        cancion: data.cancion || null,
-        categoria: data.categoria || "",
-        color: data.color || "#000000",
-        emociones: data.emociones || [],
-        fechaCreacion: data.fechaCreacion || null,
-        fechaRecuerdo: data.fechaRecuerdo || null,
-        isProtected: data.isProtected || false,
-        media: data.media || null,
-        mediaType: data.mediaType || null,
-        nickname: data.nickname || "",
-        nivel: data.nivel || "1",
-        texto: data.texto || "",
-        userId: data.userId || "",
-      };
-    });
-  } catch (error) {
-    console.error("Error fetching entries:", error);
-    throw error;
-  }
-};
+            // Definir valores predeterminados para los campos
+            return {
+                id: doc.id,
+                audio: data.audio || null,
+                baul: data.baul || false,
+                cancion: data.cancion || null,
+                categoria: data.categoria || '',
+                color: data.color || '#000000',
+                emociones: data.emociones || [],
+                fechaCreacion: data.fechaCreacion || null,
+                fechaRecuerdo: data.fechaRecuerdo || null,
+                isProtected: data.isProtected || false,
+                media: data.media || null,
+                mediaType: data.mediaType || null,
+                nickname: data.nickname || '',
+                nivel: data.nivel || '1',
+                texto: data.texto || '',
+                userId: data.userId || ''
+            };
+        });
+    } catch (error) {
+        console.error("Error fetching entries:", error);
+        throw error;
+
 
 export const getAlbumEntries = async (userId, albumId) => {
   try {
@@ -383,7 +369,17 @@ export const getAlbumBackground = async (userId, albumId) => {
   }
 };
 
-// Función para actualizar las entradas de un álbum en la base de datos
+export const updateAlbumEntriesInDB = async (userId, albumId, entriesData) => {
+    try {
+        const albumDocRef = doc(db, 'users', userId, 'albums', albumId);
+
+        // Aquí actualizamos el álbum con las entradas y sus posiciones
+        await updateDoc(albumDocRef, { entries: entriesData });
+        console.log("Entradas del álbum actualizadas correctamente");
+    } catch (error) {
+        console.error("Error al actualizar las entradas del álbum:", error);
+        throw error;
+    }
 export const updateAlbumEntriesInDB = async (
   userId,
   albumId,
@@ -398,7 +394,6 @@ export const updateAlbumEntriesInDB = async (
     throw error;
   }
 };
-
 // Función para actualizar el color de fondo de un álbum
 export const setAlbumBgColor = async (userId, albumId, color) => {
   try {
@@ -442,6 +437,17 @@ export const editDocument = async (documentId, updatedData) => {
   }
 };
 
+export const deleteDocument = async (documentId) => {
+    try {
+        const docRef = doc(db, "documentos", documentId);
+        await deleteDoc(docRef);
+        console.log("Documento eliminado con éxito:", documentId);
+    } catch (error) {
+        console.error("Error al eliminar el documento:", error);
+        throw error;
+    }
+};
+
 // Función para obtener los documentos de un usuario específico
 export const getDocuments = async (userId) => {
   try {
@@ -459,6 +465,24 @@ export const getDocuments = async (userId) => {
 };
 
 export const getTestigos = async (userId) => {
+
+    try {
+        const testigosCollection = collection(db, "testigos");
+        const q = query(testigosCollection, where("userId", "==", userId));
+        const snapshot = await getDocs(q);
+
+        console.log("Consulta realizada para el userId:", userId);
+        console.log("Cantidad de testigos obtenidos:", snapshot.size);
+
+        return snapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+        }));
+    } catch (error) {
+        console.error("Error al obtener testigos:", error);
+        throw error;
+    }
+
   try {
     const testigosCollection = collection(db, "testigos");
     const q = query(testigosCollection, where("userId", "==", userId));
@@ -472,7 +496,9 @@ export const getTestigos = async (userId) => {
     console.error("Error al obtener testigos:", error);
     throw error;
   }
+
 };
+
 
 // **Nueva Función para Obtener un Usuario por ID**
 export const getUserById = async (userId) => {

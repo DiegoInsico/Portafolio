@@ -1,0 +1,125 @@
+/* src/components/crudDocument/EditDocument.css */
+
+/* Contenedor del formulario de editar documento */
+.edit-document-container {
+    width: 500px;
+    /* Ajuste de ancho para responsividad */
+    max-width: 800px;
+    /* Ancho máximo */
+    padding: 20px;
+    border-radius: 8px;
+    margin: 0 auto;
+    /* Centrado */
+    font-family: 'Roboto', sans-serif;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+/* Título del formulario */
+.edit-document-container h2 {
+    font-size: 24px;
+    color: #2c3e50;
+    margin-bottom: 15px;
+    text-align: center;
+    font-family: 'Merriweather', serif;
+}
+
+/* Etiquetas del formulario */
+.edit-document-container label {
+    font-size: 14px;
+    color: #333333;
+    margin-bottom: 5px;
+    display: block;
+    font-weight: bold;
+}
+
+/* Inputs, selects y textareas del formulario */
+.edit-document-container input,
+.edit-document-container select,
+.edit-document-container textarea {
+    width: 100%;
+    /* Cambiado de 60% a 100% */
+    padding: 10px 12px;
+    font-size: 14px;
+    border: 1px solid #bdc3c7;
+    border-radius: 5px;
+    transition: border-color 0.3s ease;
+    margin-bottom: 15px;
+    font-family: 'Roboto', sans-serif;
+    box-sizing: border-box;
+}
+
+/* Botones */
+.edit-document-container button {
+    background-color: #2980b9;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 12px 20px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    width: 100%;
+    /* Mantener ancho completo */
+    font-weight: bold;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+}
+
+/* Enfoque de los campos del formulario */
+.edit-document-container input:focus,
+.edit-document-container select:focus,
+.edit-document-container textarea:focus {
+    border-color: #2980b9;
+    outline: none;
+}
+
+
+/* Hover en los botones */
+.edit-document-container button:hover:not(:disabled) {
+    background-color: #3498db;
+    transform: translateY(-2px);
+}
+
+/* Botón deshabilitado */
+.edit-document-container button:disabled {
+    background-color: #bdc3c7;
+    cursor: not-allowed;
+}
+
+/* Botón de cancelar */
+.edit-document-container .cancel-button {
+    background-color: #bdc3c7;
+    color: #2c3e50;
+    margin-top: 0;
+    /* Asegura alineación perfecta con el botón superior */
+}
+
+/* Mensajes de error */
+.edit-document-container .error-message {
+    color: #e74c3c;
+    font-size: 14px;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+/* Indicación de campos obligatorios */
+.edit-document-container label::after {
+    content: " *";
+    color: #e74c3c;
+}
+
+/* Ajustes responsivos */
+@media (max-width: 768px) {
+    .edit-document-container {
+        width: 95%;
+        /* Más ancho en dispositivos pequeños */
+        padding: 15px;
+    }
+
+    .edit-document-container input,
+    .edit-document-container select,
+    .edit-document-container textarea {
+        width: 100%;
+    }
+}

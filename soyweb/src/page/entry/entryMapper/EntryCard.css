@@ -1,9 +1,7 @@
 .entry-card {
     margin-top: 5px;
     margin-bottom: 5px;
-    flex: 0 0 calc(100% / 3);
-    /* Divide las cards equitativamente */
-    max-width: calc(100% / 3);
+    width: 200px;
     height: 200px;
     /* Altura uniforme para todas las cards */
     box-sizing: border-box;
@@ -19,11 +17,25 @@
     align-items: center;
     /* Centra horizontalmente */
     text-align: center;
-    transition: transform 0.3s ease;
+    transition: transform 0.3s ease, opacity 0.3s ease;
     overflow: hidden;
     /* Evita que el contenido sobresalga */
 }
 
+/* Efecto cuando la tarjeta está en el centro */
+.entry-card.center {
+    transform: scale(1.2);
+    /* Aumenta el tamaño de la tarjeta */
+    opacity: 1;
+}
+
+/* Tarjetas que no están en el centro */
+.entry-card:not(.center) {
+    opacity: 0.6;
+    transform: scale(0.8);
+}
+
+/* Efecto hover */
 .entry-card:hover {
     transform: scale(1.05);
 }
@@ -48,6 +60,11 @@
 .entry-title {
     font-size: 16px;
     font-weight: bold;
+}
+
+.entry-card.selected {
+    border: 2px solid #007bff;
+    /* O cualquier otro estilo que prefieras */
 }
 
 .entry-subtitle {

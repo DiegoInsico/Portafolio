@@ -1,9 +1,12 @@
 import React from 'react';
 import './EntryCard.css';
 
-const EntryCard = ({ entry, onClick }) => {
+const EntryCard = ({ entry, onClick, isSelected }) => {
     return (
-        <div className="entry-card" onClick={() => onClick(entry)}>
+        <div
+            className={`entry-card ${isSelected ? 'selected' : ''}`}
+            onClick={() => onClick(entry)}
+        >
             {/* Canción */}
             {entry.cancion && (
                 <div className="entry-song">

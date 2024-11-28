@@ -1,56 +1,37 @@
-/* src/album/CreateAlbum.css */
+/* src/album/crudAlbum/CreateAlbum.css */
 
-.create-album-container {
-    position: relative;
-    padding: 16px;
-    background-color: #ffffff;
-    /* Añadido fondo blanco */
-    width: 100%;
-    box-sizing: border-box;
-    z-index: 10;
+.create-album {
+    max-width: 500px;
+    margin: 0 auto;
 }
 
-.create-album-container h2 {
-    margin-bottom: 16px;
-    font-size: 20px;
-    color: #333;
+.create-album h2 {
+    text-align: center;
+    margin-bottom: 20px;
 }
 
-.create-album-container form {
+.create-album form {
     display: flex;
     flex-direction: column;
 }
 
-.create-album-input {
+.create-album input,
+.create-album select {
     padding: 10px;
-    margin-bottom: 16px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 14px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
 }
 
-.beneficiario-select {
+.create-album button {
+    background-color: #1abc9c;
+    color: white;
     padding: 10px;
-    margin-bottom: 16px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 14px;
-    background-color: #fff;
-    color: #333;
-    cursor: pointer;
-}
-
-.create-album-button {
-    padding: 12px;
-    background-color: #27ae60;
-    color: #fff;
     border: none;
-    border-radius: 4px;
-    font-size: 16px;
+    border-radius: 5px;
     cursor: pointer;
-    transition: background-color 0.2s;
 }
 
-.create-album-button:hover {
-    background-color: #219150;
+.create-album button:hover {
+    background-color: #16a085;
 }

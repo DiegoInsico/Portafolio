@@ -1,0 +1,73 @@
+/* Contenedor principal del carrusel */
+.carousel-container {
+    /* Elimina estas líneas */
+    /* position: fixed; */
+    /* top: 0; */
+    /* left: 0; */
+    width: 100%;
+    background: white;
+    z-index: 1000;
+    padding: 10px 0;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Estilos de Swiper */
+.my-swiper {
+    width: 100%;
+}
+
+.my-swiper-slide {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    opacity: 0.6;
+    /* Tarjetas no activas */
+}
+
+.my-swiper-slide.highlighted-slide {
+    transform: scale(1.2);
+    /* Escala para resaltar */
+    opacity: 1;
+    /* Totalmente visible */
+    z-index: 10;
+    /* Sobre las demás tarjetas */
+}
+
+/* Ajustes de tamaño para las tarjetas */
+.entry-card {
+    width: 100px;
+    height: 100px;
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: transform 0.3s ease;
+}
+
+.my-swiper-button-next,
+.my-swiper-button-prev {
+    color: #228291;
+}
+
+.my-swiper-pagination-bullet {
+    background: #228291;
+}
+
+/* Responsividad */
+@media (max-width: 768px) {
+    .entry-card {
+        width: 80px;
+        height: 80px;
+    }
+}
+
+@media (max-width: 480px) {
+    .entry-card {
+        width: 60px;
+        height: 60px;
+    }
+}

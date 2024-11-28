@@ -1,29 +1,6 @@
-/* src/album/Album.css */
-
-/* Layout General */
-.album-layout {
-    display: flex;
-    height: 100vh;
-    font-family: Arial, sans-serif;
-    background-color: #f7f9fc;
-    color: #333;
-}
-
-/* Contenido Principal */
-.main-content {
-    flex: 1;
-    display: flex;
-    flex-direction: row;
-    gap: 16px;
-    padding: 16px;
-    overflow-y: hidden;
-    /* Para evitar scroll innecesario */
-}
-
 /* Album Manager */
 .album-manager {
     flex: 3;
-    /* Mayor proporción */
     display: flex;
     flex-direction: column;
     padding: 20px;
@@ -32,6 +9,20 @@
     background-color: #fff;
     height: 100%;
     overflow-y: auto;
+}
+
+.album-manager .add-text-area-btn {
+    padding: 10px 20px;
+    background-color: #1abc9c;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-bottom: 10px;
+}
+
+.album-manager .add-text-area-btn:hover {
+    background-color: #16a085;
 }
 
 .album-header {
@@ -76,132 +67,114 @@
     text-align: center;
 }
 
-/* Album Entries */
-.album-entries {
-    flex: 1;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 16px;
-    padding: 16px;
+/* Droppable Container */
+.droppable-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
     border: 2px dashed #ccc;
     border-radius: 8px;
-    overflow-y: auto;
-    background-color: rgba(255, 255, 255, 0.8);
+    overflow: hidden;
+    background-color: #ffffff;
 }
 
-.album-entry-draggable {
+/* Draggable Entry */
+.draggable-entry {
     background-color: #fff;
-    padding: 12px;
     border: 1px solid #ddd;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     cursor: grab;
-    width: 100px;
-    height: 100px;
-    text-align: center;
-    transition: transform 0.2s;
-}
-
-.album-entry-draggable:active {
-    cursor: grabbing;
-}
-
-.album-entry-draggable p {
-    margin: 0;
-    font-size: 12px;
-    color: #333;
-    text-overflow: ellipsis;
-    white-space: nowrap;
     overflow: hidden;
-}
-
-/* Nueva Clase para la Sección de Entradas */
-.entries-section {
-    flex: 1;
-    width: 100%;
-    /* Menor proporción */
     display: flex;
     flex-direction: column;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    height: 25%;
-    overflow-y: auto;
+    min-width: 100px;
+    min-height: 100px;
+    max-width: 300px;
+    max-height: 250px;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-    .side-menu {
-        position: absolute;
-        z-index: 1000;
-        height: 100%;
-        left: 0;
-        top: 0;
-        transform: translateX(-100%);
-        transition: transform 0.3s;
-    }
-
-    .side-menu.expanded {
-        transform: translateX(0);
-    }
-
-    .side-menu.collapsed {
-        transform: translateX(-100%);
-    }
-
-    .main-content {
-        flex-direction: column;
-    }
-
-    .album-manager,
-    .entries-section {
-        flex: none;
-        width: 100%;
-    }
+.draggable-entry.dragging {
+    opacity: 0.5;
 }
 
-.save-album-btn{
-    height: 100px;
+.entry-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
 }
 
-/* Opciones del Contenedor */
-.options-container {
-    position: fixed;
-    top: 0; /* Alinea con el top del sidebar */
-    left: 250px; /* Ancho del sidebar cuando está expandido */
-    width: 400px; /* Ajusta según tus necesidades */
-    height: 100%; /* Para que coincida en altura con el sidebar */
-    background-color: #fff;
-    z-index: 9;
-    overflow-y: auto;
-    transition: left 0.3s ease;
+.entry-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
-.options-container.collapsed {
-    left: 60px; /* Ancho del sidebar cuando está colapsado */
+.entry-info {
+    padding: 8px;
+    background-color: rgba(255, 255, 255, 0.8);
 }
 
-/* Ajustes para responsive si es necesario */
-@media (max-width: 768px) {
-    .options-container {
-        left: 0;
-        width: 100%;
-        height: auto;
-        position: absolute;
-        top: 60px; /* Ajusta según la altura de tu menú en móviles */
-        z-index: 999; /* Asegúrate de que esté encima de otros elementos */
-    }
+.entry-title {
+    margin: 0;
+    font-size: 16px;
+    font-weight: bold;
 }
-.draggable-entry{
-    justify-content: center;
-    height: 200px;
-    width: 180px;
-    border: 10px;
-    border-radius: 10px;
-    border:#333;
-    background-color: aqua;
 
+.entry-subtitle {
+    margin: 0;
+    font-size: 14px;
+    color: #777;
 }
-.entry-content{
-    justify-content: flex-end;
+
+.entry-text-audio {
+    padding: 8px;
+    overflow: auto;
+}
+
+.entry-text {
+    margin: 0;
+    font-size: 14px;
+}
+
+.entry-media img,
+.entry-media video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.entry-media video {
+    height: auto;
+}
+
+.entry-song {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+}
+
+.entry-song .entry-image {
+    flex: 1;
+}
+
+.entry-song .entry-info {
+    flex: 0;
+}
+
+/* Botón Guardar Cambios */
+.save-album-btn {
+    padding: 10px 20px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 20px;
+}
+
+.save-album-btn:hover {
+    background-color: #2980b9;
 }

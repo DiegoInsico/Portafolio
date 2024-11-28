@@ -1,20 +1,19 @@
+// src/album/AlbumPage.jsx
+
 import React, { useState, useEffect } from 'react';
 import './AlbumPage.css';
 import { useAuth } from '../auth/authContext';
 import Album from './album';
-import EntriesManager from '../entry/entry';
+import Carousel from '../entry/entry'; // Asegúrate de que la ruta y el nombre del componente sean correctos
 import useEntries from '../entry/useEntries';
-import SideMenu from './sideMenu';
+import MiniNav from './miniNav'; // Asegúrate de que la ruta y el nombre del componente sean correctos
 import CreateAlbum from './crudAlbum/createAlbum';
-import ListAlbums from './crudAlbum/listAlbums';
 import SelectedAlbum from './crudAlbum/selectedAlbum';
 
 const AlbumPage = () => {
     const { currentUser, albums, addAlbum, modifyAlbum, removeAlbum } = useAuth();
     const [selectedAlbum, setSelectedAlbum] = useState(null);
-    const [isMenuExpanded, setIsMenuExpanded] = useState(false);
     const [activeOption, setActiveOption] = useState(null);
-    const [newAlbumName, setNewAlbumName] = useState('');
     const [localAlbumEntries, setLocalAlbumEntries] = useState([]);
 
     const {
@@ -53,7 +52,6 @@ const AlbumPage = () => {
         if (albumName.trim() === '' || beneficiarioId === '') return;
         try {
             await addAlbum(albumName, '#ffffff', beneficiarioId);
-            setNewAlbumName('');
             setActiveOption(null);
         } catch (error) {
             console.error("Error al crear álbum:", error);
@@ -87,20 +85,24 @@ const AlbumPage = () => {
         setActiveOption(null);
     };
 
-    const handleEntryClick = (entry) => {
-        if (!selectedAlbum) return;
-
+    const handleEntrySelect = (entry) => {
+        // Verifica si la entrada ya está en el collage
         const isSelected = localAlbumEntries.some(albumEntry => albumEntry.id === entry.id);
 
         if (isSelected) {
+            // Si ya está, la removemos
             setLocalAlbumEntries(prevEntries =>
                 prevEntries.filter(albumEntry => albumEntry.id !== entry.id)
             );
         } else {
-            if (localAlbumEntries.length >= 15) {
-                alert("No puedes agregar más de 15 entradas a un álbum.");
+            const totalEntries = localAlbumEntries.length;
+            const textAreasCount = localAlbumEntries.filter(entry => entry.isTextArea).length;
+
+            if (totalEntries - textAreasCount >= 15) {
+                alert("No puedes agregar más de 15 entradas al collage.");
                 return;
             }
+            // Si no está, la agregamos con una posición inicial
             setLocalAlbumEntries(prevEntries => [
                 ...prevEntries,
                 { ...entry, position: { x: 0, y: 0 } }
@@ -125,26 +127,23 @@ const AlbumPage = () => {
         }
     };
 
-    const toggleMenu = () => {
-        setIsMenuExpanded(!isMenuExpanded);
-        if (isMenuExpanded) {
-            setActiveOption(null);
-        }
-    };
-
     const renderContent = () => {
         switch (activeOption) {
             case 'crearAlbum':
                 return (
                     <CreateAlbum onCreate={handleCreateAlbum} />
                 );
-            case 'listarAlbums':
-                return (
-                    <ListAlbums albums={albums} onDelete={handleDeleteAlbum} />
-                );
             case 'tusAlbums':
                 return (
-                    <SelectedAlbum albums={albums} onSelect={handleAlbumSelect} />
+                    <SelectedAlbum
+                        albums={albums}
+                        onSelect={handleAlbumSelect}
+                        onDelete={handleDeleteAlbum}
+                    />
+                );
+            case 'compartidosContigo':
+                return (
+                    <p>Aquí se mostrarán los collages compartidos contigo.</p>
                 );
             default:
                 return null;
@@ -153,34 +152,31 @@ const AlbumPage = () => {
 
     return (
         <div className="album-page-layout">
-            {/* Menú Lateral Izquierdo */}
-            <SideMenu
-                isExpanded={isMenuExpanded}
-                toggleMenu={toggleMenu}
+            {/* Nav Superior */}
+            <MiniNav
                 activeOption={activeOption}
                 handleOptionClick={handleOptionClick}
             />
-            {/* Contenedor de Opciones Activas */}
+            {/* Contenido de la opción seleccionada */}
             {activeOption && (
-                <div className={`options-container ${isMenuExpanded ? 'expanded' : 'collapsed'}`}>
+                <div className="option-content">
                     {renderContent()}
                 </div>
             )}
-            <div className='entries-manager'>
-                <EntriesManager
-                    entries={entries}
-                    albumEntries={albumEntries}
-                    selectedAlbum={selectedAlbum}
-                    onEntryClick={handleEntryClick}
+            {/* Carrusel de Entradas */}
+            <div className='entries-carousel'>
+                <Carousel
+                    currentUser={currentUser}
+                    onEntrySelect={handleEntrySelect}
+                    selectedEntries={localAlbumEntries}
                 />
             </div>
             {/* Contenido Principal del Álbum */}
             <div className='album-card'>
                 <Album
                     selectedAlbum={selectedAlbum}
-                    onBackgroundChange={handleBackgroundChange}
                     localAlbumEntries={localAlbumEntries}
-                    handleSaveAlbumChanges={handleSaveAlbumChanges}
+                    setLocalAlbumEntries={setLocalAlbumEntries}
                 />
             </div>
         </div>

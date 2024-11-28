@@ -1,14 +1,14 @@
-// src/album/SelectedAlbum.jsx
+// src/album/crudAlbum/SelectedAlbum.jsx
 
 import React from 'react';
 import './SelectedAlbum.css';
 
-const SelectedAlbum = ({ albums, onSelect }) => {
+const SelectedAlbum = ({ albums, onSelect, onDelete }) => {
     return (
         <div className="selected-albums-container">
-            <h2>Tus Álbumes</h2>
+            <h2>Tus Collages</h2>
             {albums.length === 0 ? (
-                <p>No tienes álbumes aún.</p>
+                <p>No tienes collages aún.</p>
             ) : (
                 <ul className="albums-list-content">
                     {albums.map(album => (
@@ -18,6 +18,12 @@ const SelectedAlbum = ({ albums, onSelect }) => {
                                 onClick={() => onSelect(album)}
                             >
                                 {album.name}
+                            </button>
+                            <button
+                                className="delete-album-button-content"
+                                onClick={() => onDelete(album.id)}
+                            >
+                                Eliminar
                             </button>
                         </li>
                     ))}

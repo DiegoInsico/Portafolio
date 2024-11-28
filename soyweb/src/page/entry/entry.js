@@ -1,83 +1,67 @@
 import React, { useState, useEffect } from 'react';
-import './Entry.css';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Navigation, Pagination } from 'swiper/modules';
+import { getEntries } from '../../firebase';
 import EntryCard from './entryMapper/entryCard';
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
 
-const EntriesManager = ({ entries, onEntryClick }) => {
-    const [currentIndex, setCurrentIndex] = useState(entries.length); // Inicia en la primera copia
-    const [isPaused, setIsPaused] = useState(false); // Pausa el movimiento cuando el mouse está encima
-    const [index, setIndex] = useState(0);
+const Carousel = ({ currentUser, onEntrySelect, selectedEntries }) => {
+    const [entries, setEntries] = useState([]);
+    const [activeIndex, setActiveIndex] = useState(0); // Índice de la tarjeta activa
 
-    // Duplicamos las entradas para crear el efecto de bucle infinito
-    const extendedEntries = [...entries, ...entries, ...entries]; // Tres copias para la ilusión
-
-    const handleTransitionEnd = () => {
-        // Rebota al final o al inicio si llega a los extremos duplicados
-        if (currentIndex === 0) {
-            setCurrentIndex(entries.length); // Rebota al final duplicado
-        } else if (currentIndex === extendedEntries.length - 1) {
-            setCurrentIndex(entries.length - 1); // Rebota al inicio duplicado
-        }
-    };
-
-    // Desplazamiento automático
     useEffect(() => {
-        if (!isPaused) {
-            const interval = setInterval(() => {
-                moveRight();
-            }, 2100); // Desplazamiento automático cada 3 segundos
-            return () => clearInterval(interval);
-        }
-    }, [currentIndex, isPaused]);
-
-    const moveLeft = () => {
-        setCurrentIndex((prev) => prev - 1);
-    };
-
-    const moveRight = () => {
-        setCurrentIndex((prev) => prev + 1);
-    };
+        const fetchEntries = async () => {
+            try {
+                const entriesData = await getEntries(currentUser);
+                setEntries(entriesData);
+            } catch (error) {
+                console.error("Error fetching entries:", error);
+            }
+        };
+        fetchEntries();
+    }, [currentUser]);
 
     return (
-        <div
-            className="entries-manager"
-            onMouseEnter={() => setIsPaused(true)} // Pausa el movimiento al pasar el mouse
-            onMouseLeave={() => setIsPaused(false)} // Reanuda el movimiento al quitar el mouse
-        >
-            <div className="entries-selector">
-                <h3>Entradas Disponibles</h3>
-                <div className="wrapper">
-                    <div className="arrow left-arrow" onClick={moveLeft}>
-                        &lt;
-                    </div>
-                    <div
-                        className="inner"
-                        style={{
-                            transform: `translateX(-${currentIndex * (100 / 3)}%)`,
-                            transition: 'transform 0.5s ease',
-                        }}
-                        onTransitionEnd={handleTransitionEnd}
-                    >
-                        {extendedEntries.map((entry, index) => {
-                            // Resalta cada 6 entradas
-                            const isHighlighted = (index % 3 === 0);
-
-                            return (
-                                <EntryCard
-                                    key={`${entry.id}-${index}`} // Asegura un key único para cada entrada
-                                    entry={entry}
-                                    onClick={onEntryClick}
-                                    className={isHighlighted ? 'highlight' : ''} // Clase condicional
-                                />
-                            );
-                        })}
-                    </div>
-                    <div className="arrow right-arrow" onClick={moveRight}>
-                        &gt;
-                    </div>
-                </div>
-            </div>
+        <div className="carousel-container">
+            <Swiper
+                className="my-swiper"
+                modules={[Navigation, Pagination]}
+                spaceBetween={10}
+                slidesPerView={5}
+                loop={true} // Habilita el bucle infinito
+                centeredSlides={true} // Siempre centra la tarjeta activa
+                onSlideChange={(swiper) => setActiveIndex(swiper.realIndex)} // Actualiza el índice activo
+                navigation
+                pagination={{ clickable: true }}
+                breakpoints={{
+                    1024: {
+                        slidesPerView: 5,
+                    },
+                    768: {
+                        slidesPerView: 3,
+                    },
+                    480: {
+                        slidesPerView: 2,
+                    },
+                    0: {
+                        slidesPerView: 1,
+                    },
+                }}
+            >
+                {entries.map((entry, index) => (
+                    <SwiperSlide key={entry.id}>
+                        <EntryCard
+                            entry={entry}
+                            onClick={() => onEntrySelect(entry)}
+                            isSelected={selectedEntries.some(e => e.id === entry.id)}
+                        />
+                    </SwiperSlide>
+                ))}
+            </Swiper>
         </div>
     );
 };
 
-export default EntriesManager;
+export default Carousel;

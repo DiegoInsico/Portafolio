@@ -1,8 +1,4 @@
-.testing-page {
-    display: flex;
-    flex-direction: column;
+.test-container {
     align-items: center; /* Centra el contenido horizontalmente */
-    width: 100%;
-    padding: 16px;
-    box-sizing: border-box; /* Asegúrate de incluir padding en el ancho total */
+    margin-top: 5%;
 }
