@@ -1,53 +1,45 @@
 // src/components/PasswordOverlay.js
 
-import React, { useState } from "react";
-import "./PasswordOverlay.css";
-import { FaLock } from "react-icons/fa";
+import React, { useState } from 'react';
+import './PasswordOverlay.css'; // Asegúrate de importar el CSS
 
-const PasswordOverlay = ({ level, onClose, onSuccess }) => {
-    const [password, setPassword] = useState("");
-    const [error, setError] = useState("");
+const PasswordOverlay = ({ level, onClose, onSuccess, correctPassword }) => {
+  const [inputPassword, setInputPassword] = useState('');
 
-    // Obtener las contraseñas desde variables de entorno
-    const passwords = {
-        2: process.env.REACT_APP_LEVEL2_PASSWORD,
-        3: process.env.REACT_APP_LEVEL3_PASSWORD
-    };
+  const handleSubmit = () => {
+    if (inputPassword === correctPassword) {
+      onSuccess();
+      onClose();
+    } else {
+      alert('Contraseña incorrecta');
+    }
+  };
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        if (password === passwords[level]) {
-            onSuccess();
-            onClose();
-        } else {
-            setError("Contraseña incorrecta. Inténtalo de nuevo.");
-        }
-    };
-
-    return (
-        <div className="password-overlay">
-            <div className="password-overlay-content">
-                <div className="password-overlay-header">
-                    <FaLock size={24} />
-                    <h2>Autenticación Nivel {level}</h2>
-                </div>
-                <form onSubmit={handleSubmit} className="password-overlay-form">
-                    <input
-                        type="password"
-                        placeholder="Ingresa la contraseña"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
-                    />
-                    {error && <p className="error-message">{error}</p>}
-                    <div className="password-overlay-buttons">
-                        <button type="submit">Aceptar</button>
-                        <button type="button" onClick={onClose}>Cancelar</button>
-                    </div>
-                </form>
-            </div>
+  return (
+    <div className="password-overlay">
+      <div className="password-overlay-content">
+        <div className="password-overlay-header">
+          <h2>Introduce la contraseña para el nivel {level}</h2>
         </div>
-    );
+        <div className="password-overlay-form">
+          <input
+            type="password"
+            placeholder="Contraseña"
+            value={inputPassword}
+            onChange={(e) => setInputPassword(e.target.value)}
+          />
+        </div>
+        <div className="password-overlay-buttons">
+          <button type="button" onClick={onClose}>
+            Cancelar
+          </button>
+          <button type="submit" onClick={handleSubmit}>
+            Aceptar
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default PasswordOverlay;

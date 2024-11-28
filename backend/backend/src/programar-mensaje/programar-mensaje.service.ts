@@ -32,7 +32,7 @@ export class ProgramarMensajeService {
         }
   
         // Generar un link único para el mensaje
-        const link = `https://tuapp.com/view-message/${message.id}`;
+        const link = `http://tuapp.com/view-message/${message.id}`;
         const subject = 'Tienes un Mensaje Programado de Soy';
         const html = `<p>Hola,</p><p>Han programado un mensaje para ti el día de hoy. Puedes verlo aquí: <a href="${link}">Ver mensaje</a></p>`;
   

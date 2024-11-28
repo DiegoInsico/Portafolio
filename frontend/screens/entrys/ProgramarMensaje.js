@@ -1,5 +1,3 @@
-// ProgramarMensaje.js
-
 import React, { useState, useEffect, useContext } from "react";
 import {
   View,
@@ -16,18 +14,18 @@ import {
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { Picker } from "@react-native-picker/picker";
 import * as ImagePicker from "expo-image-picker";
-import { db } from "../../utils/firebase";
 import { collection, addDoc, getDocs, Timestamp } from "firebase/firestore";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Video } from "expo-av";
 import { AuthContext } from "../../context/AuthContext";
 import PremiumMessage from "./../suscripcion/PremiumMessage";
-import { COLORS } from "../../utils/colors"; // Importa los colores centralizados
-import PropTypes from "prop-types"; // Asegúrate de importar PropTypes
+import { COLORS } from "../../utils/colors";
+import PropTypes from "prop-types";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { storage, db } from '../../utils/firebase';
 
 const ProgramarMensaje = ({ navigation }) => {
   const { user, isPremium, loading } = useContext(AuthContext);
-
   const [beneficiarios, setBeneficiarios] = useState([]);
   const [selectedBeneficiary, setSelectedBeneficiary] = useState("");
   const [date, setDate] = useState(new Date());
@@ -35,7 +33,6 @@ const ProgramarMensaje = ({ navigation }) => {
   const [media, setMedia] = useState(null);
   const [mediaType, setMediaType] = useState(null);
 
-  // Mostrar indicador de carga mientras se verifica el estado premium
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
@@ -44,29 +41,21 @@ const ProgramarMensaje = ({ navigation }) => {
     );
   }
 
-  // Verificar si el usuario está autenticado
   if (!user) {
     return (
       <View style={styles.centerContainer}>
-        <Text style={styles.messageText}>
-          Debes iniciar sesión para acceder a esta funcionalidad.
-        </Text>
-        <TouchableOpacity
-          onPress={() => navigation.navigate("Login")}
-          style={styles.button}
-        >
+        <Text style={styles.messageText}>Debes iniciar sesión para acceder a esta funcionalidad.</Text>
+        <TouchableOpacity onPress={() => navigation.navigate("Login")} style={styles.button}>
           <Text style={styles.buttonText}>Ir a Iniciar Sesión</Text>
         </TouchableOpacity>
       </View>
     );
   }
 
-  // Verificar si el usuario es premium
   if (!isPremium) {
     return <PremiumMessage navigation={navigation} />;
   }
 
-  // Continuar con la funcionalidad si es premium
   useEffect(() => {
     const fetchBeneficiarios = async () => {
       try {
@@ -85,9 +74,13 @@ const ProgramarMensaje = ({ navigation }) => {
     fetchBeneficiarios();
   }, []);
 
-  // Funciones para seleccionar video
   const seleccionarVideo = async () => {
     try {
+      if (!user) {
+        Alert.alert("Error", "Debes iniciar sesión para seleccionar un video.");
+        return;
+      }
+
       let result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Videos,
         quality: 1,
@@ -97,6 +90,9 @@ const ProgramarMensaje = ({ navigation }) => {
         const selectedAsset = result.assets[0];
         setMedia(selectedAsset.uri);
         setMediaType(selectedAsset.type); // 'video'
+        
+        // Subir el video a Firebase
+        await subirVideoAFirebase(selectedAsset.uri, user.email, new Date(), selectedAsset.type, user.uid);
       }
     } catch (error) {
       console.log("Error al seleccionar video:", error);
@@ -104,15 +100,16 @@ const ProgramarMensaje = ({ navigation }) => {
     }
   };
 
-  // Funciones para grabar video
   const grabarVideo = async () => {
     try {
+      if (!user) {
+        Alert.alert("Error", "Debes iniciar sesión para grabar un video.");
+        return;
+      }
+
       const { status } = await ImagePicker.requestCameraPermissionsAsync();
       if (status !== "granted") {
-        Alert.alert(
-          "Permiso necesario",
-          "Se necesitan permisos para grabar video."
-        );
+        Alert.alert("Permiso necesario", "Se necesitan permisos para grabar video.");
         return;
       }
 
@@ -125,6 +122,9 @@ const ProgramarMensaje = ({ navigation }) => {
         const recordedVideo = result.assets[0];
         setMedia(recordedVideo.uri);
         setMediaType(recordedVideo.type); // 'video'
+        
+        // Subir el video a Firebase
+        await subirVideoAFirebase(recordedVideo.uri, user.email, new Date(), recordedVideo.type, user.uid);
       }
     } catch (error) {
       console.log("Error al grabar video:", error);
@@ -137,6 +137,40 @@ const ProgramarMensaje = ({ navigation }) => {
     setMediaType(null);
   };
 
+  // Función para subir el video a Firebase Storage y luego guardar la URL en Firestore
+  const subirVideoAFirebase = async (uri, email, fechaEnvio, mediaType, userId) => {
+    try {
+      const response = await fetch(uri);
+      const blob = await response.blob();
+
+      // Crear una referencia para el archivo en Firebase Storage
+      const videoRef = ref(storage, `videos/${Date.now()}.mp4`);
+
+      // Subir el archivo
+      const uploadResult = await uploadBytes(videoRef, blob);
+      
+      // Obtener la URL de descarga
+      const videoURL = await getDownloadURL(uploadResult.ref);
+
+      // Ahora guardar el mensaje con la URL del video en Firestore
+      const mensajeRef = collection(db, "mensajesProgramados");
+      await addDoc(mensajeRef, {
+        email,
+        enviado: false,
+        fechaEnvio,
+        media: videoURL,
+        mediaType,
+        userId,
+        beneficiarioId: selectedBeneficiary,  // Este es el beneficiarioId
+      });
+
+      console.log("Video subido y mensaje guardado en Firestore");
+    } catch (error) {
+      console.error("Error al subir video y guardar mensaje:", error);
+      throw error;
+    }
+  };
+
   const handleSaveMessage = async () => {
     if (!selectedBeneficiary || !media) {
       Alert.alert("Error", "Por favor completa todos los campos.");
@@ -146,13 +180,16 @@ const ProgramarMensaje = ({ navigation }) => {
     const selectedBeneficiaryData = beneficiarios.find(
       (b) => b.id === selectedBeneficiary
     );
-    const email = selectedBeneficiaryData?.email;
+
+    if (!selectedBeneficiaryData) {
+      Alert.alert("Error", "No se ha encontrado un beneficiario con el ID seleccionado.");
+      return;
+    }
+
+    const email = selectedBeneficiaryData.email;
 
     if (!email) {
-      Alert.alert(
-        "Error",
-        "El beneficiario seleccionado no tiene un correo electrónico asociado."
-      );
+      Alert.alert("Error", "El beneficiario seleccionado no tiene un correo electrónico asociado.");
       return;
     }
 
@@ -163,7 +200,7 @@ const ProgramarMensaje = ({ navigation }) => {
         email: email,
         fechaEnvio: Timestamp.fromDate(date),
         media: media,
-        mediaType: mediaType, // 'video'
+        mediaType: mediaType,
         enviado: false,
       });
       Alert.alert("Éxito", "Mensaje programado correctamente.");
@@ -199,51 +236,30 @@ const ProgramarMensaje = ({ navigation }) => {
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.container}>
         <ImageBackground
-          source={require("../../assets/background/mensaje.webp")} // Asegúrate de tener esta imagen en tu carpeta assets
+          source={require("../../assets/background/mensaje.webp")}
           style={styles.backgroundImage}
           resizeMode="cover"
         >
-          {/* Superposición para mejorar la legibilidad */}
           <View style={styles.overlay} />
           <View style={styles.content}>
-            {/* Título */}
             <Text style={styles.title}>Programar Mensaje de Video</Text>
-
-            {/* Seleccionar Beneficiario */}
             <View style={styles.beneficiaryDateRow}>
-              {/* Seleccionar Beneficiario */}
               <View style={styles.pickerContainer}>
                 <Picker
                   selectedValue={selectedBeneficiary}
-                  onValueChange={(itemValue) =>
-                    setSelectedBeneficiary(itemValue)
-                  }
+                  onValueChange={(itemValue) => setSelectedBeneficiary(itemValue)}
                   style={styles.picker}
                   dropdownIconColor={COLORS.primary}
                 >
                   <Picker.Item label="Selecciona un beneficiario" value="" />
                   {beneficiarios.map((beneficiary) => (
-                    <Picker.Item
-                      key={beneficiary.id}
-                      label={beneficiary.name}
-                      value={beneficiary.id}
-                    />
+                    <Picker.Item key={beneficiary.id} label={beneficiary.name} value={beneficiary.id} />
                   ))}
                 </Picker>
               </View>
-
-              {/* Fecha y Hora de Envío */}
-              <TouchableOpacity
-                onPress={showDatePickerModal}
-                style={styles.dateIconContainer}
-              >
-                <MaterialIcons
-                  name="calendar-today"
-                  size={28}
-                  color={COLORS.primary}
-                />
+              <TouchableOpacity onPress={showDatePickerModal} style={styles.dateIconContainer}>
+                <MaterialIcons name="calendar-today" size={28} color={COLORS.primary} />
               </TouchableOpacity>
-
               <DateTimePickerModal
                 isVisible={isDatePickerVisible}
                 mode="datetime"
@@ -254,35 +270,18 @@ const ProgramarMensaje = ({ navigation }) => {
                 minimumDate={new Date()}
               />
             </View>
-
-            {/* Seleccionar o Grabar Video */}
             <Text style={styles.label}>Selecciona o graba un video:</Text>
             <View style={styles.videoButtonsContainer}>
-              <TouchableOpacity
-                style={styles.videoButton}
-                onPress={seleccionarVideo}
-              >
-                <MaterialIcons
-                  name="video-library"
-                  size={30}
-                  color={COLORS.surface}
-                />
+              <TouchableOpacity style={styles.videoButton} onPress={seleccionarVideo}>
+                <MaterialIcons name="video-library" size={30} color={COLORS.surface} />
                 <Text style={styles.videoButtonText}>Subir Video</Text>
               </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.videoButton}
-                onPress={grabarVideo}
-              >
-                <MaterialIcons
-                  name="videocam"
-                  size={30}
-                  color={COLORS.surface}
-                />
+              <TouchableOpacity style={styles.videoButton} onPress={grabarVideo}>
+                <MaterialIcons name="videocam" size={30} color={COLORS.surface} />
                 <Text style={styles.videoButtonText}>Grabar Video</Text>
               </TouchableOpacity>
             </View>
 
-            {/* Vista Previa de Video */}
             {media && mediaType === "video" && (
               <View style={styles.mediaContainer}>
                 <Video
@@ -296,31 +295,17 @@ const ProgramarMensaje = ({ navigation }) => {
                   style={styles.mediaPreview}
                   useNativeControls
                 />
-                <TouchableOpacity
-                  style={styles.deleteButton}
-                  onPress={eliminarMedia}
-                >
-                  <MaterialIcons
-                    name="delete"
-                    size={24}
-                    color={COLORS.delete}
-                  />
+                <TouchableOpacity style={styles.deleteButton} onPress={eliminarMedia}>
+                  <MaterialIcons name="delete" size={24} color={COLORS.delete} />
                 </TouchableOpacity>
               </View>
             )}
 
-            {/* Botones de Guardar y Cancelar */}
             <View style={styles.buttonContainer}>
-              <TouchableOpacity
-                style={styles.saveButton}
-                onPress={handleSaveMessage}
-              >
-                <Text style={styles.buttonText}>Guardar</Text>
+              <TouchableOpacity style={styles.saveButton} onPress={handleSaveMessage}>
+                <Text style={styles.buttonText}>Enviar</Text>
               </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.cancelButton}
-                onPress={() => navigation.goBack()}
-              >
+              <TouchableOpacity style={styles.cancelButton} onPress={() => navigation.goBack()}>
                 <Text style={styles.buttonText}>Cancelar</Text>
               </TouchableOpacity>
             </View>

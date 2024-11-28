@@ -1,4 +1,5 @@
 // src/App.js
+
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/NavBar/navBar';
@@ -11,6 +12,7 @@ import RegisterPage from './page/auth/register';
 import ProtectedRoute from './components/protectedRoute';
 import { AuthProvider } from './page/auth/authContext'; // Importa el AuthProvider
 import LineaDeTiempo from './page/history/LineaDeTiempo'; // Importa LineaDeTiempo
+import Mensajes from './components/Mensajes/Mensajes';
 import "./App.css";
 
 const ProtectedLayout = ({ children }) => (
@@ -78,11 +80,21 @@ function App() {
               </ProtectedRoute>
             }
           />
+          {/* Ruta protegida para Mensajes */}
+          <Route
+            path="/mensajes"
+            element={
+              <ProtectedRoute>
+                <ProtectedLayout>
+                  <Mensajes />
+                </ProtectedLayout>
+              </ProtectedRoute>
+            }
+          />
         </Routes>
       </Router>
     </AuthProvider>
   );
 }
-
 
 export default App;

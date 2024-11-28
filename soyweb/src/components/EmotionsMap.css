@@ -1,0 +1,61 @@
+/* src/components/EmotionsMap.css */
+
+/* ============================ */
+/* EMOCIONES MAP */
+.emociones-section {
+    margin-top: 10px;
+  }
+  
+  .emociones-grid {
+    display: grid;
+    /* Definimos una cuadrícula con columnas de tamaño fijo para que cada bloque ocupe 2 columnas de ancho y 1 de alto */
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); /* 2 bloques de 120px cada uno */
+    gap: 15px;
+  }
+  
+  .emocion-box {
+    /* Definimos una altura fija y permitimos que el ancho se ajuste según la cuadrícula */
+    height: 100px; /* Altura fija */
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    cursor: default;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    position: relative; /* Para posicionar el nombre de la emoción */
+  }
+  
+  .emocion-box:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+  }
+  
+  /* Si deseas mostrar el nombre de la emoción dentro del bloque */
+  .emocion-box .emotion-name {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #fff;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.6);
+    font-size: 14px;
+  }
+  
+  /* Ajustes Responsivos */
+  @media (min-width: 480px) {
+    .emociones-grid {
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); /* 2 bloques de 150px cada uno */
+    }
+  }
+  
+  @media (min-width: 768px) {
+    .emociones-grid {
+      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); /* 2 bloques de 180px cada uno */
+    }
+  }
+  
+  @media (min-width: 1024px) {
+    .emociones-grid {
+      grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); /* 2 bloques de 200px cada uno */
+    }
+  }
+  
