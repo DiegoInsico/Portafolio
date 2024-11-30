@@ -15,22 +15,16 @@ import PropTypes from "prop-types";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../utils/firebase";
 import { getAuth } from "firebase/auth"; // Importar getAuth
+import { useNavigation } from "@react-navigation/native"; // Importar useNavigation
 
 const SideBarMenu = ({
   isVisible,
   toggleMenu,
-  navigateToHome,
-  navigateToEntries,
-  navigateToProfile,
-  navigateToSettings,
-  navigateToTestigos,
-  navigateToBeneficiarios,
-  navigateToProgramarMensaje,
-  navigateToSoporte,
   handleSignOut,
 }) => {
   const slideAnim = new Animated.Value(-300); // Posición inicial fuera de la pantalla
   const [userData, setUserData] = useState(null);
+  const navigation = useNavigation(); // Usar el hook useNavigation
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -61,6 +55,12 @@ const SideBarMenu = ({
 
   if (!isVisible) return null; // No renderizar si no es visible
 
+  // Función para manejar la navegación y cerrar la sidebar
+  const handleNavigation = (screenName) => {
+    toggleMenu();
+    navigation.navigate(screenName);
+  };
+
   return (
     <View style={styles.overlayContainer}>
       {/* Overlay oscuro para el fondo */}
@@ -90,27 +90,45 @@ const SideBarMenu = ({
 
         {/* Opciones del menú */}
         <View style={styles.menuContent}>
-          <TouchableOpacity style={styles.menuItem} onPress={navigateToHome}>
+          <TouchableOpacity
+            style={styles.menuItem}
+            onPress={() => handleNavigation("MainTabs")}
+          >
             <FontAwesome name="home" size={24} color="#000" />
             <Text style={styles.menuText}>Inicio</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.menuItem} onPress={navigateToEntries}>
+          <TouchableOpacity
+            style={styles.menuItem}
+            onPress={() => handleNavigation("ListEntry")}
+          >
             <FontAwesome name="tasks" size={24} color="#000" />
             <Text style={styles.menuText}>Entradas</Text>
+          </TouchableOpacity>
+
+          {/* Nueva opción de "Mi Despedida" */}
+          <TouchableOpacity
+            style={styles.menuItem}
+            onPress={() => handleNavigation("MiDespedida")}
+          >
+            <FontAwesome name="video-camera" size={24} color="#000" />
+            <Text style={styles.menuText}>Mi Despedida</Text>
           </TouchableOpacity>
 
           {/* Línea divisoria */}
           <View style={styles.divider} />
 
-          <TouchableOpacity style={styles.menuItem} onPress={navigateToProfile}>
+          <TouchableOpacity
+            style={styles.menuItem}
+            onPress={() => handleNavigation("UserProfile")}
+          >
             <FontAwesome name="user" size={24} color="#000" />
             <Text style={styles.menuText}>Perfil</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={styles.menuItem}
-            onPress={navigateToTestigos}
+            onPress={() => handleNavigation("Testigos")}
           >
             <FontAwesome name="users" size={24} color="#000" />
             <Text style={styles.menuText}>Testigos</Text>
@@ -118,7 +136,7 @@ const SideBarMenu = ({
 
           <TouchableOpacity
             style={styles.menuItem}
-            onPress={navigateToBeneficiarios}
+            onPress={() => handleNavigation("Beneficiarios")}
           >
             <FontAwesome name="heart" size={24} color="#000" />
             <Text style={styles.menuText}>Beneficiarios</Text>
@@ -126,7 +144,7 @@ const SideBarMenu = ({
 
           <TouchableOpacity
             style={styles.menuItem}
-            onPress={navigateToProgramarMensaje}
+            onPress={() => handleNavigation("ProgramarMensaje")}
           >
             <FontAwesome name="clock-o" size={24} color="#000" />
             <Text style={styles.menuText}>Programar Mensaje</Text>
@@ -137,18 +155,27 @@ const SideBarMenu = ({
 
           <TouchableOpacity
             style={styles.menuItem}
-            onPress={navigateToSettings}
+            onPress={() => handleNavigation("Settings")}
           >
             <FontAwesome name="cog" size={24} color="#000" />
             <Text style={styles.menuText}>Configuración</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.menuItem} onPress={navigateToSoporte}>
+          <TouchableOpacity
+            style={styles.menuItem}
+            onPress={() => handleNavigation("Soporte")}
+          >
             <FontAwesome name="ticket" size={24} color="#000" />
             <Text style={styles.menuText}>Soporte</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.menuItem} onPress={handleSignOut}>
+          <TouchableOpacity
+            style={styles.menuItem}
+            onPress={() => {
+              toggleMenu();
+              handleSignOut();
+            }}
+          >
             <FontAwesome name="sign-out" size={24} color="#000" />
             <Text style={styles.menuText}>Cerrar Sesión</Text>
           </TouchableOpacity>
@@ -161,14 +188,6 @@ const SideBarMenu = ({
 SideBarMenu.propTypes = {
   isVisible: PropTypes.bool.isRequired,
   toggleMenu: PropTypes.func.isRequired,
-  navigateToHome: PropTypes.func.isRequired,
-  navigateToEntries: PropTypes.func.isRequired,
-  navigateToProfile: PropTypes.func.isRequired,
-  navigateToSettings: PropTypes.func.isRequired,
-  navigateToTestigos: PropTypes.func.isRequired,
-  navigateToBeneficiarios: PropTypes.func.isRequired,
-  navigateToProgramarMensaje: PropTypes.func.isRequired,
-  navigateToSoporte: PropTypes.func.isRequired,
   handleSignOut: PropTypes.func.isRequired,
 };
 

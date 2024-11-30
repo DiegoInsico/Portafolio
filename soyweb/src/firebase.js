@@ -571,5 +571,158 @@ export const addReflexion = async (userId, entradaId, texto) => {
   }
 };
 
+export const getDespedidasForUser = async (userId) => {
+  try {
+    const despedidasCollection = collection(db, "despedidas");
+    const q = query(despedidasCollection, where("userId", "==", userId));
+    const snapshot = await getDocs(q);
+    const despedidas = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+    return despedidas;
+  } catch (error) {
+    console.error("Error al obtener despedidas propias:", error);
+    throw error;
+  }
+};
+
+/**
+ * Obtener despedidas asignadas al usuario a través de beneficiarios
+ * @param {string} email - Email del usuario
+ * @returns {Array} - Lista de despedidas asignadas
+ */
+export const getDespedidasAssignedToUser = async (email) => {
+  try {
+    const despedidasRef = collection(db, "despedidas");
+    const q = query(despedidasRef, where("beneficiarioEmails", "array-contains", email));
+    const querySnapshot = await getDocs(q);
+    const despedidas = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    return despedidas;
+  } catch (error) {
+    console.error("Error al obtener despedidas asignadas:", error);
+    throw error;
+  }
+};
+/**
+ * Obtener beneficiarios de un usuario
+ * @param {string} userId - UID del usuario
+ * @returns {Array} - Lista de beneficiarios (emails)
+ */
+export const getBeneficiariosForUser = async (userId) => {
+  try {
+    const beneficiariosCollection = collection(db, "beneficiarios");
+    const q = query(beneficiariosCollection, where("userId", "==", userId));
+    const snapshot = await getDocs(q);
+    const beneficiarios = snapshot.docs.map((doc) => doc.data().email);
+    return beneficiarios;
+  } catch (error) {
+    console.error("Error al obtener beneficiarios:", error);
+    throw error;
+  }
+};
+
+/**
+ * Obtener un usuario por su email
+ * @param {string} email - Email del usuario
+ * @returns {Array|null} - Lista de usuarios o null si no existe
+ */
+export const getUserByEmail = async (email) => {
+  try {
+    const usersCollection = collection(db, "users");
+    const q = query(usersCollection, where("email", "==", email));
+    const snapshot = await getDocs(q);
+    if (snapshot.empty) {
+      console.log("No se encontró ningún usuario con el email proporcionado.");
+      return null;
+    }
+    const userData = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+    return userData;
+  } catch (error) {
+    console.error("Error al obtener usuario por email:", error);
+    throw error;
+  }
+};
+
+/**
+ * Obtener un usuario por su userId
+ * @param {string} userId - UID del usuario
+ * @returns {Object|null} - Datos del usuario o null si no existe
+ */
+export const getUserByIdFromFirestore = async (userId) => {
+  try {
+    const usersCollection = collection(db, "users");
+    const q = query(usersCollection, where("__name__", "==", userId));
+    const snapshot = await getDocs(q);
+    if (snapshot.empty) {
+      console.log("No se encontró ningún usuario con el userId proporcionado.");
+      return null;
+    }
+    const userData = snapshot.docs[0].data();
+    return userData;
+  } catch (error) {
+    console.error("Error al obtener usuario por userId:", error);
+    throw error;
+  }
+};
+
+// firebase.js
+
+/**
+ * Obtener usuarios por una lista de UIDs
+ * @param {Array} userIds - Array de UIDs de usuarios
+ * @returns {Array} - Lista de usuarios con sus datos
+ */
+export const getUsersByIds = async (userIds) => {
+  try {
+    // Dividir el array de userIds en lotes de 10 (limitación de Firestore)
+    const batches = [];
+    while (userIds.length) {
+      const batch = userIds.splice(0, 10);
+      batches.push(batch);
+    }
+
+    const users = [];
+    for (const batch of batches) {
+      const usersCollection = collection(db, "users");
+      const q = query(usersCollection, where("__name__", "in", batch));
+      const snapshot = await getDocs(q);
+      snapshot.forEach((doc) => {
+        users.push({ id: doc.id, ...doc.data() });
+      });
+    }
+    return users;
+  } catch (error) {
+    console.error("Error al obtener usuarios por IDs:", error);
+    throw error;
+  }
+};
+
+export const getReflexionesForUser = async (userId, entradaId) => {
+  try {
+    const reflexionesCollection = collection(db, "entradas", entradaId, "reflexiones");
+    const snapshot = await getDocs(reflexionesCollection);
+    const reflexiones = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+
+    // Asegurar que los campos necesarios existen y convertir Timestamp a Date
+    const reflexionesFormateadas = reflexiones.map((reflexion) => ({
+      texto: reflexion.texto || "",
+      categoria: reflexion.categoria || "Reflexion", // Por defecto
+      fecha: reflexion.fecha ? reflexion.fecha.toDate() : new Date(), // Convertir a Date
+      userId: reflexion.userId || "",
+    }));
+
+    return reflexionesFormateadas;
+  } catch (error) {
+    console.error("Error al obtener reflexiones:", error);
+    throw error;
+  }
+};
+
+
+
 // Exportar auth, db y storage para su uso en otros componentes
 export { auth, db, storage };

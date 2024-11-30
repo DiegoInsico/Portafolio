@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Navbar from './components/NavBar/navBar';
+
 import Home from './page/home/home';
 import Prueba from './page/prueba';
 import AlbumPage from './page/album/pageAlbum';
@@ -10,9 +10,12 @@ import DocumentManager from './page/organizes/pageOrganize';
 import LoginPage from './page/auth/login';
 import RegisterPage from './page/auth/register';
 import ProtectedRoute from './components/protectedRoute';
-import { AuthProvider } from './page/auth/authContext'; // Importa el AuthProvider
-import LineaDeTiempo from './page/history/LineaDeTiempo'; // Importa LineaDeTiempo
+import LineaDeTiempo from './page/history/LineaDeTiempo';
 import Mensajes from './components/Mensajes/Mensajes';
+import HastaPronto from './components/HastaPronto/HastaPronto'; // Importar el componente HastaPronto
+import LibroDeReflexion from './components/LibroDeReflexion/LibroDeReflexion'; // Importar el nuevo componente
+import { AuthProvider } from './page/auth/authContext';
+import Navbar from './components/NavBar/navBar';
 import "./App.css";
 
 const ProtectedLayout = ({ children }) => (
@@ -87,6 +90,38 @@ function App() {
               <ProtectedRoute>
                 <ProtectedLayout>
                   <Mensajes />
+                </ProtectedLayout>
+              </ProtectedRoute>
+            }
+          />
+          {/* Rutas para Hasta Pronto */}
+          <Route
+            path="/hasta-pronto/mis-despedidas"
+            element={
+              <ProtectedRoute>
+                <ProtectedLayout>
+                  <HastaPronto tipo="mis-despedidas" />
+                </ProtectedLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/hasta-pronto/despedidas-asignadas"
+            element={
+              <ProtectedRoute>
+                <ProtectedLayout>
+                  <HastaPronto tipo="despedidas-asignadas" />
+                </ProtectedLayout>
+              </ProtectedRoute>
+            }
+          />
+          {/* Ruta para Libro de Reflexión */}
+          <Route
+            path="/libro-de-reflexion"
+            element={
+              <ProtectedRoute>
+                <ProtectedLayout>
+                  <LibroDeReflexion tipo="libro-de-reflexion" />
                 </ProtectedLayout>
               </ProtectedRoute>
             }

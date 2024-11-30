@@ -1,6 +1,6 @@
 // src/components/LineaDeTiempo.js
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useAuth } from "../auth/authContext";
 import "./LineaDeTiempo.css";
 import { ClipLoader } from "react-spinners";
@@ -44,28 +44,43 @@ const LineaDeTiempo = () => {
   });
   const [showPasswordOverlay, setShowPasswordOverlay] = useState(false);
   const [levelToUnlock, setLevelToUnlock] = useState(null);
+  const swiper = useRef(null); // Crea la referencia a Swiper
 
   const [entries, setEntries] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Configuración de Swiper
-  const swiperParams = {
-    modules: [Navigation, Pagination, Autoplay, A11y],
-    spaceBetween: 50, // Aumenta el espacio entre slides
-    slidesPerView: 3,
-    navigation: true,
-    pagination: { clickable: true },
-    autoplay: { delay: 3000, disableOnInteraction: false },
-    loop: true,
-    breakpoints: {
-      320: { slidesPerView: 1 },
-      480: { slidesPerView: 1 },
-      640: { slidesPerView: 1 },
-      768: { slidesPerView: 2 },
-      1024: { slidesPerView: 3 },
-      1440: { slidesPerView: 3 },
+// Configuración de Swiper
+const swiperParams = {
+  modules: [Navigation, Pagination, Autoplay, A11y],
+  spaceBetween: 50, // Aumenta el espacio entre slides
+  slidesPerView: 3,
+  navigation: true,
+  pagination: { clickable: true },
+  autoplay: { delay: 3000, disableOnInteraction: false },
+  loop: true,
+  breakpoints: {
+    320: { slidesPerView: 1 },
+    480: { slidesPerView: 1 },
+    640: { slidesPerView: 1 },
+    768: { slidesPerView: 2 },
+    1024: { slidesPerView: 3 },
+    1440: { slidesPerView: 3 },
+  },
+  on: {
+    slideChange: () => {
+      // Seleccionamos todos los slides
+      const slides = document.querySelectorAll('.timeline-item');
+      slides.forEach((slide, index) => {
+        // Eliminamos la clase "active" de todos los slides
+        slide.classList.remove('active');
+      });
+      // Agregamos la clase "active" al slide central
+      const activeSlide = swiper.current.swiper.slides[swiper.current.swiper.activeIndex]; // Corregir esta línea
+      activeSlide.classList.add('active');
     },
-  };
+  },
+};
+
 
   const [userPasswords, setUserPasswords] = useState({
     level2Password: "",

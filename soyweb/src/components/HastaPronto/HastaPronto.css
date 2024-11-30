@@ -1,0 +1,335 @@
+/* src/components/HastaPronto/HastaPronto.css */
+
+/* Contenedor con scroll */
+.hp-scroll-container {
+    scroll-snap-type: y mandatory;
+    overflow-y: scroll;
+    height: 100vh;
+    scroll-behavior: smooth; /* Desplazamiento suave */
+    background-color: #f0f4f8; /* Fondo suave y elegante */
+    font-family: 'Georgia', serif;
+  }
+  
+  /* Secciones generales */
+  .hp-section {
+    scroll-snap-align: start;
+    min-height: 100vh; /* Cada sección ocupa al menos la altura del viewport */
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Centra verticalmente */
+    align-items: center;     /* Centra horizontalmente */
+    position: relative;
+    padding: 20px;
+    box-sizing: border-box;
+    color: #2C3E50; /* Azul oscuro para mejor legibilidad */
+  }
+  
+  /* Hero Section */
+  .hp-hero-section {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-end;
+    background-image: url('../../assets/images/mensaje.webp'); /* Ajusta la ruta si es necesario */
+    background-size: cover;
+    background-position: center;
+    min-height: 80vh;
+    margin-left: 15%;
+    margin-right: 15%;
+    border-radius: 90px;
+    padding: 0 5%;
+    width: 60%;
+    position: relative;
+    margin-top: 10vh;
+    margin-bottom: 10vh;
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    transition: transform 0.5s ease;
+  }
+  
+  .hp-hero-section:hover {
+    transform: scale(1.02);
+  }
+  
+  /* Capa de opacidad */
+  .hp-hero-section::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(44, 62, 80, 0.5); /* Azul oscuro con opacidad */
+    z-index: 1;
+  }
+  
+  /* Contenido Hero */
+  .hp-hero-section-left {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    z-index: 2;
+    position: relative;
+    margin-bottom: 150px;
+  }
+  
+  .hp-hero-section-left h1 {
+    font-size: 5rem;
+    color: #ECF0F1; /* Blanco suave */
+    font-weight: bold;
+    margin: 20px 0;
+    font-family: 'Georgia', serif;
+  }
+  
+  .hp-hero-section-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    max-width: 40%;
+    z-index: 2;
+    position: relative;
+    color: #ECF0F1; /* Blanco suave */
+    margin-bottom: 160px;
+  }
+  
+  .hp-hero-section-right p {
+    font-size: 1.8rem;
+    line-height: 1.6;
+    text-align: right;
+    margin: 20px 0;
+    font-family: 'Georgia', serif;
+  }
+  
+  /* Sección de Remitentes */
+  .hp-sender-list-section {
+    background-color: #ffffff;
+    width: 100%;
+    padding: 40px 20px;
+  }
+  
+  .hp-sender-list-container {
+    max-width: 800px;
+    text-align: center;
+  }
+  
+  .hp-sender-list {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 20px;
+  }
+  
+  .hp-sender-item-button {
+    background-color: #f0f0f0;
+    padding: 10px 20px;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    font-size: 1.2rem;
+    color: #2C3E50;
+  }
+  
+  .hp-sender-item-button:hover {
+    background-color: #34495E; /* Azul oscuro elegante */
+    color: #ffffff;
+  }
+  
+  .hp-sender-item-button.selected {
+    background-color: #2980B9; /* Azul brillante */
+    color: #ffffff;
+  }
+  
+  /* Sección "Mis Despedidas" */
+  .hp-mis-despedidas-section {
+    background-color: #ffffff;
+    width: 100%;
+    padding: 40px 20px;
+  }
+  
+  .hp-section-title {
+    text-align: center;
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+    color: #34495E; /* Azul oscuro elegante para énfasis */
+    font-family: 'Georgia', serif;
+  }
+  
+  /* Contenedor de la despedida en "Mis Despedidas" */
+  .hp-despedida-contenido {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    width: 100%;
+    max-width: 1200px;
+    align-items: stretch; /* Cambiado a 'stretch' para igualar alturas */
+    justify-content: center;
+    margin: 0 auto;
+    padding: 20px;
+    box-sizing: border-box;
+  }
+  
+  /* Estilos para el video */
+  .hp-video-container-mis {
+    flex: 1;
+    max-width: 30%;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Estilos para el mensaje */
+  .hp-mensaje-container-mis {
+    flex: 1;
+    max-width: 50%;
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    overflow-y: auto; /* Permite el scroll vertical */
+  }
+  
+  /* Opcional: Limita la altura máxima del mensaje al contenedor del video */
+  .hp-mensaje-container-mis p {
+    margin: 0;
+  }
+  
+  /* Estilos del texto del mensaje */
+  .hp-mensaje-texto-mis {
+    font-size: 1.4rem;
+    color: #34495E;
+    font-style: italic;
+    font-family: 'Georgia', serif;
+    line-height: 1.6;
+  }
+  
+  /* Sección de Información del Usuario */
+/* Sección de Información del Usuario */
+.hp-info-section {
+    background-color: #FFFFFF; /* Fondo blanco para contraste */
+    color: #2C3E50;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 60px 40px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    border-radius: 15px;
+    margin: 20px auto;
+    width: 80%;
+    max-width: 1200px;
+    height: 80%;
+    max-height: 500px;
+    position: relative; /* Para posicionamiento absoluto de título */
+  }
+
+  .hp-info-content {
+    width: 82%;
+  }
+  
+.hp-mensaje-titulo {
+  position: absolute;
+  top: 40px;
+  left: 20px;
+  font-size: 1.6rem;
+  color: #555555; /* Gris elegante */
+  font-family: 'Georgia', serif;
+}
+
+  /* Contenedor de Video y Mensaje en Dos Columnas */
+  .hp-contenido-dos-columnas {
+    display: flex;
+    flex-direction: row; /* Asegura que los hijos se dispongan en fila */
+    justify-content: space-between; /* Espacio entre columnas */
+    align-items: stretch; /* Igualar alturas */
+    gap: 40px;
+    margin-top: 60px;
+    width: 100%;
+  }
+  
+  /* Video Container */
+  .hp-video-container {
+    flex: 1;
+    max-width: 50%;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Mensaje Container */
+  .hp-mensaje-container {
+    flex: 1;
+    max-width: 50%;
+    overflow-y: auto; /* Permite el scroll vertical */
+  }
+  
+  .hp-mensaje-texto {
+    font-size: 1.4rem;
+    color: #34495E; /* Azul oscuro elegante para el texto del mensaje */
+    margin-top: 10px;
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    font-style: italic;
+    font-family: 'Georgia', serif;
+  }
+  /* Responsividad */
+  @media (max-width: 1200px) {
+    .hp-despedidas-list {
+      flex-direction: column;
+      align-items: center;
+    }
+  }
+  
+  @media (max-width: 992px) {
+    .hp-despedida-contenido {
+      flex-direction: column;
+      align-items: center;
+    }
+  
+    .hp-video-container-mis,
+    .hp-mensaje-container-mis {
+      max-width: 100%;
+    }
+  
+    .hp-contenido-dos-columnas {
+      flex-direction: column;
+      gap: 20px;
+    }
+  
+    .hp-video-container,
+    .hp-mensaje-container {
+      max-width: 100%;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .hp-contenido-dos-columnas {
+      margin-top: 30px;
+    }
+  
+    .hp-mensaje-texto,
+    .hp-mensaje-texto-mis {
+      font-size: 1.2rem;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .hp-mensaje-titulo {
+      font-size: 1.4rem;
+      left: 10px;
+      top: 10px;
+    }
+  
+    .hp-contenido-dos-columnas {
+      margin-top: 20px;
+    }
+  
+    .hp-mensaje-texto,
+    .hp-mensaje-texto-mis {
+      font-size: 1rem;
+    }
+  }
+  

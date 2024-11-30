@@ -79,6 +79,11 @@ function AppNavigator({ navigation, user }) {
           handleToggleSidebar();
           navigation.navigate("Detalle");
         }}
+        navigateToMiDespedida={() => {
+          handleToggleSidebar();
+          navigation.navigate("MiDespedida");
+        }}
+        
         handleSignOut={handleSignOutAndToggle} // Pasar la función correcta
         user={user}
       />

@@ -9,6 +9,7 @@ import {
   ScrollView,
   Image,
   Dimensions,
+  TouchableOpacity,
 } from "react-native";
 import {
   Button,
@@ -17,13 +18,28 @@ import {
   Portal,
   TextInput,
   ActivityIndicator,
+  Menu,
+  List,
 } from "react-native-paper";
-import { Picker } from "@react-native-picker/picker";
 import { useRoute, useNavigation } from "@react-navigation/native";
+import { Picker } from "@react-native-picker/picker";
 import { updateDoc, doc, getDoc, collection, addDoc } from "firebase/firestore";
 import { db } from "../../utils/firebase"; // Asegúrate de que la ruta es correcta
 import { Video } from "expo-av"; // Importa Video desde expo-av
 import AudioPlayer from "../../components/audioPlayer"; // Importación corregida
+
+// Definir las categorías disponibles con sus iconos
+const categorias = [
+  { label: "Idea", value: "idea", icon: "lightbulb" },
+  { label: "Consejo", value: "consejo", icon: "handshake" },
+  {
+    label: "Aprendizaje",
+    value: "aprendizaje",
+    icon: "book-open-page-variant",
+  },
+  { label: "Reflexión", value: "reflexion", icon: "thought-bubble" }, // Nueva categoría
+  { label: "Otro", value: "otro", icon: "dots-horizontal" },
+];
 
 // Función para determinar el color del texto basado en el color de fondo
 const getContrastingTextColor = (bgColor) => {
@@ -66,6 +82,17 @@ const EntryDetailScreen = () => {
   const [isAddReflexionModalVisible, setIsAddReflexionModalVisible] =
     useState(false);
   const [nuevaReflexion, setNuevaReflexion] = useState("");
+  const [selectedCategoria, setSelectedCategoria] = useState(""); // Nuevo estado para la categoría
+  const [categoriaError, setCategoriaError] = useState(""); // Estado para manejar errores de categoría
+
+  // Estados para el menú de categorías
+  const [menuVisible, setMenuVisible] = useState(false);
+
+  // Función para abrir el menú
+  const openMenu = () => setMenuVisible(true);
+
+  // Función para cerrar el menú
+  const closeMenu = () => setMenuVisible(false);
 
   // Obtener dimensiones de la pantalla para la imagen
   const { width } = Dimensions.get("window");
@@ -103,6 +130,10 @@ const EntryDetailScreen = () => {
   // Obtener color de la categoría desde la base de datos
   const categoryColor = item.color || "#1E90FF"; // Color por defecto si no está definido
   const textColor = getContrastingTextColor(categoryColor); // Para textos sobre fondo oscuro
+
+  // Obtener el icono de la categoría seleccionada
+  const selectedCategoriaIcon =
+    categorias.find((cat) => cat.value === selectedCategoria)?.icon || "folder";
 
   // Efecto para obtener beneficiario asignado
   useEffect(() => {
@@ -200,6 +231,13 @@ const EntryDetailScreen = () => {
 
   // Agregar reflexión
   const handleAgregarReflexion = async () => {
+    // Validar que la categoría esté seleccionada
+    if (!selectedCategoria) {
+      setCategoriaError("Por favor, selecciona una categoría.");
+      return;
+    }
+
+    // Validar que la reflexión no esté vacía
     if (!nuevaReflexion.trim()) {
       Alert.alert("Error", "La reflexión no puede estar vacía.");
       return;
@@ -209,10 +247,12 @@ const EntryDetailScreen = () => {
       const reflexionesRef = collection(db, "entradas", item.id, "reflexiones");
       await addDoc(reflexionesRef, {
         texto: nuevaReflexion.trim(),
+        categoria: selectedCategoria, // Agregar la categoría
         fecha: new Date(),
       });
       Alert.alert("Éxito", "Reflexión agregada correctamente.");
       setNuevaReflexion("");
+      setSelectedCategoria(""); // Resetear la categoría seleccionada
       setIsAddReflexionModalVisible(false);
     } catch (error) {
       console.error("Error al agregar reflexión:", error);
@@ -432,11 +472,51 @@ const EntryDetailScreen = () => {
       <Portal>
         <Dialog
           visible={isAddReflexionModalVisible}
-          onDismiss={() => setIsAddReflexionModalVisible(false)}
+          onDismiss={() => {
+            setIsAddReflexionModalVisible(false);
+            setCategoriaError(""); // Limpiar errores al cerrar el modal
+          }}
           style={styles.dialogContainer}
         >
           <Dialog.Title>Agregar Reflexión</Dialog.Title>
           <Dialog.Content>
+            {/* Selector de Categoría Personalizado */}
+            <Text style={styles.inputLabel}>Categoría:</Text>
+            <Menu
+              visible={menuVisible}
+              onDismiss={closeMenu}
+              anchor={
+                <TouchableOpacity onPress={openMenu} style={styles.menuAnchor}>
+                  <List.Icon icon={selectedCategoriaIcon} />
+                  <Text style={styles.selectedCategoriaText}>
+                    {selectedCategoria
+                      ? categorias.find(
+                          (cat) => cat.value === selectedCategoria
+                        )?.label
+                      : "-- Selecciona una categoría --"}
+                  </Text>
+                  <List.Icon icon="chevron-down" />
+                </TouchableOpacity>
+              }
+            >
+              {categorias.map((categoria) => (
+                <Menu.Item
+                  key={categoria.value}
+                  leadingIcon={categoria.icon}
+                  title={categoria.label}
+                  onPress={() => {
+                    setSelectedCategoria(categoria.value);
+                    setCategoriaError("");
+                    closeMenu();
+                  }}
+                />
+              ))}
+            </Menu>
+            {categoriaError ? (
+              <Text style={styles.errorText}>{categoriaError}</Text>
+            ) : null}
+
+            {/* Campo de Texto para la Reflexión */}
             <TextInput
               label="Escribe tu reflexión aquí"
               value={nuevaReflexion}
@@ -450,7 +530,12 @@ const EntryDetailScreen = () => {
             />
           </Dialog.Content>
           <Dialog.Actions>
-            <Button onPress={() => setIsAddReflexionModalVisible(false)}>
+            <Button
+              onPress={() => {
+                setIsAddReflexionModalVisible(false);
+                setCategoriaError("");
+              }}
+            >
               Cancelar
             </Button>
             <Button onPress={handleAgregarReflexion}>Guardar</Button>
@@ -602,6 +687,32 @@ const styles = StyleSheet.create({
     width: "100%",
     color: "#000000",
   },
+  menuAnchor: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 10,
+    paddingHorizontal: 5,
+    borderWidth: 1,
+    borderColor: "#CCCCCC",
+    borderRadius: 5,
+    marginBottom: 10,
+  },
+  selectedCategoriaText: {
+    flex: 1,
+    fontSize: 16,
+    marginLeft: 10,
+    color: "#000000",
+  },
+  inputLabel: {
+    fontSize: 16,
+    marginBottom: 5,
+    color: "#000000",
+  },
+  errorText: {
+    color: "red",
+    fontSize: 14,
+    marginBottom: 10,
+  },
   spotifyContainer: {
     width: "100%",
     height: 300,
@@ -642,6 +753,22 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#FFFFFF",
     marginTop: 2,
+  },
+  loadingIndicator: {
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    marginLeft: -25, // Para centrar el ActivityIndicator
+    marginTop: -25,
+  },
+  fullWidthTextInput: {
+    width: "100%",
+    marginTop: 10,
+  },
+  centeredContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
 

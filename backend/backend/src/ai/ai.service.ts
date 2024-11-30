@@ -55,6 +55,9 @@ Ejemplos de Preguntas:
 ¿Qué secreto te gustaría que alguien importante en tu vida conociera?
 ¿Qué sentimiento deseas transmitirle a alguien especial en un futuro importante para esa persona?
 ¿Qué reflexión sobre tu propósito de vida te gustaría dejar como parte de tu legado?
+¿Qué frase de un libro o película describe un momento importante en tu vida y cómo quisieras transmitir esa experiencia?
+¿Cómo una cita literaria o cinematográfica podría representar los valores que deseas compartir con quienes amas?
+¿Qué palabras de una historia que te marcó reflejan un mensaje que quisieras dejar como legado?
 `;
 
       const response = await this.openai.chat.completions.create({

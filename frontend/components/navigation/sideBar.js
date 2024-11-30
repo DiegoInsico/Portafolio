@@ -28,6 +28,7 @@ export default function SideBar({
   navigateToBeneficiarios,
   navigateToProgramarMensaje,
   navigateToSoporte, // Nueva función de navegación para Soporte
+  navigateToMiDespedida,
   handleSignOut
 }) {
   const { user, userData, loading } = useContext(AuthContext);
@@ -276,13 +277,13 @@ export default function SideBar({
               <FontAwesome
                 name="sign-out"
                 size={20}
-                color={selected === "Cerrar Sesión" ? "#FFD700" : "#fff"}
+                color={selected === "Cerrar Sesi" ? "#FFD700" : "#fff"}
               />
               <Text
                 style={[
                   styles.drawerButtonText,
                   {
-                    color: selected === "Cerrar Sesión" ? "#FFD700" : "#fff",
+                    color: selected === "Cerrar Sesi" ? "#FFD700" : "#fff",
                   },
                 ]}
               >

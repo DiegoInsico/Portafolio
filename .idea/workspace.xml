@@ -6,10 +6,26 @@
   <component name="ChangeListManager">
     <list default="true" id="2137b152-a29a-4d26-8781-e8af1c953a9c" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/screens/entrys/ProgramarMensaje.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/screens/entrys/ProgramarMensaje.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/screens/entrys/listEntry.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/screens/entrys/listEntry.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/components/navigation/AppNavigator.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/components/navigation/AppNavigator.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/components/navigation/MainTabs.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/components/navigation/MainTabs.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/components/navigation/sideBar.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/components/navigation/sideBar.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/components/navigation/sideBarMenu.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/components/navigation/sideBarMenu.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/screens/entrys/EntryDetailScreen.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/screens/entrys/EntryDetailScreen.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/soyweb/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/soyweb/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/soyweb/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/soyweb/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/soyweb/src/App.css" beforeDir="false" afterPath="$PROJECT_DIR$/soyweb/src/App.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/soyweb/src/App.js" beforeDir="false" afterPath="$PROJECT_DIR$/soyweb/src/App.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/soyweb/src/components/Mensajes/Mensajes.css" beforeDir="false" afterPath="$PROJECT_DIR$/soyweb/src/components/Mensajes/Mensajes.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/soyweb/src/components/Mensajes/Mensajes.js" beforeDir="false" afterPath="$PROJECT_DIR$/soyweb/src/components/Mensajes/Mensajes.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/soyweb/src/components/NavBar/Navbar.css" beforeDir="false" afterPath="$PROJECT_DIR$/soyweb/src/components/NavBar/Navbar.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/soyweb/src/components/NavBar/navBar.js" beforeDir="false" afterPath="$PROJECT_DIR$/soyweb/src/components/NavBar/navBar.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/soyweb/src/firebase.js" beforeDir="false" afterPath="$PROJECT_DIR$/soyweb/src/firebase.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/soyweb/src/page/history/LineaDeTiempo.css" beforeDir="false" afterPath="$PROJECT_DIR$/soyweb/src/page/history/LineaDeTiempo.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/soyweb/src/page/history/LineaDeTiempo.js" beforeDir="false" afterPath="$PROJECT_DIR$/soyweb/src/page/history/LineaDeTiempo.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/soyweb/src/page/home/Home.css" beforeDir="false" afterPath="$PROJECT_DIR$/soyweb/src/page/home/Home.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/soyweb/src/page/home/home.js" beforeDir="false" afterPath="$PROJECT_DIR$/soyweb/src/page/home/home.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

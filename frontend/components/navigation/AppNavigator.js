@@ -1,9 +1,13 @@
-// src/navigation/AppNavigator.js
+// src/navigation/RootNavigator.js
 
 import React, { useState, useContext } from "react";
 import { View, StyleSheet, Alert, Image } from "react-native";
 import { createStackNavigator } from "@react-navigation/stack";
+import SideBarMenu from "./sideBarMenu"; // Asegúrate de que la ruta es correcta
+import { AuthContext } from "../../context/AuthContext";
+import { signOutUser } from "../../utils/firebase";
 
+// Importar tus pantallas
 import MainTabs from "./MainTabs";
 import UserProfile from "../../screens/user/userProfile";
 import Testigos from "../../screens/user/Testigos";
@@ -24,14 +28,11 @@ import ListEntry from "../../screens/entrys/ListEntry";
 import EntryScreen from "../../screens/entrys/EntryScreen";
 import EntryDetailScreen from "../../screens/entrys/EntryDetailScreen";
 import ReflexionListScreen from "../../screens/entrys/ReflexionListScreen";
-
-import SideBarMenu from "./sideBarMenu"; // Asegúrate de que la ruta es correcta
-import { AuthContext } from "../../context/AuthContext";
-import { signOutUser } from "../../utils/firebase";
+import MiDespedidaScreen from "../../screens/midespedida/MiDespedidaScreen"; // Importar la nueva pantalla
 
 const Stack = createStackNavigator();
 
-const AppNavigator = () => {
+const RootNavigator = () => {
   const { user, loading } = useContext(AuthContext);
   const [sidebarVisible, setSidebarVisible] = useState(false);
 
@@ -66,8 +67,6 @@ const AppNavigator = () => {
           isVisible={sidebarVisible}
           toggleMenu={handleToggleSidebar}
           handleSignOut={handleSignOutAndToggle}
-          user={user}
-          // Puedes agregar funciones de navegación adicionales aquí
         />
       )}
 
@@ -182,7 +181,12 @@ const AppNavigator = () => {
             <Stack.Screen
               name="ReflexionListScreen"
               component={ReflexionListScreen}
-              options={{ title: "Reflexion List" }}
+              options={{ title: "Reflexiones" }}
+            />
+            <Stack.Screen
+              name="MiDespedida"
+              component={MiDespedidaScreen}
+              options={{ title: "Mi Despedida" }}
             />
           </>
         ) : (
@@ -209,7 +213,7 @@ const AppNavigator = () => {
   );
 };
 
-export default AppNavigator;
+export default RootNavigator;
 
 const styles = StyleSheet.create({
   container: {

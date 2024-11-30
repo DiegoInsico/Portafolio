@@ -1,122 +1,68 @@
 /* src/pages/Home.css */
 
-.main {
-    margin-top: 0px;
-    width: 100%;
-    /* Eliminar overflow-x: hidden para permitir desplazamiento horizontal en hijos */
-    overflow-x: visible;
-}
-
-.section {
-    height: 100vh;
+.home-container {
     display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background-color: #1a202c; /* Fondo oscuro para toda la página */
+    color: white;
+    font-family: Arial, sans-serif;
+  }
+  
+  .home-section {
+    position: relative;
+    height: 100vh; /* Ocupa toda la altura de la pantalla */
+    background: url('../../../public/fondo1.png') center/cover no-repeat; /* Imagen de fondo */
+    display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
-    color: white;
-    font-size: 2rem;
     text-align: center;
     padding: 20px;
-    box-sizing: border-box;
-    background-attachment: fixed;
-    position: relative;
-    overflow: visible;
-    /* Asegura que las tarjetas emergentes no sean ocultadas */
-}
-
-.section::before {
-    content: "";
+  }
+  
+  .overlay {
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.7));
-    z-index: 1;
-}
-
-.section::after {
-    content: "";
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 230px;
-    background: linear-gradient(to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.5));
-}
-
-.home {
-    height: 100vh;
-    display: flex;
-    padding-top: 20px;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    background: url('../../../public/fondo1.png') center/cover no-repeat;
-    /* Imagen de fondo */
+    background: rgba(0, 0, 0, 0.5); /* Overlay oscuro */
+    z-index: 1; /* Colocar encima de la imagen */
+  }
+  
+  .content {
     position: relative;
+    z-index: 2; /* Asegura que el texto esté por encima del overlay */
     color: white;
     text-align: center;
-}
-
-.home::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    /* Filtro oscuro sobre la imagen de fondo */
-    backdrop-filter: blur(5px);
-    /* Difumina la imagen para un efecto elegante */
-    z-index: 1;
-}
-
-.home h1 {
-    font-size: 4rem;
+    padding: 20px;
+  }
+  
+  .title {
+    font-size: 3rem;
     font-weight: 300;
-    letter-spacing: 5px;
-    margin: 0;
+    letter-spacing: 3px;
+    margin-bottom: 20px;
     font-family: 'Georgia', serif;
-    /* Fuente elegante */
-    position: relative;
-    z-index: 2;
-    /* Encima del filtro oscuro */
-}
-
-.home p {
-    font-size: 1.2rem;
+  }
+  
+  .subtitle {
+    font-size: 1.25rem;
     max-width: 600px;
-    line-height: 1.6;
-    color: rgba(255, 255, 255, 0.8);
-    /* Texto ligeramente transparente */
-    position: relative;
-    z-index: 2;
-    /* Encima del filtro oscuro */
-    font-family: 'Arial', sans-serif;
-}
-
-.footer {
-    background-color: #111;
-    /* Negro oscuro */
-    font-size: 1.2rem;
-    padding: 50px 20px;
+    margin: 0 auto;
+    opacity: 0.8;
+  }
+  
+  .footer {
+    background-color: #2d3748; /* Fondo gris oscuro */
+    padding: 20px;
     text-align: center;
-}
-
-/* Animaciones */
-@keyframes fadeIn {
-    0% {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-
-    100% {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.fade-in {
-    animation: fadeIn 1s ease forwards;
-}
+    font-size: 1rem;
+    color: #cbd5e0; /* Texto gris claro */
+  }
+  
+  footer p {
+    margin: 0;
+  }
+  

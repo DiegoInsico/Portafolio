@@ -4,13 +4,23 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom'; // Para navegar entre rutas
 import { useNavigate } from 'react-router-dom'; // Para la funcionalidad de logout
 import { signOutUser } from '../../firebase';
-import { FaBook, FaPhotoVideo, FaTasks, FaClock, FaEnvelope, FaBars, FaTimes } from 'react-icons/fa'; // Importa iconos opcionales
+import { 
+    FaBook, 
+    FaPhotoVideo, 
+    FaTasks, 
+    FaClock, 
+    FaEnvelope, 
+    FaBars, 
+    FaTimes, 
+    FaHandsHelping 
+} from 'react-icons/fa'; // Importa iconos adicionales
 import './Navbar.css';
 
 const Navbar = () => {
     const [showNavbar, setShowNavbar] = useState(true);
     const [lastScrollY, setLastScrollY] = useState(0);
     const [menuActive, setMenuActive] = useState(false); // Estado para el menú hamburguesa
+    const [dropdownHastaProntoActive, setDropdownHastaProntoActive] = useState(false); // Estado para el dropdown de Hasta Pronto
     const navigate = useNavigate();
 
     const handleLogout = async () => {
@@ -51,10 +61,22 @@ const Navbar = () => {
         setMenuActive(false);
     };
 
+    const toggleDropdownHastaPronto = () => {
+        setDropdownHastaProntoActive(!dropdownHastaProntoActive);
+    };
+
+    const closeDropdownHastaPronto = () => {
+        setDropdownHastaProntoActive(false);
+    };
+
     return (
         <nav className={`navbar ${showNavbar ? '' : 'navbar--hidden'}`}>
             <div className="navbar-container">
-                <Link to="/" className="navbar-brand" onClick={closeMenu}>
+                <Link 
+                    to="/" 
+                    className="navbar-brand" 
+                    onClick={() => { closeMenu(); closeDropdownHastaPronto(); }}
+                >
                     {/* Puedes reemplazar el texto "Soy" por un logo si lo deseas */}
                     <span className="brand-logo">Soy</span>
                 </Link>
@@ -82,19 +104,65 @@ const Navbar = () => {
                     <li>
                         <Link to="/mensajes" onClick={closeMenu}>
                             <FaEnvelope className="icon" /> Tus Mensajes
-                        </Link> {/* Nuevo enlace agregado */}
+                        </Link>
+                    </li>
+                    {/* Elemento de menú "Hasta Pronto" con sub-opciones */}
+                    <li className="navbar-dropdown">
+                        <div 
+                            className="dropdown-toggle" 
+                            onClick={toggleDropdownHastaPronto} 
+                            tabIndex={0}
+                            onKeyPress={(e) => { if (e.key === 'Enter') toggleDropdownHastaPronto(); }}
+                            aria-haspopup="true"
+                            aria-expanded={dropdownHastaProntoActive}
+                        >
+                            <FaHandsHelping className="icon" /> Hasta Pronto
+                        </div>
+                        {dropdownHastaProntoActive && (
+                            <ul className="dropdown-menu">
+                                <li>
+                                    <Link 
+                                        to="/hasta-pronto/mis-despedidas" 
+                                        onClick={() => { closeMenu(); closeDropdownHastaPronto(); }}
+                                    >
+                                        Mis Despedidas
+                                    </Link>
+                                </li>
+                                <li>
+                                    <Link 
+                                        to="/hasta-pronto/despedidas-asignadas" 
+                                        onClick={() => { closeMenu(); closeDropdownHastaPronto(); }}
+                                    >
+                                        Sus Despedidas
+                                    </Link>
+                                </li>
+                            </ul>
+                        )}
+                    </li>
+                    {/* Enlace directo "Libro de Reflexión" */}
+                    <li>
+                        <Link to="/libro-de-reflexion" onClick={closeMenu}>
+                            <FaBook className="icon" /> Libro de Reflexión
+                        </Link>
                     </li>
                 </ul>
                 <div className="navbar-actions">
                     <button onClick={handleLogout} className="logout-button">Cerrar Sesión</button>
-                    <div className="menu-toggle" onClick={toggleMenu} aria-label="Toggle Menu" role="button" tabIndex={0}
-                        onKeyPress={(e) => { if (e.key === 'Enter') toggleMenu(); }}>
+                    <div 
+                        className="menu-toggle" 
+                        onClick={toggleMenu} 
+                        aria-label="Toggle Menu" 
+                        role="button" 
+                        tabIndex={0}
+                        onKeyPress={(e) => { if (e.key === 'Enter') toggleMenu(); }}
+                    >
                         {menuActive ? <FaTimes className="hamburger-icon" /> : <FaBars className="hamburger-icon" />}
                     </div>
                 </div>
             </div>
         </nav>
     );
+
 };
 
 export default Navbar;

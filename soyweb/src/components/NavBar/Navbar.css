@@ -3,11 +3,11 @@
 /* ============================ */
 /* VARIABLES CSS */
 :root {
-    /* Paleta de colores oscura */
-    --color-principal: #1f1f1f; /* Gris oscuro para fondo */
+    /* Paleta de colores oscura mejorada */
+    --color-principal: #1f1f1f; /* Gris muy oscuro para fondo general */
     --color-secundario: #ffffff; /* Blanco para texto principal */
-    --color-fondo: #121212; /* Negro casi puro para la navbar */
-    --color-overlay: rgba(0, 0, 0, 0.6); /* Negro semi-transparente */
+    --color-fondo: #1a1a1a; /* Negro más suave para la navbar */
+    --color-overlay: rgba(0, 0, 0, 0.7); /* Negro semi-transparente */
     --color-hover: #333333; /* Gris medio para hover */
     --color-activo: #bb86fc; /* Lavanda para elementos activos */
     --color-cerrar: #cf6679; /* Rojo suave para botones de cierre */
@@ -26,12 +26,13 @@
     position: fixed;
     top: 0;
     width: 100%;
-    background-color: var(--color-fondo);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    background-color: var(--color-fondo); /* Fondo oscuro */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.7); /* Sombra oscura */
     z-index: 1001;
-    transition: top var(--transition-duration) ease-in-out;
+    transition: top var(--transition-duration) ease-in-out, background-color var(--transition-duration) ease-in-out;
 }
 
+/* Navbar oculto */
 .navbar--hidden {
     top: -100px; /* Oculta la navbar moviéndola hacia arriba */
 }
@@ -42,7 +43,7 @@
     justify-content: space-between;
     align-items: center;
     height: var(--navbar-height);
-    max-width: 1200px;
+    max-width: 1500px;
     margin: 0 auto;
     padding: 0 20px;
 }
@@ -58,16 +59,10 @@
     align-items: center;
 }
 
-.brand-logo {
-    /* Puedes agregar estilos adicionales para el logo */
-    /* Por ejemplo, si usas una imagen: */
-    /* background-image: url('/path-to-logo.png');
-    background-size: contain;
-    background-repeat: no-repeat;
-    width: 40px;
-    height: 40px;
-    display: inline-block;
-    margin-right: 10px; */
+.navbar-brand .brand-logo {
+    margin-left: 8px; /* Espacio entre el icono y el texto */
+    font-size: 1.8rem;
+    color: var(--color-activo); /* Color lavanda para destacar */
 }
 
 /* Enlaces de la navbar */
@@ -104,11 +99,12 @@
     margin-right: 8px;
     font-size: 1.2rem;
     vertical-align: middle;
+    color: var(--color-activo); /* Color lavanda para los iconos */
 }
 
 /* Botón de Cerrar Sesión */
 .logout-button {
-    background-color: var(--color-activo);
+    background-color: var(--color-cerrar);
     color: var(--color-fondo);
     border: none;
     padding: 8px 16px;
@@ -121,7 +117,7 @@
 
 .logout-button:hover,
 .logout-button:focus {
-    background-color: var(--color-hover);
+    background-color: var(--color-cerrar-hover);
     transform: translateY(-2px);
 }
 
@@ -141,6 +137,61 @@
 .menu-toggle:hover .hamburger-icon,
 .menu-toggle:focus .hamburger-icon {
     color: var(--color-activo);
+}
+
+/* Dropdown para "Hasta Pronto" */
+.navbar-dropdown {
+    position: relative;
+}
+
+.dropdown-toggle {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    color: var(--color-texto);
+    font-size: 1rem;
+    font-family: var(--fuente-principal);
+    padding: 8px 12px;
+    border-radius: 4px;
+    transition: background-color var(--transition-duration), color var(--transition-duration);
+}
+
+.dropdown-toggle:hover,
+.dropdown-toggle:focus {
+    background-color: var(--color-hover);
+    color: var(--color-secundario);
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: var(--color-fondo);
+    list-style: none;
+    padding: 10px 0;
+    margin: 0;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
+    min-width: 180px;
+    z-index: 1002;
+}
+
+.dropdown-menu li {
+    width: 100%;
+}
+
+.dropdown-menu a {
+    display: block;
+    padding: 8px 20px;
+    color: var(--color-texto);
+    text-decoration: none;
+    transition: background-color var(--transition-duration), color var(--transition-duration);
+}
+
+.dropdown-menu a:hover,
+.dropdown-menu a:focus {
+    background-color: var(--color-hover);
+    color: var(--color-secundario);
 }
 
 /* ============================ */
@@ -183,6 +234,18 @@
     .navbar-links a {
         width: 100%;
         padding: 12px 20px;
+    }
+
+    /* Dropdown en pantallas pequeñas */
+    .navbar-dropdown .dropdown-menu {
+        position: static;
+        box-shadow: none;
+        border: none;
+    }
+
+    /* Ajustar el dropdown */
+    .navbar-dropdown .dropdown-menu a {
+        padding-left: 40px; /* Indentación para sub-opciones */
     }
 
     /* Alinear el botón de cerrar sesión */

@@ -3,7 +3,9 @@
 /* ============================ */
 /* GENERAL STYLES */
 body {
-  background-color: #121212; /* Color oscuro */
+  background-color: #000000; /* Color oscuro */
+  margin: 0;
+  font-family: Arial, sans-serif;
 }
 
 /* ============================ */
@@ -11,19 +13,40 @@ body {
 .page-one {
   display: flex;
   flex-direction: row;
-  justify-content: space-between; /* Separar elementos izquierda y derecha */
-  align-items: flex-end; /* Alinear contenido al fondo */
+  /* Distribuir el contenido en filas */
+  justify-content: space-between;
+  /* Separar elementos izquierda y derecha */
+  align-items: flex-end;
+  /* Alinear el contenido al fondo */
   background-image: url('../../../public/lineavida.webp');
   background-size: cover;
   background-position: center;
   min-height: 80vh;
-  margin: 10vh 15%; /* Márgenes superior/inferior y laterales */
+  margin-left: 15%;
+  margin-right: 15%;
   border-radius: 90px;
   padding: 0 5%;
   width: 60%;
   position: relative;
+  margin-top: 10vh;
+  margin-bottom: 10vh;
   overflow: hidden;
 }
+
+/* Capa de opacidad */
+.page-one::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.3);
+  /* Color negro con opacidad */
+  z-index: 1;
+  /* Asegura que está detrás del contenido */
+}
+
 
 /* Contenedor Izquierdo */
 .titulo-left {
@@ -33,6 +56,7 @@ body {
   z-index: 2;
   margin-bottom: 150px;
   position: relative;
+  
 }
 
 .titulo-left h1 {
@@ -40,6 +64,7 @@ body {
   color: #ffffff; /* Texto blanco */
   font-weight: bold;
   margin: 20px 0;
+  font-family: 'Georgia', serif;
 }
 
 /* Contenedor Derecho */
@@ -59,6 +84,7 @@ body {
   line-height: 1.6;
   text-align: right; /* Texto alineado a la derecha */
   margin: 10px 0;
+  font-family: 'Georgia', serif;
 }
 
 /* ============================ */
@@ -336,4 +362,17 @@ body {
   color: #ffffff;
   font-size: 1.2rem;
   text-align: center;
+}
+
+
+/* Resaltar el slide central */
+.timeline-item.active {
+  transform: scale(1.1); /* Aumentar el tamaño */
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5); /* Agregar sombra */
+  z-index: 2; /* Asegurarse de que se superponga a los demás */
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.timeline-item {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
