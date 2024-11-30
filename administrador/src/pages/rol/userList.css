@@ -1,88 +1,211 @@
+/* Contenedor general */
 .user-list-container {
   padding: 20px;
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  margin-top: 20px;
+  background-color: #f4f4f9;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  font-family: Arial, sans-serif;
 }
 
+/* Título */
 .user-list-title {
-  font-size: 1.5rem;
+  font-size: 24px;
   font-weight: bold;
+  margin-bottom: 20px;
   color: #333;
   text-align: center;
-  margin-bottom: 20px;
 }
 
-.rol-user-table {
-  width: 100%;
-  border-collapse: collapse;
-  background-color: #ffffff;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-}
-
-.rol-user-table th,
-.rol-user-table td {
-  text-align: left;
-  padding: 15px;
-  border-bottom: 1px solid #ddd;
-}
-
-.rol-user-table th {
-  background-color: #f0f0f0;
-  font-weight: bold;
-  color: #555;
-}
-
-.rol-user-table tr:hover {
-  background-color: #f9f9f9;
-}
-
-.action-button {
-  padding: 10px 15px;
-  font-size: 14px;
+/* Botones de alternancia */
+.userlist-buttons button {
+  padding: 10px 20px;
+  margin: 5px;
   border: none;
   border-radius: 5px;
+  font-size: 14px;
+  font-weight: bold;
   cursor: pointer;
+  background-color: #4caf50;
+  color: #fff;
   transition: background-color 0.3s ease;
-  margin-right: 5px;
 }
 
-.action-button.edit {
-  background-color: #ffc107;
-  color: #fff;
+.userlist-buttons button:hover {
+  background-color: #45a049;
 }
 
-.action-button.ban-active {
-  background-color: #dc3545;
-  color: #fff;
-}
-
-.action-button.ban-inactive {
-  background-color: #28a745;
-  color: #fff;
-}
-
-.action-button.view {
+.userlist-add-worker {
+  margin-top: 10px;
   background-color: #007bff;
   color: #fff;
 }
 
-.action-button:hover {
-  opacity: 0.8;
+.userlist-add-worker:hover {
+  background-color: #0056b3;
 }
 
-@media (max-width: 768px) {
-  .rol-user-table th,
-  .rol-user-table td {
-    font-size: 0.9rem;
-    padding: 10px;
-  }
+/* Tabla de usuarios */
+.userlist-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  background-color: #fff;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
 
-  .action-button {
-    font-size: 12px;
-    padding: 8px 10px;
-  }
+.userlist-table th,
+.userlist-table td {
+  padding: 15px;
+  text-align: center;
+  border-bottom: 1px solid #ddd;
+}
+
+.userlist-table th {
+  background-color: #4caf50;
+  color: white;
+  font-size: 16px;
+}
+
+.userlist-table tr:hover {
+  background-color: #f1f1f1;
+}
+
+.userlist-table td {
+  font-size: 14px;
+  color: #555;
+}
+
+/* Botones de acciones */
+.userlist-action {
+  padding: 8px 12px;
+  font-size: 12px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin: 2px;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.userlist-action.edit {
+  background-color: #007bff;
+  color: #fff;
+}
+
+.userlist-action.edit:hover {
+  background-color: #0056b3;
+  transform: scale(1.05);
+}
+
+.userlist-action.view {
+  background-color: #ffc107;
+  color: #fff;
+}
+
+.userlist-action.view:hover {
+  background-color: #e0a800;
+  transform: scale(1.05);
+}
+
+.userlist-action.ban-active {
+  background-color: #f44336;
+  color: white;
+}
+
+.userlist-action.ban-active:hover {
+  background-color: #c62828;
+  transform: scale(1.05);
+}
+
+.userlist-action.ban-inactive {
+  background-color: #4caf50;
+  color: white;
+}
+
+.userlist-action.ban-inactive:hover {
+  background-color: #45a049;
+  transform: scale(1.05);
+}
+
+/* Modal */
+.userlist-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.userlist-modal {
+  background: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  max-width: 600px;
+  width: 100%;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  animation: fadeIn 0.3s ease;
+}
+
+.userlist-modal h3 {
+  font-size: 20px;
+  margin-bottom: 15px;
+  color: #333;
+}
+
+.userlist-modal ul {
+  list-style: none;
+  padding: 0;
+}
+
+.userlist-modal ul li {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+  margin-bottom: 10px;
+  background-color: #f9f9f9;
+  border-radius: 5px;
+}
+
+.userlist-modal button {
+  padding: 8px 12px;
+  font-size: 14px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  background-color: #4caf50;
+  color: #fff;
+}
+
+.userlist-modal button:hover {
+  background-color: #45a049;
+}
+
+.userlist-modal-close {
+  background-color: #f44336;
+  color: #fff;
+  margin-top: 20px;
+}
+
+.userlist-modal-close:hover {
+  background-color: #c62828;
+}
+
+/* Workers list */
+.worker-list-ul {
+  list-style: none;
+  padding: 0;
+}
+
+.worker-list-item {
+  margin: 10px 0;
+  padding: 10px;
+  background: #f9f9f9;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }

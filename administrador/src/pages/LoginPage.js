@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { auth, db } from "../firebase";
 import { useNavigate } from "react-router-dom";
 import { doc, getDoc } from "firebase/firestore";
@@ -11,11 +11,10 @@ const LoginPage = ({ onLogin }) => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const auth = getAuth();
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    setError("");
-    setLoading(true);
 
     try {
       const userCredential = await signInWithEmailAndPassword(
@@ -25,36 +24,31 @@ const LoginPage = ({ onLogin }) => {
       );
       const user = userCredential.user;
 
-      // Verificar el rol del usuario en Firestore
-      const docRef = doc(db, "users", user.uid);
-      const docSnap = await getDoc(docRef);
+      // Verificar si está en la colección employees o es admin
+      const userDoc = await getDoc(doc(db, "users", user.uid));
+      const employeeDoc = await getDoc(doc(db, "employees", user.uid));
 
-      if (docSnap.exists() && docSnap.data().role === "admin") {
-        onLogin(user);
-        navigate("/dashboard");
+      if (userDoc.exists() && userDoc.data().isAdmin) {
+        navigate("/dashboard"); // Admin tiene acceso
+      } else if (employeeDoc.exists()) {
+        navigate("/dashboard"); // Employee tiene acceso
       } else {
-        setError("No tienes permisos de administrador.");
+        throw new Error("No tienes permisos para acceder a la plataforma.");
       }
     } catch (err) {
-      if (err.code === "auth/user-not-found") {
-        setError("Usuario no encontrado.");
-      } else if (err.code === "auth/wrong-password") {
-        setError("Contraseña incorrecta.");
-      } else {
-        setError("Error en el inicio de sesión. Verifica tus credenciales.");
-      }
-    } finally {
-      setLoading(false);
+      setError(err.message || "Error al iniciar sesión");
     }
   };
-
+  
   return (
     <div className="login-container">
       <div className="login-content">
         <div className="login-box">
           <h1 className="login-title">Soy</h1>
-          <p className="login-subtitle">Bienvenido al sistema de administración</p>
-  
+          <p className="login-subtitle">
+            Bienvenido al sistema de administración
+          </p>
+
           <form onSubmit={handleLogin}>
             <div className="form-group">
               <label htmlFor="email" className="login-label">
@@ -88,7 +82,9 @@ const LoginPage = ({ onLogin }) => {
             </div>
             <button
               type="submit"
-              className={`login-button button-primary ${loading ? "loading" : ""}`}
+              className={`login-button button-primary ${
+                loading ? "loading" : ""
+              }`}
               disabled={loading}
             >
               {loading ? "Cargando..." : "Iniciar Sesión"}
@@ -101,7 +97,6 @@ const LoginPage = ({ onLogin }) => {
       </div>
     </div>
   );
-  
 };
 
 export default LoginPage;

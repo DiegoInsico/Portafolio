@@ -1,38 +1,55 @@
 import React, { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
-import { collection, getDoc, doc } from "firebase/firestore";
-import { db } from "../firebase"; // Ajusta la ruta según tu configuración
+import { db } from "../firebase";
+import { collection, query, where, getDocs } from "firebase/firestore";
+import { useAuth } from "../context/authContext";
+const PrivateRoute = ({ children }) => {
+  const { currentUser } = useAuth();
+  const [hasAccess, setHasAccess] = useState(null); // Estado para verificar acceso
+  const [loading, setLoading] = useState(true); // Estado de carga mientras se verifica
 
-const PrivateRoute = ({ children, currentUser }) => {
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const checkAccess = async () => {
+    try {
+      if (!currentUser) {
+        console.warn("Usuario no autenticado.");
+        return false; // Usuario no autenticado
+      }
+
+      console.log("Buscando documentos en employees con UID:", currentUser.uid);
+
+      // Consultar documentos en employees donde el campo `id` coincide con `currentUser.uid`
+      const employeesRef = collection(db, "employees");
+      const q = query(employeesRef, where("id", "==", currentUser.uid));
+      const querySnapshot = await getDocs(q);
+
+      if (!querySnapshot.empty) {
+        console.log("Documento encontrado en employees:", querySnapshot.docs[0].data());
+        return true; // Usuario válido en employees
+      }
+
+      console.warn("No se encontró un documento válido en employees para el UID:", currentUser.uid);
+      return false; // Usuario no válido
+    } catch (error) {
+      console.error("Error verificando acceso en employees:", error);
+      return false; // Negar acceso en caso de error
+    }
+  };
 
   useEffect(() => {
-    async function checkAdminStatus() {
-      if (!currentUser) {
-        setIsAdmin(false);
-        setLoading(false);
-        return;
-      }
+    const verifyAccess = async () => {
+      const access = await checkAccess();
+      setHasAccess(access); // Actualizar estado de acceso
+      setLoading(false); // Finalizar carga
+    };
 
-      const userDocRef = doc(db, "usuarios", currentUser.uid);
-      const userDoc = await getDoc(userDocRef);
-
-      if (userDoc.exists()) {
-        const userData = userDoc.data();
-        setIsAdmin(userData.isAdmin === true);
-      }
-      setLoading(false);
-    }
-
-    checkAdminStatus();
+    verifyAccess();
   }, [currentUser]);
 
   if (loading) {
-    return <div>Loading...</div>; // Puedes reemplazar esto con un spinner o un componente de carga
+    return <p>Cargando...</p>;
   }
 
-  return isAdmin ? children : <Navigate to="/login" />;
+  return hasAccess ? children : <Navigate to="/login" />;
 };
 
 export default PrivateRoute;

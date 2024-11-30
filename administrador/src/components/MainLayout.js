@@ -32,10 +32,18 @@ const MainLayout = ({ children, isAuthenticated, currentUser }) => {
   useEffect(() => {
     const fetchUserDetails = async () => {
       if (currentUser) {
-        const userRef = doc(db, "users", currentUser.uid); // Supongamos que `uid` está en currentUser
-        const userSnapshot = await getDoc(userRef);
-        if (userSnapshot.exists()) {
-          setUserDetails(userSnapshot.data());
+        try {
+          // Consultar la colección employees en lugar de users
+          const userRef = doc(db, "employees", currentUser.uid);
+          const userSnapshot = await getDoc(userRef);
+
+          if (userSnapshot.exists()) {
+            setUserDetails(userSnapshot.data());
+          } else {
+            console.error("Usuario no encontrado en la colección employees");
+          }
+        } catch (error) {
+          console.error("Error al obtener detalles del usuario:", error);
         }
       }
     };
@@ -50,7 +58,7 @@ const MainLayout = ({ children, isAuthenticated, currentUser }) => {
           <>
             {/* Barra superior */}
             <TopBar
-              currentUser={{ ...currentUser, ...userDetails }}
+              currentUser={{ ...currentUser, ...userDetails }} // Pasar detalles del usuario al TopBar
               handleLogout={handleLogout}
             />
 
