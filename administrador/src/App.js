@@ -34,35 +34,37 @@ function App() {
     try {
       if (!uid) {
         console.warn("UID no proporcionado.");
-        return false; // UID no disponible
+        return false;
       }
 
-      console.log("Consultando Firestore para UID:", uid); // Debug
+      console.log("Consultando Firestore para UID:", uid);
       const employeesRef = collection(db, "employees");
       const q = query(employeesRef, where("id", "==", uid));
       const querySnapshot = await getDocs(q);
 
       if (!querySnapshot.empty) {
-        console.log("Acceso permitido. Documento encontrado:", querySnapshot.docs[0].data()); // Debug
+        console.log(
+          "Acceso permitido. Documento encontrado:",
+          querySnapshot.docs[0].data()
+        );
         return true;
       } else {
-        console.warn("Acceso denegado. No se encontró un documento en employees para UID:", uid); // Debug
+        console.warn("Acceso denegado. No se encontró un documento en employees para UID:", uid);
         return false;
       }
     } catch (error) {
       console.error("Error verificando acceso:", error);
-      return false; // En caso de error, denegar acceso
+      return false;
     }
   };
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
-      console.log("Estado de autenticación cambiado:", user ? user.uid : "No autenticado"); // Debug
+      console.log("Estado de autenticación cambiado:", user ? user.uid : "No autenticado");
       if (user) {
         setCurrentUser(user);
         setIsAuthenticated(true);
 
-        // Verificar si el usuario pertenece a `employees`
         const access = await checkAccess(user.uid);
         setHasAccess(access);
       } else {
@@ -70,24 +72,23 @@ function App() {
         setIsAuthenticated(false);
         setHasAccess(false);
       }
-      setLoading(false); // Validación completa
+      setLoading(false);
     });
 
     return () => unsubscribe();
   }, []);
 
   const handleLogin = (user) => {
-    console.log("Inicio de sesión exitoso:", user.uid); // Debug
+    console.log("Inicio de sesión exitoso:", user.uid);
     setIsAuthenticated(true);
     setCurrentUser(user);
 
-    // Validar acceso después del login
     checkAccess(user.uid).then((access) => setHasAccess(access));
   };
 
   const handleLogout = () => {
     auth.signOut().then(() => {
-      console.log("Usuario cerró sesión."); // Debug
+      console.log("Usuario cerró sesión.");
       setIsAuthenticated(false);
       setCurrentUser(null);
       setHasAccess(false);
@@ -95,8 +96,8 @@ function App() {
   };
 
   if (loading) {
-    console.log("Cargando estado de autenticación..."); // Debug
-    return <p>Cargando...</p>; // Mostrar mientras se verifica el acceso
+    console.log("Cargando estado de autenticación...");
+    return <p>Cargando...</p>;
   }
 
   return (
@@ -106,7 +107,7 @@ function App() {
         <Route
           path="/login"
           element={
-            isAuthenticated && hasAccess ? (
+            isAuthenticated ? (
               <Navigate to="/dashboard" replace />
             ) : (
               <LoginPage onLogin={handleLogin} />
@@ -114,20 +115,8 @@ function App() {
           }
         />
 
-        {/* Redirección inicial según autenticación */}
-        <Route
-          path="/"
-          element={
-            isAuthenticated && hasAccess ? (
-              <Navigate to="/dashboard" replace />
-            ) : (
-              <Navigate to="/login" replace />
-            )
-          }
-        />
-
-        {/* Rutas protegidas */}
-        {isAuthenticated && hasAccess && (
+        {/* Estructura principal */}
+        {isAuthenticated && (
           <Route
             path="*"
             element={
@@ -137,29 +126,72 @@ function App() {
                 onLogout={handleLogout}
               >
                 <Routes>
-                  {/* Dashboard y páginas principales */}
-                  <Route path="/dashboard" element={<Dashboard />} />
-                  <Route path="/Alertas" element={<Alertas />} />
-                  <Route path="/test/test" element={<Test />} />
-                  <Route path="/monitor/clouster" element={<Clouster />} />
+                  {/* Rutas protegidas */}
                   <Route
-                    path="/monitor/graphics"
-                    element={<GraphicsContext />}
+                    path="/dashboard"
+                    element={
+                      <PrivateRoute allowedRoles={["Administrador", "Operador"]}>
+                        <Dashboard />
+                      </PrivateRoute>
+                    }
                   />
                   <Route
-                    path="/monitor/graphs/userHeatmap"
-                    element={<UserHeatmap />}
+                    path="/Alertas"
+                    element={
+                      <PrivateRoute allowedRoles={["Administrador"]}>
+                        <Alertas />
+                      </PrivateRoute>
+                    }
+                  />
+                  <Route
+                    path="/monitor/graphics"
+                    element={
+                      <PrivateRoute allowedRoles={["Administrador", "Analista"]}>
+                        <GraphicsContext />
+                      </PrivateRoute>
+                    }
                   />
                   <Route
                     path="/monitor/storage/storageUsage"
-                    element={<Graphics />}
+                    element={
+                      <PrivateRoute allowedRoles={["Administrador", "Analista"]}>
+                        <Graphics />
+                      </PrivateRoute>
+                    }
                   />
                   <Route
-                    path="/system/notifications"
-                    element={<Notifications />}
+                    path="/monitor/graphs/userHeatmap"
+                    element={
+                      <PrivateRoute allowedRoles={["Administrador", "Analista"]}>
+                        <UserHeatmap />
+                      </PrivateRoute>
+                    }
                   />
-                  <Route path="/rol/RolManagment" element={<RolManagment />} />
-                  <Route path="/system/inbox" element={<Inbox />} />
+                  <Route
+                    path="/system/inbox"
+                    element={
+                      <PrivateRoute allowedRoles={["Administrador", "Operador"]}>
+                        <Inbox />
+                      </PrivateRoute>
+                    }
+                  />
+                  <Route
+                    path="/monitor/clouster"
+                    element={
+                      <PrivateRoute allowedRoles={["Administrador", "Operador"]}>
+                        <Clouster />
+                      </PrivateRoute>
+                    }
+                  />
+                  <Route
+                    path="/rol/RolManagment"
+                    element={
+                      <PrivateRoute allowedRoles={["Administrador"]}>
+                        <RolManagment />
+                      </PrivateRoute>
+                    }
+                  />
+                  <Route path="/test/test" element={<Test />} />
                   <Route path="/ticket/:ticketId" element={<TicketDetails />} />
                 </Routes>
               </MainLayout>
@@ -176,17 +208,6 @@ function App() {
             }
           />
         )}
-
-        {/* Ruta por defecto */}
-        <Route
-          path="*"
-          element={
-            <Navigate
-              to={isAuthenticated && hasAccess ? "/dashboard" : "/login"}
-              replace
-            />
-          }
-        />
       </Routes>
     </Router>
   );

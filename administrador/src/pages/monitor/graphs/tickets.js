@@ -4,25 +4,34 @@ import "react-circular-progressbar/dist/styles.css";
 import { collection, getDocs } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import { db } from "../../../firebase"; // Ajusta la ruta según tu proyecto
-import './css/ticket.css'
-const mapUserIdsToDisplayNames = async () => {
-  const userMap = {};
+import './css/ticket.css';
+
+const mapEmployeeIdsToDisplayNames = async () => {
+  const employeeMap = {};
 
   try {
-    const usersCollection = collection(db, "users");
-    const usersSnapshot = await getDocs(usersCollection);
+    const employeesCollection = collection(db, "employees");
+    const employeesSnapshot = await getDocs(employeesCollection);
 
-    usersSnapshot.forEach((doc) => {
+    employeesSnapshot.forEach((doc) => {
       const data = doc.data();
-      const userId = doc.id;
-      const displayName = data.displayName || "Usuario Desconocido";
-      userMap[userId] = displayName;
+      const employeeIdentifier = doc.id; // Usa el ID del documento como clave
+      const displayName = data.displayName || "Empleado Desconocido";
+      const role = data.role || "Desconocido";
+
+      console.log(
+        `Empleado encontrado: ${displayName}, ID: ${employeeIdentifier}`
+      );
+
+      // Almacena el empleado en el mapa
+      employeeMap[employeeIdentifier] = { displayName, role };
     });
 
-    return userMap;
+    console.log("Mapa de empleados actualizado:", employeeMap);
+    return employeeMap;
   } catch (error) {
-    console.error("Error al mapear userId a displayName:", error);
-    return userMap;
+    console.error("Error al mapear employeeId a displayName:", error);
+    return employeeMap;
   }
 };
 
@@ -34,7 +43,7 @@ const TicketsChart = () => {
   useEffect(() => {
     async function fetchTickets() {
       try {
-        const userMap = await mapUserIdsToDisplayNames();
+        const employeeMap = await mapEmployeeIdsToDisplayNames();
 
         const ticketsCollection = collection(db, "tickets");
         const ticketsSnapshot = await getDocs(ticketsCollection);
@@ -45,16 +54,23 @@ const TicketsChart = () => {
 
         ticketsSnapshot.forEach((doc) => {
           const data = doc.data();
+          console.log(`Ticket encontrado: ${doc.id}`, data);
+
           if (data.status === "abierto") {
             abiertoCount++;
           } else if (data.status === "cerrado") {
             cerradoCount++;
           }
 
+          const assignedToInfo = employeeMap[data.assignedTo] || {
+            displayName: "Empleado Desconocido",
+            role: "Desconocido",
+          };
+
           if (data.status === "abierto") {
             tableRows.push({
               id: doc.id,
-              assignedTo: userMap[data.assignedTo] || "Usuario Desconocido",
+              assignedTo: `${assignedToInfo.displayName} - ${assignedToInfo.role}`,
               priority: data.priority || "No Definida",
               createdAt:
                 data.createdAt?.toDate().toLocaleString() || "Fecha Desconocida",
@@ -77,6 +93,9 @@ const TicketsChart = () => {
 
         setStatusData(statusData);
         setTableData(tableRows);
+
+        console.log("Tickets procesados:", tableRows);
+        console.log("Datos de estado:", statusData);
       } catch (error) {
         console.error("Error al obtener los tickets: ", error);
       }
@@ -91,7 +110,6 @@ const TicketsChart = () => {
 
   return (
     <div className="ticket-container">
-      <h2 className="ticket-title">Porcentaje de Tickets por Estado</h2>
       <div className="ticket-charts">
         {statusData.map((item, index) => (
           <div key={index} className="ticket-chart-item">
@@ -113,13 +131,13 @@ const TicketsChart = () => {
           </div>
         ))}
       </div>
-  
-      <h2 className="ticket-subtitle">Tickets Abiertos</h2>
+
       <div className="ticket-table-container">
+        <h2 className="ticket-title">Porcentaje de Tickets por Estado</h2>
         <table className="ticket-table">
           <thead>
             <tr>
-              <th>Asignado A</th>
+              <th>Empleado Asignado</th>
               <th>Prioridad</th>
               <th>Fecha Creación</th>
               <th>Acciones</th>
@@ -146,7 +164,6 @@ const TicketsChart = () => {
       </div>
     </div>
   );
-  
 };
 
 export default TicketsChart;

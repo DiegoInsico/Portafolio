@@ -7,6 +7,7 @@ import {
   updateDoc,
   deleteDoc,
   doc,
+  Timestamp,
 } from "firebase/firestore";
 import Container from "../../components/container";
 import UserForm from "./userForm";
@@ -28,6 +29,8 @@ const RolManagement = () => {
   const [editingUser, setEditingUser] = useState(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [error, setError] = useState("");
+  
+  
 
   // Función para cargar usuarios
   const fetchUsers = async () => {
@@ -51,14 +54,15 @@ const RolManagement = () => {
 
   // Crear usuario
   const handleCreateUser = async () => {
-    if (!formData.displayName || !formData.email || !formData.password) {
+    if (!formData.displayName || !formData.email || !formData.password || !formData.birthDate) {
       setError("Todos los campos son obligatorios.");
       return;
     }
-
+  
     try {
       await addDoc(collection(db, "users"), {
         ...formData,
+        birthDate: new Timestamp(Math.floor(new Date(formData.birthDate).getTime() / 1000), 0),
         isBanned: false,
         createdAt: new Date(),
       });
@@ -68,11 +72,15 @@ const RolManagement = () => {
       console.error("Error al crear usuario:", error);
     }
   };
+  
 
   // Editar usuario
   const handleEditUser = async () => {
     try {
-      await updateDoc(editingUser.ref, { ...formData });
+      await updateDoc(editingUser.ref, {
+        ...formData,
+        birthDate: new Timestamp(Math.floor(new Date(formData.birthDate).getTime() / 1000), 0),
+      });
       setEditingUser(null);
       setDisplayForm(false);
       fetchUsers();
@@ -80,6 +88,7 @@ const RolManagement = () => {
       console.error("Error al modificar usuario:", error);
     }
   };
+  
 
   // Eliminar usuario
   const handleDeleteUser = async () => {

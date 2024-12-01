@@ -1,177 +1,321 @@
 import React, { useEffect, useState } from "react";
-import { Bar } from "react-chartjs-2";
+import { collection, getDocs, addDoc, Timestamp } from "firebase/firestore";
 import { db } from "../../firebase";
-import { collection, getDocs, addDoc } from "firebase/firestore";
-import "./Clouster.css";
-import Container from "../../components/container";
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
+import { Pie, Bar } from "react-chartjs-2"; // Gráficos
+import "./clouster.css";
+import CustomAlert from "../../components/customAlert";
+
+ChartJS.register(ArcElement, Tooltip, Legend);
 
 const Clouster = () => {
-  const [emotionCounts, setEmotionCounts] = useState({});
-  const [topEmotions, setTopEmotions] = useState([]);
-  const [emotionSummary, setEmotionSummary] = useState("");
-  const [predominantMessage, setPredominantMessage] = useState("");
-  const [customMessage, setCustomMessage] = useState("");
+  // Estados principales
+  const [userStats, setUserStats] = useState({
+    totalUsers: 0,
+    premiumUsers: 0,
+    freeUsers: 0,
+    renewalRate: 0,
+    cancellationRate: 0,
+  });
+  const [logs, setLogs] = useState([]);
+  const [alerts, setAlerts] = useState([]);
+  const [announcement, setAnnouncement] = useState({
+    message: "",
+    audience: "all",
+    scheduledDate: new Date(),
+  });
+  const [chartData, setChartData] = useState(null);
+  const [alertMessage, setAlertMessage] = useState("");
 
+  // Fetch inicial de datos
   useEffect(() => {
-    const fetchEmotionData = async () => {
-      const emotionsData = {};
-      const snapshot = await getDocs(collection(db, "entradas"));
+    fetchUserStats();
+    fetchLogs();
+    fetchAlerts();
+  }, []);
 
-      snapshot.forEach((doc) => {
+  // 1. Obtener métricas de usuarios
+  const fetchUserStats = async () => {
+    try {
+      const usersSnapshot = await getDocs(collection(db, "users"));
+      const totalUsers = usersSnapshot.size;
+      let premiumUsers = 0;
+
+      usersSnapshot.forEach((doc) => {
         const data = doc.data();
-        if (data.emociones && Array.isArray(data.emociones)) {
-          data.emociones.forEach((emotion) => {
-            emotionsData[emotion] = (emotionsData[emotion] || 0) + 1;
+        if (data.isPremium) premiumUsers++;
+      });
+
+      const freeUsers = totalUsers - premiumUsers;
+
+      setUserStats({
+        totalUsers,
+        premiumUsers,
+        freeUsers,
+        renewalRate: calculateRenewalRate(premiumUsers), // Ejemplo de cálculo
+        cancellationRate: calculateCancellationRate(premiumUsers), // Ejemplo de cálculo
+      });
+
+      setChartData({
+        labels: ["Premium", "Gratuito"],
+        datasets: [
+          {
+            label: "Distribución de Usuarios",
+            data: [premiumUsers, freeUsers],
+            backgroundColor: ["#bb86fc", "#03dac6"],
+            borderColor: ["#bb86fc", "#03dac6"],
+            borderWidth: 1,
+          },
+        ],
+      });
+    } catch (error) {
+      console.error("Error obteniendo estadísticas de usuarios:", error);
+    }
+  };
+
+  // Cálculo de métricas (simulado)
+  const calculateRenewalRate = (premiumUsers) =>
+    (premiumUsers * 0.8).toFixed(2); // Ejemplo: 80%
+  const calculateCancellationRate = (premiumUsers) =>
+    (premiumUsers * 0.2).toFixed(2); // Ejemplo: 20%
+
+  // 2. Obtener logs de auditoría
+  const fetchLogs = async () => {
+    try {
+      const logsSnapshot = await getDocs(collection(db, "logs"));
+      const ticketsSnapshot = await getDocs(collection(db, "tickets")); // Agregamos tickets
+      const employeesSnapshot = await getDocs(collection(db, "employees")); // Agregamos empleados
+      const logsData = [];
+      const employeeMap = {};
+
+      // Mapear empleados
+      employeesSnapshot.forEach((doc) => {
+        const data = doc.data();
+        employeeMap[doc.id] = {
+          displayName: data.displayName || "Desconocido",
+          role: data.role || "Sin rol",
+        };
+      });
+
+      // Procesar logs existentes
+      logsSnapshot.forEach((doc) => logsData.push(doc.data()));
+
+      // Procesar asignaciones y respuestas desde tickets
+      ticketsSnapshot.forEach((doc) => {
+        const ticketData = doc.data();
+        if (ticketData.assignedTo) {
+          logsData.push({
+            timestamp: ticketData.updatedAt || ticketData.createdAt,
+            description: `Asignación de ticket: ${ticketData.subject}`,
+            action: `Asignado a: ${
+              employeeMap[ticketData.assignedTo]?.displayName || "Desconocido"
+            } - ${employeeMap[ticketData.assignedTo]?.role || "Sin rol"}`,
+          });
+        }
+
+        // Agregar log de respuesta si existe
+        if (ticketData.respuesta) {
+          logsData.push({
+            timestamp: ticketData.updatedAt || ticketData.createdAt,
+            description: `Respuesta registrada para ticket: ${ticketData.subject}`,
+            action: `Estado: ${ticketData.estado || "Abierto"}, Respuesta: ${
+              ticketData.respuesta || "Sin respuesta"
+            }`,
+            respondedBy: `${
+              employeeMap[ticketData.assignedTo]?.displayName || "Desconocido"
+            } - ${employeeMap[ticketData.assignedTo]?.role || "Sin rol"}`,
           });
         }
       });
 
-      setEmotionCounts(emotionsData);
-      calculateTopEmotions(emotionsData);
-      calculateEmotionSummary(emotionsData);
-    };
-
-    fetchEmotionData();
-  }, []);
-
-  const calculateTopEmotions = (data) => {
-    const sortedEmotions = Object.entries(data).sort((a, b) => b[1] - a[1]);
-    setTopEmotions(sortedEmotions.slice(0, 3));
-  };
-
-  const calculateEmotionSummary = (data) => {
-    let total = 0;
-    let positive = 0;
-    let negative = 0;
-    let neutral = 0;
-
-    const emotionCategories = {
-      alegría: "positiva",
-      tristeza: "negativa",
-      motivación: "positiva",
-      pensamiento: "neutra",
-    };
-
-    for (const [emotion, count] of Object.entries(data)) {
-      total += count;
-      const category = emotionCategories[emotion.toLowerCase()];
-      if (category === "positiva") positive += count;
-      else if (category === "negativa") negative += count;
-      else neutral += count;
-    }
-
-    const positivePercent = ((positive / total) * 100).toFixed(1);
-    const negativePercent = ((negative / total) * 100).toFixed(1);
-    const neutralPercent = ((neutral / total) * 100).toFixed(1);
-
-    setEmotionSummary(
-      `De las ${total} emociones, el ${positivePercent}% son positivas, el ${negativePercent}% son negativas y el ${neutralPercent}% son neutras.`
-    );
-
-    determinePredominantEmotionMessage(
-      positivePercent,
-      negativePercent,
-      neutralPercent
-    );
-  };
-
-  const determinePredominantEmotionMessage = (
-    positivePercent,
-    negativePercent,
-    neutralPercent
-  ) => {
-    let message;
-    if (positivePercent > negativePercent && positivePercent > neutralPercent) {
-      message =
-        "El estado de ánimo general es positivo, con la mayoría de los usuarios sintiéndose felices y motivados.";
-    } else if (
-      negativePercent > positivePercent &&
-      negativePercent > neutralPercent
-    ) {
-      message =
-        "El estado de ánimo general muestra un alto nivel de tristeza o miedo.";
-    } else if (
-      neutralPercent > positivePercent &&
-      neutralPercent > negativePercent
-    ) {
-      message =
-        "El estado de ánimo general es neutro, con usuarios en un estado de calma o reflexión.";
-    } else {
-      message = "El estado de ánimo es variado, con una mezcla de emociones.";
-    }
-    setPredominantMessage(message);
-    setCustomMessage(message);
-  };
-
-  const handleSendNotification = async () => {
-    try {
-      await addDoc(collection(db, "notifications"), {
-        nombreDeNotificacion: "Análisis de Emociones",
-        descripcion: customMessage,
-        tipoDeNotificacion: "Estado de ánimo",
-        userId: "global",
-        enviadoPor: "Sistema de Análisis de Emociones",
-      });
-      alert("Notificación global enviada con éxito.");
+      setLogs(logsData);
     } catch (error) {
-      console.error("Error al enviar la notificación: ", error);
-      alert("Error al enviar la notificación.");
+      console.error("Error obteniendo logs:", error);
     }
   };
 
-  const chartData = {
-    labels: Object.keys(emotionCounts),
-    datasets: [
-      {
-        label: "Emociones utilizadas",
-        data: Object.values(emotionCounts),
-        backgroundColor: ["#FFD700", "#FF6347", "#3CB371", "#4682B4"],
-        borderColor: "#1e1e2f",
-        borderWidth: 1,
-      },
-    ],
+  // 3. Obtener alertas generadas automáticamente
+  const fetchAlerts = async () => {
+    try {
+      const alertsSnapshot = await getDocs(collection(db, "alerts"));
+      const alertsData = [];
+      alertsSnapshot.forEach((doc) => alertsData.push(doc.data()));
+      setAlerts(alertsData);
+    } catch (error) {
+      console.error("Error obteniendo alertas:", error);
+    }
   };
 
+  // 4. Crear y programar anuncios
+  const handleCreateAnnouncement = async (announcementData) => {
+    try {
+      // Guarda el anuncio en "announcements"
+      const docRef = await addDoc(collection(db, "announcements"), {
+        ...announcementData,
+        createdAt: Timestamp.now(),
+      });
+
+      // Registra una alerta operativa en "alerts"
+      await addDoc(collection(db, "alerts"), {
+        title: "Nuevo Anuncio Creado",
+        message: `Se ha creado un anuncio dirigido a ${announcementData.audience}.`,
+        relatedDocId: docRef.id, // Relaciona con el anuncio creado
+        timestamp: Timestamp.now(),
+      });
+
+      console.log("Anuncio y alerta creados con éxito");
+      setAlertMessage("¡El anuncio ha sido creado exitosamente!");
+    } catch (error) {
+      console.error("Error al crear el anuncio y la alerta:", error);
+    }
+  };
   return (
-    <Container>
-      <div className="clouster-container">
-        <h1>Análisis de Emociones</h1>
-        <div className="chart-container uiverse-chart">
-          <Bar
-            data={chartData}
-            options={{ responsive: true, maintainAspectRatio: false }}
-          />
-        </div>
-        <h2>Top de Emociones</h2>
-        <ul className="top-emotions">
-          {topEmotions.map(([emotion, count], index) => (
-            <li key={index}>
-              {emotion.charAt(0).toUpperCase() + emotion.slice(1)}: {count}{" "}
-              veces
-            </li>
-          ))}
-        </ul>
-        <h2>Resumen de Emociones</h2>
-        <p className="summary-text">{emotionSummary}</p>
-        <h2>Mensaje Predominante</h2>
-        <p
-          className="predominant-message"
-          onClick={() => setCustomMessage(predominantMessage)}
-        >
-          {predominantMessage}
-        </p>
-        <textarea
-          className="uiverse-input"
-          value={customMessage}
-          onChange={(e) => setCustomMessage(e.target.value)}
-          rows="4"
-          placeholder="Modifica el mensaje antes de enviar..."
-        ></textarea>
-        <button onClick={handleSendNotification} className="uiverse-button">
-          Enviar Notificación
-        </button>
+    <div className="clouster-container">
+      {alertMessage && (
+        <CustomAlert
+          message={alertMessage}
+          onClose={() => setAlertMessage("")}
+          duration={5000}
+        />
+      )}
+      {/* Gráfico de Distribución de Usuarios */}
+      <div className="clouster-stats">
+        <h2 className="clouster-title">Distribución de Usuarios</h2>
+        {chartData ? (
+          <div className="clouster-content">
+            <div className="clouster-chart">
+              <Pie data={chartData} />
+            </div>
+            <div className="clouster-summary">
+              <p>Total de Usuarios: {userStats.totalUsers}</p>
+              <p>Usuarios Premium: {userStats.premiumUsers}</p>
+              <p>Usuarios Gratuitos: {userStats.freeUsers}</p>
+              <p>Tasa de Renovación: {userStats.renewalRate}%</p>
+              <p>Tasa de Cancelación: {userStats.cancellationRate}%</p>
+            </div>
+          </div>
+        ) : (
+          <p className="clouster-loading">Cargando datos...</p>
+        )}
       </div>
-    </Container>
+
+      {/* Logs de Auditoría */}
+      <div className="clouster-logs">
+        <h2 className="clouster-title">Logs de Auditoría</h2>
+        <div className="clouster-logs-table">
+          <table>
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Descripción</th>
+                <th>Acción</th>
+              </tr>
+            </thead>
+            <tbody>
+              {logs.length > 0 ? (
+                logs.map((log, index) => (
+                  <tr key={index}>
+                    <td>{log.timestamp?.toDate().toLocaleString() || "N/A"}</td>
+                    <td>{log.description || "Sin descripción"}</td>
+                    <td>{log.action || "N/A"}</td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="3">No hay registros disponibles.</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Alertas Operativas */}
+      <div className="clouster-alerts">
+        <h2 className="clouster-title">Alertas Operativas</h2>
+        <div className="clouster-alerts-list">
+          {alerts.length > 0 ? (
+            alerts.map((alert, index) => (
+              <div key={index} className="clouster-alert">
+                <p>
+                  <strong>{alert.title || "Alerta"}</strong>
+                </p>
+                <p>{alert.message || "Mensaje no disponible."}</p>
+                {alert.relatedDocId && (
+                  <p>
+                    <strong>Documento Relacionado:</strong> {alert.relatedDocId}
+                  </p>
+                )}
+                <p className="alert-timestamp">
+                  {alert.timestamp?.toDate().toLocaleString() || "N/A"}
+                </p>
+              </div>
+            ))
+          ) : (
+            <p>No hay alertas disponibles.</p>
+          )}
+        </div>
+      </div>
+
+      {/* Formulario para Crear Anuncios */}
+      <div className="clouster-announcement">
+        <h2 className="clouster-title">Crear Anuncio</h2>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            const announcementData = {
+              message: e.target["announcement-message"].value,
+              audience: e.target["announcement-audience"].value,
+              scheduledDate: new Date(e.target["announcement-date"].value),
+            };
+            handleCreateAnnouncement(announcementData);
+          }}
+        >
+          <div className="form-group">
+            <label htmlFor="announcement-message">Mensaje:</label>
+            <textarea
+              id="announcement-message"
+              value={announcement.message}
+              onChange={(e) =>
+                setAnnouncement({ ...announcement, message: e.target.value })
+              }
+              maxLength="280"
+              placeholder="Escribe un mensaje para los usuarios (máximo 280 caracteres)"
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="announcement-audience">Audiencia:</label>
+            <select
+              id="announcement-audience"
+              value={announcement.audience}
+              onChange={(e) =>
+                setAnnouncement({ ...announcement, audience: e.target.value })
+              }
+            >
+              <option value="all">Todos los usuarios</option>
+              <option value="premium">Usuarios Premium</option>
+            </select>
+          </div>
+          <div className="form-group">
+            <label htmlFor="announcement-date">Fecha de Envío:</label>
+            <input
+              type="datetime-local"
+              id="announcement-date"
+              value={announcement.scheduledDate.toISOString().substring(0, 16)}
+              onChange={(e) =>
+                setAnnouncement({
+                  ...announcement,
+                  scheduledDate: new Date(e.target.value),
+                })
+              }
+            />
+          </div>
+          <button type="submit" className="clouster-submit-button">
+            Crear Anuncio
+          </button>
+        </form>
+      </div>
+    </div>
   );
 };
 

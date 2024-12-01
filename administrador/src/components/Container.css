@@ -1,39 +1,39 @@
 .container {
   display: flex;
   flex-direction: column;
-  align-items: center;
   justify-content: flex-start;
-  margin: 0 auto;
-  max-width: 1400px; 
+  align-items: center;
   width: 100%;
-  height: 100%;
-  padding: 20px;
-  overflow-y: auto;
+  height: calc(100vh - 70px); /* Descuenta la altura de la barra superior */
+  padding: 10px;
+  overflow-y: auto; /* Habilita scroll solo en el eje Y */
   box-sizing: border-box;
+  background-color: #333; /* Fondo del contenedor */
+  color: #fff; /* Texto claro para contraste */
 }
 
 /* Scroll personalizado */
 .container::-webkit-scrollbar {
-  width: 10px;
+  width: 8px;
 }
 
 .container::-webkit-scrollbar-track {
-  background: #333;
+  background: #222;
 }
 
 .container::-webkit-scrollbar-thumb {
   background-color: #555;
   border-radius: 5px;
-  border: 2px solid #333;
+  border: 2px solid #222;
 }
 
 .container::-webkit-scrollbar-thumb:hover {
   background-color: #777;
 }
 
-/* Responsividad */
+/* Ajustes responsivos */
 @media (max-width: 768px) {
   .container {
-    padding: 10px;
+    padding: 5px;
   }
 }

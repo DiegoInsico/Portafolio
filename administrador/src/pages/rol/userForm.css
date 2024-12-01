@@ -9,7 +9,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
+  z-index: 5;
 }
 
 .modal-content {
@@ -109,6 +109,7 @@
 .role-input label {
   display: flex;
   align-items: center;
+  color: black;
   font-size: 1rem;
   gap: 8px;
 }
@@ -164,4 +165,67 @@
   margin-bottom: 15px;
   text-align: center;
   font-weight: bold;
+}
+.user-form-container {
+  padding: 20px;
+  background-color: #212121;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  color: #ffffff;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.user-form-container h1 {
+  font-size: 24px;
+  font-weight: bold;
+  color: #bb86fc;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.user-form-container label {
+  display: block;
+  font-size: 14px;
+  color: #e0e0e0;
+  margin-bottom: 5px;
+}
+
+.user-form-container input,
+.user-form-container select {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  background-color: #333;
+  color: #ffffff;
+  border: 1px solid #555;
+  border-radius: 5px;
+}
+
+.user-form-container input[type="date"] {
+  appearance: none;
+}
+
+.user-form-container button {
+  width: 100%;
+  padding: 10px;
+  background-color: #178a00;
+  color: #ffffff;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.user-form-container button:hover {
+  background-color: #45a049;
+}
+
+.user-form-container .error-message {
+  color: #ff4d4f;
+  font-size: 14px;
+  margin-top: -10px;
+  margin-bottom: 10px;
+  text-align: center;
 }

@@ -50,7 +50,6 @@ const Music = () => {
 
   return (
     <div className="music-section">
-      <h2 className="music-title">Artista Más Escuchado</h2>
       {mostPlayedArtist ? (
         <div className="music-card">
           {artistImage && (

@@ -1,8 +1,7 @@
 import { collection, getDocs } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
-import { getUserContext } from "./../graphs/dataService"; // Ruta hacia el archivo dataService.js
 
-import "./../graphics.css"; // Opcional: estilos adicionales
+import "./css/context.css"; // Opcional: estilos adicionales
 import { db } from "../../../firebase";
 import { Line } from "react-chartjs-2";
 
@@ -11,7 +10,6 @@ import "react-datepicker/dist/react-datepicker.css";
 import { addDays } from "date-fns";
 
 const UserContext = () => {
-  const [userContext, setUserContext] = useState([]);
   const [chartData, setChartData] = useState(null);
   const [summary, setSummary] = useState({});
   const [startDate, setStartDate] = useState(new Date());
@@ -126,11 +124,41 @@ const UserContext = () => {
   fetchData();
 }, [startDate, endDate]);
 
-  return (
-    <div className="graphics-container">
-      <div style={{ padding: "20px" }}>
-        <h2>Comportamiento Diario de Usuarios</h2>
-        {chartData ? (
+return (
+  <div className="context-container">
+    <div className="context-content">
+    <div className="context-date-picker-container">
+        <h2 className="context-subtitle">Selecciona el Rango de Fechas</h2>
+        <div className="context-date-picker">
+          <div className="context-date-picker-item">
+            <label className="context-date-label">Fecha de Inicio:</label>
+            <DatePicker
+              selected={startDate}
+              onChange={(date) => setStartDate(date)}
+              selectsStart
+              startDate={startDate}
+              endDate={endDate}
+              dateFormat="dd/MM/yyyy"
+              className="context-date-input"
+            />
+          </div>
+          <div className="context-date-picker-item">
+            <label className="context-date-label">Fecha de Fin:</label>
+            <DatePicker
+              selected={endDate}
+              onChange={(date) => setEndDate(date)}
+              selectsEnd
+              startDate={startDate}
+              endDate={endDate}
+              minDate={startDate}
+              dateFormat="dd/MM/yyyy"
+              className="context-date-input"
+            />
+          </div>
+        </div>
+      </div>
+      {chartData ? (
+        <div className="context-chart">
           <Line
             data={chartData}
             options={{
@@ -148,61 +176,32 @@ const UserContext = () => {
               },
             }}
           />
-        ) : (
-          <p>Cargando datos...</p>
-        )}
-
-        <h2>Resumen Semanal</h2>
-        <ul>
-          {Object.entries(summary.weeklySummary || {}).map(([week, counts]) => (
-            <li key={week}>
-              {week}: {counts.sessions} sesiones, {counts.entries} entradas
-            </li>
-          ))}
-        </ul>
-        <h2>Resumen Mensual</h2>
-        <ul>
-          {Object.entries(summary.monthlySummary || {}).map(
-            ([month, counts]) => (
-              <li key={month}>
-                {month}: {counts.sessions} sesiones, {counts.entries} entradas
-              </li>
-            )
-          )}
-        </ul>
-        <div style={{ marginBottom: "20px", textAlign: "center" }}>
-          <h2>Selecciona el Rango de Fechas</h2>
-          <div
-            style={{ display: "flex", justifyContent: "center", gap: "10px" }}
-          >
-            <div>
-              <label>Fecha de Inicio:</label>
-              <DatePicker
-                selected={startDate}
-                onChange={(date) => setStartDate(date)}
-                selectsStart
-                startDate={startDate}
-                endDate={endDate}
-                dateFormat="dd/MM/yyyy"
-              />
-            </div>
-            <div>
-              <label>Fecha de Fin:</label>
-              <DatePicker
-                selected={endDate}
-                onChange={(date) => setEndDate(date)}
-                selectsEnd
-                startDate={startDate}
-                endDate={endDate}
-                minDate={startDate}
-                dateFormat="dd/MM/yyyy"
-              />
-            </div>
-          </div>
         </div>
-      </div>
+      ) : (
+        <p className="context-loading">Cargando datos...</p>
+      )}
+
+      <h2 className="context-subtitle">Resumen Semanal</h2>
+      <ul className="context-list">
+        {Object.entries(summary.weeklySummary || {}).map(([week, counts]) => (
+          <li key={week} className="context-list-item">
+            {week}: {counts.sessions} sesiones, {counts.entries} entradas
+          </li>
+        ))}
+      </ul>
+
+      <h2 className="context-subtitle">Resumen Mensual</h2>
+      <ul className="context-list">
+        {Object.entries(summary.monthlySummary || {}).map(([month, counts]) => (
+          <li key={month} className="context-list-item">
+            {month}: {counts.sessions} sesiones, {counts.entries} entradas
+          </li>
+        ))}
+      </ul>
     </div>
-  );
+  </div>
+);
+
 };
 
 export default UserContext;

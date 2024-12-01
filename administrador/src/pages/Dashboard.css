@@ -3,169 +3,80 @@
   grid-template-areas:
     "tickets info music"
     "map map charts";
-  grid-template-columns: 1fr 1fr 1fr;
-  grid-template-rows: auto 1fr;
-  gap: 20px;
-  padding: 20px;
+  grid-template-columns: 1fr 1fr 1fr; /* Columnas iguales */
+  grid-template-rows: 45% 55%; /* Fila automática */
+  gap: 15px; 
   width: 100%;
-  height: calc(100vh - 60px);
+  height: calc(100vh - 70px); /* Ajuste dinámico excluyendo el TopBar */
+  padding: 10px; /* Espaciado interno */
   box-sizing: border-box;
-  background-color: #f9f9f9;
+  margin-top: 60PX;
 }
 
+/* Estilo general para las secciones */
+.tickets-section,
+.info-section,
+.music-section,
+.map-section,
+.charts-section {
+  border-radius: 8px;
+  background-color: #212121; /* Color oscuro */
+  overflow-y: auto; /* Solo overflow vertical */
+  padding: 10px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: stretch;
+  margin: 0; /* Sin márgenes adicionales */
+}
+
+/* Definición de las áreas del grid */
 .tickets-section {
   grid-area: tickets;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 20px;
-  background-color: #fff;
-  overflow-y: auto;
-}
-
-.tickets-section::-webkit-scrollbar {
-  width: 5px;
-  background-color: #ffffff; /* Fondo oscuro del scroll */
-}
-
-.tickets-section::-webkit-scrollbar-thumb {
-  background-color: #afafaf; /* Pulgar del scroll */
-  border-radius: 5px;
-}
-
-.tickets-section::-webkit-scrollbar-thumb:hover {
-  background-color: #777777;
 }
 
 .info-section {
   grid-area: info;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 20px;
-  background-color: #fff;
-}
-
-.card{
-  /* background-color: rgba(225, 0, 0, 0.495); */
-  backdrop-filter: blur(5px);
-  border-radius: 10px;
-  border: 1px solid #00000025;
-  width: 100px;
-  height: 140px;
-  text-align: center;
-  margin: 0;
-}
-
-.info-section h1{
-  font-size: 5;
-}
-
-.card p{
-  font: 8px;
 }
 
 .music-section {
   grid-area: music;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 20px;
-  background-color: #fff;
 }
 
 .map-section {
   grid-area: map;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 20px;
-  background-color: #fff;
 }
 
 .charts-section {
   grid-area: charts;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 20px;
-  background-color: #fff;
 }
 
-.charts-section canvas{
-  height: 180px !important;
+/* Ajustes responsivos */
+@media (max-width: 1024px) {
+  .main-dashboard {
+    grid-template-areas:
+      "tickets"
+      "info"
+      "music"
+      "map"
+      "charts";
+    grid-template-columns: 1fr; /* Una sola columna */
+    grid-template-rows: repeat(5, auto);
+  }
 }
 
+@media (max-width: 768px) {
+  .main-dashboard {
+    gap: 5px; /* Espaciado más compacto */
+  }
 
-
-.popup {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-color: rgba(0, 0, 0, 0.5); /* Fondo semi-transparente */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
-
-.popup-content {
-  background-color: white;
-  border-radius: 8px;
-  z-index: 10;
-  padding: 20px;
-  width: 80%; /* Ancho del modal */
-  max-width: 700px; /* Máximo ancho */
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-  position: relative;
-}
-
-.popup-close {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background-color: transparent;
-  border: none;
-  font-size: 16px;
-  cursor: pointer;
-}
-
-.modal-title {
-  font-size: 20px;
-  margin-bottom: 15px;
-  font-weight: bold;
-}
-
-.modal-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 15px;
-}
-
-.modal-table th, .modal-table td {
-  padding: 10px;
-  text-align: left;
-  border: 1px solid #ddd;
-}
-
-.data-summary {
-  margin-top: 15px;
-  font-size: 14px;
-  text-align: right;
-  color: #555;
-}
-
-.charts-section {
-  grid-area: charts;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 20px;
-  background-color: #fff;
-  text-align: center;
-}
-
-.charts-section canvas {
-  max-width: 100%;
-  height: auto;
+  .tickets-section,
+  .info-section,
+  .music-section,
+  .map-section,
+  .charts-section {
+    padding: 0; /* Ajuste para pantallas pequeñas */
+    font-size: 14px; /* Texto más pequeño */
+  }
 }

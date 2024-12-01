@@ -1,83 +1,122 @@
-.dashboard-container {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr); /* 4 columnas iguales */
-    gap: 20px; /* Espaciado entre las tarjetas */
-    width: 100%;
-    padding: 20px;
-    background-color: #f9f9f9; /* Fondo claro */
-    border-radius: 8px; /* Bordes redondeados */
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  }
-  
-  .info-section,
-  .music-section {
-    grid-column: span 2; /* Cada sección ocupa 2 columnas */
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  
-  .info-title,
-  .music-title {
-    font-size: 20px;
-    font-weight: bold;
-    text-align: center;
-    margin-bottom: 15px;
-  }
-  
-  .info-cards {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr); /* Tarjetas distribuidas en 2 columnas */
-    gap: 10px; /* Espaciado entre tarjetas */
-  }
-  
-  .info-card {
-    background-color: #ffffff; /* Fondo blanco */
-    border: 1px solid #ddd; /* Borde claro */
-    border-radius: 8px;
-    text-align: center;
-    padding: 15px;
-    transition: box-shadow 0.3s ease;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  }
-  
-  .info-card:hover {
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Sombra al pasar el mouse */
-  }
-  
-  .info-card h3 {
-    font-size: 16px;
-    font-weight: bold;
-    margin-bottom: 10px;
-    color: #444;
-  }
-  
-  .info-card p {
-    font-size: 14px;
-    color: #e74c3c;
-    margin: 0;
-  }
-  
-  .music-card {
-    background-color: #ffffff; /* Fondo blanco */
-    border: 1px solid #ddd; /* Borde claro */
-    border-radius: 8px;
-    text-align: center;
-    padding: 15px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    max-width: 100%; /* Se adapta al contenedor */
-  }
-  
-  .music-card img {
-    width: 100%; /* Imagen ocupa todo el ancho */
-    max-width: 300px; /* Ancho máximo */
-    border-radius: 8px; /* Bordes redondeados */
-    object-fit: cover; /* Asegura proporción */
-  }
-  
-  .music-card p {
-    margin: 10px 0;
-    font-size: 14px;
-    color: #444;
-  }
-  
+/* Contenedor principal */
+.info-container {
+  width: 100%;
+  height: 100%;
+  padding: 20px;
+  background-color: #212121; /* Fondo oscuro */
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+  color: #ffffff; /* Texto blanco */
+  text-align: center;
+  box-sizing: border-box;
+  overflow: hidden; /* Evita desbordamientos */
+}
+
+/* Título principal */
+.info-title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  color: #bb86fc; 
+  text-transform: uppercase;
+}
+
+/* Contenedor de tarjetas */
+.info-cards {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* 2 columnas */
+  gap: 20px; /* Espaciado entre tarjetas */
+  margin: 0 auto; /* Centra el contenido */
+  max-width: 600px; /* Ancho máximo del grid */
+  max-height: 100%;
+}
+
+/* Tarjetas */
+.info-card {
+  background-color: #2b2b2b; /* Fondo ligeramente más claro */
+  border: 1px solid #444; /* Borde más oscuro */
+  border-radius: 10px;
+  text-align: center;
+  padding: 15px;
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+}
+
+.info-card:hover {
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5);
+  transform: translateY(-5px); 
+}
+
+/* Títulos de las tarjetas */
+.info-card h3 {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  color: #bb86fc; /* Color del título */
+}
+
+/* Contenido de las tarjetas */
+.info-card p {
+  font-size: 16px;
+  color: #ffffff; /* Texto blanco */
+  margin: 0;
+}
+
+/* Modal */
+.info-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  transition: 1s;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 8;
+}
+
+/* Contenido del modal */
+.info-modal-content {
+  background-color: #2b2b2b; /* Fondo del modal */
+  border-radius: 10px;
+  padding: 30px;
+  width: 90%;
+  max-width: 400px;
+  text-align: center;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+  color: #ffffff; /* Texto blanco */
+}
+
+/* Botón de cerrar */
+.info-modal-close {
+  background-color: #bb86fc; 
+  border: none;
+  color: #ffffff;
+  padding: 10px 20px;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-bottom: 15px;
+}
+
+.info-modal-close:hover {
+  background-color: #9b6bf2;
+}
+
+.info-modal-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.info-modal-content::-webkit-scrollbar-thumb {
+  background-color: #444;
+  border-radius: 8px;
+}
+
+.info-modal-content::-webkit-scrollbar-track {
+  background-color: #2b2b2b;
+}
