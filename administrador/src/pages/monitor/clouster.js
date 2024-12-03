@@ -3,7 +3,7 @@ import { collection, getDocs, addDoc, Timestamp } from "firebase/firestore";
 import { db } from "../../firebase";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import { Pie, Bar } from "react-chartjs-2"; // Gráficos
-import "./clouster.css";
+import "./Clouster.css";
 import CustomAlert from "../../components/customAlert";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
