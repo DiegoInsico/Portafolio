@@ -1,189 +1,139 @@
 import React, { useState, useEffect } from "react";
+import {
+  collection,
+  getDocs,
+  deleteDoc,
+  doc,
+  updateDoc,
+} from "firebase/firestore";
+import { auth, db } from "../../firebase";
+import { ToastContainer, toast } from "react-toastify";
+import { Box, Button, Typography } from "@mui/material";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { DataGrid } from "@mui/x-data-grid";
 import "./userList.css";
-import { addDoc, collection, getDocs } from "firebase/firestore";
-import { db } from "../../firebase";
 
-const UserList = ({ users, onEdit, onToggleBan, onView }) => {
-  const [showUsers, setShowUsers] = useState(true); // Alterna entre usuarios y trabajadores
-  const [workers, setWorkers] = useState([]); // Lista de trabajadores
-  const [showAddWorker, setShowAddWorker] = useState(false);
-  const [selectedWorker, setSelectedWorker] = useState(null);
-  const [workerRole, setWorkerRole] = useState(""); // "Analista" o "Operador"
+const UserList = () => {
+  const [users, setUsers] = useState([]);
 
-  // Cargar trabajadores desde Firebase
-  const fetchWorkers = async () => {
+  // Obtener lista de empleados
+  const fetchUsers = async () => {
     try {
-      const workersSnapshot = await getDocs(collection(db, "employees"));
-      const workersList = workersSnapshot.docs.map((doc) => {
-        const data = doc.data();
-        return {
-          id: doc.id,
-          ...data,
-          CreationRole: data.CreationRole?.toDate ? data.CreationRole.toDate() : data.CreationRole, // Convierte el timestamp si es necesario
-        };
-      });
-      setWorkers(workersList);
+      const querySnapshot = await getDocs(collection(db, "employees"));
+      const usersData = querySnapshot.docs.map((doc) => ({
+        id: doc.id, // ID del documento en Firestore
+        ...doc.data(),
+      }));
+      setUsers(usersData);
     } catch (error) {
-      console.error("Error al cargar trabajadores:", error);
+      console.error("Error al obtener los empleados:", error);
+      toast.error("Error al obtener los empleados.");
     }
   };
-  
 
-  // Cargar usuarios y trabajadores al montar
+  // Autenticar empleado
+  const handleAuthenticateEmployee = async (employee) => {
+    try {
+      // Crear usuario en Firebase Authentication usando el ID del documento como UID
+      const customUid = employee.id;
+      const email = employee.email;
+      const password = "contraseña-segura-por-defecto";
+
+      // Usar una función personalizada para crear el usuario con UID
+      const { user } = await createUserWithEmailAndPassword(auth, email, password);
+
+      // Actualizar el documento en Firestore con el UID del usuario autenticado
+      await updateDoc(doc(db, "employees", customUid), {
+        authId: user.uid,
+        isAuthenticated: true,
+      });
+
+      toast.success(`Empleado ${employee.displayName} autenticado con éxito.`);
+      fetchUsers(); // Refrescar lista
+    } catch (error) {
+      console.error("Error al autenticar empleado:", error);
+      toast.error("Error al autenticar empleado.");
+    }
+  };
+
+  // Eliminar empleado
+  const handleDelete = async (userId) => {
+    try {
+      await deleteDoc(doc(db, "employees", userId));
+      toast.success("Empleado eliminado con éxito.");
+      fetchUsers(); // Actualizar lista después de eliminar
+    } catch (error) {
+      console.error("Error al eliminar empleado:", error);
+      toast.error("Error al eliminar empleado.");
+    }
+  };
+
   useEffect(() => {
-    fetchWorkers();
+    fetchUsers();
   }, []);
 
   return (
-    <div className="user-list-container">
-      <h2 className="user-list-title">Gestión de Usuarios y Trabajadores</h2>
-
-      {/* Botones para alternar vistas */}
-      <div className="userlist-buttons">
-        <button onClick={() => setShowUsers(true)}>Mostrar Usuarios</button>
-        <button onClick={() => setShowUsers(false)}>Mostrar Trabajadores</button>
-        {!showUsers && (
-          <button
-            className="userlist-add-worker"
-            onClick={() => setShowAddWorker(true)}
-          >
-            Agregar Trabajador
-          </button>
-        )}
-      </div>
-
-      {/* Modal para agregar trabajador */}
-      {showAddWorker && (
-        <div className="userlist-modal-overlay">
-          <div className="userlist-modal">
-            <h3>Selecciona un Usuario para Asignarlo como Trabajador</h3>
-            <ul className="userlist-modal-userlist">
-              {users.map((user) => (
-                <li key={user.id}>
-                  {user.displayName} ({user.email})
-                  <button
-                    onClick={() => setSelectedWorker(user)}
-                    className="userlist-select-user"
-                  >
-                    Seleccionar
-                  </button>
-                </li>
-              ))}
-            </ul>
-            {selectedWorker && (
-              <div className="userlist-role-selection">
-                <p>
-                  Usuario Seleccionado:{" "}
-                  <strong>{selectedWorker.displayName}</strong>
-                </p>
-                <label>
-                  <input
-                    type="radio"
-                    name="workerRole"
-                    value="Analista"
-                    onChange={(e) => setWorkerRole(e.target.value)}
-                  />
-                  Analista
-                </label>
-                <label>
-                  <input
-                    type="radio"
-                    name="workerRole"
-                    value="Operador"
-                    onChange={(e) => setWorkerRole(e.target.value)}
-                  />
-                  Operador
-                </label>
-                <button
-                  onClick={async () => {
-                    if (selectedWorker && workerRole) {
-                      await addDoc(collection(db, "employees"), {
-                        ...selectedWorker,
-                        role: workerRole,
-                        CreationRole: new Date(),
-                      });
-                      setShowAddWorker(false);
-                      setSelectedWorker(null);
-                      setWorkerRole("");
-                      fetchWorkers(); // Actualizar lista de trabajadores
-                    }
-                  }}
-                  className="userlist-assign-role"
+    <Box
+      sx={{
+        maxWidth: 800,
+        margin: "auto",
+        padding: 3,
+        backgroundColor: "#212121",
+        borderRadius: 2,
+      }}
+    >
+      <Typography variant="h6" gutterBottom>
+        Lista de Empleados
+      </Typography>
+      <DataGrid
+        rows={users}
+        columns={[
+          { field: "displayName", headerName: "Nombre", width: 150 },
+          { field: "email", headerName: "Correo", width: 200 },
+          { field: "role", headerName: "Rol", width: 100 },
+          {
+            field: "isAuthenticated",
+            headerName: "Estado",
+            width: 150,
+            renderCell: (params) => (
+              <span>
+                {params.row.isAuthenticated ? "Autenticado" : "No autenticado"}
+              </span>
+            ),
+          },
+          {
+            field: "actions",
+            headerName: "Acciones",
+            width: 200,
+            renderCell: (params) => (
+              <>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={() => handleAuthenticateEmployee(params.row)}
+                  disabled={params.row.isAuthenticated}
+                  style={{ marginRight: "10px" }}
                 >
-                  Asignar Rol
-                </button>
-              </div>
-            )}
-            <button
-              onClick={() => setShowAddWorker(false)}
-              className="userlist-modal-close"
-            >
-              Cancelar
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Vista de Usuarios o Trabajadores */}
-      {showUsers ? (
-        <table className="userlist-table">
-          <thead>
-            <tr>
-              <th>Nombre</th>
-              <th>Email</th>
-              <th>Rol</th>
-              <th>Estado</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {users.map((user) => (
-              <tr key={user.id}>
-                <td>{user.displayName}</td>
-                <td>{user.email}</td>
-                <td>{user.isAdmin ? "Administrador" : "Usuario"}</td>
-                <td>{user.isBanned ? "Baneado" : "Activo"}</td>
-                <td>
-                  <button
-                    onClick={() => onEdit(user)}
-                    className="userlist-action edit"
-                  >
-                    Editar
-                  </button>
-                  <button
-                    onClick={() => onToggleBan(user.id, user.isBanned)}
-                    className={`userlist-action ${
-                      user.isBanned ? "ban-active" : "ban-inactive"
-                    }`}
-                  >
-                    {user.isBanned ? "Desbanear" : "Banear"}
-                  </button>
-                  <button
-                    onClick={() => onView(user)}
-                    className="userlist-action view"
-                  >
-                    Ver Usuario
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      ) : (
-        <div className="worker-list">
-          <h2>Lista de Trabajadores</h2>
-          <ul className="worker-list-ul">
-            {workers.map((worker) => (
-              <li key={worker.id} className="worker-list-item">
-                {worker.displayName} - {worker.role} (
-                Asignado el{" "}
-                {new Date(worker.CreationRole).toLocaleDateString()})
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-    </div>
+                  Autenticar
+                </Button>
+                <Button
+                  variant="contained"
+                  color="secondary"
+                  onClick={() => handleDelete(params.row.id)}
+                >
+                  Eliminar
+                </Button>
+              </>
+            ),
+          },
+        ]}
+        pageSize={5}
+        rowsPerPageOptions={[5, 10, 20]}
+        autoHeight
+        disableSelectionOnClick
+      />
+      <ToastContainer />
+    </Box>
   );
 };
 

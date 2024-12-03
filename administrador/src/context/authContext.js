@@ -1,12 +1,25 @@
 // src/context/AuthContext.js
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { auth } from "../firebase";
+import { auth, db } from "../firebase";
 import { onAuthStateChanged } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
 
 const AuthContext = createContext();
 
 export const useAuth = () => {
   return useContext(AuthContext);
+};
+
+
+export const getCurrentUserRole = async () => {
+  try {
+    const user = auth.currentUser;
+    const userDoc = await getDoc(doc(db, "employees", user.uid));
+    return userDoc.exists() ? userDoc.data().role : null;
+  } catch (error) {
+    console.error("Error al obtener el rol del usuario:", error);
+    throw error;
+  }
 };
 
 export const AuthProvider = ({ children }) => {

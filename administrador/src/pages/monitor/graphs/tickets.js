@@ -4,7 +4,9 @@ import "react-circular-progressbar/dist/styles.css";
 import { collection, getDocs } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import { db } from "../../../firebase"; // Ajusta la ruta según tu proyecto
-import './css/ticket.css';
+import "./css/ticket.css";
+import { Modal } from "@mui/material";
+import TicketDetails from "../../system/TicketDetails";
 
 const mapEmployeeIdsToDisplayNames = async () => {
   const employeeMap = {};
@@ -15,19 +17,19 @@ const mapEmployeeIdsToDisplayNames = async () => {
 
     employeesSnapshot.forEach((doc) => {
       const data = doc.data();
-      const employeeIdentifier = doc.id; // Usa el ID del documento como clave
-      const displayName = data.displayName || "Empleado Desconocido";
-      const role = data.role || "Desconocido";
+      const employeeIdentifier = doc.id; // ID del documento como clave
+      const displayName = data.displayName || "Sin asignar";
+      const role = data.role || "Sin rol";
 
       console.log(
         `Empleado encontrado: ${displayName}, ID: ${employeeIdentifier}`
       );
 
-      // Almacena el empleado en el mapa
+      // Almacenar en el mapa
       employeeMap[employeeIdentifier] = { displayName, role };
     });
 
-    console.log("Mapa de empleados actualizado:", employeeMap);
+    console.log("Mapa de empleados completo:", employeeMap);
     return employeeMap;
   } catch (error) {
     console.error("Error al mapear employeeId a displayName:", error);
@@ -38,6 +40,8 @@ const mapEmployeeIdsToDisplayNames = async () => {
 const TicketsChart = () => {
   const [statusData, setStatusData] = useState([]);
   const [tableData, setTableData] = useState([]);
+  const [selectedTicket, setSelectedTicket] = useState(null); // Ticket seleccionado
+  const [isModalOpen, setIsModalOpen] = useState(false); // Estado del modal
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -51,43 +55,65 @@ const TicketsChart = () => {
         let abiertoCount = 0;
         let cerradoCount = 0;
         const tableRows = [];
+        let enProgresoCount = 0;
 
         ticketsSnapshot.forEach((doc) => {
           const data = doc.data();
-          console.log(`Ticket encontrado: ${doc.id}`, data);
+          console.log("Datos del ticket:", data);
 
           if (data.status === "abierto") {
             abiertoCount++;
           } else if (data.status === "cerrado") {
             cerradoCount++;
+          } else if (data.status === "en progreso") {
+            enProgresoCount++;
+          }
+          if (!employeeMap[data.assignedTo]) {
+            console.warn(`Empleado no encontrado para ID: ${data.assignedTo}`);
           }
 
           const assignedToInfo = employeeMap[data.assignedTo] || {
-            displayName: "Empleado Desconocido",
-            role: "Desconocido",
+            displayName: "Sin asignar",
+            role: "",
           };
 
-          if (data.status === "abierto") {
+          if (data.status === "abierto" || data.status === "en progreso") {
             tableRows.push({
               id: doc.id,
               assignedTo: `${assignedToInfo.displayName} - ${assignedToInfo.role}`,
               priority: data.priority || "No Definida",
-              createdAt:
-                data.createdAt?.toDate().toLocaleString() || "Fecha Desconocida",
+              createdAt: data.createdAt?.toDate().toLocaleString() || "Fecha Desconocida",
+              status: data.status || "Sin estado",
+              description: data.description || "Sin descripción",
+              subject: data.subject || "Sin asunto",
+              updatedAt: data.updatedAt?.toDate().toLocaleString() || "Sin fecha",
             });
+            
+
+            console.log(
+              "Fila agregada a la tabla:",
+              tableRows[tableRows.length - 1]
+            );
           }
         });
 
         // Calcular porcentajes después de contar
-        const total = abiertoCount + cerradoCount;
+        const total = abiertoCount + cerradoCount + enProgresoCount;
         const statusData = [
           {
             estado: "abierto",
-            porcentaje: total > 0 ? ((abiertoCount / total) * 100).toFixed(2) : 0,
+            porcentaje:
+              total > 0 ? ((abiertoCount / total) * 100).toFixed(2) : 0,
           },
           {
             estado: "cerrado",
-            porcentaje: total > 0 ? ((cerradoCount / total) * 100).toFixed(2) : 0,
+            porcentaje:
+              total > 0 ? ((cerradoCount / total) * 100).toFixed(2) : 0,
+          },
+          {
+            estado: "en progreso",
+            porcentaje:
+              total > 0 ? ((enProgresoCount / total) * 100).toFixed(2) : 0,
           },
         ];
 
@@ -105,7 +131,16 @@ const TicketsChart = () => {
   }, []);
 
   const handleViewDetails = (id) => {
-    navigate(`/tickets/${id}`); // Redirige a la página de detalles del ticket
+    const ticket = tableData.find((row) => row.id === id); // Buscar ticket en la tabla
+    console.log("Ticket seleccionado para detalles:", ticket);
+
+    setSelectedTicket(ticket);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setSelectedTicket(null);
+    setIsModalOpen(false);
   };
 
   return (
@@ -162,6 +197,18 @@ const TicketsChart = () => {
           </tbody>
         </table>
       </div>
+      <Modal
+        open={isModalOpen}
+        onClose={handleCloseModal}
+        aria-labelledby="modal-title"
+        aria-describedby="modal-description"
+      >
+        <div className="modal-container">
+          {selectedTicket && (
+            <TicketDetails ticket={selectedTicket} onClose={handleCloseModal} />
+          )}
+        </div>
+      </Modal>
     </div>
   );
 };

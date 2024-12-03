@@ -1,117 +1,149 @@
-/* src/pages/system/TicketDetails.css */
-
-.ticket-details-container {
+.modal-container {
+  width: 100%;
+  height: 100%; /* Incrementado para usar más espacio */
   display: flex;
   flex-direction: column;
-  height: 100vh;
-  padding: 20px;
-  box-sizing: border-box;
-  background-color: #f0f2f5;
-  font-family: 'Roboto', sans-serif;
+  background-color: #212121;
+  border-radius: 10px;
 }
 
-.header {
+.header-container {
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  background-color: #1976d2;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.close-button {
+  background-color: #f50057;
   color: #fff;
-  padding: 10px 20px;
-  border-radius: 8px 8px 0 0;
-}
-
-.assignment-section {
-  display: flex;
-  align-items: center;
-  padding: 10px 20px;
-  background-color: #ffffff;
-  border-bottom: 1px solid #ccc;
-}
-
-.assign-select {
-  min-width: 200px;
-}
-
-.assign-button {
-  padding: 6px 12px;
-}
-
-.description-section {
-  padding: 20px;
-  background-color: #ffffff;
-  border-bottom: 1px solid #ccc;
-}
-
-.chat-section {
-  flex-grow: 1;
-  padding: 20px;
-  overflow-y: auto;
-  background-color: #f5f5f5;
-}
-
-.send-message-bar {
-  display: flex;
-  align-items: center;
-  padding: 10px 20px;
-  background-color: #ffffff;
-  border-top: 1px solid #ccc;
-}
-
-.send-message-bar .MuiTextField-root {
-  margin-right: 10px;
-}
-
-.mark-solved-section {
-  padding: 10px 20px;
-  background-color: #ffffff;
-  border-top: 1px solid #ccc;
-  text-align: right;
-}
-
-.message-item {
-  display: flex;
-  align-items: flex-start;
-  margin-bottom: 10px;
-}
-
-.user-message {
-  justify-content: flex-start;
-}
-
-.admin-message {
-  justify-content: flex-end;
-}
-
-.message-bubble {
   padding: 10px 15px;
-  border-radius: 15px;
+  border-radius: 8px;
+  font-weight: bold;
+}
+
+.resolve-button {
+  background-color: #4caf50;
+  color: #fff;
+  padding: 10px 15px;
+  border-radius: 8px;
+  font-weight: bold;
+}
+
+.modal-title {
+  font-weight: bold;
+  font-size: 24px;
+  color: #fff;
+}
+
+.details-container {
+  flex: 1;
+  display: flex;
+  gap: 20px;
+}
+
+.description-box {
+  width: 40%;
+  background-color: #1c1c1c;
+  padding: 20px;
+  border-radius: 8px;
+  overflow-y: auto; /* Para que la descripción pueda desplazarse si es muy larga */
+}
+
+.description-box p {
+  margin: 10px 0;
+  color: #ff6f61; /* Resaltando los detalles */
+  font-size: 16px;
+}
+
+.chat-container {
+  flex: 1;
+  background-color: #1c1c1c;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.chat-list {
+  flex: 1;
+  padding: 10px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.chat-message {
   max-width: 70%;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  padding: 15px;
+  border-radius: 10px;
+  color: #fff;
+  font-size: 14px;
+  line-height: 1.4;
 }
 
-.user-message .message-bubble {
-  background-color: #e0f7fa;
+.chat-message.user {
+  align-self: flex-start;
+  background-color: #f48fb1;
 }
 
-.admin-message .message-bubble {
-  background-color: #c5cae9;
+.chat-message.worker {
+  align-self: flex-end;
+  background-color: #90caf9;
 }
 
-@media (max-width: 768px) {
-  .assignment-section, .description-section, .chat-section, .send-message-bar, .mark-solved-section {
-    padding: 10px;
-  }
+.chat-timestamp {
+  font-size: 12px;
+  color: #ccc;
+  text-align: right;
+  margin-top: 5px;
+}
 
-  .assign-select {
-    min-width: 150px;
-  }
+.chat-input-container {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  background-color: #2b2b2b;
+  border-radius: 8px;
+  margin-top: 10px;
+}
 
-  .assign-button {
-    padding: 4px 8px;
-    font-size: 0.875rem;
-  }
+.chat-input {
+  flex: 1;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #fff;
+  margin-right: 10px;
+  font-size: 16px;
+}
 
-  .send-message-bar .MuiTextField-root {
-    margin-right: 5px;
-  }
+.chat-send-button {
+  padding: 10px 20px;
+  background-color: #2196f3;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.chat-send-button:hover {
+  background-color: #065fb8;
+  transition: 0.3s;
+}
+
+/* Scrollbar personalizado */
+.chat-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.chat-list::-webkit-scrollbar-thumb {
+  background-color: #444;
+  border-radius: 5px;
+}
+
+.chat-list::-webkit-scrollbar-track {
+  background-color: #2b2b2b;
 }

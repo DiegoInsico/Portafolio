@@ -91,11 +91,16 @@ const Clouster = () => {
       // Mapear empleados
       employeesSnapshot.forEach((doc) => {
         const data = doc.data();
+        console.log(`Empleado encontrado: ${data.displayName}, IDDocument: ${doc.id}`);
         employeeMap[doc.id] = {
           displayName: data.displayName || "Desconocido",
           role: data.role || "Sin rol",
+          employeeId: data.employeeId, // Opcional, por si es necesario.
         };
       });
+      
+
+      console.log("Mapa de empleados procesado: ", employeeMap);
 
       // Procesar logs existentes
       logsSnapshot.forEach((doc) => logsData.push(doc.data()));
@@ -103,30 +108,39 @@ const Clouster = () => {
       // Procesar asignaciones y respuestas desde tickets
       ticketsSnapshot.forEach((doc) => {
         const ticketData = doc.data();
-        if (ticketData.assignedTo) {
+        console.log(`Ticket encontrado: ${doc.id}`, ticketData);
+      
+        const assignedEmployee = employeeMap[ticketData.assignedTo]; // Buscar en el mapa por idDocument.
+      
+        if (assignedEmployee) {
+          console.log(`Empleado asignado encontrado: ${assignedEmployee.displayName}`);
           logsData.push({
             timestamp: ticketData.updatedAt || ticketData.createdAt,
             description: `Asignación de ticket: ${ticketData.subject}`,
-            action: `Asignado a: ${
-              employeeMap[ticketData.assignedTo]?.displayName || "Desconocido"
-            } - ${employeeMap[ticketData.assignedTo]?.role || "Sin rol"}`,
+            action: `Asignado a: ${assignedEmployee.displayName} - ${assignedEmployee.role}`,
+          });
+        } else {
+          console.log(`Empleado asignado no encontrado: ${ticketData.assignedTo}`);
+          logsData.push({
+            timestamp: ticketData.updatedAt || ticketData.createdAt,
+            description: `Asignación de ticket: ${ticketData.subject}`,
+            action: `Asignado a: Desconocido`,
           });
         }
-
-        // Agregar log de respuesta si existe
+      
+        // Procesar respuesta, si existe.
         if (ticketData.respuesta) {
           logsData.push({
             timestamp: ticketData.updatedAt || ticketData.createdAt,
             description: `Respuesta registrada para ticket: ${ticketData.subject}`,
-            action: `Estado: ${ticketData.estado || "Abierto"}, Respuesta: ${
-              ticketData.respuesta || "Sin respuesta"
-            }`,
-            respondedBy: `${
-              employeeMap[ticketData.assignedTo]?.displayName || "Desconocido"
-            } - ${employeeMap[ticketData.assignedTo]?.role || "Sin rol"}`,
+            action: `Estado: ${ticketData.status || "Abierto"}, Respuesta: ${ticketData.respuesta}`,
+            respondedBy: assignedEmployee
+              ? `${assignedEmployee.displayName} - ${assignedEmployee.role}`
+              : "Desconocido",
           });
         }
       });
+      
 
       setLogs(logsData);
     } catch (error) {
@@ -162,8 +176,6 @@ const Clouster = () => {
         relatedDocId: docRef.id, // Relaciona con el anuncio creado
         timestamp: Timestamp.now(),
       });
-
-      console.log("Anuncio y alerta creados con éxito");
       setAlertMessage("¡El anuncio ha sido creado exitosamente!");
     } catch (error) {
       console.error("Error al crear el anuncio y la alerta:", error);

@@ -1,23 +1,123 @@
+/* Contenedor principal de Inbox */
 .inbox-container {
-  padding: 20px;
-  background-color: #f0f2f5;
-  width: 80%; /* Asegura que ocupe todo el ancho del contenedor */
-  box-sizing: border-box; /* Incluye padding en el cálculo del ancho */
-}
-
-
-.inbox-header {
-  color: #333;
-  margin-bottom: 20px;
-}
-.data-grid-container {
-  flex: 1; /* Permite que el DataGrid se expanda para llenar el espacio */
-  width: 100%;
+  margin-top: 20px;
+  /* Espacio entre la barra y el contenedor */
+  display: flex;
+  flex-direction: column;
   align-items: center;
+  color: white;
+  font-family: "Arial", sans-serif;
 }
 
-@media (max-width: 768px) {
-  .data-grid-container {
-    height: 400px; /* Reducir la altura en pantallas pequeñas */
-  }
+/* Título */
+.inbox-title {
+  margin-bottom: 20px;
+  color: #fff;
+}
+
+/* Barra de filtros */
+.filter-bar {
+  width: 50%;
+  /* Reducido para que esté más compacto */
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 20px;
+  justify-content: flex-start;
+  /* Alineado a la izquierda */
+}
+
+/* Ajuste para el input de filtro */
+.filter-input {
+  flex: none;
+  width: 70%;
+  /* Reducido para que no ocupe tanto espacio */
+  max-width: 300px;
+  /* Limita el ancho máximo */
+  background-color: #2c2c2c;
+  color: white;
+  border-radius: 5px;
+}
+
+.filter-input input {
+  color: white;
+  padding: 5px;
+}
+
+/* Botón de filtro */
+.filter-select {
+  background-color: #404040;
+  color: white;
+  border-radius: 5px;
+}
+
+/* Contenedor de la tabla */
+.table-container {
+  width: 70%;
+  /* Ajustado para un diseño más compacto */
+  margin: auto;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
+  /* Agregando un sombreado ligero */
+}
+
+/* Estilos de la tabla */
+.tickets-table {
+  background-color: #1e1e1e;
+  border: none;
+  color: white;
+}
+
+/* Encabezados de la tabla */
+.tickets-table .MuiDataGrid-columnHeaders {
+  background-color: #2c2c2c;
+  color: #aaaaaa;
+  /* Cambia el color a gris claro para visibilidad */
+  font-weight: bold;
+  /* Para destacar los títulos */
+}
+
+.tickets-table .MuiDataGrid-row {
+  background-color: #1e1e1e;
+  color: white;
+}
+
+/* Celda de la tabla */
+.tickets-table .MuiDataGrid-cell {
+  border-bottom: 1px solid #2c2c2c;
+  color: white;
+  /* Asegura el contraste del texto */
+}
+
+/* Botón Ver Detalles */
+.actions-container button {
+  background-color: #404040;
+  color: white;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+}
+
+.actions-container button:hover {
+  background-color: #606060;
+}
+
+/* Select desplegables */
+.MuiSelect-select {
+  background-color: #2c2c2c !important;
+  color: white !important;
+}
+
+.MuiMenu-paper {
+  background-color: #2c2c2c !important;
+  color: white !important;
+}
+
+.MuiMenuItem-root {
+  color: white !important;
+  transition: background-color 0.3s ease;
+}
+
+.MuiMenuItem-root:hover {
+  background-color: #404040 !important;
 }

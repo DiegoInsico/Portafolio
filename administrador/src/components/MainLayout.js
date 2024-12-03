@@ -18,9 +18,11 @@ const MainLayout = ({ children, isAuthenticated, currentUser }) => {
 
         if (!querySnapshot.empty) {
           const data = querySnapshot.docs[0].data();
+          console.log("Detalles del usuario obtenidos:", data);
           setUserRole(data.role || "Sin rol");
           setUserDetails(data);
         } else {
+          console.warn("No se encontró el usuario en la base de datos.");
           setUserRole("Sin rol");
           setUserDetails(null);
         }
