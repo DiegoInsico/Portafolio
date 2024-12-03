@@ -63,81 +63,88 @@ const RolManagement = () => {
       }));
       setEmployees(employeesData);
     } catch (error) {
-      console.error("Error al cargar empleados:", error);
+      console.error("Error al obtener empleados:", error.message);
     }
   };
 
-  // Crear empleado en Firestore
+  // Crear empleado en Firebase Authentication y Firestore
   const handleCreateEmployee = async () => {
     try {
+      // Validar datos obligatorios
       if (!formData.email || !formData.role) {
         setAlertMessage("El correo y el rol son obligatorios.");
         return;
       }
 
-      const docRef = await addDoc(collection(db, "employees"), {
+      // Crear usuario en Firebase Authentication
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        formData.email,
+        formData.password || "password123" // Contraseña predeterminada
+      );
+      const newUser = userCredential.user;
+
+      console.log("Usuario creado en Authentication:", newUser.uid);
+
+      // Crear documento en Firestore con el mismo UID
+      const employeeRef = doc(db, "employees", newUser.uid);
+      await setDoc(employeeRef, {
         ...formData,
-        CreationRole: new Date(),
+        id: newUser.uid, // Sincronizar UID
+        authId: newUser.uid, // Referencia cruzada
+        isAuthenticated: true, // Indica que está autenticado
+        CreationRole: Timestamp.now(),
       });
 
-      // Actualizar el documento con su propio ID
-      await updateDoc(doc(db, "employees", docRef.id), { id: docRef.id });
-
-      setAlertMessage("Trabajador creado con éxito.");
-      fetchEmployees();
+      // Mostrar mensaje de éxito
+      setAlertMessage("Trabajador creado y autenticado con éxito.");
+      fetchEmployees(); // Actualizar la tabla de empleados
     } catch (error) {
-      console.error("Error al crear trabajador:", error);
-      setAlertMessage("Error al crear trabajador: " + error.message);
+      console.error("Error al crear el trabajador:", error.message);
+      setAlertMessage("Error al crear el trabajador: " + error.message);
     }
   };
 
   // Autenticar empleado y actualizar Firestore
   const handleAuthenticateEmployee = async (employee) => {
-    // Mostrar alerta de confirmación
-    setAlertMessage(
-      `¿Estás seguro de autenticar a ${employee.displayName}? Serás redirigido a su cuenta para hacer pruebas.`
-    );
-
-    const confirmAuthentication = window.confirm(
-      `¿Estás seguro de autenticar a ${employee.displayName}? Serás redirigido a su cuenta para hacer pruebas.`
-    );
-
-    if (!confirmAuthentication) {
-      setAlertMessage("Autenticación cancelada por el usuario.");
-      return;
-    }
-
-    const adminEmail = auth.currentUser?.email; // Obtener correo del admin actual
-    const adminPassword = "admin-password"; // Cambiar por la contraseña real
-
     try {
+      if (!employee.email) {
+        toast.error("El correo del empleado es obligatorio para autenticarlo.");
+        return;
+      }
+
+      const confirmAuthentication = window.confirm(
+        `¿Estás seguro de autenticar a ${employee.displayName}? Esto lo registrará en Authentication.`
+      );
+      if (!confirmAuthentication) return;
+
       // Crear usuario en Firebase Authentication
-      const { user } = await createUserWithEmailAndPassword(
+      console.log("Autenticando empleado:", employee);
+
+      const userCredential = await createUserWithEmailAndPassword(
         auth,
         employee.email,
-        "contraseña-segura-por-defecto"
+        "password123" // Contraseña predeterminada
       );
+      const newUser = userCredential.user;
 
-      // Actualizar el documento en Firestore con el UID del usuario autenticado
-      await updateDoc(doc(db, "employees", employee.id), {
-        authId: user.uid,
+      console.log("Usuario autenticado en Firebase:", newUser.uid);
+
+      // Actualizar Firestore con el UID como documentId
+      const employeeRef = doc(db, "employees", newUser.uid);
+      await setDoc(employeeRef, {
+        ...employee,
+        authId: newUser.uid, // Relación con Authentication
         isAuthenticated: true,
       });
 
-      setAlertMessage(
-        `Empleado ${employee.displayName} autenticado con éxito. Redirigiendo a su cuenta...`
-      );
+      toast.success(`Empleado ${employee.displayName} autenticado con éxito.`);
 
-      // Restaurar sesión del administrador después de la prueba
-      setTimeout(async () => {
-        if (adminEmail) {
-          await signInWithEmailAndPassword(auth, adminEmail, adminPassword);
-          setAlertMessage("Sesión del administrador restaurada.");
-        }
-      }, 5000);
+      // Actualizar la tabla en el frontend
+      fetchEmployees();
     } catch (error) {
-      console.error("Error al autenticar empleado:", error);
-      setAlertMessage("Error al autenticar empleado: " + error.message);
+      console.error("Error al autenticar al empleado:", error.message);
+      toast.error(`Error al autenticar al empleado: ${error.message}`);
     }
   };
 
@@ -239,64 +246,50 @@ const RolManagement = () => {
             </tr>
           </thead>
           <tbody>
-            {employees.length > 0 ? (
-              employees.map((employee) => (
-                <tr key={employee.id}>
-                  <td>{employee.displayName || "Sin nombre"}</td>
-                  <td>{employee.email}</td>
-                  <td>{employee.role}</td>
-                  <td>
-                    {employee.isAuthenticated ? (
-                      <span className="authenticated">Autenticado</span>
-                    ) : (
-                      <span className="not-authenticated">No autenticado</span>
-                    )}
-                  </td>
-                  <td>
-                    <button
-                      className="edit-button"
-                      onClick={() => {
-                        setEditingEmployee(employee);
-                        setFormData({
-                          displayName: employee.displayName,
-                          email: employee.email,
-                          password: "",
-                          birthDate: employee.birthDate || "",
-                          pais: employee.pais || "",
-                          ciudad: employee.ciudad || "",
-                          comuna: employee.comuna || "",
-                          role: employee.role || "Analista",
-                        });
-                        setDisplayForm(true);
-                      }}
-                    >
-                      Modificar
-                    </button>
-                    <button
-                      className="delete-button"
-                      onClick={() => {
-                        setEditingEmployee(employee);
-                        setShowDeleteConfirm(true);
-                      }}
-                    >
-                      Eliminar
-                    </button>
-                    {!employee.isAuthenticated && (
-                      <button
-                        className="authenticate-button"
-                        onClick={() => handleAuthenticateEmployee(employee)}
-                      >
-                        Autenticar
-                      </button>
-                    )}
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="5">No hay trabajadores registrados.</td>
+            {employees.map((employee) => (
+              <tr key={employee.id}>
+                <td>{employee.displayName || "Sin nombre"}</td>
+                <td>{employee.email}</td>
+                <td>{employee.role}</td>
+                <td>
+                  {employee.isAuthenticated ? (
+                    <span className="authenticated">Autenticado</span>
+                  ) : (
+                    <span className="not-authenticated">No autenticado</span>
+                  )}
+                </td>
+                <td>
+                  <button
+                    className="edit-button"
+                    onClick={() => {
+                      setEditingEmployee(employee);
+                      setFormData({
+                        displayName: employee.displayName,
+                        email: employee.email,
+                        password: "",
+                        birthDate: employee.birthDate || "",
+                        pais: employee.pais || "",
+                        ciudad: employee.ciudad || "",
+                        comuna: employee.comuna || "",
+                        role: employee.role || "Analista",
+                      });
+                      setDisplayForm(true);
+                    }}
+                  >
+                    Modificar
+                  </button>
+                  <button
+                    className="delete-button"
+                    onClick={() => {
+                      setEditingEmployee(employee);
+                      setShowDeleteConfirm(true);
+                    }}
+                  >
+                    Eliminar
+                  </button>
+                </td>
               </tr>
-            )}
+            ))}
           </tbody>
         </table>
       </div>
@@ -328,14 +321,10 @@ const RolManagement = () => {
               formData={formData}
               setFormData={setFormData}
               onSubmit={() => {
-                toast.success("¿Quieres guardar este usuario?");
                 handleCreateEmployee();
-                setDisplayForm(false); // Cierra el modal al guardar
+                setDisplayForm(false); // Cerrar modal
               }}
-              onClose={() => {
-                toast.info("Operación cancelada.");
-                setDisplayForm(false); // Cierra el modal al cancelar
-              }}
+              onClose={() => setDisplayForm(false)}
             />
           </div>
         </div>

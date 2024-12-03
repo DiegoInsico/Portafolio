@@ -16,6 +16,7 @@ import {
 } from "@mui/material";
 import { ToastContainer, toast } from "react-toastify";
 import "./TicketDetails.css";
+import { auth } from "../../firebase";
 
 const TicketDetails = ({ ticket, onClose }) => {
   console.log("Datos recibidos en TicketDetails:", ticket);
@@ -26,6 +27,8 @@ const TicketDetails = ({ ticket, onClose }) => {
   const assignedTo = ticket.assignedTo || "Sin asignar";
   const priority = ticket.priority || "No Definida";
   const createdAt = ticket.createdAt || "Fecha desconocida";
+  const currentUser = auth.currentUser;
+
 
   // Obtener mensajes en tiempo real
   useEffect(() => {
@@ -42,8 +45,10 @@ const TicketDetails = ({ ticket, onClose }) => {
 
     try {
       // Actualizar estado a "en progreso" si no está ya en este estado
+      // Actualizar estado a "en progreso" si no está ya en este estado
       if (ticket.status !== "en progreso") {
-        await updateTicketStatus(ticket.id, "en progreso");
+        const performedBy = currentUser.displayName || "Usuario desconocido";
+        await updateTicketStatus(ticket.id, "en progreso", performedBy);
         toast.info("El estado del ticket ha cambiado a 'En Progreso'.");
       }
 

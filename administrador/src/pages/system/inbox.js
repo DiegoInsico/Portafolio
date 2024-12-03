@@ -1,22 +1,7 @@
 import React, { useEffect, useState } from "react";
-import {
-  getTickets,
-  getEmployees,
-  updateTicketStatus,
-  assignTicket,
-} from "./ticketService";
+import {getTickets, getEmployees, updateTicketStatus, assignTicket, } from "./ticketService";
 import { ToastContainer, toast } from "react-toastify";
-import {
-  Box,
-  Button,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-  Modal,
-  TextField,
-  Typography,
-} from "@mui/material";
+import { Box, Button, FormControl, InputLabel, MenuItem, Select, Modal, TextField, Typography, } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import TicketDetails from "./TicketDetails";
 import "./inbox.css";
@@ -34,24 +19,8 @@ const Inbox = () => {
 
   // Obtener los tickets en tiempo real
   useEffect(() => {
-    const unsubscribe = getTickets((tickets) => {
-      console.log("Tickets recibidos en Inbox:", tickets);
-      setTickets(tickets);
-    });
+    const unsubscribe = getTickets(setTickets);
     return () => unsubscribe();
-  }, []);
-
-  useEffect(() => {
-    const fetchEmployees = async () => {
-      try {
-        const data = await getEmployees();
-        console.log("Empleados obtenidos:", data);
-        setEmployees(data);
-      } catch (error) {
-        toast.error("Error al obtener la lista de trabajadores.");
-      }
-    };
-    fetchEmployees();
   }, []);
 
   // Obtener la lista de empleados (Operadores y Administradores)

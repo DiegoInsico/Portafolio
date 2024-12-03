@@ -83,24 +83,19 @@ const Clouster = () => {
   const fetchLogs = async () => {
     try {
       const logsSnapshot = await getDocs(collection(db, "logs"));
-      const ticketsSnapshot = await getDocs(collection(db, "tickets")); // Agregamos tickets
-      const employeesSnapshot = await getDocs(collection(db, "employees")); // Agregamos empleados
+      const ticketsSnapshot = await getDocs(collection(db, "tickets"));
+      const employeesSnapshot = await getDocs(collection(db, "employees"));
       const logsData = [];
       const employeeMap = {};
 
       // Mapear empleados
       employeesSnapshot.forEach((doc) => {
         const data = doc.data();
-        console.log(`Empleado encontrado: ${data.displayName}, IDDocument: ${doc.id}`);
         employeeMap[doc.id] = {
           displayName: data.displayName || "Desconocido",
           role: data.role || "Sin rol",
-          employeeId: data.employeeId, // Opcional, por si es necesario.
         };
       });
-      
-
-      console.log("Mapa de empleados procesado: ", employeeMap);
 
       // Procesar logs existentes
       logsSnapshot.forEach((doc) => logsData.push(doc.data()));
@@ -108,39 +103,45 @@ const Clouster = () => {
       // Procesar asignaciones y respuestas desde tickets
       ticketsSnapshot.forEach((doc) => {
         const ticketData = doc.data();
-        console.log(`Ticket encontrado: ${doc.id}`, ticketData);
-      
-        const assignedEmployee = employeeMap[ticketData.assignedTo]; // Buscar en el mapa por idDocument.
-      
-        if (assignedEmployee) {
-          console.log(`Empleado asignado encontrado: ${assignedEmployee.displayName}`);
+        const assignedEmployee = employeeMap[ticketData.assignedTo] || null;
+
+        // Registro de asignaciones
+        if (ticketData.assignedTo) {
           logsData.push({
             timestamp: ticketData.updatedAt || ticketData.createdAt,
             description: `Asignación de ticket: ${ticketData.subject}`,
-            action: `Asignado a: ${assignedEmployee.displayName} - ${assignedEmployee.role}`,
-          });
-        } else {
-          console.log(`Empleado asignado no encontrado: ${ticketData.assignedTo}`);
-          logsData.push({
-            timestamp: ticketData.updatedAt || ticketData.createdAt,
-            description: `Asignación de ticket: ${ticketData.subject}`,
-            action: `Asignado a: Desconocido`,
+            action: assignedEmployee
+              ? `Asignado a: ${assignedEmployee.displayName} - ${assignedEmployee.role}`
+              : `Asignado a: Desconocido`,
           });
         }
-      
-        // Procesar respuesta, si existe.
+
+        // Procesar cambios de estado con operador o administrador
+        if (ticketData.status) {
+          const performedById = ticketData.performedBy; // Agrega este campo en el documento del ticket
+          const performedBy = employeeMap[performedById]
+            ? `${employeeMap[performedById].displayName} - ${employeeMap[performedById].role}`
+            : "Trabajador desconocido";
+
+          logsData.push({
+            timestamp: ticketData.updatedAt || ticketData.createdAt,
+            description: `Cambio de estado del ticket: ${ticketData.subject}`,
+            action: `Nuevo estado: ${ticketData.status} por ${performedBy}`,
+          });
+        }
+
+        // Registro de respuestas (si existen)
         if (ticketData.respuesta) {
           logsData.push({
             timestamp: ticketData.updatedAt || ticketData.createdAt,
             description: `Respuesta registrada para ticket: ${ticketData.subject}`,
-            action: `Estado: ${ticketData.status || "Abierto"}, Respuesta: ${ticketData.respuesta}`,
-            respondedBy: assignedEmployee
-              ? `${assignedEmployee.displayName} - ${assignedEmployee.role}`
-              : "Desconocido",
+            action: `Respuesta: ${ticketData.respuesta}`,
           });
         }
       });
-      
+
+      // Ordenar logs por fecha
+      logsData.sort((a, b) => b.timestamp?.seconds - a.timestamp?.seconds);
 
       setLogs(logsData);
     } catch (error) {
@@ -229,7 +230,14 @@ const Clouster = () => {
                   <tr key={index}>
                     <td>{log.timestamp?.toDate().toLocaleString() || "N/A"}</td>
                     <td>{log.description || "Sin descripción"}</td>
-                    <td>{log.action || "N/A"}</td>
+                    <td>
+                      {log.action || "N/A"}
+                      {log.performedBy && (
+                        <div style={{ fontSize: "0.9em", color: "#888" }}>
+                          <strong>Por:</strong> {log.performedBy}
+                        </div>
+                      )}
+                    </td>
                   </tr>
                 ))
               ) : (

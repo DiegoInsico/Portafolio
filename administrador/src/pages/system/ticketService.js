@@ -21,7 +21,6 @@ export const getTickets = (setTickets) => {
       id: doc.id,
       ...doc.data(),
     }));
-    console.log("Tickets obtenidos desde Firestore:", tickets);
     setTickets(tickets);
   });
 };
@@ -81,6 +80,8 @@ export const getTicketMessages = (ticketId, setMessages) => {
     setMessages(messages);
   });
 };
+
+
 
 export const getTicketsByRole = async (userId, role) => {
   try {

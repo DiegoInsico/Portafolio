@@ -6,6 +6,22 @@ const UserForm = ({ formData, setFormData, onSubmit, onClose }) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    // Mostrar confirmación con toast y alert
+    toast.info("Estás a punto de crear un usuario nuevo.");
+    const confirmation = window.confirm(
+      "Estás a punto de crear un usuario nuevo. Serás redirigido para comprobar este nuevo usuario. ¿Deseas continuar?"
+    );
+
+    if (confirmation) {
+      onSubmit(); // Llamar a la función pasada como prop
+    } else {
+      toast.info("Operación cancelada.");
+    }
+  };
+
   return (
     <div className="form-modal-overlay" onClick={onClose}>
       <div
@@ -15,7 +31,7 @@ const UserForm = ({ formData, setFormData, onSubmit, onClose }) => {
         <button className="form-close-button" onClick={onClose}>
           &times;
         </button>
-        <form onSubmit={onSubmit}>
+        <form onSubmit={handleSubmit}>
           <h2>{formData.id ? "Modificar Trabajador" : "Crear Trabajador"}</h2>
           <input
             type="text"
@@ -98,7 +114,6 @@ const UserForm = ({ formData, setFormData, onSubmit, onClose }) => {
       </div>
     </div>
   );
-  
 };
 
 export default UserForm;
