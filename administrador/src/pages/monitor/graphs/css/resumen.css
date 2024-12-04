@@ -1,57 +1,56 @@
 .dataser-container {
     width: 100%;
-    max-width: 600px; /* Limitar el ancho máximo del contenedor */
-    background-color: #363636; /* Fondo oscuro elegante */
-    color: #ffffff; /* Texto blanco */
-    padding: 10px; /* Pequeño padding para espacio interno */
+    max-width: 600px;
+    background-color: #363636; 
+    color: #ffffff; 
+    padding: 10px; 
     box-sizing: border-box;
     border-radius: 10px;
-    margin: 0 auto; /* Centrado horizontal */
+    margin: 0 auto;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-    overflow-x: hidden; /* Evita overflow horizontal */
+    overflow-x: hidden;
   }
   
   .dataser-chart {
-    width: 100%; /* Usar el 100% del ancho del contenedor */
-    max-width: 500px; /* Limitar el ancho máximo del gráfico */
-    max-height: 300px; /* Limitar la altura máxima del gráfico */
-    margin: 0 auto; /* Centrar */
-    background-color: #2b2b2b; /* Fondo ligeramente más claro */
+    width: 100%; 
+    max-width: 500px;
+    max-height: 300px;
+    margin: 0 auto; 
+    background-color: #2b2b2b;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-    overflow: hidden; /* Asegurar que no haya desbordamiento */
-    padding: 10px; /* Espacio interno adicional */
-    box-sizing: border-box; /* Considerar padding y borde en el tamaño total */
+    overflow: hidden; 
+    padding: 10px; 
+    box-sizing: border-box;
   }
   
   .dataser-chart canvas {
-    max-width: 100%; /* Ajustar el ancho al contenedor */
-    max-height: 300px; /* Limitar la altura máxima del canvas */
-    height: auto; /* Mantener proporción */
+    max-width: 100%; 
+    max-height: 300px;
+    height: auto; 
   }
   
   .dataser-title {
-    font-size: 20px; /* Ajustar el tamaño del título */
+    font-size: 20px;
     margin-bottom: 10px;
     text-align: center;
     color: #bb86fc;
   }
   
-  /* Responsividad */
   @media (max-width: 768px) {
     .dataser-container {
-      padding: 8px; /* Reducir padding en pantallas pequeñas */
-      max-width: 100%; /* Asegurar que ocupe todo el ancho disponible */
+      padding: 8px; 
+      max-width: 100%;
     }
   
     .dataser-chart {
-      max-width: 100%; /* Asegurar que el gráfico ocupe el ancho disponible */
-      max-height: 250px; /* Reducir la altura máxima en pantallas pequeñas */
+      max-width: 100%;
+      max-height: 250px;
       padding: 8px;
     }
   
     .dataser-title {
-      font-size: 18px; /* Reducir el tamaño del texto */
+      font-size: 18px; 
     }
   }
   

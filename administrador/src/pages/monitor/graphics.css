@@ -13,6 +13,7 @@
   height: calc(100vh - 70px); /* Usa todo el espacio disponible */
 }
 
+
 .top-left {
   grid-area: top-left;
   border: 1px solid #ddd;

@@ -4,12 +4,14 @@ import UserContext from "./context/usercontext";
 import NivelSeguridad from "./context/segEntryContext";
 
 import "./graphics.css";
+import ExportPage from "./export";
+import ExportPagesi from "./export";
 
 const GraphicsContext = () => {
     return (
       <div className="graphics-container">
         <div className="top-left">
-          <p>Contenido superior izquierdo</p>
+          <ExportPagesi/>
         </div>
         <div className="top-right">
           <RelationCharts/>
