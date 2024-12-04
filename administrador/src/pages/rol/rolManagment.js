@@ -1,284 +1,335 @@
 import React, { useState, useEffect } from "react";
-import { db } from "../../firebase";
+import { db, auth } from "../../firebase";
 import {
   collection,
+  doc,
   getDocs,
-  addDoc,
+  setDoc,
   updateDoc,
   deleteDoc,
-  query,
+  Timestamp,
   where,
+  query,
+  addDoc,
 } from "firebase/firestore";
-import Container from "../../components/container";
+import {
+  createUserWithEmailAndPassword,
+  deleteUser,
+  fetchSignInMethodsForEmail,
+  signInWithEmailAndPassword,
+  updateProfile,
+} from "firebase/auth";
+import CustomAlert from "../../components/customAlert";
+import UserForm from "./userForm";
 import "./roles.css";
+import { toast } from "react-toastify";
 
 const RolManagement = () => {
-  const [users, setUsers] = useState([]);
-  const [displayForm, setDisplayForm] = useState(false);
+  // Estados principales
+  const [employees, setEmployees] = useState([]);
   const [formData, setFormData] = useState({
     displayName: "",
     email: "",
     password: "",
-    countryCode: "+56",
-    phoneNumber: "",
-    role: "user",
+    birthDate: "0000-00-00",
+    pais: "",
+    ciudad: "",
+    comuna: "",
+    role: "",
   });
-  const [editingUser, setEditingUser] = useState(null);
-  const [error, setError] = useState("");
+  const [displayForm, setDisplayForm] = useState(false);
+  const [editingEmployee, setEditingEmployee] = useState(null);
+  const [alertMessage, setAlertMessage] = useState("");
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
-  const fetchUsers = async () => {
-    const usersSnapshot = await getDocs(
-      query(collection(db, "users"), where("role", "!=", ""))
-    );
-    const usersList = usersSnapshot.docs
-      .map((doc) => ({ id: doc.id, ...doc.data() }))
-      .sort((a, b) => a.displayName.localeCompare(b.displayName));
-    setUsers(usersList);
+  const convertTimestampToDate = (timestamp) => {
+    if (!timestamp) return "";
+    const date = timestamp.toDate();
+    return date.toISOString().split("T")[0];
   };
 
+  // Fetch inicial de datos
   useEffect(() => {
-    fetchUsers();
+    fetchEmployees();
   }, []);
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({ ...prevData, [name]: value }));
-  };
-
-  const handleCreateUser = async () => {
-    if (
-      !formData.displayName ||
-      !formData.email ||
-      !formData.password ||
-      !formData.phoneNumber
-    ) {
-      setError("Todos los campos son obligatorios.");
-      return;
-    }
-
-    const emailExists = users.some((user) => user.email === formData.email);
-    if (emailExists) {
-      setError("Este correo ya está registrado.");
-      return;
-    }
-
+  // Obtener trabajadores existentes
+  const fetchEmployees = async () => {
     try {
-      await addDoc(collection(db, "users"), {
-        displayName: formData.displayName,
-        email: formData.email,
-        phoneNumber: formData.phoneNumber,
-        countryCode: formData.countryCode,
-        role: formData.role,
-        isVerified: false,
-        notificationsEnabled: true,
-        bio: "",
-        birthDate: "",
-        createdAt: new Date(),
-      });
-      setError("");
-      setFormData({
-        displayName: "",
-        email: "",
-        password: "",
-        countryCode: "+56",
-        phoneNumber: "",
-        role: "user",
-      });
-      setDisplayForm(false);
-      fetchUsers();
+      const employeesSnapshot = await getDocs(collection(db, "employees"));
+      const employeesData = employeesSnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setEmployees(employeesData);
     } catch (error) {
-      setError("Error al crear usuario.");
-      console.error(error);
+      console.error("Error al obtener empleados:", error.message);
     }
   };
 
-  const handleEditUser = async () => {
+  // Crear empleado en Firebase Authentication y Firestore
+  const handleCreateEmployee = async () => {
     try {
-      await updateDoc(editingUser.ref, {
-        displayName: formData.displayName,
-        email: formData.email,
-        phoneNumber: formData.phoneNumber,
-        countryCode: formData.countryCode,
-        role: formData.role,
-      });
-      setEditingUser(null);
-      setFormData({
-        displayName: "",
-        email: "",
-        password: "",
-        countryCode: "+56",
-        phoneNumber: "",
-        role: "user",
-      });
-      fetchUsers();
-    } catch (error) {
-      setError("Error al modificar usuario.");
-      console.error(error);
-    }
-  };
-
-  const handleDeleteUser = async () => {
-    if (
-      window.confirm(
-        "¿Estás seguro de que deseas eliminar este usuario? Esta acción es irreversible."
-      )
-    ) {
-      try {
-        await deleteDoc(editingUser.ref);
-        setEditingUser(null);
-        setFormData({
-          displayName: "",
-          email: "",
-          password: "",
-          countryCode: "+56",
-          phoneNumber: "",
-          role: "user",
-        });
-        fetchUsers();
-      } catch (error) {
-        setError("Error al eliminar usuario.");
-        console.error(error);
+      // Validar datos obligatorios
+      if (!formData.email || !formData.role) {
+        setAlertMessage("El correo y el rol son obligatorios.");
+        return;
       }
+
+      // Crear usuario en Firebase Authentication
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        formData.email,
+        formData.password || "password123" // Contraseña predeterminada
+      );
+      const newUser = userCredential.user;
+
+      console.log("Usuario creado en Authentication:", newUser.uid);
+
+      // Crear documento en Firestore con el mismo UID
+      const employeeRef = doc(db, "employees", newUser.uid);
+      await setDoc(employeeRef, {
+        ...formData,
+        id: newUser.uid, // Sincronizar UID
+        authId: newUser.uid, // Referencia cruzada
+        isAuthenticated: true, // Indica que está autenticado
+        CreationRole: Timestamp.now(),
+      });
+
+      // Mostrar mensaje de éxito
+      setAlertMessage("Trabajador creado y autenticado con éxito.");
+      fetchEmployees(); // Actualizar la tabla de empleados
+    } catch (error) {
+      console.error("Error al crear el trabajador:", error.message);
+      setAlertMessage("Error al crear el trabajador: " + error.message);
     }
   };
 
-  const openCreateForm = () => {
-    setEditingUser(null);
-    setDisplayForm(true);
-    setFormData({
-      displayName: "",
-      email: "",
-      password: "",
-      countryCode: "+56",
-      phoneNumber: "",
-      role: "user",
-    });
+  // Autenticar empleado y actualizar Firestore
+  const handleAuthenticateEmployee = async (employee) => {
+    try {
+      if (!employee.email) {
+        toast.error("El correo del empleado es obligatorio para autenticarlo.");
+        return;
+      }
+
+      const confirmAuthentication = window.confirm(
+        `¿Estás seguro de autenticar a ${employee.displayName}? Esto lo registrará en Authentication.`
+      );
+      if (!confirmAuthentication) return;
+
+      // Crear usuario en Firebase Authentication
+      console.log("Autenticando empleado:", employee);
+
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        employee.email,
+        "password123" // Contraseña predeterminada
+      );
+      const newUser = userCredential.user;
+
+      console.log("Usuario autenticado en Firebase:", newUser.uid);
+
+      // Actualizar Firestore con el UID como documentId
+      const employeeRef = doc(db, "employees", newUser.uid);
+      await setDoc(employeeRef, {
+        ...employee,
+        authId: newUser.uid, // Relación con Authentication
+        isAuthenticated: true,
+      });
+
+      toast.success(`Empleado ${employee.displayName} autenticado con éxito.`);
+
+      // Actualizar la tabla en el frontend
+      fetchEmployees();
+    } catch (error) {
+      console.error("Error al autenticar al empleado:", error.message);
+      toast.error(`Error al autenticar al empleado: ${error.message}`);
+    }
   };
 
-  const openEditForm = (user) => {
-    setEditingUser(user);
-    setDisplayForm(true);
-    setFormData({
-      displayName: user.displayName,
-      email: user.email,
-      password: "", // No se modifica la contraseña
-      countryCode: user.countryCode || "+56",
-      phoneNumber: user.phoneNumber || "",
-      role: user.role,
-    });
+  // Buscar usuario por correo
+  const handleSearchUserByEmail = async () => {
+    if (!formData.email) {
+      setAlertMessage("Por favor, ingresa un correo válido para buscar.");
+      return;
+    }
+
+    try {
+      const usersSnapshot = await getDocs(collection(db, "users"));
+      const matchedUser = usersSnapshot.docs.find(
+        (doc) => doc.data().email === formData.email
+      );
+
+      if (matchedUser) {
+        const userData = matchedUser.data();
+
+        setFormData({
+          displayName: userData.displayName || "",
+          email: userData.email,
+          birthDate: convertTimestampToDate(userData.birthDate),
+          pais: userData.pais || "",
+          ciudad: userData.ciudad || "",
+          comuna: userData.comuna || "",
+          role: "Analista",
+        });
+
+        setAlertMessage(
+          "Usuario encontrado. Puedes completar los datos y guardar."
+        );
+      } else {
+        setAlertMessage("No se encontró un usuario con ese correo.");
+      }
+    } catch (error) {
+      console.error("Error al buscar usuario:", error);
+      setAlertMessage("Ocurrió un error al buscar el usuario.");
+    }
+  };
+
+  // Eliminar trabajador
+  const handleDeleteEmployee = async () => {
+    try {
+      if (!editingEmployee) return;
+      await deleteDoc(doc(db, "employees", editingEmployee.id));
+      setAlertMessage("Trabajador eliminado con éxito.");
+      fetchEmployees();
+      setShowDeleteConfirm(false);
+    } catch (error) {
+      console.error("Error al eliminar trabajador:", error);
+    }
   };
 
   return (
-      <div className="role-management-container">
-        <div className="column col-1">
-          <button className="create-user-button" onClick={openCreateForm}>
-            <div className="sign">+</div>
-            <div className="text">Crear Usuario</div>
-          </button>
-          <h3>Usuarios</h3>
-          <table className="user-table">
-            <thead>
-              <tr>
-                <th>Nombre</th>
-                <th>Rol</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {users.map((user) => (
-                <tr key={user.id}>
-                  <td>{user.displayName}</td>
-                  <td>{user.role === "admin" ? "Administrador" : "Usuario"}</td>
-                  <td>
-                    <button
-                      onClick={() => openEditForm(user)}
-                      className="edit-user-button"
-                    >
-                      Modificar
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+    <div className="rol-management-container">
+      <h1 className="rol-management-title">Gestión de Roles y Trabajadores</h1>
 
-        {displayForm && (
-          <div className="column col-2">
-            <h3>{editingUser ? "Modificar Usuario" : "Crear Usuario"}</h3>
-            {error && <p className="error-message">{error}</p>}
-            <input
-              type="text"
-              name="displayName"
-              placeholder="Nombre de usuario"
-              value={formData.displayName}
-              onChange={handleInputChange}
-              required
-            />
-            <input
-              type="email"
-              name="email"
-              placeholder="Correo del Usuario"
-              value={formData.email}
-              onChange={handleInputChange}
-              required
-            />
-            {!editingUser && (
-              <input
-                type="password"
-                name="password"
-                placeholder="Contraseña"
-                value={formData.password}
-                onChange={handleInputChange}
-                required
-              />
-            )}
-            <div className="phone-input">
-              <select
-                name="countryCode"
-                value={formData.countryCode}
-                onChange={handleInputChange}
-              >
-                <option value="+56">Chile (+56)</option>
-                <option value="+54">Argentina (+54)</option>
-                <option value="+51">Perú (+51)</option>
-                <option value="+57">Colombia (+57)</option>
-                <option value="+58">Venezuela (+58)</option>
-                <option value="+591">Bolivia (+591)</option>
-              </select>
-              <input
-                type="number"
-                name="phoneNumber"
-                placeholder="Número celular"
-                value={formData.phoneNumber}
-                onChange={handleInputChange}
-                required
-                maxLength="9"
-              />
-            </div>
-            <select
-              name="role"
-              value={formData.role}
-              onChange={handleInputChange}
-              required
-            >
-              <option value="user">Usuario</option>
-              <option value="admin">Administrador</option>
-            </select>
-            <button
-              onClick={editingUser ? handleEditUser : handleCreateUser}
-              className="submit-button"
-            >
-              {editingUser ? "Modificar Usuario" : "Crear Usuario"}
-            </button>
-            {editingUser && (
-              <button onClick={handleDeleteUser} className="delete-user-button">
-                Eliminar Usuario
-              </button>
-            )}
-          </div>
-        )}
+      {alertMessage && (
+        <CustomAlert
+          message={alertMessage}
+          onClose={() => setAlertMessage("")}
+          duration={5000}
+        />
+      )}
+
+      <div className="rol-management-actions">
+        <button
+          className="rol-create-button"
+          onClick={() => {
+            setEditingEmployee(null);
+            setFormData({
+              displayName: "",
+              email: "",
+              password: "",
+              birthDate: "",
+              pais: "",
+              ciudad: "",
+              comuna: "",
+              role: "Analista",
+            });
+            setDisplayForm(true);
+          }}
+        >
+          Crear Trabajador
+        </button>
       </div>
+
+      <div className="rol-management-table">
+        <h2 className="rol-management-subtitle">Lista de Trabajadores</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Email</th>
+              <th>Rol</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {employees.map((employee) => (
+              <tr key={employee.id}>
+                <td>{employee.displayName || "Sin nombre"}</td>
+                <td>{employee.email}</td>
+                <td>{employee.role}</td>
+                <td>
+                  {employee.isAuthenticated ? (
+                    <span className="authenticated">Autenticado</span>
+                  ) : (
+                    <span className="not-authenticated">No autenticado</span>
+                  )}
+                </td>
+                <td>
+                  <button
+                    className="edit-button"
+                    onClick={() => {
+                      setEditingEmployee(employee);
+                      setFormData({
+                        displayName: employee.displayName,
+                        email: employee.email,
+                        password: "",
+                        birthDate: employee.birthDate || "",
+                        pais: employee.pais || "",
+                        ciudad: employee.ciudad || "",
+                        comuna: employee.comuna || "",
+                        role: employee.role || "Analista",
+                      });
+                      setDisplayForm(true);
+                    }}
+                  >
+                    Modificar
+                  </button>
+                  <button
+                    className="delete-button"
+                    onClick={() => {
+                      setEditingEmployee(employee);
+                      setShowDeleteConfirm(true);
+                    }}
+                  >
+                    Eliminar
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {showDeleteConfirm && (
+        <div className="modal">
+          <div className="modal-content">
+            <h3>¿Estás seguro de eliminar a este trabajador?</h3>
+            <p>{editingEmployee?.displayName}</p>
+            <div className="modal-actions">
+              <button className="confirm-button" onClick={handleDeleteEmployee}>
+                Sí, eliminar
+              </button>
+              <button
+                className="cancel-button"
+                onClick={() => setShowDeleteConfirm(false)}
+              >
+                Cancelar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {displayForm && (
+        <div className="modal">
+          <div className="modal-content">
+            <UserForm
+              formData={formData}
+              setFormData={setFormData}
+              onSubmit={() => {
+                handleCreateEmployee();
+                setDisplayForm(false); // Cerrar modal
+              }}
+              onClose={() => setDisplayForm(false)}
+            />
+          </div>
+        </div>
+      )}
+    </div>
   );
 };
 

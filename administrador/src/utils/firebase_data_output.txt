@@ -1,0 +1,708 @@
+--- Colección: beneficiarios ---
+Documento ID: yLrNnT3b6lOBS8syqAyn
+  - profileImage: file:///data/user/0/host.exp.exponent/cache/ExperienceData/%2540anonymous%252Ffrontend-757d86fb-d0d4-4d41-96c4-b2780a31e8fc/ImagePicker/8610108a-4a09-44f4-a63a-71dd6d41db96.jpeg
+  - email: alvaroawero10@gmail.com
+  - phone: 
+  - userId: OMP4tKWkILfFWY4WYaH9vD4jEIC2
+  - name: Alvaro
+
+
+--- Colección: certificados ---
+Documento ID: ke6NBGQlrgTeEk3l3Vdw
+  - fileName: DEF_500594079273_9975623.pdf
+  - userId: OMP4tKWkILfFWY4WYaH9vD4jEIC2
+  - testigoId: ID_REAL_DEL_TESTIGO
+  - createdAt: 2024-11-15 17:49:51.523000+00:00
+  - fileUrl: https://firebasestorage.googleapis.com/v0/b/soul2024-abe2f.appspot.com/o/certificados%2FOMP4tKWkILfFWY4WYaH9vD4jEIC2%2F1731692990828_DEF_500594079273_9975623.pdf?alt=media&token=fc7e231f-b052-498c-a576-d0b007fdee7b
+  - status: pending
+  - filePath: certificados/OMP4tKWkILfFWY4WYaH9vD4jEIC2/1731692990828_DEF_500594079273_9975623.pdf
+
+
+--- Colección: documentos ---
+Documento ID: 8mWYdhpZKA4XEu2BFy8N
+  - title: Contraseña banco estado
+  - texto: Esta es mi contraseña para la cuenta de banco estado: 12345678
+  - createdAt: 2024-11-22 02:43:34.230000+00:00
+  - userId: OMP4tKWkILfFWY4WYaH9vD4jEIC2
+  - testigo: Javier Caceres
+
+Documento ID: DiGgrz1tXH487zdCDcIN
+  - texto: Documento 6
+
+  - createdAt: 2024-11-22 01:56:02.963000+00:00
+  - title: Prueba 6
+  - userId: OMP4tKWkILfFWY4WYaH9vD4jEIC2
+  - testigo: Javier Caceres
+
+Documento ID: NHM72geQLgMR18eDDZjT
+  - texto: La contraseña de mi correo electronico javi.caceresg@duocuc.cl es **********
+  - createdAt: 2024-11-22 00:08:52.176000+00:00
+  - userId: OMP4tKWkILfFWY4WYaH9vD4jEIC2
+
+Documento ID: RpHrKOUZggoaQzvSwVJy
+  - texto: Documento 3
+
+  - createdAt: 2024-11-22 01:55:40.195000+00:00
+  - userId: OMP4tKWkILfFWY4WYaH9vD4jEIC2
+
+Documento ID: aPbKiQnLgCdDBRNOfAOr
+  - texto: Documento 4
+
+  - createdAt: 2024-11-22 01:55:48.755000+00:00
+  - userId: OMP4tKWkILfFWY4WYaH9vD4jEIC2
+
+Documento ID: jZNWRabEi8sXrN75zvs7
+  - texto: Documento 5
+
+  - createdAt: 2024-11-22 01:55:57.339000+00:00
+  - userId: OMP4tKWkILfFWY4WYaH9vD4jEIC2
+
+Documento ID: lGa8aBdOsKnoFZdK6iXM
+  - texto: Prueba de documento 2
+
+  - createdAt: 2024-11-22 01:49:01.781000+00:00
+  - userId: OMP4tKWkILfFWY4WYaH9vD4jEIC2
+
+Documento ID: roGBU23z2Bn4VzNVRCX6
+  - title: Prueba 7
+  - texto: Prueba de ancho y largo de lista de documentos, se necesita visualizar como se adaptan las cards y el texto
+  - createdAt: 2024-11-22 03:18:30.040000+00:00
+  - userId: OMP4tKWkILfFWY4WYaH9vD4jEIC2
+  - testigo: Javier Caceres
+
+
+--- Colección: entradas ---
+Documento ID: 2UcoJM3wUAx6Ws12IJWx
+  - nivel: 1
+  - id: 2UcoJM3wUAx6Ws12IJWx
+  - baul: False
+  - categoria: Tristeza
+  - media: https://firebasestorage.googleapis.com/v0/b/soul2024-abe2f.appspot.com/o/media%2F5cdd7dd1-fb6e-4300-a614-6b13e3dedaa3_fd23f7a8-ebfe-4dfe-8d09-4f99587dbdbd.jpeg?alt=media&token=c389df9a-b942-4da2-9d0d-d5b4582f381d
+  - color: #8AA1B2
+  - emociones: []
+  - isProtected: False
+  - cancion: None
+  - fechaRecuerdo: None
+  - userId: OMP4tKWkILfFWY4WYaH9vD4jEIC2
+  - fechaCreacion: 2024-11-24 17:46:37.407000+00:00
+  - nickname: Tristeza
+  - texto: None
+  - mediaType: image
+  - audio: None
+
+Documento ID: 2pWMeBsDIPPSJCKISPEO
+  - nivel: 1
+  - id: 2pWMeBsDIPPSJCKISPEO
+  - baul: False
+  - categoria: Alegria
+  - media: https://firebasestorage.googleapis.com/v0/b/soul2024-abe2f.appspot.com/o/media%2F2a8ba678-051d-4403-8f6d-b0fa9d720266_ab54c161-1f30-423a-ab62-5bcc5ac01869.jpeg?alt=media&token=20669717-9370-4df7-8a92-0568c33a9123
+  - color: #E6CBA1
+  - emociones: []
+  - isProtected: False
+  - cancion: None
+  - fechaRecuerdo: None
+  - userId: OMP4tKWkILfFWY4WYaH9vD4jEIC2
+  - fechaCreacion: 2024-11-24 17:44:16.326000+00:00
+  - nickname: Apodo user
+  - texto: None
+  - mediaType: image
+  - audio: None
+
+Documento ID: 8ECdKEsOgtdjQ75EFER5
+  - nivel: 1
+  - id: 8ECdKEsOgtdjQ75EFER5
+  - baul: False
+  - categoria: Alegria
+  - media: None
+  - color: #FFEB3B
+  - emociones: ['No se proporcionó un texto válido para analizar. Por favor vuelve a intentarlo.']
+  - isProtected: False
+  - cancion: None
+  - fechaRecuerdo: None
+  - userId: OMP4tKWkILfFWY4WYaH9vD4jEIC2
+  - fechaCreacion: 2024-11-24 17:24:45.379000+00:00
+  - nickname: 123123123
+  - texto: asdasdasd
+  - mediaType: None
+  - audio: None
+
+Documento ID: H4zWuhQMWtfQfO5YVIYz
+  - nivel: 1
+  - id: H4zWuhQMWtfQfO5YVIYz
+  - baul: False
+  - categoria: Miedo
+  - media: https://firebasestorage.googleapis.com/v0/b/soul2024-abe2f.appspot.com/o/media%2Fd4fc10cb-6144-44b4-ae86-a7ecd137a130_d682ac87-8857-4e94-883a-8328a8cca02b.mp4?alt=media&token=04a7ad8d-f5c5-483a-80ef-8b12befc6673
+  - color: #E6C19A
+  - emociones: []
+  - isProtected: False
+  - cancion: None
+  - fechaRecuerdo: None
+  - userId: OMP4tKWkILfFWY4WYaH9vD4jEIC2
+  - fechaCreacion: 2024-11-24 17:46:55.157000+00:00
+  - nickname: Miedo
+  - texto: None
+  - mediaType: video
+  - audio: None
+
+Documento ID: KLzzPShioIiTPRdg6cX4
+  - nivel: 1
+  - id: KLzzPShioIiTPRdg6cX4
+  - baul: False
+  - categoria: Alegria
+  - beneficiary: {'profileImage': 'file:///data/user/0/host.exp.exponent/cache/ExperienceData/%2540anonymous%252Ffrontend-757d86fb-d0d4-4d41-96c4-b2780a31e8fc/ImagePicker/8610108a-4a09-44f4-a63a-71dd6d41db96.jpeg', 'email': 'alvaroawero10@gmail.com', 'id': 'yLrNnT3b6lOBS8syqAyn', 'name': 'Alvaro'}
+  - media: https://firebasestorage.googleapis.com/v0/b/soul2024-abe2f.appspot.com/o/media%2F6517b465-1231-4c83-82d4-937e597e9e8c_6a677595-f02a-4c54-b904-9a2ade828a6d.jpeg?alt=media&token=1c36a2fb-be19-4c42-b2e3-9f7cd46355d6
+  - color: #E6CBA1
+  - emociones: ['alegría', 'motivación']
+  - isProtected: False
+  - cancion: None
+  - fechaRecuerdo: None
+  - userId: OMP4tKWkILfFWY4WYaH9vD4jEIC2
+  - fechaCreacion: 2024-11-24 22:24:09.983000+00:00
+  - nickname: Motivacional
+  - texto: ✨ "Hoy es un nuevo día lleno de oportunidades para crecer, aprender y brillar. Cree en ti, en tus capacidades, y en el impacto positivo que puedes tener en el mundo. Aunque los desafíos parezcan grandes, recuerda que dentro de ti hay una fortaleza inmensa. Cada paso cuenta, y estás avanzando hacia algo grandioso. ¡Tú puedes lograrlo!" 🌟
+  - mediaType: image
+  - audio: None
+
+Documento ID: O1VrKv5izyxr8qyqq8Yw
+  - nivel: 1
+  - id: O1VrKv5izyxr8qyqq8Yw
+  - baul: False
+  - categoria: Idea
+  - beneficiary: {'profileImage': 'file:///data/user/0/host.exp.exponent/cache/ExperienceData/%2540anonymous%252Ffrontend-757d86fb-d0d4-4d41-96c4-b2780a31e8fc/ImagePicker/fd4022e0-d33b-4024-bd10-7fc3c371cfac.jpeg', 'email': 'parraastete.diego11@gmail.com', 'id': 'aFy9yB7nXXQCfgwtwbQt', 'name': 'Yo mismo'}
+  - media: https://firebasestorage.googleapis.com/v0/b/soul2024-abe2f.appspot.com/o/media%2F48877ac3-9115-4fb7-ba71-e0d7b7b1789e_83ffc792-a3ba-4134-98b5-9fdff580db7f.mp4?alt=media&token=90bcf6c2-e309-4b12-8b8f-6a3edb8b76f1
+  - color: #99D099
+  - emociones: []
+  - isProtected: False
+  - cancion: None
+  - fechaRecuerdo: None
+  - userId: OMP4tKWkILfFWY4WYaH9vD4jEIC2
+  - fechaCreacion: 2024-11-24 17:47:06.811000+00:00
+  - nickname: Idea
+  - texto: None
+  - mediaType: video
+  - audio: None
+
+Documento ID: OjeZEC6MkfkrzsG15Apr
+  - nivel: 1
+  - id: OjeZEC6MkfkrzsG15Apr
+  - baul: False
+  - categoria: Alegria
+  - beneficiary: {'profileImage': 'file:///data/user/0/host.exp.exponent/cache/ExperienceData/%2540anonymous%252Ffrontend-757d86fb-d0d4-4d41-96c4-b2780a31e8fc/ImagePicker/d70940cf-f18d-43ca-8ea4-2b1f5873857b.jpeg', 'email': 'javiercg.5656@gmail.com', 'id': 'wfPVgrwWKcWDbEMSbr9W', 'name': 'Javier'}
+  - media: https://firebasestorage.googleapis.com/v0/b/soul2024-abe2f.appspot.com/o/media%2F65da4a1e-759b-4f07-8c61-04ab30ce9828_545f8fa0-f014-4320-834b-72903121fba3.jpeg?alt=media&token=3fe4bbef-d300-4356-8f27-828bbd6b0ccd
+  - color: #FFEB3B
+  - emociones: ['alegría', 'éxito']
+  - isProtected: False
+  - cancion: None
+  - fechaRecuerdo: None
+  - userId: OMP4tKWkILfFWY4WYaH9vD4jEIC2
+  - fechaCreacion: 2024-11-24 17:21:23.216000+00:00
+  - nickname: Apodito
+  - texto:       if (!result.canceled) {
+        setUploading(true);
+        const imageUri = result.assets[0].uri;
+        const response = await fetch(imageUri);
+        const blob = await response.blob();
+
+        const storageRef = ref(storage, `profile_pics/${user.uid}`);
+        await uploadBytes(storageRef, blob);
+        const downloadURL = await getDownloadURL(storageRef);
+
+        await updateProfile(user, { photoURL: downloadURL });
+        await updateDoc(userRef, { photoURL: downloadURL }); // Guardar en Firestore
+
+        setProfileImage(downloadURL);
+        setUploading(false);
+
+        Alert.alert("Éxito", "La foto 
+  - mediaType: image
+  - audio: None
+
+Documento ID: TDEqnKxsPtaC8Md7rAzr
+  - nivel: 1
+  - id: TDEqnKxsPtaC8Md7rAzr
+  - baul: False
+  - categoria: Ira
+  - media: https://firebasestorage.googleapis.com/v0/b/soul2024-abe2f.appspot.com/o/media%2Fcd64b1c5-63b2-4b62-8062-4787590a0052_4143265c-74e3-4d72-a2c5-3f114ef62baa.jpeg?alt=media&token=8c2fbe39-0232-4fda-a18d-aa19ebd0a88d
+  - color: #E6A1A4
+  - emociones: []
+  - isProtected: False
+  - cancion: None
+  - fechaRecuerdo: None
+  - userId: OMP4tKWkILfFWY4WYaH9vD4jEIC2
+  - fechaCreacion: 2024-11-24 17:46:45.731000+00:00
+  - nickname: Ira
+  - texto: None
+  - mediaType: image
+  - audio: None
+
+Documento ID: ho3TAznAGA7XqElYBnBX
+  - nivel: 1
+  - id: ho3TAznAGA7XqElYBnBX
+  - baul: False
+  - categoria: Consejo
+  - beneficiary: {'profileImage': 'file:///data/user/0/host.exp.exponent/cache/ExperienceData/%2540anonymous%252Ffrontend-757d86fb-d0d4-4d41-96c4-b2780a31e8fc/ImagePicker/d70940cf-f18d-43ca-8ea4-2b1f5873857b.jpeg', 'email': 'javiercg.5656@gmail.com', 'id': 'wfPVgrwWKcWDbEMSbr9W', 'name': 'Javier'}
+  - media: https://firebasestorage.googleapis.com/v0/b/soul2024-abe2f.appspot.com/o/media%2F383caebb-410f-4e3a-a35e-df428b734829_0c8f9409-ca1a-49f1-a617-72fd360e728b.mp4?alt=media&token=a1e47894-8ee6-41a0-9e2b-7fa3e437888b
+  - color: #E6C4A4
+  - emociones: []
+  - isProtected: False
+  - cancion: None
+  - fechaRecuerdo: None
+  - userId: OMP4tKWkILfFWY4WYaH9vD4jEIC2
+  - fechaCreacion: 2024-11-24 17:47:18.432000+00:00
+  - nickname: Consejo
+  - texto: None
+  - mediaType: video
+  - audio: None
+
+Documento ID: saRBQ3cDXpxbi7lmhDNl
+  - nivel: 1
+  - id: saRBQ3cDXpxbi7lmhDNl
+  - baul: False
+  - categoria: Alegria
+  - media: None
+  - color: #FFEB3B
+  - emociones: ['Sin poder analizar el texto proporcionado', 'no puedo determinar las emociones predominantes. ¿Te gustaría realizar otra consulta o proporcionar más información para poder ayudarte?']
+  - isProtected: False
+  - cancion: None
+  - fechaRecuerdo: None
+  - userId: OMP4tKWkILfFWY4WYaH9vD4jEIC2
+  - fechaCreacion: 2024-11-24 17:25:26.937000+00:00
+  - nickname: 123
+  - texto: 123123123
+  - mediaType: None
+  - audio: None
+
+
+--- Colección: mensajesProgramados ---
+Documento ID: gGpxzljrhU5M09wJvaxK
+  - fechaEnvio: 2024-11-22 11:30:00+00:00
+  - enviado: True
+  - userId: OMP4tKWkILfFWY4WYaH9vD4jEIC2
+  - mediaType: video
+  - email: alvaroawero10@gmail.com
+  - beneficiarioId: yLrNnT3b6lOBS8syqAyn
+  - media: file:///data/user/0/host.exp.exponent/cache/ExperienceData/%2540anonymous%252Ffrontend-757d86fb-d0d4-4d41-96c4-b2780a31e8fc/ImagePicker/0aaee2cb-1eb2-43f4-933e-b514e5e11f4a.mp4
+
+Documento ID: pxY7Np2twMC8tRGr8Xy9
+  - fechaEnvio: 2024-11-14 21:01:00+00:00
+  - enviado: True
+  - userId: OMP4tKWkILfFWY4WYaH9vD4jEIC2
+  - mediaType: video
+  - email: parraastete.diego11@gmail.com
+  - beneficiarioId: aFy9yB7nXXQCfgwtwbQt
+  - media: file:///data/user/0/host.exp.exponent/cache/ExperienceData/%2540anonymous%252Ffrontend-757d86fb-d0d4-4d41-96c4-b2780a31e8fc/ImagePicker/ac9467fa-da86-44bc-93e0-73e7de8270f2.mp4
+
+
+--- Colección: notifications ---
+Documento ID: GMLyMVAH6KftJDaHsj4L
+  - nombreDeNotificacion: Análisis de Emociones
+  - descripcion: El estado de ánimo general es neutro, con usuarios en un estado de calma o reflexión.
+  - tipoDeNotificacion: Estado de ánimo
+  - enviadoPor: Sistema de Análisis de Emociones
+  - userId: global
+
+Documento ID: HvycJgnaXhmcVkoTaXq4
+  - nombreDeNotificacion: Notificacion global
+  - descripcion: ustedes son beta. disfruten de los nuevos cambios
+  - tipoDeNotificacion: Recordatorio
+  - enviadoPor: admin
+  - userId: global
+
+Documento ID: IdtUZydhnieH68qV2UVd
+  - nombreDeNotificacion: hola alan
+  - descripcion: te estan vulnerando la cuenta
+  - tipoDeNotificacion: Alerta
+  - enviadoPor: admin
+  - userId: mrF9VRaEYLa1kEZrvOwuTtsUDc42
+
+Documento ID: RvRNNUQduVQKyBXsbKxj
+  - nombreDeNotificacion: notificacion 2
+  - descripcion: si es una noti
+  - tipoDeNotificacion: Recordatorio
+  - enviadoPor: admin
+  - userId: xtGtXLnphhfqA5hQKkBxQcqcmlf2
+
+Documento ID: WJ1TnQbeMzKpjBCJx6oH
+  - nombreDeNotificacion: tengo nuevo nombre
+  - descripcion: te estan vulnerando la cuenta
+  - tipoDeNotificacion: Novedades
+  - enviadoPor: admin
+  - userId: mrF9VRaEYLa1kEZrvOwuTtsUDc42
+
+Documento ID: WQXMr9Tk4LHAlX6zMwj3
+  - nombreDeNotificacion: notifiacion de prueba
+  - descripcion: notificacion de prueba n3
+  - tipoDeNotificacion: Novedades
+  - enviadoPor: Administrador 1
+  - userId: cow4yjgWIeh77xm96kokUu60JTb2
+
+Documento ID: Zj8OmTSkeCuOrb0tCu8r
+  - nombreDeNotificacion: otra noti
+  - descripcion: otra noti
+  - tipoDeNotificacion: Novedades
+  - enviadoPor: admin
+  - userId: cow4yjgWIeh77xm96kokUu60JTb2
+
+Documento ID: ggl2PXEREpPHsFNBJbjJ
+  - nombreDeNotificacion: cambio de nombre 
+  - descripcion: notificacion de prueba
+  - tipoDeNotificacion: Novedades
+  - enviadoPor: Administrador 1
+  - userId: global
+
+Documento ID: jft4jVEEtegkoQ5YaiDN
+  - nombreDeNotificacion: 
+  - descripcion: se agrego una actualizacion
+  - tipoDeNotificacion: Novedades
+  - enviadoPor: Administrador 1
+  - userId: global
+
+Documento ID: yTnz45kK0v5u4m1Em4wI
+  - nombreDeNotificacion: notifiacion personal
+  - descripcion: es una notificacion de pruba
+  - tipoDeNotificacion: Alerta
+  - enviadoPor: admin
+  - userId: gtUFjiMReVV5xTVWAPP7XxParjk2
+
+Documento ID: zUWjrHKihvyqiAWO5I2g
+  - nombreDeNotificacion: notificacion 2
+  - descripcion: si es una noti
+  - tipoDeNotificacion: Recordatorio
+  - enviadoPor: admin
+  - userId: xtGtXLnphhfqA5hQKkBxQcqcmlf2
+
+
+--- Colección: pdfs ---
+Documento ID: OMP4tKWkILfFWY4WYaH9vD4jEIC2
+  - createdAt: 2024-11-24 16:11:48.663000+00:00
+  - url: https://firebasestorage.googleapis.com/v0/b/soul2024-abe2f.appspot.com/o/pdfs%2FOMP4tKWkILfFWY4WYaH9vD4jEIC2%2Fdocumento.pdf?alt=media&token=87fa3b9d-a803-459c-ad95-c9b6c3fbc696
+
+
+--- Colección: sessions ---
+Documento ID: 2dxnCvtmlXdFjKBZGCFa
+  - userId: mrF9VRaEYLa1kEZrvOwuTtsUDc42
+  - timestamp: 2024-10-27 22:20:47.663000+00:00
+
+Documento ID: 3OeDRp6F9MVybOiS4V6Fo1gQ8vG3_1731366449116
+  - userId: 3OeDRp6F9MVybOiS4V6Fo1gQ8vG3
+  - timestamp: 2024-11-11 23:07:30.084000+00:00
+
+Documento ID: 48TyLeeSi9g4GA0mpdPZ
+  - userId: mrF9VRaEYLa1kEZrvOwuTtsUDc42
+  - timestamp: 2024-10-30 00:13:48.269000+00:00
+
+Documento ID: 7knsb2gXrsR9VhHgWOvhfSxQ6q42_1731367148043
+  - userId: 7knsb2gXrsR9VhHgWOvhfSxQ6q42
+  - timestamp: 2024-11-11 23:19:08.703000+00:00
+
+Documento ID: DtJpTNcRN5XpaFwWIpe7
+  - userId: mrF9VRaEYLa1kEZrvOwuTtsUDc42
+  - timestamp: 2024-10-27 21:22:30.251000+00:00
+
+Documento ID: Glim90DvMpY34sExMexq
+  - userId: mrF9VRaEYLa1kEZrvOwuTtsUDc42
+  - timestamp: 2024-10-27 22:15:48.902000+00:00
+
+Documento ID: OMP4tKWkILfFWY4WYaH9vD4jEIC2_1730908237163
+  - userId: OMP4tKWkILfFWY4WYaH9vD4jEIC2
+  - timestamp: 2024-11-06 15:50:48.307000+00:00
+
+Documento ID: OMP4tKWkILfFWY4WYaH9vD4jEIC2_1730915290382
+  - userId: OMP4tKWkILfFWY4WYaH9vD4jEIC2
+  - timestamp: 2024-11-06 17:48:18.249000+00:00
+
+Documento ID: OMP4tKWkILfFWY4WYaH9vD4jEIC2_1730915393296
+  - userId: OMP4tKWkILfFWY4WYaH9vD4jEIC2
+  - timestamp: 2024-11-06 17:50:01.867000+00:00
+
+Documento ID: OMP4tKWkILfFWY4WYaH9vD4jEIC2_1731350820530
+  - userId: OMP4tKWkILfFWY4WYaH9vD4jEIC2
+  - timestamp: 2024-11-11 18:47:00.524000+00:00
+
+Documento ID: OMP4tKWkILfFWY4WYaH9vD4jEIC2_1731351902452
+  - userId: OMP4tKWkILfFWY4WYaH9vD4jEIC2
+  - timestamp: 2024-11-11 19:05:02.991000+00:00
+
+Documento ID: OMP4tKWkILfFWY4WYaH9vD4jEIC2_1731355478734
+  - userId: OMP4tKWkILfFWY4WYaH9vD4jEIC2
+  - timestamp: 2024-11-11 20:04:39.852000+00:00
+
+Documento ID: OMP4tKWkILfFWY4WYaH9vD4jEIC2_1731356824280
+  - userId: OMP4tKWkILfFWY4WYaH9vD4jEIC2
+  - timestamp: 2024-11-11 20:27:04.898000+00:00
+
+Documento ID: OMP4tKWkILfFWY4WYaH9vD4jEIC2_1731356855631
+  - userId: OMP4tKWkILfFWY4WYaH9vD4jEIC2
+  - timestamp: 2024-11-11 20:27:36.310000+00:00
+
+Documento ID: OMP4tKWkILfFWY4WYaH9vD4jEIC2_1731366043103
+  - userId: OMP4tKWkILfFWY4WYaH9vD4jEIC2
+  - timestamp: 2024-11-11 23:00:45.804000+00:00
+
+Documento ID: OMP4tKWkILfFWY4WYaH9vD4jEIC2_1731437314613
+  - userId: OMP4tKWkILfFWY4WYaH9vD4jEIC2
+  - timestamp: 2024-11-12 18:48:47.825000+00:00
+
+Documento ID: OMP4tKWkILfFWY4WYaH9vD4jEIC2_1731680838303
+  - userId: OMP4tKWkILfFWY4WYaH9vD4jEIC2
+  - timestamp: 2024-11-15 14:27:27.309000+00:00
+
+Documento ID: OMP4tKWkILfFWY4WYaH9vD4jEIC2_1731694949780
+  - userId: OMP4tKWkILfFWY4WYaH9vD4jEIC2
+  - timestamp: 2024-11-15 18:22:38.582000+00:00
+
+Documento ID: OMP4tKWkILfFWY4WYaH9vD4jEIC2_1732126498770
+  - userId: OMP4tKWkILfFWY4WYaH9vD4jEIC2
+  - timestamp: 2024-11-20 18:15:06.222000+00:00
+
+Documento ID: OMP4tKWkILfFWY4WYaH9vD4jEIC2_1732205634472
+  - userId: OMP4tKWkILfFWY4WYaH9vD4jEIC2
+  - timestamp: 2024-11-21 16:13:55.168000+00:00
+
+Documento ID: ZFODH5cHq82XAESFKhGa
+  - userId: mrF9VRaEYLa1kEZrvOwuTtsUDc42
+  - timestamp: 2024-10-27 20:42:12.224000+00:00
+
+Documento ID: c7fPIAnnT946tirDoNkR
+  - userId: mrF9VRaEYLa1kEZrvOwuTtsUDc42
+  - timestamp: 2024-10-30 00:20:28.457000+00:00
+
+Documento ID: dgdxnVug9XWD2Rd49Hzh
+  - userId: mrF9VRaEYLa1kEZrvOwuTtsUDc42
+  - timestamp: 2024-10-27 22:17:46.152000+00:00
+
+Documento ID: mrF9VRaEYLa1kEZrvOwuTtsUDc42_1730504499065
+  - userId: mrF9VRaEYLa1kEZrvOwuTtsUDc42
+  - timestamp: 2024-11-01 23:41:43.215000+00:00
+
+Documento ID: mrF9VRaEYLa1kEZrvOwuTtsUDc42_1730504964424
+  - userId: mrF9VRaEYLa1kEZrvOwuTtsUDc42
+  - timestamp: 2024-11-01 23:49:28.223000+00:00
+
+Documento ID: mrF9VRaEYLa1kEZrvOwuTtsUDc42_1730855793997
+  - userId: mrF9VRaEYLa1kEZrvOwuTtsUDc42
+  - timestamp: 2024-11-06 01:16:34.826000+00:00
+
+Documento ID: sessions
+  - userId: 1
+  - timestamp: 1
+
+Documento ID: wvP1ZhCotihL0uIive1Y
+  - userId: mrF9VRaEYLa1kEZrvOwuTtsUDc42
+  - timestamp: 2024-10-30 01:11:38.180000+00:00
+
+Documento ID: xtGtXLnphhfqA5hQKkBxQcqcmlf2_1731883046547
+  - userId: xtGtXLnphhfqA5hQKkBxQcqcmlf2
+  - timestamp: 2024-11-17 22:37:28.323000+00:00
+
+
+--- Colección: solicitudes ---
+Documento ID: 6ks4DbGhSevr3Jpp7YMS
+  - messageId: msg-1730249502321
+  - description: Si
+  - date: 29/10/2024 9:51:42 p. m.
+  - userId: mrF9VRaEYLa1kEZrvOwuTtsUDc42
+  - respuesta: esta es una respuesta
+
+atentamente administracion
+  - estado: respondido
+  - motivo: Otro mensaje 
+
+Documento ID: IlEbkShC8nqTm51ysz50
+  - messageId: msg-1730251043608
+  - description: Tengo problemas al actualizar mi foto
+  - date: 29/10/2024 10:17:23 p. m.
+  - userId: mrF9VRaEYLa1kEZrvOwuTtsUDc42
+  - respuesta: ultima respuesta del dia
+  - estado: respondido
+  - motivo: Mensaje 3
+
+Documento ID: PZf10u7h3ZfU1s0BNmo4
+  - messageId: msg-1730251706452
+  - description: Soy Alan y necesito respuesta 
+  - date: 29/10/2024 10:28:26 p. m.
+  - userId: mrF9VRaEYLa1kEZrvOwuTtsUDc42
+  - respuesta: hola alan esta es tu respuesta
+  - estado: respondido
+  - motivo: Esperando respuesta 
+
+Documento ID: kvMLN3L2Nbo5rIBi1jLZ
+  - messageId: msg-1730245767236
+  - description: Mensaje prueba 
+  - date: 29/10/2024 8:49:27 p. m.
+  - userId: mrF9VRaEYLa1kEZrvOwuTtsUDc42
+  - respuesta: esta es otra respuesta
+  - estado: respondido
+  - motivo: Mensaje 
+
+
+--- Colección: testigos ---
+Documento ID: A74KzopPtNmvyUIU6tQt
+  - imageUrl: None
+  - email: javier.cg5656@gmail.com
+  - userId: OMP4tKWkILfFWY4WYaH9vD4jEIC2
+  - phone: 
+  - name: Javier Caceres
+
+Documento ID: YieHg7sFfsUw3Io9Jw5Z
+  - imageUrl: https://firebasestorage.googleapis.com/v0/b/soul2024-abe2f.appspot.com/o/testigos%2F1730168427501_Miguel?alt=media&token=a245ec77-9303-4c03-9b47-d3d007b48c4d
+  - email: miguel.jara.atria@gmail.com
+  - phone: 
+  - name: Miguel
+
+Documento ID: ukXDwhv5HMxRnaSnkhhO
+  - timestamp: 2024-10-14 23:59:36.471000+00:00
+  - fotoUrl: 
+  - nombre: lilo
+  - correo: lilo@gmail.com
+  - circuloCercano: amigo
+  - telefono: 1231231
+
+
+--- Colección: tickets ---
+Documento ID: ES3KcWpv2vkk49U9WdWJ
+  - assignedTo: OMP4tKWkILfFWY4WYaH9vD4jEIC2
+  - description: 123
+  - subject: 123
+  - userId: OMP4tKWkILfFWY4WYaH9vD4jEIC2
+  - createdAt: 2024-11-14 18:16:43.608000+00:00
+  - status: cerrado
+  - updatedAt: 2024-11-16 20:59:49.514000+00:00
+
+Documento ID: MeGgto9kEUrZhwAgxMtr
+  - assignedTo: None
+  - description: esto es un mensaje para sabe el  estado de tal
+  - subject: Ticket de prueba desde reactnative
+  - userId: xtGtXLnphhfqA5hQKkBxQcqcmlf2
+  - createdAt: 2024-11-17 22:39:45.991000+00:00
+  - status: abierto
+  - updatedAt: 2024-11-17 22:39:45.991000+00:00
+
+Documento ID: SMTbusEPeuQ8cozKlpCU
+  - assignedTo: xtGtXLnphhfqA5hQKkBxQcqcmlf2
+  - description: Tengo un problema
+  - subject: Cualquiera
+  - userId: OMP4tKWkILfFWY4WYaH9vD4jEIC2
+  - createdAt: 2024-11-14 18:13:59.345000+00:00
+  - status: cerrado
+  - updatedAt: 2024-11-17 00:28:49.651000+00:00
+
+Documento ID: nbU9GDawjM9ACjWeBxZM
+  - assignedTo: None
+  - description: HOla felipe
+  - subject: Ticket de prueba 2
+  - userId: OMP4tKWkILfFWY4WYaH9vD4jEIC2
+  - createdAt: 2024-11-20 18:15:38.406000+00:00
+  - status: abierto
+  - updatedAt: 2024-11-20 18:16:06.094000+00:00
+
+Documento ID: vYOQW3EtEkTeMypLWS5P
+  - assignedTo: xtGtXLnphhfqA5hQKkBxQcqcmlf2
+  - description: 123
+  - subject: Ticket de Prueba
+  - userId: OMP4tKWkILfFWY4WYaH9vD4jEIC2
+  - respuesta: esta es una respuesta editada
+  - estado: respondido
+  - createdAt: 2024-11-12 20:09:30.406000+00:00
+  - status: abierto
+  - updatedAt: 2024-11-14 16:51:14.505000+00:00
+  - priority: media
+
+
+--- Colección: users ---
+Documento ID: 7knsb2gXrsR9VhHgWOvhfSxQ6q42
+  - displayName: Admin
+  - birthDate: 2001-11-11 23:18:00+00:00
+  - isPremium: False
+  - country: Chile
+  - createdAt: 2024-11-11 23:18:43.442000+00:00
+  - email: di.parra1@gmail.com
+  - city: Santiago
+  - isVerified: True
+
+Documento ID: Lb4k5QvcJ6toXk2ZFtg5
+  - phoneNumber: 123123123
+  - bio: 
+  - birthDate: 2002-02-08 03:00:00.814000+00:00
+  - displayName: pedro
+  - countryCode: +56
+  - role: user
+  - notificationsEnabled: False
+  - createdAt: 2024-11-14 00:35:15.364000+00:00
+  - country: Chile
+  - email: user@gmail.com
+  - city: Santiago
+  - isVerified: False
+
+Documento ID: OMP4tKWkILfFWY4WYaH9vD4jEIC2
+  - pais: Chile
+  - displayName: Diego Parra
+  - level3Password: Diego123
+  - bio: Mi biografia
+  - countryCode: +56
+  - notificationsEnabled: False
+  - ciudad: Santiago
+  - city: Santiago
+  - phoneNumber: 959770647
+  - photoURL: https://firebasestorage.googleapis.com/v0/b/soul2024-abe2f.appspot.com/o/profile_pics%2FOMP4tKWkILfFWY4WYaH9vD4jEIC2?alt=media&token=281174c7-be78-40ad-be4a-3d2a07ed6759
+  - birthDate: 2001-12-11 23:12:00+00:00
+  - isPremium: True
+  - role: admin
+  - isDeceased: True
+  - createdAt: 2024-10-21 01:49:16.042000+00:00
+  - level2Password: Diego123
+  - email: parraastete.diego11@gmail.com
+  - country: Chile
+  - comuna: Providencia
+
+Documento ID: gtUFjiMReVV5xTVWAPP7XxParjk2
+  - displayName: Javier Caceres
+  - birthDate: 14 de February de 2000, 04:24:52 PM UTC-3
+  - country: Chile
+  - role: user
+  - createdAt: 2024-10-21 02:29:28.217000+00:00
+  - email: javiercg.5656@gmail.com
+  - city: Valparaiso
+
+Documento ID: mP6YDtfEmphlReyEpHP3
+  - isBanned: True
+  - phoneNumber: 12341234
+  - displayName: super
+  - birthDate: 09 de January de 1994, 01:56:04 AM UTC-3
+  - bio: 
+  - countryCode: +56
+  - role: superadmin
+  - notificationsEnabled: True
+  - createdAt: 2024-11-20 18:31:58.911000+00:00
+  - country: Chile
+  - email: super@gmail.com
+  - city: Santiago
+  - isVerified: False
+
+Documento ID: mrF9VRaEYLa1kEZrvOwuTtsUDc42
+  - phoneNumber: 912341234
+  - displayName: alan
+  - birthDate: 1994-11-23 23:50:00+00:00
+  - bio: me gustan los fideos
+  - countryCode: +56
+  - notificationsEnabled: True
+  - role: user
+  - createdAt: 2024-10-22 02:33:06.762000+00:00
+  - country: Chile
+  - email: alanbritodelgado2112@gmail.com
+  - city: Viña del mar
+  - isVerified: True
+
+Documento ID: xtGtXLnphhfqA5hQKkBxQcqcmlf2
+  - phoneNumber: 12341234
+  - displayName: Admin General
+  - birthDate: 1997-11-17 22:37:00+00:00
+  - bio: Soy el admin
+  - countryCode: +56
+  - role: admin
+  - photoURL: https://firebasestorage.googleapis.com/v0/b/soul2024-abe2f.appspot.com/o/profile_pics%2FxtGtXLnphhfqA5hQKkBxQcqcmlf2?alt=media&token=7b25c712-3784-49c3-b426-d46c7cdf0990
+  - country: Argentina
+  - email: admin@gmail.com
+  - city: Buenos Aires
+
+

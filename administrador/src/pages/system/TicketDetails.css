@@ -1,190 +1,149 @@
-.ticket-details-container {
-  display: grid;
-  grid-template-areas: 
-    "header header header"
-    "assign chat ready"
-    "info chat nothing"
-    "ntng input send-btn";
-  grid-template-columns: 1fr 2fr 0.3fr;
-  grid-template-rows: 0.1fr auto auto auto;
-  gap: 10px;
-  margin-top:80px;
-  margin-left: 5%;
-  background-color: #f0f2f53b;
-  width: 90vw;
-  height: 80vh;
-  backdrop-filter: blur(5px);
-  border-radius: 20px;
-  font-family: 'Roboto', sans-serif;
-  padding: 10px;
-  color: #333;
+.modal-container {
+  width: 100%;
+  height: 100%; /* Incrementado para usar más espacio */
+  display: flex;
+  flex-direction: column;
+  background-color: #212121;
+  border-radius: 10px;
 }
 
-
-.ticket-header {
-  grid-area: header;
+.header-container {
   display: flex;
-  background-color: #ffffff7c; 
-  color: black;
-  border-radius: 20px;
-  backdrop-filter: blur(5px);
   justify-content: space-between;
   align-items: center;
-  margin: 0;
-  width: 100%;
-  z-index: 2;
-  /* border-bottom: 1px solid #ff9900;  */
+  margin-bottom: 20px;
 }
 
-.ticket-header h5{
-  color: black;
-  text-align: center;
-  border-radius: 20px;
-  font-size: 20px;
-  margin-left: 15px;
+.close-button {
+  background-color: #f50057;
+  color: #fff;
+  padding: 10px 15px;
+  border-radius: 8px;
+  font-weight: bold;
 }
 
-.ticket-btn-close {
-  /* background: none; */
-  border: none;
-  width: 80px;
-  margin-right: 10px;
-  background-color: rgb(202, 62, 62);
-  border-radius: 30px;
-  font-size: 1.2rem;
-  cursor: pointer;
+.resolve-button {
+  background-color: #4caf50;
+  color: #fff;
+  padding: 10px 15px;
+  border-radius: 8px;
+  font-weight: bold;
+}
+
+.modal-title {
+  font-weight: bold;
+  font-size: 24px;
   color: #fff;
 }
 
-.ticket-btn-close:hover{
-  transition: 0.3s;
-  background-color: red;
+.details-container {
+  flex: 1;
+  display: flex;
+  gap: 20px;
 }
 
-.ticket-assignment-section {
-  grid-area: assign;
+.description-box {
+  width: 40%;
+  background-color: #1c1c1c;
+  padding: 20px;
+  border-radius: 8px;
+  overflow-y: auto; /* Para que la descripción pueda desplazarse si es muy larga */
+}
+
+.description-box p {
+  margin: 10px 0;
+  color: #ff6f61; /* Resaltando los detalles */
+  font-size: 16px;
+}
+
+.chat-container {
+  flex: 1;
+  background-color: #1c1c1c;
+  border-radius: 8px;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
-.ticket-assign-select {
-  width: 100%;
-  margin-top: 5px;
-  background-color: #ffffff88;
-  font-size: 15px;
-  padding: 5px;
-}
-
-
-.ticket-assign-button {
-  grid-area: assign-btn;
-  align-self: start;
-  padding: 5px 10px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  background-color: #1976d2;
-  color: white;
-}
-
-
-.ticket-assign-button:hover{
- background-color: blueviolet;
-}
-
-.ticket-description-section {
-  grid-area: info;
-  background-color: #ffffff88;
+.chat-list {
+  flex: 1;
   padding: 10px;
-  border-radius: 10px;
-  height: 100%;
-}
-
-.ticket-description-section p{
-  text-align: left;
-  color: black;
-  /* align-items: flex-start; */
-}
-
-.ticket-chat-section {
-  grid-area: chat;
-  background-color: #ffffff;
-  padding: 10px;
-  border-radius: 10px;
   overflow-y: auto;
-  max-height: 100%;
-}
-
-.ticket-message-item {
   display: flex;
-  margin-bottom: 10px;
+  flex-direction: column;
+  gap: 10px;
 }
 
-.ticket-user-message .ticket-message-bubble {
-  background-color: rgb(245, 212, 253);
-  margin-right: auto;
-}
-
-.ticket-message-bubble p{
-  color: black;
-  text-align: left;
-}
-
-.ticket-admin-message .ticket-message-bubble {
-  background-color: #c5cdff;
-  margin-left: auto;
-}
-
-.ticket-message-sender{
-  color: red;
-}
-
-.ticket-message-bubble {
-  padding: 10px;
-  border-radius: 10px;
+.chat-message {
   max-width: 70%;
+  padding: 15px;
+  border-radius: 10px;
+  color: #fff;
+  font-size: 14px;
+  line-height: 1.4;
 }
 
-.ticket-send-message-bar {
-  grid-area: input;
+.chat-message.user {
+  align-self: flex-start;
+  background-color: #f48fb1;
+}
+
+.chat-message.worker {
+  align-self: flex-end;
+  background-color: #90caf9;
+}
+
+.chat-timestamp {
+  font-size: 12px;
+  color: #ccc;
+  text-align: right;
+  margin-top: 5px;
+}
+
+.chat-input-container {
   display: flex;
-}
-
-.ticket-message-input {
-  grid-area: input;
-  width: 100%;
+  align-items: center;
   padding: 10px;
-
-  border: 1px solid #ddd;
-  border-radius: 25px;
-  resize: none;
-}
-
-.ticket-send-button {
-  grid-area: send-btn;
-  padding: 5px 10px;
-  border: none;
-  width: 80px;
-  border-radius: 25px;
-  cursor: pointer;
-  background-color: #1976d2;
-  color: white;
-  margin-left: 10px;
-}
-
-.ticket-mark-solved-section {
-  grid-area: ready;
+  background-color: #2b2b2b;
+  border-radius: 8px;
   margin-top: 10px;
-  text-align: center;
 }
 
-.ticket-mark-solved-button {
-  padding: 5px 10px;
-  border: none;
-  width: 100px;
-  border-radius: 15px;
-  cursor: pointer;
-  background-color: #5ab900;
+.chat-input {
+  flex: 1;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #fff;
+  margin-right: 10px;
+  font-size: 16px;
+}
+
+.chat-send-button {
+  padding: 10px 20px;
+  background-color: #2196f3;
   color: white;
-  font-size: 15px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.chat-send-button:hover {
+  background-color: #065fb8;
+  transition: 0.3s;
+}
+
+/* Scrollbar personalizado */
+.chat-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.chat-list::-webkit-scrollbar-thumb {
+  background-color: #444;
+  border-radius: 5px;
+}
+
+.chat-list::-webkit-scrollbar-track {
+  background-color: #2b2b2b;
 }

@@ -1,0 +1,144 @@
+.security-level-container {
+  width: 100%;
+  background-color: #212121; /* Fondo oscuro elegante */
+  color: #ffffff; /* Texto blanco */
+  padding: 5px;
+  box-sizing: border-box;
+  border-radius: 10px;
+  margin: 0 auto; /* Centrado horizontal */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+  overflow-x: hidden; /* Evita overflow horizontal */
+}
+
+.security-level-title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  color: #bb86fc; /* Color destacado */
+  text-align: center;
+}
+
+.date-picker-container {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap; /* Ajuste para pantallas pequeñas */
+  margin-bottom: 20px;
+}
+
+.date-picker-label {
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 8px;
+  color: #bb86fc;
+}
+
+.date-picker-input {
+  font-size: 12px;
+  border-radius: 5px;
+  border: 1px solid #444;
+  background-color: #5f5e5e;
+  color: #ffffff;
+  padding: 5px;
+  max-width: 200px; /* Limitar el ancho máximo */
+  text-align: center;
+}
+
+.chart-container {
+  width: 100%;
+  margin: 0 auto;
+  background-color: #2b2b2b; /* Fondo ligeramente más claro */
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  overflow: hidden; /* Asegurar que no haya desbordamiento */
+  padding: 10px;
+}
+
+.chart-container canvas {
+  max-width: 100%; /* Limitar ancho del canvas */
+  height: auto; /* Mantener proporción */
+}
+
+.loading-message {
+  font-size: 18px;
+  color: #cccccc;
+  text-align: center;
+}
+
+.table-title {
+  font-size: 20px;
+  font-weight: bold;
+  margin: 20px 0;
+  color: #ffffff;
+  text-align: center;
+}
+
+.entries-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0 auto; /* Centrar la tabla */
+  background-color: #2b2b2b; /* Fondo gris oscuro */
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.entries-table th,
+.entries-table td {
+  text-align: center;
+  padding: 10px;
+  border: 1px solid #444; /* Bordes sutiles */
+  color: #ffffff; /* Texto blanco */
+}
+
+.entries-table th {
+  background-color: #444; /* Fondo más oscuro para los encabezados */
+  font-weight: bold;
+}
+
+.entries-table tr:nth-child(even) {
+  background-color: #3a3a3a; /* Fondo alternativo */
+}
+
+.entries-table tr:hover {
+  background-color: #555; /* Fondo al pasar el mouse */
+}
+
+/* Scroll personalizado */
+.security-level-container::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.security-level-container::-webkit-scrollbar-thumb {
+  background-color: #444; /* Oscuro */
+  border-radius: 8px;
+}
+
+.security-level-container::-webkit-scrollbar-track {
+  background-color: #1e1e1e; /* Fondo oscuro */
+}
+
+/* Responsividad */
+@media (max-width: 768px) {
+  .security-level-container {
+    padding: 15px;
+  }
+
+  .date-picker-container {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .entries-table th,
+  .entries-table td {
+    font-size: 14px; /* Reducir tamaño de fuente */
+  }
+
+  .security-level-title {
+    font-size: 20px; /* Ajustar tamaño del título */
+  }
+
+  .table-title {
+    font-size: 18px; /* Ajustar tamaño del título de la tabla */
+  }
+}
