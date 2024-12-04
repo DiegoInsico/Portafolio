@@ -87,7 +87,7 @@ const Navbar = () => {
                         </Link>
                     </li>
                     <li>
-                        <Link to="/album" onClick={closeMenu}>
+                        <Link to="/collage" onClick={closeMenu}>
                             <FaPhotoVideo className="icon" /> Tu Álbum
                         </Link>
                     </li>

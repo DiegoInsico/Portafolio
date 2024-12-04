@@ -1,0 +1,13 @@
+/* Collage.css */
+
+.collage-workspace {
+    position: relative;
+    width: 1600px;
+    margin-left: 10px;
+    margin-right: 10px;
+    height: 80vh;
+    border: 2px solid #ccc;
+    margin: 20px auto;
+    background-color: #c9c9c9;
+    overflow: hidden;
+}

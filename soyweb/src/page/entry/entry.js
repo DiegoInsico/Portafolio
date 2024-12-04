@@ -9,7 +9,6 @@ import 'swiper/css/pagination';
 
 const Carousel = ({ currentUser, onEntrySelect, selectedEntries }) => {
     const [entries, setEntries] = useState([]);
-    const [activeIndex, setActiveIndex] = useState(0); // Índice de la tarjeta activa
 
     useEffect(() => {
         const fetchEntries = async () => {
@@ -22,40 +21,39 @@ const Carousel = ({ currentUser, onEntrySelect, selectedEntries }) => {
         };
         fetchEntries();
     }, [currentUser]);
+    const handleEntryClick = (entry) => {
+        // Si la entrada ya está seleccionada, la eliminamos
+        if (selectedEntries.includes(entry.id)) {
+            onEntrySelect(entry, false); // Pasamos false para indicar deselección
+        } else {
+            onEntrySelect(entry, true); // Pasamos true para indicar selección
+        }
+    };
+
 
     return (
         <div className="carousel-container">
             <Swiper
                 className="my-swiper"
                 modules={[Navigation, Pagination]}
-                spaceBetween={10}
-                slidesPerView={5}
+                spaceBetween={1} // Añadido un espacio entre las tarjetas
+                slidesPerView={5} // Ajustar la cantidad de tarjetas visibles
                 loop={true} // Habilita el bucle infinito
-                centeredSlides={true} // Siempre centra la tarjeta activa
-                onSlideChange={(swiper) => setActiveIndex(swiper.realIndex)} // Actualiza el índice activo
+                onSlideChange={(swiper) => console.log('Slide changed to index:', swiper.realIndex)} // Actualiza el índice activo
                 navigation
                 pagination={{ clickable: true }}
                 breakpoints={{
                     1024: {
-                        slidesPerView: 5,
-                    },
-                    768: {
-                        slidesPerView: 3,
-                    },
-                    480: {
-                        slidesPerView: 2,
-                    },
-                    0: {
-                        slidesPerView: 1,
-                    },
+                        slidesPerView: 5, // Para pantallas grandes
+                    }
                 }}
             >
-                {entries.map((entry, index) => (
+                {entries.map((entry) => (
                     <SwiperSlide key={entry.id}>
                         <EntryCard
                             entry={entry}
-                            onClick={() => onEntrySelect(entry)}
-                            isSelected={selectedEntries.some(e => e.id === entry.id)}
+                            onClick={() => handleEntryClick(entry)}
+                            isSelected={selectedEntries.includes(entry.id)}
                         />
                     </SwiperSlide>
                 ))}

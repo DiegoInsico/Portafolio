@@ -2,27 +2,16 @@
 
 import { initializeApp } from "firebase/app";
 import {
-  getAuth,
-  signInWithEmailAndPassword,
-  onAuthStateChanged,
-  createUserWithEmailAndPassword,
-  signOut as firebaseSignOut,
+  getAuth, signInWithEmailAndPassword, onAuthStateChanged, createUserWithEmailAndPassword, signOut as firebaseSignOut,
 } from "firebase/auth";
 import {
-  getFirestore,
-  collection,
-  getDocs,
-  query,
-  where,
-  Timestamp,
-  addDoc,
-  doc,
-  updateDoc,
-  deleteDoc,
-  getDoc,
-  setDoc,
+  getFirestore, collection, getDocs, query, where, Timestamp, addDoc, doc, updateDoc, onSnapshot, deleteDoc, getDoc, setDoc, arrayUnion, serverTimestamp, runTransaction
 } from "firebase/firestore";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+
+import { v4 as uuidv4 } from 'uuid';
+import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
+
+const DEFAULT_THUMBNAIL_URL = "https://via.placeholder.com/150";
 
 // Configuración de Firebase
 const firebaseConfig = {
@@ -39,6 +28,7 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 const storage = getStorage(app);
+const firestore = getFirestore(app);
 
 // **Funciones Existentes**
 
@@ -76,80 +66,106 @@ export const getMensajesForUser = async (email) => {
 
 // Función para obtener las entradas de un usuario específico
 export const getEntradas = async (userId) => {
-    try {
-      const entradasCollection = collection(db, "entradas");
-      const q = query(entradasCollection, where("userId", "==", userId));
-      const snapshot = await getDocs(q);
-  
-      return snapshot.docs.map((doc) => {
-        const data = doc.data();
-  
-        // Convertir fechas a objetos Date
-        data.fechaCreacion = data.fechaCreacion
-          ? data.fechaCreacion.toDate
-            ? data.fechaCreacion.toDate()
-            : new Date(data.fechaCreacion)
-          : null;
-  
-        data.fechaRecuerdo = data.fechaRecuerdo
-          ? data.fechaRecuerdo.toDate
-            ? data.fechaRecuerdo.toDate()
-            : new Date(data.fechaRecuerdo)
-          : null;
-  
-        // Asegurar que 'nivel' es una cadena
-        data.nivel = data.nivel ? data.nivel.toString() : "1";
-  
-        // Definir valores predeterminados para los campos
-        return {
-          id: doc.id,
-          audio: data.audio || null,
-          baul: data.baul || false,
-          cancion: data.cancion || null,
-          categoria: data.categoria || "",
-          color: data.color || "#000000",
-          emociones: data.emociones || [],
-          fechaCreacion: data.fechaCreacion || null,
-          fechaRecuerdo: data.fechaRecuerdo || null,
-          isProtected: data.isProtected || false,
-          media: data.media || null,
-          mediaType: data.mediaType || null,
-          nickname: data.nickname || "",
-          nivel: data.nivel || "1",
-          texto: data.texto || "",
-          userId: data.userId || "",
-        };
-      });
-    } catch (error) {
-      console.error("Error fetching entries:", error);
-      throw error;
-    }
-  };
-  
+  try {
+    const entradasCollection = collection(db, "entradas");
+    const q = query(entradasCollection, where("userId", "==", userId));
+    const snapshot = await getDocs(q);
 
+    return snapshot.docs.map((doc) => {
+      const data = doc.data();
+
+      // Convertir fechas a objetos Date
+      data.fechaCreacion = data.fechaCreacion
+        ? data.fechaCreacion.toDate
+          ? data.fechaCreacion.toDate()
+          : new Date(data.fechaCreacion)
+        : null;
+
+      data.fechaRecuerdo = data.fechaRecuerdo
+        ? data.fechaRecuerdo.toDate
+          ? data.fechaRecuerdo.toDate()
+          : new Date(data.fechaRecuerdo)
+        : null;
+
+      // Asegurar que 'nivel' es una cadena
+      data.nivel = data.nivel ? data.nivel.toString() : "1";
+
+      // Definir valores predeterminados para los campos
+      return {
+        id: doc.id,
+        audio: data.audio || null,
+        baul: data.baul || false,
+        cancion: data.cancion || null,
+        categoria: data.categoria || "",
+        color: data.color || "#000000",
+        emociones: data.emociones || [],
+        fechaCreacion: data.fechaCreacion || null,
+        fechaRecuerdo: data.fechaRecuerdo || null,
+        isProtected: data.isProtected || false,
+        media: data.media || null,
+        mediaType: data.mediaType || null,
+        nickname: data.nickname || "",
+        nivel: data.nivel || "1",
+        texto: data.texto || "",
+        userId: data.userId || "",
+      };
+    });
+  } catch (error) {
+    console.error("Error fetching entries:", error);
+    throw error;
+  }
+};
+
+// Función para obtener una entrada específica por ID
+export const getEntradaById = async (entryId) => {
+  try {
+    const entryDocRef = doc(db, 'entradas', entryId);
+    const entryDoc = await getDoc(entryDocRef);
+    if (entryDoc.exists()) {
+      return { id: entryDoc.id, ...entryDoc.data() };
+    } else {
+      console.warn(`Entrada con ID ${entryId} no encontrada.`);
+      return null;
+    }
+  } catch (error) {
+    console.error(`Error fetching entrada with ID ${entryId}:`, error);
+    throw error;
+  }
+};
+
+// Función para obtener múltiples entradas por IDs
+export const getEntradasByIds = async (entryIds) => {
+  try {
+    const entriesPromises = entryIds.map(entryId => getEntradaById(entryId));
+    const entries = await Promise.all(entriesPromises);
+    // Filtrar entradas no encontradas
+    return entries.filter(entry => entry !== null);
+  } catch (error) {
+    console.error("Error fetching entradas by IDs:", error);
+    throw error;
+  }
+};
 // Función para obtener reflexiones de una entrada
 export const getReflexiones = async (userId, entradaId) => {
-    try {
-      const reflexionesCollection = collection(
-        db,
-        "entradas",
-        entradaId,
-        "reflexiones"
-      );
-      const snapshot = await getDocs(reflexionesCollection);
-      return snapshot.docs
-        .map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }))
-        .map((reflexion) => reflexion.texto); // Asumiendo que cada reflexión tiene un campo 'texto'
-    } catch (error) {
-      console.error("Error al obtener reflexiones:", error);
-      return [];
-    }
-  };
-  
-
+  try {
+    const reflexionesCollection = collection(
+      db,
+      "entradas",
+      entradaId,
+      "reflexiones"
+    );
+    const snapshot = await getDocs(reflexionesCollection);
+    return snapshot.docs
+      .map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }))
+      .map((reflexion) => reflexion.texto); // Asumiendo que cada reflexión tiene un campo 'texto'
+  } catch (error) {
+    console.error("Error al obtener reflexiones:", error);
+    return [];
+  }
+};
 export const getUsers = async () => {
   try {
     const usersCollection = collection(db, "users");
@@ -164,7 +180,6 @@ export const getUsers = async () => {
     throw error;
   }
 };
-
 export const getMensajesProgramados = async () => {
   try {
     const mensajesCollection = collection(db, "mensajesProgramados");
@@ -179,7 +194,6 @@ export const getMensajesProgramados = async () => {
     throw error;
   }
 };
-
 // Función para iniciar sesión y guardar la sesión en localStorage
 export const signIn = async (email, password) => {
   try {
@@ -196,7 +210,6 @@ export const signIn = async (email, password) => {
     throw error;
   }
 };
-
 // Función para crear un nuevo usuario
 export const createUser = async (email, password) => {
   try {
@@ -213,7 +226,6 @@ export const createUser = async (email, password) => {
     throw error;
   }
 };
-
 // Función para cerrar sesión
 export const signOutUser = async () => {
   try {
@@ -226,182 +238,287 @@ export const signOutUser = async () => {
   }
 };
 
-// Funciones relacionadas con álbumes
-export const getAlbums = async (userId) => {
-  try {
-    const albumsCollection = collection(db, "users", userId, "albums");
-    const snapshot = await getDocs(albumsCollection);
-    return snapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
-  } catch (error) {
-    console.error("Error al obtener álbumes:", error);
-    throw error;
-  }
-};
-
-export const createAlbum = async (
-  userId,
-  albumName,
-  backgroundColor = "#ffffff",
-  beneficiarioId
-) => {
-  try {
-    const albumsCollection = collection(db, "users", userId, "albums");
-    const newAlbum = {
-      name: albumName,
-      backgroundColor: backgroundColor,
-      entries: [], // Inicialmente vacío
-      beneficiarioId: beneficiarioId, // Asociar al beneficiario
-      createdAt: Timestamp.now(),
-    };
-    const docRef = await addDoc(albumsCollection, newAlbum);
-    console.log("Álbum creado con ID: ", docRef.id);
-    return { id: docRef.id, ...newAlbum };
-  } catch (error) {
-    console.error("Error al crear álbum:", error);
-    throw error;
-  }
-};
-
-export const updateAlbum = async (userId, albumId, updatedData) => {
-  try {
-    const albumDocRef = doc(db, "users", userId, "albums", albumId);
-    await updateDoc(albumDocRef, updatedData);
-    console.log("Álbum actualizado correctamente");
-  } catch (error) {
-    console.error("Error al actualizar el álbum:", error);
-    throw error;
-  }
-};
-
-export const deleteAlbum = async (userId, albumId) => {
-  try {
-    const albumDocRef = doc(db, "users", userId, "albums", albumId);
-    await deleteDoc(albumDocRef);
-    console.log("Álbum eliminado correctamente");
-  } catch (error) {
-    console.error("Error al eliminar el álbum:", error);
-    throw error;
-  }
-};
-
 // Funciones relacionadas con entradas
 
 export const getEntries = async (user) => {
-    try {
-        const entradasCollection = collection(db, 'entradas');
-        const q = query(entradasCollection, where("userId", "==", user.uid)); // Usa user.uid en lugar de user
-        const snapshot = await getDocs(q);
-
-        return snapshot.docs.map(doc => {
-            const data = doc.data();
-
-            // Formateo de fecha para fechaCreacion y fechaRecuerdo
-            if (data.fechaCreacion && data.fechaCreacion.toDate) {
-                const fecha = data.fechaCreacion.toDate();
-                data.fechaCreacion = `${fecha.getDate()}/${fecha.getMonth() + 1}/${fecha.getFullYear()}`;
-            }
-            if (data.fechaRecuerdo && data.fechaRecuerdo.toDate) {
-                const fechaRecuerdo = data.fechaRecuerdo.toDate();
-                data.fechaRecuerdo = `${fechaRecuerdo.getDate()}/${fechaRecuerdo.getMonth() + 1}/${fechaRecuerdo.getFullYear()}`;
-            }
-
-            // Definir valores predeterminados para los campos
-            return {
-                id: doc.id,
-                audio: data.audio || null,
-                baul: data.baul || false,
-                cancion: data.cancion || null,
-                categoria: data.categoria || '',
-                color: data.color || '#000000',
-                emociones: data.emociones || [],
-                fechaCreacion: data.fechaCreacion || null,
-                fechaRecuerdo: data.fechaRecuerdo || null,
-                isProtected: data.isProtected || false,
-                media: data.media || null,
-                mediaType: data.mediaType || null,
-                nickname: data.nickname || '',
-                nivel: data.nivel || '1',
-                texto: data.texto || '',
-                userId: data.userId || ''
-            };
-        });
-    } catch (error) {
-        console.error("Error fetching entries:", error);
-        throw error;
-
-
-export const getAlbumEntries = async (userId, albumId) => {
   try {
-    const albumEntriesCollection = collection(
-      db,
-      "users",
-      userId,
-      "albums",
-      albumId,
-      "entries"
-    );
-    const snapshot = await getDocs(albumEntriesCollection);
-    return snapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
+    const entradasCollection = collection(db, 'entradas');
+    const q = query(entradasCollection, where("userId", "==", user.uid)); // Usa user.uid en lugar de user
+    const snapshot = await getDocs(q);
+
+    return snapshot.docs.map(doc => {
+      const data = doc.data();
+
+      // Formateo de fecha para fechaCreacion y fechaRecuerdo
+      if (data.fechaCreacion && data.fechaCreacion.toDate) {
+        const fecha = data.fechaCreacion.toDate();
+        data.fechaCreacion = `${fecha.getDate()}/${fecha.getMonth() + 1}/${fecha.getFullYear()}`;
+      }
+      if (data.fechaRecuerdo && data.fechaRecuerdo.toDate) {
+        const fechaRecuerdo = data.fechaRecuerdo.toDate();
+        data.fechaRecuerdo = `${fechaRecuerdo.getDate()}/${fechaRecuerdo.getMonth() + 1}/${fechaRecuerdo.getFullYear()}`;
+      }
+
+      // Definir valores predeterminados para los campos
+      return {
+        id: doc.id,
+        audio: data.audio || null,
+        baul: data.baul || false,
+        cancion: data.cancion || null,
+        categoria: data.categoria || '',
+        color: data.color || '#000000',
+        emociones: data.emociones || [],
+        fechaCreacion: data.fechaCreacion || null,
+        fechaRecuerdo: data.fechaRecuerdo || null,
+        isProtected: data.isProtected || false,
+        media: data.media || null,
+        mediaType: data.mediaType || null,
+        nickname: data.nickname || '',
+        nivel: data.nivel || '1',
+        texto: data.texto || '',
+        userId: data.userId || ''
+      };
+    });
   } catch (error) {
-    console.error("Error al obtener entradas del álbum:", error);
+    console.error("Error fetching entries:", error);
+    throw error;
+  }
+}
+
+//Funciones de collage
+
+export const addEntryToCollage = async (collageId, entryId, initialPosition = { x: 100, y: 100 }) => {
+  try {
+    const collageRef = doc(db, "collages", collageId);
+    await updateDoc(collageRef, {
+      entries: arrayUnion({
+        entryId,
+        position: initialPosition,
+        size: { width: 300, height: 400 }, // Tamaño predeterminado
+        backgroundColor: '#ffffff' // Color de fondo predeterminado
+      }),
+    });
+  } catch (error) {
+    console.error("Error agregando la entrada al collage:", error);
     throw error;
   }
 };
 
-// Función para obtener el color de fondo de un álbum
-export const getAlbumBackground = async (userId, albumId) => {
-  try {
-    const albumDocRef = doc(db, "users", userId, "albums", albumId);
-    const albumSnapshot = await getDoc(albumDocRef);
-    if (albumSnapshot.exists()) {
-      return albumSnapshot.data().backgroundColor;
+export const subscribeToCollages = (userId, onUpdate, onError) => {
+  const db = getFirestore();
+  const collagesRef = collection(db, 'collages');
+  const q = query(collagesRef, where('userId', '==', userId));
+
+  const unsubscribe = onSnapshot(
+    q,
+    (snapshot) => {
+      const collages = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        name: doc.data().name,
+        thumbnail: doc.data().thumbnail || DEFAULT_THUMBNAIL_URL, // Asegúrate de definir `DEFAULT_THUMBNAIL_URL`
+        entries: doc.data().entries || [],
+        createdAt: doc.data().createdAt,
+        userId: doc.data().userId,
+      }));
+      onUpdate(collages);
+    },
+    (error) => {
+      console.error('Error en la suscripción a collages:', error);
+      onError(error);
     }
-    return "#ffffff"; // Valor predeterminado si no existe
-  } catch (error) {
-    console.error("Error al obtener el color de fondo del álbum:", error);
-    return "#ffffff"; // Retornar valor predeterminado en caso de error
-  }
+  );
+
+  return unsubscribe; // Retorna la función para desuscribirse
 };
 
-export const updateAlbumEntriesInDB = async (userId, albumId, entriesData) => {
-    try {
-        const albumDocRef = doc(db, 'users', userId, 'albums', albumId);
-
-        // Aquí actualizamos el álbum con las entradas y sus posiciones
-        await updateDoc(albumDocRef, { entries: entriesData });
-        console.log("Entradas del álbum actualizadas correctamente");
-    } catch (error) {
-        console.error("Error al actualizar las entradas del álbum:", error);
-        throw error;
-    }
-export const updateAlbumEntriesInDB = async (
-  userId,
-  albumId,
-  newEntriesIds
-) => {
+export const createCollageAlbum = async (collageName, selectedEntries, thumbnail, currentUser) => {
   try {
-    const albumDocRef = doc(db, "users", userId, "albums", albumId);
-    await updateDoc(albumDocRef, { entries: newEntriesIds });
-    console.log("Entradas del álbum actualizadas correctamente");
+    if (!currentUser || !currentUser.uid) {
+      throw new Error('User ID is undefined');
+    }
+
+    // Subir thumbnail a Firebase Storage
+    const thumbnailRef = ref(storage, `thumbnails/${uuidv4()}-${thumbnail.name}`);
+    await uploadBytes(thumbnailRef, thumbnail);
+
+    // Obtener URL del thumbnail
+    const thumbnailURL = await getDownloadURL(thumbnailRef);
+
+    // Crear documento en Firestore con la URL del thumbnail
+    const newCollageRef = doc(collection(db, 'collages'));
+    await setDoc(newCollageRef, {
+      name: collageName,
+      thumbnail: thumbnailURL,
+      thumbnailPath: `thumbnails/${uuidv4()}-${thumbnail.name}`, // Añadido para facilitar la eliminación
+      createdAt: serverTimestamp(), // Usar timestamp del servidor
+      userId: currentUser.uid,
+      entries: selectedEntries.map(entryId => ({
+        entryId,
+        position: { x: 100, y: 100 }, // Posiciones iniciales predeterminadas
+        size: { width: 300, height: 400 }, // Tamaños predeterminados
+        backgroundColor: '#ffffff' // Color de fondo predeterminado
+      })),
+    });
+
+    return newCollageRef.id;
   } catch (error) {
-    console.error("Error al actualizar las entradas del álbum:", error);
+    console.error('Error al crear el collage:', error);
     throw error;
   }
 };
-// Función para actualizar el color de fondo de un álbum
-export const setAlbumBgColor = async (userId, albumId, color) => {
+
+export const getCollagesByUser = async (userId) => {
   try {
-    const albumDocRef = doc(db, "users", userId, "albums", albumId);
-    await updateDoc(albumDocRef, { backgroundColor: color });
-    console.log("Color de fondo del álbum actualizado correctamente");
+    console.log(`Fetching collages for userId: ${userId}`); // Log del userId
+    const collagesCollection = collection(db, "collages");
+    const q = query(collagesCollection, where("userId", "==", userId));
+    const snapshot = await getDocs(q);
+
+    console.log(`Number of collages fetched: ${snapshot.size}`); // Log de la cantidad de collages
+
+    const collages = snapshot.docs.map((doc) => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        name: data.name,
+        thumbnail: data.thumbnail || DEFAULT_THUMBNAIL_URL, // Valor predeterminado
+        entries: data.entries || [],
+      };
+    });
+
+    console.log("Collages data:", collages); // Log de los datos de collages
+
+    return collages;
   } catch (error) {
-    console.error("Error al actualizar el color de fondo del álbum:", error);
+    console.error("Error fetching collages:", error);
+    throw error;
+  }
+};
+
+
+// Función para obtener un collage específico
+export const getCollageById = async (collageId) => {
+  try {
+    const collageRef = doc(db, "collages", collageId);
+    const collageDoc = await getDoc(collageRef);
+
+    if (collageDoc.exists()) {
+      const data = collageDoc.data();
+      return {
+        id: collageDoc.id,
+        name: data.name,
+        thumbnail: data.thumbnail || DEFAULT_THUMBNAIL_URL,
+        entries: data.entries || [],
+        createdAt: data.createdAt,
+        userId: data.userId,
+      };
+    } else {
+      console.warn("Collage no encontrado");
+      return null;
+    }
+  } catch (error) {
+    console.error("Error fetching collage:", error);
+    throw error;
+  }
+};
+
+export const updateEntryPositionInCollage = async (collageId, entryId, newPosition) => {
+  try {
+    const collageRef = doc(db, "collages", collageId);
+
+    await runTransaction(db, async (transaction) => {
+      const collageDoc = await transaction.get(collageRef);
+      if (!collageDoc.exists()) {
+        throw new Error("Collage no encontrado");
+      }
+
+      const entries = collageDoc.data().entries || [];
+      const updatedEntries = entries.map(entry => {
+        if (entry.entryId === entryId) {
+          return { ...entry, position: newPosition };
+        }
+        return entry;
+      });
+
+      transaction.update(collageRef, { entries: updatedEntries });
+    });
+  } catch (error) {
+    console.error("Error updating entry position:", error);
+    throw error;
+  }
+};
+
+export const updateCollageTitleProperties = async (collageId, properties) => {
+  try {
+    const collageRef = doc(db, "collages", collageId);
+    const collageDoc = await getDoc(collageRef);
+    if (!collageDoc.exists()) {
+      throw new Error("Collage no encontrado");
+    }
+
+    await updateDoc(collageRef, { ...properties });
+  } catch (error) {
+    console.error("Error actualizando propiedades del título:", error);
+    throw error;
+  }
+};
+
+export const removeEntryFromCollage = async (collageId, entryId) => {
+  try {
+    const collageRef = doc(db, "collages", collageId);
+    await collageRef.update({
+      entries: firestore.FieldValue.arrayRemove(entryId)
+    });
+  } catch (error) {
+    console.error("Error removing entry from collage:", error);
+    throw error;
+  }
+};
+
+// Función para eliminar un collage
+export const deleteCollage = async (collageId) => {
+  const storage = getStorage();
+  const firestore = getFirestore();
+
+  // Referencia al archivo en Firebase Storage
+  const collageRef = ref(storage, `collages/${collageId}`);
+
+  // Referencia al documento de Firestore
+  const collageDocRef = doc(firestore, "collages", collageId); // Suponiendo que el documento se llama 'collages'
+
+  try {
+    // Eliminar el archivo de Firebase Storage
+    await deleteObject(collageRef);
+    console.log("Archivo de collage eliminado de Firebase Storage");
+
+    // Eliminar el documento de Firestore
+    await deleteDoc(collageDocRef);
+    console.log("Collage eliminado de Firestore");
+
+  } catch (error) {
+    console.error("Error eliminando el collage:", error);
+  }
+};
+
+export const updateEntryProperties = async (collageId, entryId, properties) => {
+  try {
+    const collageRef = doc(db, "collages", collageId);
+    const collageDoc = await getDoc(collageRef);
+    if (!collageDoc.exists()) {
+      throw new Error("Collage no encontrado");
+    }
+
+    const entries = collageDoc.data().entries || [];
+    const updatedEntries = entries.map(entry => {
+      if (entry.entryId === entryId) {
+        return { ...entry, ...properties };
+      }
+      return entry;
+    });
+
+    await updateDoc(collageRef, { entries: updatedEntries });
+  } catch (error) {
+    console.error("Error updating entry properties:", error);
     throw error;
   }
 };
@@ -438,14 +555,14 @@ export const editDocument = async (documentId, updatedData) => {
 };
 
 export const deleteDocument = async (documentId) => {
-    try {
-        const docRef = doc(db, "documentos", documentId);
-        await deleteDoc(docRef);
-        console.log("Documento eliminado con éxito:", documentId);
-    } catch (error) {
-        console.error("Error al eliminar el documento:", error);
-        throw error;
-    }
+  try {
+    const docRef = doc(db, "documentos", documentId);
+    await deleteDoc(docRef);
+    console.log("Documento eliminado con éxito:", documentId);
+  } catch (error) {
+    console.error("Error al eliminar el documento:", error);
+    throw error;
+  }
 };
 
 // Función para obtener los documentos de un usuario específico
@@ -466,22 +583,22 @@ export const getDocuments = async (userId) => {
 
 export const getTestigos = async (userId) => {
 
-    try {
-        const testigosCollection = collection(db, "testigos");
-        const q = query(testigosCollection, where("userId", "==", userId));
-        const snapshot = await getDocs(q);
+  try {
+    const testigosCollection = collection(db, "testigos");
+    const q = query(testigosCollection, where("userId", "==", userId));
+    const snapshot = await getDocs(q);
 
-        console.log("Consulta realizada para el userId:", userId);
-        console.log("Cantidad de testigos obtenidos:", snapshot.size);
+    console.log("Consulta realizada para el userId:", userId);
+    console.log("Cantidad de testigos obtenidos:", snapshot.size);
 
-        return snapshot.docs.map((doc) => ({
-            id: doc.id,
-            ...doc.data(),
-        }));
-    } catch (error) {
-        console.error("Error al obtener testigos:", error);
-        throw error;
-    }
+    return snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+  } catch (error) {
+    console.error("Error al obtener testigos:", error);
+    throw error;
+  }
 
   try {
     const testigosCollection = collection(db, "testigos");
@@ -722,7 +839,5 @@ export const getReflexionesForUser = async (userId, entradaId) => {
   }
 };
 
-
-
 // Exportar auth, db y storage para su uso en otros componentes
-export { auth, db, storage };
+export { auth, db, storage }

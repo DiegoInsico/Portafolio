@@ -1,0 +1,105 @@
+/* ListCollage.css */
+
+/* Contenedor principal de la lista de collages */
+.collages-list {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: 'Arial', sans-serif;
+    color: #333;
+}
+
+/* Título de la sección */
+.collages-list h3 {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 1.8em;
+    border-bottom: 2px solid #e0e0e0;
+    padding-bottom: 10px;
+}
+
+/* Lista de collages */
+.collages-list ul {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    /* 4 columnas */
+    gap: 20px;
+    padding: 0;
+}
+
+/* Elemento individual de collage */
+.collage-item {
+    position: relative;
+    /* Para posicionar el botón de eliminar */
+    background-color: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.collage-item:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transform: translateY(-5px);
+}
+
+/* Imagen del collage */
+.collage-thumbnail {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+}
+
+/* Nombre del collage */
+.collage-item h4 {
+    margin: 15px;
+    font-size: 1.2em;
+    text-align: center;
+    flex-grow: 1;
+}
+
+/* Botón de eliminar */
+.delete-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(255, 255, 255, 0.8);
+    border: none;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    cursor: pointer;
+}
+
+.collage-item:hover .delete-button {
+    opacity: 1;
+}
+
+.delete-button:hover {
+    background: rgba(255, 0, 0, 0.8);
+    color: #fff;
+}
+
+/* Icono de eliminar (puedes usar un SVG o un carácter Unicode) */
+.delete-button::before {
+    content: '🗑️';
+    /* Icono de papelera */
+    font-size: 16px;
+}
+
+/* Mensaje cuando no hay collages */
+.collages-list p {
+    text-align: center;
+    font-size: 1.2em;
+    color: #777;
+}
