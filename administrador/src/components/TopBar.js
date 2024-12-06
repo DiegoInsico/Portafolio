@@ -20,6 +20,9 @@ const TopBar = ({ currentUser, userRole, handleLogout }) => {
             <NavLink to="/monitor/storage/storageUsage" className="topbar-link">
               Gráficos Masivos
             </NavLink>
+            <NavLink to="/monitor/pb/pb" className="topbar-link">
+              Gráficos PB
+            </NavLink>
             <NavLink to="/monitor/graphs/userHeatmap" className="topbar-link">
               Mapa de Usuarios
             </NavLink>
@@ -27,7 +30,7 @@ const TopBar = ({ currentUser, userRole, handleLogout }) => {
               Consultas y Soporte
             </NavLink>
             <NavLink to="/monitor/clouster" className="topbar-link">
-              Clouster
+              Logs
             </NavLink>
             <NavLink to="/rol/RolManagment" className="topbar-link">
               Administración de Usuarios

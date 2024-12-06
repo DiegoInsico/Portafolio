@@ -23,6 +23,7 @@ import Graphics from "./pages/monitor/storage/storageUsage";
 import { db } from "./firebase";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import "leaflet/dist/leaflet.css";
+import AnalysisPage from "./pages/monitor/pb/pb";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -148,6 +149,14 @@ function App() {
                     element={
                       <PrivateRoute allowedRoles={["Administrador", "Analista"]}>
                         <GraphicsContext />
+                      </PrivateRoute>
+                    }
+                  />
+                  <Route
+                    path="/monitor/pb/pb"
+                    element={
+                      <PrivateRoute allowedRoles={["Administrador", "Analista"]}>
+                        <AnalysisPage />
                       </PrivateRoute>
                     }
                   />
