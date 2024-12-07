@@ -24,6 +24,8 @@ import { db } from "./firebase";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import "leaflet/dist/leaflet.css";
 import AnalysisPage from "./pages/monitor/pb/pb";
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -50,7 +52,10 @@ function App() {
         );
         return true;
       } else {
-        console.warn("Acceso denegado. No se encontró un documento en employees para UID:", uid);
+        console.warn(
+          "Acceso denegado. No se encontró un documento en employees para UID:",
+          uid
+        );
         return false;
       }
     } catch (error) {
@@ -61,7 +66,10 @@ function App() {
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
-      console.log("Estado de autenticación cambiado:", user ? user.uid : "No autenticado");
+      console.log(
+        "Estado de autenticación cambiado:",
+        user ? user.uid : "No autenticado"
+      );
       if (user) {
         setCurrentUser(user);
         setIsAuthenticated(true);
@@ -131,7 +139,9 @@ function App() {
                   <Route
                     path="/dashboard"
                     element={
-                      <PrivateRoute allowedRoles={["Administrador", "Operador"]}>
+                      <PrivateRoute
+                        allowedRoles={["Administrador", "Operador"]}
+                      >
                         <Dashboard />
                       </PrivateRoute>
                     }
@@ -147,7 +157,9 @@ function App() {
                   <Route
                     path="/monitor/graphics"
                     element={
-                      <PrivateRoute allowedRoles={["Administrador", "Analista"]}>
+                      <PrivateRoute
+                        allowedRoles={["Administrador", "Analista"]}
+                      >
                         <GraphicsContext />
                       </PrivateRoute>
                     }
@@ -155,15 +167,28 @@ function App() {
                   <Route
                     path="/monitor/pb/pb"
                     element={
-                      <PrivateRoute allowedRoles={["Administrador", "Analista"]}>
-                        <AnalysisPage />
-                      </PrivateRoute>
+                      <DndProvider backend={HTML5Backend}>
+                        <Routes>
+                          <Route
+                            path="/monitor/pb/pb"
+                            element={
+                              <PrivateRoute
+                                allowedRoles={["Administrador", "Analista"]}
+                              >
+                                <AnalysisPage />
+                              </PrivateRoute>
+                            }
+                          />
+                        </Routes>
+                      </DndProvider>
                     }
                   />
                   <Route
                     path="/monitor/storage/storageUsage"
                     element={
-                      <PrivateRoute allowedRoles={["Administrador", "Analista"]}>
+                      <PrivateRoute
+                        allowedRoles={["Administrador", "Analista"]}
+                      >
                         <Graphics />
                       </PrivateRoute>
                     }
@@ -171,7 +196,9 @@ function App() {
                   <Route
                     path="/monitor/graphs/userHeatmap"
                     element={
-                      <PrivateRoute allowedRoles={["Administrador", "Analista"]}>
+                      <PrivateRoute
+                        allowedRoles={["Administrador", "Analista"]}
+                      >
                         <UserHeatmap />
                       </PrivateRoute>
                     }
@@ -179,7 +206,9 @@ function App() {
                   <Route
                     path="/system/inbox"
                     element={
-                      <PrivateRoute allowedRoles={["Administrador", "Operador"]}>
+                      <PrivateRoute
+                        allowedRoles={["Administrador", "Operador"]}
+                      >
                         <Inbox />
                       </PrivateRoute>
                     }
@@ -187,7 +216,9 @@ function App() {
                   <Route
                     path="/monitor/clouster"
                     element={
-                      <PrivateRoute allowedRoles={["Administrador", "Operador"]}>
+                      <PrivateRoute
+                        allowedRoles={["Administrador", "Operador"]}
+                      >
                         <Clouster />
                       </PrivateRoute>
                     }
@@ -213,7 +244,11 @@ function App() {
           <Route
             path="*"
             element={
-              <Navigate to="/login" replace state={{ error: "No autorizado" }} />
+              <Navigate
+                to="/login"
+                replace
+                state={{ error: "No autorizado" }}
+              />
             }
           />
         )}

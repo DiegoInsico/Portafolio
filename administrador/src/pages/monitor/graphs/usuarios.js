@@ -37,8 +37,8 @@ const UsuariosChart = () => {
         }
 
         // Procesar ubicación
-        const pais = data.country || "Indefinido";
-        const ciudad = data.city || "Indefinida";
+        const pais = data.pais || "Indefinido";
+        const ciudad = data.ciudad || "Indefinida";
         const comuna = data.comuna || "Indefinida";
 
         if (!locationCounts.Pais[pais]) locationCounts.Pais[pais] = 0;
