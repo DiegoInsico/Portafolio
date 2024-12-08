@@ -1,358 +1,417 @@
 import React, { useState, useEffect } from "react";
-import { Bar, Line, Pie } from "react-chartjs-2";
-import { Chart as ChartJS } from "chart.js/auto";
+import { Bar } from "react-chartjs-2";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "../../../firebase";
+import "./pb.css";
 import { DndProvider, useDrag, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
-import "./pb.css"; // Importa el CSS
-import { collection, getDocs } from "firebase/firestore";
-import { db } from "../../../firebase"; // Cambiar a tu configuración
 
-// Filtros iniciales
-const initialFilters = {
-  entradas: false,
-  emociones: false,
-  seguridad: false,
-  sesiones: false,
-  categorias: false,
-  tiempo: false,
-  edad: false,
-  sector: false,
-};
-
-// Tipos de gráficos disponibles
-const chartTypes = ["Barras", "Líneas", "Circular"];
-
-// Componente principal
 const AnalysisPage = () => {
-  const [filters, setFilters] = useState(initialFilters);
-  const [charts, setCharts] = useState([]);
-  const [selectedChartType, setSelectedChartType] = useState("Barras");
-  const [xAxisFilter, setXAxisFilter] = useState("");
-  const [yAxisFilter, setYAxisFilter] = useState("");
   const [data, setData] = useState({ entries: [], sessions: [], users: [] });
+  const [xAxisFilter, setXAxisFilter] = useState(null);
+  const [yAxisFilter, setYAxisFilter] = useState(null);
+  const [filteredData, setFilteredData] = useState([]);
 
-  const DraggableFilter = ({ filter }) => {
-    const [{ isDragging }, drag] = useDrag({
-      type: "filter",
-      item: { filter },
-      collect: (monitor) => ({
-        isDragging: !!monitor.isDragging(),
-      }),
-    });
-
-    return (
-      <div ref={drag} className={`filter-item ${isDragging ? "dragging" : ""}`}>
-        {filter}
-      </div>
-    );
+  const clearFiltersAndCharts = () => {
+    setXAxisFilter(null);
+    setYAxisFilter(null);
+    setFilteredData([]);
   };
 
-  // Carga de datos desde Firebase
-  useEffect(() => {
-    const fetchData = async () => {
-      const entriesSnapshot = await getDocs(collection(db, "entradas"));
-      const sessionsSnapshot = await getDocs(collection(db, "sessions"));
-      const usersSnapshot = await getDocs(collection(db, "users"));
-
-      const entriesData = entriesSnapshot.docs.map((doc) => doc.data());
-      const sessionsData = sessionsSnapshot.docs.map((doc) => doc.data());
-      const usersData = usersSnapshot.docs.map((doc) => doc.data());
-
-      setData({
-        entries: entriesData,
-        sessions: sessionsData,
-        users: usersData,
-      });
-      console.log("Datos obtenidos de Firebase:", {
-        entries: entriesData,
-        sessions: sessionsData,
-        users: usersData,
-      });
-    };
-
-    fetchData();
-  }, []);
-
-  // Cálculo de la edad a partir de la fecha de nacimiento
   const calculateAge = (birthDate) => {
     const today = new Date();
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const m = today.getMonth() - birthDate.getMonth();
-    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+    const birth = new Date(birthDate.seconds * 1000);
+    let age = today.getFullYear() - birth.getFullYear();
+    if (
+      today.getMonth() < birth.getMonth() ||
+      (today.getMonth() === birth.getMonth() &&
+        today.getDate() < birth.getDate())
+    ) {
       age--;
     }
     return age;
   };
 
+  const getZodiacSign = (birthDate) => {
+    const birth = new Date(birthDate.seconds * 1000);
+    const month = birth.getMonth() + 1;
+    const day = birth.getDate();
+    if ((month === 1 && day >= 20) || (month === 2 && day <= 18))
+      return "Acuario";
+    // Añadir más signos zodiacales aquí
+    return "Desconocido";
+  };
+
+  // Fetch data from Firebase
   useEffect(() => {
     const fetchData = async () => {
       const entriesSnapshot = await getDocs(collection(db, "entradas"));
       const sessionsSnapshot = await getDocs(collection(db, "sessions"));
       const usersSnapshot = await getDocs(collection(db, "users"));
 
-      const entriesData = entriesSnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-      const sessionsData = sessionsSnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-      const usersData = usersSnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-
-      // Combinación de datos de entradas y usuarios
-      const combinedEntries = entriesData.map((entry) => {
-        const user = usersData.find((u) => u.id === entry.userId);
-        return {
-          ...entry,
-          user,
-        };
-      });
-
       setData({
-        entries: combinedEntries,
-        sessions: sessionsData,
-        users: usersData,
-      });
-
-      console.log("Datos combinados cargados:", {
-        entries: combinedEntries,
-        sessions: sessionsData,
-        users: usersData,
+        entries: entriesSnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        })),
+        sessions: sessionsSnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        })),
+        users: usersSnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        })),
       });
     };
-
     fetchData();
   }, []);
 
-  // Procesar filtros
+  // Process filters
   const processFilters = () => {
-    if (!xAxisFilter || !yAxisFilter) return [];
-    const { entries, sessions, users } = data;
+    const { entries } = data;
 
-    let filteredData = [];
-
-    if (xAxisFilter === "edad" || yAxisFilter === "edad") {
-      filteredData = entries.map((entry) => {
-        const user = users.find((u) => u.id === entry.userId);
-        if (!user) return null;
-
-        const birthDate = user?.birthDate?.seconds
-          ? new Date(user.birthDate.seconds * 1000)
-          : null;
-        const age = birthDate ? calculateAge(birthDate) : "Desconocido";
-
-        const yValue =
-          yAxisFilter === "entradas"
-            ? 1
-            : yAxisFilter === "emociones"
-            ? entry.emociones?.length || 0
-            : yAxisFilter === "seguridad"
-            ? entry.nivel === "nivel 3"
-              ? 3
-              : entry.nivel === "nivel 2"
-              ? 2
-              : 1
-            : 0;
-
-        return { x: age, y: yValue };
-      });
-    } else if (xAxisFilter === "categorias") {
-      const categoryCounts = entries.reduce((acc, entry) => {
-        acc[entry.categoria] = (acc[entry.categoria] || 0) + 1;
-        return acc;
-      }, {});
-
-      filteredData = Object.entries(categoryCounts).map(
-        ([category, count]) => ({
-          x: category,
-          y: count,
-        })
-      );
-    } else if (xAxisFilter === "emociones") {
-      const emotionCounts = entries.reduce((acc, entry) => {
-        entry.emociones?.forEach((emotion) => {
-          acc[emotion] = (acc[emotion] || 0) + 1;
-        });
-        return acc;
-      }, {});
-
-      filteredData = Object.entries(emotionCounts).map(([emotion, count]) => ({
-        x: emotion,
-        y: count,
-      }));
-    }
-
-    return filteredData.filter((d) => d !== null);
-  };
-
-  // Agregar un nuevo gráfico
-  const addChart = () => {
     if (!xAxisFilter || !yAxisFilter) {
-      alert("Por favor, selecciona filtros para ambos ejes.");
-      return;
+      alert("Por favor selecciona filtros para ambos ejes.");
+      return [];
     }
 
-    const filteredData = processFilters(); // Procesar datos según los filtros seleccionados
+    let result = [];
+    const xField = xAxisFilter;
+    const yField = yAxisFilter;
 
-    // Formatear los datos para Chart.js
-    const formattedData = {
-      labels: filteredData.map((item) => item.x),
-      datasets: [
-        {
-          label: `${yAxisFilter} por ${xAxisFilter}`,
-          data: filteredData.map((item) => item.y),
-          backgroundColor: filteredData.map((_, index) =>
-            index % 2 === 0 ? "rgba(54,162,235,0.5)" : "rgba(255,99,132,0.5)"
-          ),
-          borderColor: "rgba(75,192,192,1)",
-          borderWidth: 1,
-        },
-      ],
+    // Mapeo para campos especiales que requieren transformación
+    const specialFields = {
+      fechaCreacion: (entry) =>
+        new Date(entry.fechaCreacion.seconds * 1000).toLocaleDateString(),
+      isProtected: (entry) =>
+        entry.isProtected ? "Protegido" : "No Protegido",
     };
 
-    console.log("Datos formateados para el gráfico:", formattedData);
+    const getFieldValue = (entry, field) =>
+      specialFields[field] ? specialFields[field](entry) : entry[field];
 
-    if (
-      !formattedData.labels.length ||
-      !formattedData.datasets[0].data.length
-    ) {
-      console.warn("Los datos para el gráfico están incompletos.");
-      alert("No se generaron datos para los filtros seleccionados.");
-      return;
-    }
+    // Procesar combinaciones dinámicamente
+    result = entries.reduce((acc, entry) => {
+      const xValue = getFieldValue(entry, xField) || "Sin Valor";
+      const yValue = getFieldValue(entry, yField);
 
-    if (
-      !formattedData.labels.length ||
-      !formattedData.datasets[0].data.length
-    ) {
-      console.warn("Los datos para el gráfico están incompletos.");
-      alert("No se generaron datos para los filtros seleccionados.");
-      return;
-    }
+      // Manejo de múltiples valores (ej: emociones)
+      if (Array.isArray(yValue)) {
+        yValue.forEach((val) => {
+          acc[xValue] = acc[xValue] || {};
+          acc[xValue][val] = (acc[xValue][val] || 0) + 1;
+        });
+      } else {
+        acc[xValue] = acc[xValue] || {};
+        acc[xValue][yValue || "Sin Valor"] =
+          (acc[xValue][yValue || "Sin Valor"] || 0) + 1;
+      }
 
-    console.log("Datos formateados para el gráfico:", formattedData);
+      return acc;
+    }, {});
 
-    // Validar si los datos están vacíos
-    if (
-      !formattedData.labels.length ||
-      !formattedData.datasets[0].data.length
-    ) {
-      console.warn("Los datos para el gráfico están incompletos.");
-      alert("No se generaron datos para los filtros seleccionados.");
-      return;
-    }
+    // Transformar resultados en un formato de gráficos
+    const formattedResult = Object.entries(result).flatMap(([xKey, yValues]) =>
+      Object.entries(yValues).map(([yKey, count]) => ({
+        x: xKey,
+        y: count,
+        label: yKey,
+      }))
+    );
 
-    // Agregar el gráfico al estado
-    setCharts([
-      ...charts,
-      {
-        type: selectedChartType,
-        data: formattedData, // Usar los datos formateados aquí
-      },
+    setFilteredData((prev) => [
+      ...prev,
+      { xAxis: xAxisFilter, yAxis: yAxisFilter, data: formattedResult },
     ]);
   };
 
-  // Detección de arrastre y soltar para filtros
-  const handleDrop = (axis, item) => {
-    if (axis === "x") {
-      setXAxisFilter(item.filter);
-      console.log("Filtro Eje X seleccionado:", item.filter);
+  const processFiltersUsers = () => {
+    const { users } = data;
+
+    if (!xAxisFilter || !yAxisFilter) {
+      alert("Por favor selecciona filtros para ambos ejes.");
+      return [];
     }
-    if (axis === "y") {
-      setYAxisFilter(item.filter);
-      console.log("Filtro Eje Y seleccionado:", item.filter);
-    }
+
+    let result = [];
+    const xField = xAxisFilter;
+    const yField = yAxisFilter;
+
+    const specialFields = {
+      edad: (user) => calculateAge(user.birthDate),
+      signo: (user) => getZodiacSign(user.birthDate),
+      isPremium: (user) => (user.isPremium ? "Premium" : "No Premium"),
+      createdAt: (user) =>
+        new Date(user.createdAt.seconds * 1000).toLocaleDateString(),
+    };
+
+    const getFieldValue = (user, field) =>
+      specialFields[field] ? specialFields[field](user) : user[field];
+
+    result = users.reduce((acc, user) => {
+      const xValue = getFieldValue(user, xField) || "Sin Valor";
+      const yValue = getFieldValue(user, yField);
+
+      acc[xValue] = acc[xValue] || {};
+      acc[xValue][yValue || "Sin Valor"] =
+        (acc[xValue][yValue || "Sin Valor"] || 0) + 1;
+
+      return acc;
+    }, {});
+
+    const formattedResult = Object.entries(result).flatMap(([xKey, yValues]) =>
+      Object.entries(yValues).map(([yKey, count]) => ({
+        x: xKey,
+        y: count,
+        label: yKey,
+      }))
+    );
+
+    setFilteredData((prev) => [
+      ...prev,
+      { xAxis: xAxisFilter, yAxis: yAxisFilter, data: formattedResult },
+    ]);
   };
 
+  // Drag-and-Drop handlers
   const [{ isOverX }, dropX] = useDrop({
-    accept: "filter",
-    drop: (item) => handleDrop("x", item),
+    accept: ["filter", "category", "security", "creation", "user"],
+    drop: (item) => setXAxisFilter(item.name),
     collect: (monitor) => ({
       isOverX: !!monitor.isOver(),
     }),
   });
 
   const [{ isOverY }, dropY] = useDrop({
-    accept: "filter",
-    drop: (item) => handleDrop("y", item),
+    accept: ["filter", "category", "security", "creation", "user"],
+    drop: (item) => setYAxisFilter(item.name),
     collect: (monitor) => ({
       isOverY: !!monitor.isOver(),
     }),
   });
 
+  const [{ isDragging }, dragEmotion] = useDrag({
+    type: "filter",
+    item: { name: "emociones" },
+    collect: (monitor) => ({
+      isDragging: !!monitor.isDragging(),
+    }),
+  });
+
+  const [{ isDraggingCategory }, dragCategory] = useDrag({
+    type: "category",
+    item: { name: "categorías" },
+    collect: (monitor) => ({
+      isDragging: !!monitor.isDragging(),
+    }),
+  });
+
+  const [{ isDraggingSecurity }, dragSecurity] = useDrag({
+    type: "security",
+    item: { name: "seguridad" },
+    collect: (monitor) => ({
+      isDragging: !!monitor.isDragging(),
+    }),
+  });
+
+  const [{ isDraggingCreation }, dragCreation] = useDrag({
+    type: "creation",
+    item: { name: "fechaCreacion" },
+    collect: (monitor) => ({
+      isDraggingCreation: !!monitor.isDragging(),
+    }),
+  });
+
+  const [{ isDraggingUser }, dragUser] = useDrag({
+    type: "user",
+    item: { name: "userID" },
+    collect: (monitor) => ({
+      isDraggingUser: !!monitor.isDragging(),
+    }),
+  });
+
+  const [{ isDraggingAge }, dragAge] = useDrag({
+    type: "user",
+    item: { name: "edad" },
+    collect: (monitor) => ({
+      isDraggingAge: !!monitor.isDragging(),
+    }),
+  });
+
+  const [{ isDraggingSign }, dragSign] = useDrag({
+    type: "user",
+    item: { name: "signo" },
+    collect: (monitor) => ({
+      isDraggingSign: !!monitor.isDragging(),
+    }),
+  });
+
+  const [{ isDraggingCity }, dragCity] = useDrag({
+    type: "user",
+    item: { name: "ciudad" },
+    collect: (monitor) => ({
+      isDraggingCity: !!monitor.isDragging(),
+    }),
+  });
+
+  const [{ isDraggingdragCommune }, dragCommune] = useDrag({
+    type: "user",
+    item: { name: "comuna" },
+    collect: (monitor) => ({
+      isDraggingCommune: !!monitor.isDragging(),
+    }),
+  });
+  const [{ isDraggingdragCountry }, dragCountry] = useDrag({
+    type: "user",
+    item: { name: "pais" },
+    collect: (monitor) => ({
+      isDraggingCountry: !!monitor.isDragging(),
+    }),
+  });
+  const [{ isDraggingdragPremium }, dragPremium] = useDrag({
+    type: "user",
+    item: { name: "premium" },
+    collect: (monitor) => ({
+      isDraggingPremium: !!monitor.isDragging(),
+    }),
+  });
+  const [{ isDraggingdragCreatedAt }, dragCreatedAt] = useDrag({
+    type: "user",
+    item: { name: "creacion" },
+    collect: (monitor) => ({
+      isDraggingCreatedAt: !!monitor.isDragging(),
+    }),
+  });
+  const [{ isDraggingdragLevel }, dragLevel] = useDrag({
+    type: "user",
+    item: { name: "creacion" },
+    collect: (monitor) => ({
+      isDraggingLevel: !!monitor.isDragging(),
+    }),
+  });
+
+
+  // Render chart
+  const renderChart = () => {
+    if (!filteredData.length) {
+      return <p>No hay datos para los filtros seleccionados.</p>;
+    }
+
+    return filteredData.map((dataset, index) => {
+      if (!dataset.data || !dataset.data.length) {
+        return <p key={index}>No hay datos para este conjunto de filtros.</p>;
+      }
+
+      const chartData = {
+        labels: dataset.data.map((item) => item.x),
+        datasets: [
+          {
+            label: `${dataset.yAxis} por ${dataset.xAxis}`,
+            data: dataset.data.map((item) => item.y),
+            backgroundColor: "rgba(75,192,192,0.4)",
+            borderColor: "rgba(75,192,192,1)",
+          },
+        ],
+      };
+
+      return <Bar key={index} data={chartData} />;
+    });
+  };
+
   return (
-    <div className="analysis-container">
-      {/* Panel izquierdo */}
-      <div className="filters-panel">
-        <h3>Tipo de Gráfico</h3>
-        {chartTypes.map((type) => (
-          <div key={type}>
-            <input
-              type="radio"
-              name="chart-type"
-              value={type}
-              checked={selectedChartType === type}
-              onChange={() => setSelectedChartType(type)}
-            />
-            <label>{type}</label>
+    <DndProvider backend={HTML5Backend}>
+      <div className="pb-container">
+        <div className="pb-filters">
+          <div className="pb-section">
+            <h3>Entradas</h3>
+            <button ref={dragEmotion} className="pb-filter-button pb-emociones">
+              Emociones
+            </button>
+            <button
+              ref={dragCategory}
+              className="pb-filter-button pb-categorias"
+            >
+              Categorías
+            </button>
+            <button
+              ref={dragSecurity}
+              className="pb-filter-button pb-seguridad"
+            >
+              Seguridad
+            </button>
+            <button ref={dragCreation} className="pb-filter-button pb-creacion">
+              Fecha de Creación
+            </button>
+            <button ref={dragUser} className="pb-filter-button pb-user">
+              Entradas por Usuario
+            </button>
           </div>
-        ))}
 
-        <h3>Filtros Disponibles</h3>
-        <div className="available-filters">
-          {Object.keys(initialFilters).map((filter) => (
-            <DraggableFilter key={filter} filter={filter} />
-          ))}
+          <div className="pb-section">
+            <h3>Usuarios</h3>
+            <button ref={dragAge} className="pb-filter-button pb-edad">
+              Edad
+            </button>
+            <button ref={dragSign} className="pb-filter-button pb-signo">
+              Signo
+            </button>
+            <button ref={dragCity} className="pb-filter-button pb-ciudad">
+              Ciudad
+            </button>
+            <button ref={dragCommune} className="pb-filter-button pb-comuna">
+              Comuna
+            </button>
+            <button ref={dragCountry} className="pb-filter-button pb-pais">
+              País
+            </button>
+            <button ref={dragPremium} className="pb-filter-button pb-premium">
+              Premium
+            </button>
+            <button
+              ref={dragCreatedAt}
+              className="pb-filter-button pb-creacion"
+            >
+              Fecha de Creación
+            </button>
+            {/* <button ref={dragLevel} className="pb-filter-button pb-nivel">
+              Nivel
+            </button> */}
+          </div>
         </div>
 
-        <h3>Insertar Filtro</h3>
-        <div className="filter-boxes">
-          <div
-            ref={dropX}
-            className={`filter-box ${isOverX ? "highlight" : ""}`}
-          >
-            {xAxisFilter || "Eje X"}
+        <div className="pb-add-filters">
+          <h3>Insertar filtros</h3>
+          <div className="pb-filters-container">
+            <div
+              ref={dropX}
+              className={`pb-filter-slot ${isOverX ? "pb-highlight" : ""}`}
+            >
+              {xAxisFilter || "Eje X"}
+            </div>
+            <div
+              ref={dropY}
+              className={`pb-filter-slot ${isOverY ? "pb-highlight" : ""}`}
+            >
+              {yAxisFilter || "Eje Y"}
+            </div>
           </div>
-          <div
-            ref={dropY}
-            className={`filter-box ${isOverY ? "highlight" : ""}`}
-          >
-            {yAxisFilter || "Eje Y"}
+          <button onClick={processFilters}>Agregar Gráfico</button>
+          <button onClick={clearFiltersAndCharts} className="pb-clear-button">
+            Limpiar Gráficos
+          </button>
+
+          <div className="pb-section">
+            <h3>Tiempo</h3>
+            <button className="pb-filter-button pb-dia">Día</button>
+            <button className="pb-filter-button pb-mes">Mes</button>
+            <button className="pb-filter-button pb-ano">Año</button>
           </div>
         </div>
 
-        <button
-          onClick={() => {
-            if (!xAxisFilter || !yAxisFilter) {
-              alert("Por favor, selecciona filtros para ambos ejes.");
-              return;
-            }
-            addChart();
-          }}
-        >
-          Añadir Gráfico
-        </button>
+        <div className="pb-graphs">{renderChart()}</div>
       </div>
-
-      {/* Panel derecho */}
-      <div className="charts-panel">
-        {charts.map((chart, index) => (
-          <div key={index} className="chart-container">
-            {chart.type === "Barras" && chart.data && <Bar data={chart.data} />}
-            {chart.type === "Líneas" && chart.data && (
-              <Line data={chart.data} />
-            )}
-            {chart.type === "Circular" && chart.data && (
-              <Pie data={chart.data} />
-            )}
-          </div>
-        ))}
-      </div>
-    </div>
+    </DndProvider>
   );
 };
 
