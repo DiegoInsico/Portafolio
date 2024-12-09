@@ -1,3 +1,4 @@
+// Aqui no se puede hacer nada nuevo, solo se puede contextualizar las colecciones de usuarios y eso
 import React, { useState, useEffect } from "react";
 import { Bar } from "react-chartjs-2";
 import { collection, getDocs } from "firebase/firestore";
@@ -126,39 +127,43 @@ const AnalysisPage = () => {
     ]);
   };
 
-  const processFiltersUsers = () => {
+  // combinacinoes para el tiempo: edad o fechas x
+  const processFiltersTime = () => {
     const { users } = data;
 
     if (!xAxisFilter || !yAxisFilter) {
       alert("Por favor selecciona filtros para ambos ejes.");
-      return [];
+      return;
     }
 
-    let result = [];
-    const xField = xAxisFilter;
-    const yField = yAxisFilter;
-
-    const specialFields = {
+    const timeFields = {
       edad: (user) => calculateAge(user.birthDate),
       signo: (user) => getZodiacSign(user.birthDate),
-      isPremium: (user) => (user.isPremium ? "Premium" : "No Premium"),
-      createdAt: (user) =>
-        new Date(user.createdAt.seconds * 1000).toLocaleDateString(),
-      comuna: (user) => user.comuna || "Sin Comuna",
-      ciudad: (user) => user.ciudad || "Sin Ciudad",
-      pais: (user) => user.pais || "Sin País",
+      dia: (user) => {
+        const date = new Date(user.createdAt.seconds * 1000);
+        return date.getDate();
+      },
+      mes: (user) => {
+        const date = new Date(user.createdAt.seconds * 1000);
+        return date.toLocaleString("default", { month: "long" });
+      },
+      año: (user) => {
+        const date = new Date(user.createdAt.seconds * 1000);
+        return date.getFullYear();
+      },
     };
 
-    const getFieldValue = (user, field) =>
-      specialFields[field] ? specialFields[field](user) : user[field];
+    const getTimeFieldValue = (user, field) =>
+      timeFields[field] ? timeFields[field](user) : "Sin Valor";
 
-    result = users.reduce((acc, user) => {
-      const xValue = getFieldValue(user, xField) || "Sin Valor";
-      const yValue = getFieldValue(user, yField);
+    const result = users.reduce((acc, user) => {
+      const xValue = getTimeFieldValue(user, xAxisFilter);
+      const yValue = getTimeFieldValue(user, yAxisFilter);
+
+      if (!xValue || !yValue) return acc;
 
       acc[xValue] = acc[xValue] || {};
-      acc[xValue][yValue || "Sin Valor"] =
-        (acc[xValue][yValue || "Sin Valor"] || 0) + 1;
+      acc[xValue][yValue] = (acc[xValue][yValue] || 0) + 1;
 
       return acc;
     }, {});
@@ -177,75 +182,35 @@ const AnalysisPage = () => {
     ]);
   };
 
-  const processGeneralFilters = () => {
-    const { entries, users } = data;
+  const processFiltersUsers = () => {
+    const { users } = data;
 
     if (!xAxisFilter || !yAxisFilter) {
       alert("Por favor selecciona filtros para ambos ejes.");
-      return [];
+      return;
     }
 
-    let result = [];
-    const xField = xAxisFilter;
-    const yField = yAxisFilter;
-
-    const processField = (item, field, specialFields) =>
-      specialFields[field] ? specialFields[field](item) : item[field];
-
-    const specialFieldsEntries = {
-      fechaCreacion: (entry) =>
-        new Date(entry.fechaCreacion.seconds * 1000).toLocaleDateString(),
-      isProtected: (entry) =>
-        entry.isProtected ? "Protegido" : "No Protegido",
-      emociones: (entry) => entry.emociones || [],
-      categoria: (entry) => entry.categoria || "Sin Categoría",
-    };
-
-    const specialFieldsUsers = {
-      edad: (user) => calculateAge(user.birthDate),
-      signo: (user) => getZodiacSign(user.birthDate),
-      isPremium: (user) => (user.isPremium ? "Premium" : "No Premium"),
-      createdAt: (user) =>
-        new Date(user.createdAt.seconds * 1000).toLocaleDateString(),
-      comuna: (user) => user.comuna || "Sin Comuna",
+    const userFields = {
       ciudad: (user) => user.ciudad || "Sin Ciudad",
+      comuna: (user) => user.comuna || "Sin Comuna",
       pais: (user) => user.pais || "Sin País",
+      premium: (user) => (user.isPremium ? "Premium" : "No Premium"),
     };
 
-    const isEntriesFilter =
-      Object.keys(entries[0] || {}).includes(xField) ||
-      Object.keys(entries[0] || {}).includes(yField);
-    const isUsersFilter =
-      Object.keys(users[0] || {}).includes(xField) ||
-      Object.keys(users[0] || {}).includes(yField);
+    const getUserFieldValue = (user, field) =>
+      userFields[field] ? userFields[field](user) : "Sin Valor";
 
-    // Procesar `entries`
-    if (isEntriesFilter) {
-      result = entries.reduce((acc, entry) => {
-        const xValue =
-          processField(entry, xField, specialFieldsEntries) || "Sin Valor";
-        const yValue = processField(entry, yField, specialFieldsEntries);
+    const result = users.reduce((acc, user) => {
+      const xValue = getUserFieldValue(user, xAxisFilter);
+      const yValue = getUserFieldValue(user, yAxisFilter);
 
-        acc[xValue] = acc[xValue] || {};
-        acc[xValue][yValue || "Sin Valor"] =
-          (acc[xValue][yValue || "Sin Valor"] || 0) + 1;
-        return acc;
-      }, result);
-    }
+      if (!xValue || !yValue) return acc;
 
-    // Procesar `users`
-    if (isUsersFilter) {
-      result = users.reduce((acc, user) => {
-        const xValue =
-          processField(user, xField, specialFieldsUsers) || "Sin Valor";
-        const yValue = processField(user, yField, specialFieldsUsers);
+      acc[xValue] = acc[xValue] || {};
+      acc[xValue][yValue] = (acc[xValue][yValue] || 0) + 1;
 
-        acc[xValue] = acc[xValue] || {};
-        acc[xValue][yValue || "Sin Valor"] =
-          (acc[xValue][yValue || "Sin Valor"] || 0) + 1;
-        return acc;
-      }, result);
-    }
+      return acc;
+    }, {});
 
     const formattedResult = Object.entries(result).flatMap(([xKey, yValues]) =>
       Object.entries(yValues).map(([yKey, count]) => ({
@@ -260,6 +225,44 @@ const AnalysisPage = () => {
       { xAxis: xAxisFilter, yAxis: yAxisFilter, data: formattedResult },
     ]);
   };
+
+  useEffect(() => {
+    const validateData = (users) => {
+      if (!users || !Array.isArray(users)) {
+        console.error("Error: Los datos de usuarios no son válidos.", users);
+        return [];
+      }
+
+      return users.map((user) => ({
+        ...user,
+        birthDate: user.birthDate || null,
+        createdAt: user.createdAt || null,
+        isPremium: user.isPremium || false,
+        comuna: user.comuna || "Sin Comuna",
+        ciudad: user.ciudad || "Sin Ciudad",
+        pais: user.pais || "Sin País",
+      }));
+    };
+
+    const fetchData = async () => {
+      try {
+        const usersSnapshot = await getDocs(collection(db, "users"));
+        const usersData = usersSnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+
+        setData((prevData) => ({
+          ...prevData,
+          users: validateData(usersData),
+        }));
+      } catch (error) {
+        console.error("Error al cargar los datos de usuarios:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   // Drag-and-Drop handlers
   const [{ isOverX }, dropX] = useDrop({
@@ -385,12 +388,8 @@ const AnalysisPage = () => {
     }
 
     return filteredData.map((dataset, index) => {
-      if (!dataset.data || !dataset.data.length) {
-        return <p key={index}>No hay datos para este conjunto de filtros.</p>;
-      }
-
       const chartData = {
-        labels: dataset.data.map((item) => item.x),
+        labels: dataset.data.map((item) => item.label),
         datasets: [
           {
             label: `${dataset.yAxis} por ${dataset.xAxis}`,
@@ -482,7 +481,7 @@ const AnalysisPage = () => {
               {yAxisFilter || "Eje Y"}
             </div>
           </div>
-          <button onClick={processGeneralFilters}>Agregar Gráfico</button>
+          <button onClick={processFilters}>Agregar Gráfico</button>
           <button onClick={clearFiltersAndCharts} className="pb-clear-button">
             Limpiar Gráficos
           </button>
