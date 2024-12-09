@@ -152,17 +152,18 @@ const AnalysisPage = () => {
     const getFieldValue = (user, field) =>
       specialFields[field] ? specialFields[field](user) : user[field];
 
+    // Procesar usuarios y combinar campos X e Y
     result = users.reduce((acc, user) => {
       const xValue = getFieldValue(user, xField) || "Sin Valor";
-      const yValue = getFieldValue(user, yField);
+      const yValue = getFieldValue(user, yField) || "Sin Valor";
 
       acc[xValue] = acc[xValue] || {};
-      acc[xValue][yValue || "Sin Valor"] =
-        (acc[xValue][yValue || "Sin Valor"] || 0) + 1;
+      acc[xValue][yValue] = (acc[xValue][yValue] || 0) + 1;
 
       return acc;
     }, {});
 
+    // Formatear los resultados para el gráfico
     const formattedResult = Object.entries(result).flatMap(([xKey, yValues]) =>
       Object.entries(yValues).map(([yKey, count]) => ({
         x: xKey,
@@ -219,34 +220,35 @@ const AnalysisPage = () => {
       Object.keys(users[0] || {}).includes(xField) ||
       Object.keys(users[0] || {}).includes(yField);
 
-    // Procesar `entries`
+    // Procesar entradas
     if (isEntriesFilter) {
       result = entries.reduce((acc, entry) => {
         const xValue =
           processField(entry, xField, specialFieldsEntries) || "Sin Valor";
-        const yValue = processField(entry, yField, specialFieldsEntries);
+        const yValue =
+          processField(entry, yField, specialFieldsEntries) || "Sin Valor";
 
         acc[xValue] = acc[xValue] || {};
-        acc[xValue][yValue || "Sin Valor"] =
-          (acc[xValue][yValue || "Sin Valor"] || 0) + 1;
+        acc[xValue][yValue] = (acc[xValue][yValue] || 0) + 1;
         return acc;
       }, result);
     }
 
-    // Procesar `users`
+    // Procesar usuarios
     if (isUsersFilter) {
       result = users.reduce((acc, user) => {
         const xValue =
           processField(user, xField, specialFieldsUsers) || "Sin Valor";
-        const yValue = processField(user, yField, specialFieldsUsers);
+        const yValue =
+          processField(user, yField, specialFieldsUsers) || "Sin Valor";
 
         acc[xValue] = acc[xValue] || {};
-        acc[xValue][yValue || "Sin Valor"] =
-          (acc[xValue][yValue || "Sin Valor"] || 0) + 1;
+        acc[xValue][yValue] = (acc[xValue][yValue] || 0) + 1;
         return acc;
       }, result);
     }
 
+    // Formatear los resultados para el gráfico
     const formattedResult = Object.entries(result).flatMap(([xKey, yValues]) =>
       Object.entries(yValues).map(([yKey, count]) => ({
         x: xKey,
