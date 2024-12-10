@@ -36,9 +36,9 @@ const firebaseConfig = {
 
 // Inicializa Firebase
 const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-const storage = getStorage(app);
+export const auth = getAuth(app); // Exporta auth
+export const db = getFirestore(app); // Exporta db
+export const storage = getStorage(app); // Exporta storage
 
 // **Funciones Existentes**
 
@@ -76,79 +76,77 @@ export const getMensajesForUser = async (email) => {
 
 // Función para obtener las entradas de un usuario específico
 export const getEntradas = async (userId) => {
-    try {
-      const entradasCollection = collection(db, "entradas");
-      const q = query(entradasCollection, where("userId", "==", userId));
-      const snapshot = await getDocs(q);
-  
-      return snapshot.docs.map((doc) => {
-        const data = doc.data();
-  
-        // Convertir fechas a objetos Date
-        data.fechaCreacion = data.fechaCreacion
-          ? data.fechaCreacion.toDate
-            ? data.fechaCreacion.toDate()
-            : new Date(data.fechaCreacion)
-          : null;
-  
-        data.fechaRecuerdo = data.fechaRecuerdo
-          ? data.fechaRecuerdo.toDate
-            ? data.fechaRecuerdo.toDate()
-            : new Date(data.fechaRecuerdo)
-          : null;
-  
-        // Asegurar que 'nivel' es una cadena
-        data.nivel = data.nivel ? data.nivel.toString() : "1";
-  
-        // Definir valores predeterminados para los campos
-        return {
-          id: doc.id,
-          audio: data.audio || null,
-          baul: data.baul || false,
-          cancion: data.cancion || null,
-          categoria: data.categoria || "",
-          color: data.color || "#000000",
-          emociones: data.emociones || [],
-          fechaCreacion: data.fechaCreacion || null,
-          fechaRecuerdo: data.fechaRecuerdo || null,
-          isProtected: data.isProtected || false,
-          media: data.media || null,
-          mediaType: data.mediaType || null,
-          nickname: data.nickname || "",
-          nivel: data.nivel || "1",
-          texto: data.texto || "",
-          userId: data.userId || "",
-        };
-      });
-    } catch (error) {
-      console.error("Error fetching entries:", error);
-      throw error;
-    }
-  };
-  
+  try {
+    const entradasCollection = collection(db, "entradas");
+    const q = query(entradasCollection, where("userId", "==", userId));
+    const snapshot = await getDocs(q);
+
+    return snapshot.docs.map((doc) => {
+      const data = doc.data();
+
+      // Convertir fechas a objetos Date
+      data.fechaCreacion = data.fechaCreacion
+        ? data.fechaCreacion.toDate
+          ? data.fechaCreacion.toDate()
+          : new Date(data.fechaCreacion)
+        : null;
+
+      data.fechaRecuerdo = data.fechaRecuerdo
+        ? data.fechaRecuerdo.toDate
+          ? data.fechaRecuerdo.toDate()
+          : new Date(data.fechaRecuerdo)
+        : null;
+
+      // Asegurar que 'nivel' es una cadena
+      data.nivel = data.nivel ? data.nivel.toString() : "1";
+
+      // Definir valores predeterminados para los campos
+      return {
+        id: doc.id,
+        audio: data.audio || null,
+        baul: data.baul || false,
+        cancion: data.cancion || null,
+        categoria: data.categoria || "",
+        color: data.color || "#000000",
+        emociones: data.emociones || [],
+        fechaCreacion: data.fechaCreacion || null,
+        fechaRecuerdo: data.fechaRecuerdo || null,
+        isProtected: data.isProtected || false,
+        media: data.media || null,
+        mediaType: data.mediaType || null,
+        nickname: data.nickname || "",
+        nivel: data.nivel || "1",
+        texto: data.texto || "",
+        userId: data.userId || "",
+      };
+    });
+  } catch (error) {
+    console.error("Error fetching entries:", error);
+    throw error;
+  }
+};
 
 // Función para obtener reflexiones de una entrada
 export const getReflexiones = async (userId, entradaId) => {
-    try {
-      const reflexionesCollection = collection(
-        db,
-        "entradas",
-        entradaId,
-        "reflexiones"
-      );
-      const snapshot = await getDocs(reflexionesCollection);
-      return snapshot.docs
-        .map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }))
-        .map((reflexion) => reflexion.texto); // Asumiendo que cada reflexión tiene un campo 'texto'
-    } catch (error) {
-      console.error("Error al obtener reflexiones:", error);
-      return [];
-    }
-  };
-  
+  try {
+    const reflexionesCollection = collection(
+      db,
+      "entradas",
+      entradaId,
+      "reflexiones"
+    );
+    const snapshot = await getDocs(reflexionesCollection);
+    return snapshot.docs
+      .map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }))
+      .map((reflexion) => reflexion.texto); // Asumiendo que cada reflexión tiene un campo 'texto'
+  } catch (error) {
+    console.error("Error al obtener reflexiones:", error);
+    return [];
+  }
+};
 
 export const getUsers = async () => {
   try {
@@ -290,48 +288,49 @@ export const deleteAlbum = async (userId, albumId) => {
 // Funciones relacionadas con entradas
 
 export const getEntries = async (user) => {
-    try {
-        const entradasCollection = collection(db, 'entradas');
-        const q = query(entradasCollection, where("userId", "==", user.uid)); // Usa user.uid en lugar de user
-        const snapshot = await getDocs(q);
+  try {
+    const entradasCollection = collection(db, "entradas");
+    const q = query(entradasCollection, where("userId", "==", user.uid)); // Usa user.uid en lugar de user
+    const snapshot = await getDocs(q);
 
-        return snapshot.docs.map(doc => {
-            const data = doc.data();
+    return snapshot.docs.map((doc) => {
+      const data = doc.data();
 
-            // Formateo de fecha para fechaCreacion y fechaRecuerdo
-            if (data.fechaCreacion && data.fechaCreacion.toDate) {
-                const fecha = data.fechaCreacion.toDate();
-                data.fechaCreacion = `${fecha.getDate()}/${fecha.getMonth() + 1}/${fecha.getFullYear()}`;
-            }
-            if (data.fechaRecuerdo && data.fechaRecuerdo.toDate) {
-                const fechaRecuerdo = data.fechaRecuerdo.toDate();
-                data.fechaRecuerdo = `${fechaRecuerdo.getDate()}/${fechaRecuerdo.getMonth() + 1}/${fechaRecuerdo.getFullYear()}`;
-            }
+      // Formateo de fecha para fechaCreacion y fechaRecuerdo
+      if (data.fechaCreacion && data.fechaCreacion.toDate) {
+        const fecha = data.fechaCreacion.toDate();
+        data.fechaCreacion = `${fecha.getDate()}/${fecha.getMonth() + 1}/${fecha.getFullYear()}`;
+      }
+      if (data.fechaRecuerdo && data.fechaRecuerdo.toDate) {
+        const fechaRecuerdo = data.fechaRecuerdo.toDate();
+        data.fechaRecuerdo = `${fechaRecuerdo.getDate()}/${fechaRecuerdo.getMonth() + 1}/${fechaRecuerdo.getFullYear()}`;
+      }
 
-            // Definir valores predeterminados para los campos
-            return {
-                id: doc.id,
-                audio: data.audio || null,
-                baul: data.baul || false,
-                cancion: data.cancion || null,
-                categoria: data.categoria || '',
-                color: data.color || '#000000',
-                emociones: data.emociones || [],
-                fechaCreacion: data.fechaCreacion || null,
-                fechaRecuerdo: data.fechaRecuerdo || null,
-                isProtected: data.isProtected || false,
-                media: data.media || null,
-                mediaType: data.mediaType || null,
-                nickname: data.nickname || '',
-                nivel: data.nivel || '1',
-                texto: data.texto || '',
-                userId: data.userId || ''
-            };
-        });
-    } catch (error) {
-        console.error("Error fetching entries:", error);
-        throw error;
-
+      // Definir valores predeterminados para los campos
+      return {
+        id: doc.id,
+        audio: data.audio || null,
+        baul: data.baul || false,
+        cancion: data.cancion || null,
+        categoria: data.categoria || "",
+        color: data.color || "#000000",
+        emociones: data.emociones || [],
+        fechaCreacion: data.fechaCreacion || null,
+        fechaRecuerdo: data.fechaRecuerdo || null,
+        isProtected: data.isProtected || false,
+        media: data.media || null,
+        mediaType: data.mediaType || null,
+        nickname: data.nickname || "",
+        nivel: data.nivel || "1",
+        texto: data.texto || "",
+        userId: data.userId || "",
+      };
+    });
+  } catch (error) {
+    console.error("Error fetching entries:", error);
+    throw error;
+  }
+};
 
 export const getAlbumEntries = async (userId, albumId) => {
   try {
@@ -369,22 +368,7 @@ export const getAlbumBackground = async (userId, albumId) => {
   }
 };
 
-export const updateAlbumEntriesInDB = async (userId, albumId, entriesData) => {
-    try {
-        const albumDocRef = doc(db, 'users', userId, 'albums', albumId);
-
-        // Aquí actualizamos el álbum con las entradas y sus posiciones
-        await updateDoc(albumDocRef, { entries: entriesData });
-        console.log("Entradas del álbum actualizadas correctamente");
-    } catch (error) {
-        console.error("Error al actualizar las entradas del álbum:", error);
-        throw error;
-    }
-export const updateAlbumEntriesInDB = async (
-  userId,
-  albumId,
-  newEntriesIds
-) => {
+export const updateAlbumEntriesInDB = async (userId, albumId, newEntriesIds) => {
   try {
     const albumDocRef = doc(db, "users", userId, "albums", albumId);
     await updateDoc(albumDocRef, { entries: newEntriesIds });
@@ -394,6 +378,7 @@ export const updateAlbumEntriesInDB = async (
     throw error;
   }
 };
+
 // Función para actualizar el color de fondo de un álbum
 export const setAlbumBgColor = async (userId, albumId, color) => {
   try {
@@ -438,14 +423,14 @@ export const editDocument = async (documentId, updatedData) => {
 };
 
 export const deleteDocument = async (documentId) => {
-    try {
-        const docRef = doc(db, "documentos", documentId);
-        await deleteDoc(docRef);
-        console.log("Documento eliminado con éxito:", documentId);
-    } catch (error) {
-        console.error("Error al eliminar el documento:", error);
-        throw error;
-    }
+  try {
+    const docRef = doc(db, "documentos", documentId);
+    await deleteDoc(docRef);
+    console.log("Documento eliminado con éxito:", documentId);
+  } catch (error) {
+    console.error("Error al eliminar el documento:", error);
+    throw error;
+  }
 };
 
 // Función para obtener los documentos de un usuario específico
@@ -465,28 +450,13 @@ export const getDocuments = async (userId) => {
 };
 
 export const getTestigos = async (userId) => {
-
-    try {
-        const testigosCollection = collection(db, "testigos");
-        const q = query(testigosCollection, where("userId", "==", userId));
-        const snapshot = await getDocs(q);
-
-        console.log("Consulta realizada para el userId:", userId);
-        console.log("Cantidad de testigos obtenidos:", snapshot.size);
-
-        return snapshot.docs.map((doc) => ({
-            id: doc.id,
-            ...doc.data(),
-        }));
-    } catch (error) {
-        console.error("Error al obtener testigos:", error);
-        throw error;
-    }
-
   try {
     const testigosCollection = collection(db, "testigos");
     const q = query(testigosCollection, where("userId", "==", userId));
     const snapshot = await getDocs(q);
+
+    console.log("Consulta realizada para el userId:", userId);
+    console.log("Cantidad de testigos obtenidos:", snapshot.size);
 
     return snapshot.docs.map((doc) => ({
       id: doc.id,
@@ -496,9 +466,7 @@ export const getTestigos = async (userId) => {
     console.error("Error al obtener testigos:", error);
     throw error;
   }
-
 };
-
 
 // **Nueva Función para Obtener un Usuario por ID**
 export const getUserById = async (userId) => {
@@ -595,15 +563,22 @@ export const getDespedidasForUser = async (userId) => {
 export const getDespedidasAssignedToUser = async (email) => {
   try {
     const despedidasRef = collection(db, "despedidas");
-    const q = query(despedidasRef, where("beneficiarioEmails", "array-contains", email));
+    const q = query(
+      despedidasRef,
+      where("beneficiarioEmails", "array-contains", email)
+    );
     const querySnapshot = await getDocs(q);
-    const despedidas = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    const despedidas = querySnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
     return despedidas;
   } catch (error) {
     console.error("Error al obtener despedidas asignadas:", error);
     throw error;
   }
 };
+
 /**
  * Obtener beneficiarios de un usuario
  * @param {string} userId - UID del usuario
@@ -636,7 +611,10 @@ export const getUserByEmail = async (email) => {
       console.log("No se encontró ningún usuario con el email proporcionado.");
       return null;
     }
-    const userData = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+    const userData = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
     return userData;
   } catch (error) {
     console.error("Error al obtener usuario por email:", error);
@@ -649,19 +627,19 @@ export const getUserByEmail = async (email) => {
  * @param {string} userId - UID del usuario
  * @returns {Object|null} - Datos del usuario o null si no existe
  */
-export const getUserByIdFromFirestore = async (userId) => {
+// Función para obtener datos del usuario por UID
+export const getUserByIdFromFirestore = async (uid) => {
   try {
-    const usersCollection = collection(db, "users");
-    const q = query(usersCollection, where("__name__", "==", userId));
-    const snapshot = await getDocs(q);
-    if (snapshot.empty) {
-      console.log("No se encontró ningún usuario con el userId proporcionado.");
+    const userDocRef = doc(db, "users", uid);
+    const userDoc = await getDoc(userDocRef);
+    if (userDoc.exists()) {
+      return userDoc.data();
+    } else {
+      console.log("No existe el documento del usuario.");
       return null;
     }
-    const userData = snapshot.docs[0].data();
-    return userData;
   } catch (error) {
-    console.error("Error al obtener usuario por userId:", error);
+    console.error("Error al obtener el documento del usuario:", error);
     throw error;
   }
 };
@@ -700,7 +678,12 @@ export const getUsersByIds = async (userIds) => {
 
 export const getReflexionesForUser = async (userId, entradaId) => {
   try {
-    const reflexionesCollection = collection(db, "entradas", entradaId, "reflexiones");
+    const reflexionesCollection = collection(
+      db,
+      "entradas",
+      entradaId,
+      "reflexiones"
+    );
     const snapshot = await getDocs(reflexionesCollection);
     const reflexiones = snapshot.docs.map((doc) => ({
       id: doc.id,
@@ -721,8 +704,3 @@ export const getReflexionesForUser = async (userId, entradaId) => {
     throw error;
   }
 };
-
-
-
-// Exportar auth, db y storage para su uso en otros componentes
-export { auth, db, storage };
