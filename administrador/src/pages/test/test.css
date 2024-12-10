@@ -1,21 +1,108 @@
-.container {
-    display: flex;
-    height: 100vh;
-}
-
-.sidebar {
-    width: 25%;
+/* Contenedor general */
+.pb-container {
     padding: 20px;
-    background-color: #f4f4f4;
-    border-right: 1px solid #ccc;
-}
-
-.charts {
-    width: 75%;
-    padding: 20px;
-    overflow: auto;
-}
-
-h2 {
+    background-color: #121212;
+    color: #ffffff;
+    min-height: 100vh;
+    font-family: Arial, sans-serif;
+  }
+  
+  /* Título */
+  .pb-title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  
+  /* Contenedor de la gráfica */
+  .pb-chart-container {
+    margin: 0 auto;
+    width: 80%; /* Reducir el tamaño de la gráfica */
+    max-width: 800px; /* Limitar el ancho máximo */
+    background-color: #1f2a44;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  }
+  
+  /* Contenedor de la tabla */
+  .pb-table-container {
     margin-top: 20px;
-}
+    width: 100%;
+  }
+  
+  /* Tabla */
+  .pb-table {
+    width: 100%;
+    background-color: #1f2a44;
+    color: #ffffff;
+    border-collapse: collapse;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  
+  .pb-table-head {
+    background-color: #2c3e50;
+  }
+  
+  .pb-table-header {
+    padding: 10px;
+    text-align: left;
+    font-size: 14px;
+    font-weight: bold;
+    border-bottom: 2px solid #ffffff;
+  }
+  
+  .pb-table-row:nth-child(even) {
+    background-color: #1a1a1a;
+  }
+  
+  .pb-table-row:nth-child(odd) {
+    background-color: #2a2a2a;
+  }
+  
+  .pb-table-cell {
+    padding: 10px;
+    font-size: 13px;
+    border-bottom: 1px solid #ffffff;
+    text-align: left;
+  }
+  
+  .pb-table-row:hover {
+    background-color: #3a3a3a;
+    cursor: pointer;
+  }
+  
+  /* Transiciones */
+  .pb-table-cell,
+  .pb-table-header {
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+  
+  .pb-table-row:hover .pb-table-cell {
+    background-color: #444444;
+  }
+  
+  /* Responsividad */
+  @media (max-width: 768px) {
+    .pb-container {
+      padding: 10px;
+    }
+  
+    .pb-title {
+      font-size: 20px;
+    }
+  
+    .pb-table-cell,
+    .pb-table-header {
+      font-size: 12px;
+      padding: 8px;
+    }
+  
+    .pb-chart-container {
+      width: 100%; /* Ajustar la gráfica al ancho del dispositivo */
+      max-width: none;
+    }
+  }
+  

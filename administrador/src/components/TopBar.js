@@ -35,6 +35,9 @@ const TopBar = ({ currentUser, userRole, handleLogout }) => {
             <NavLink to="/rol/RolManagment" className="topbar-link">
               Administración de Usuarios
             </NavLink>
+            <NavLink to="/test/test" className="topbar-link">
+              Test
+            </NavLink>
           </>
         );
       case "Operador":

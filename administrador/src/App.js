@@ -167,20 +167,11 @@ function App() {
                   <Route
                     path="/monitor/pb/pb"
                     element={
-                      <DndProvider backend={HTML5Backend}>
-                        <Routes>
-                          <Route
-                            path="/monitor/pb/pb"
-                            element={
-                              <PrivateRoute
-                                allowedRoles={["Administrador", "Analista"]}
-                              >
-                                <AnalysisPage />
-                              </PrivateRoute>
-                            }
-                          />
-                        </Routes>
-                      </DndProvider>
+                      <PrivateRoute
+                        allowedRoles={["Administrador", "Analista"]}
+                      >
+                        <AnalysisPage />
+                      </PrivateRoute>
                     }
                   />
                   <Route
@@ -231,7 +222,14 @@ function App() {
                       </PrivateRoute>
                     }
                   />
-                  <Route path="/test/test" element={<Test />} />
+                  <Route
+                    path="/test/test"
+                    element={
+                      <PrivateRoute allowedRoles={["Administrador"]}>
+                        <Test />
+                      </PrivateRoute>
+                    }
+                  />
                   <Route path="/ticket/:ticketId" element={<TicketDetails />} />
                 </Routes>
               </MainLayout>

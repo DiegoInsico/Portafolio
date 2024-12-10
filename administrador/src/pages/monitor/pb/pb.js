@@ -1,7 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { Bar } from "react-chartjs-2";
-import { collection, getDocs } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  getFirestore,
+  query,
+  where,
+} from "firebase/firestore";
 import { db } from "../../../firebase";
+import { getStorage, ref, getMetadata } from "firebase/storage";
 import "./pb.css";
 import { DndProvider, useDrag, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
@@ -11,6 +18,79 @@ const AnalysisPage = () => {
   const [xAxisFilter, setXAxisFilter] = useState(null);
   const [yAxisFilter, setYAxisFilter] = useState(null);
   const [filteredData, setFilteredData] = useState([]);
+
+  const processStorageConsumption = async () => {
+    try {
+      const usersSnapshot = await getDocs(collection(db, "users"));
+      const entriesSnapshot = await getDocs(collection(db, "entradas"));
+      const storage = getStorage();
+
+      let userStorageData = [];
+      let userIndex = 1;
+
+      for (const userDoc of usersSnapshot.docs) {
+        const userId = userDoc.id;
+        const userName = `Usuario ${userIndex++}`;
+        const userEntries = entriesSnapshot.docs.filter(
+          (entry) => entry.data().userId === userId
+        );
+
+        const usageByType = {
+          image: 0,
+          video: 0,
+          audio: 0,
+          unknown: 0,
+        };
+
+        for (const entry of userEntries) {
+          const attributes = [
+            {
+              filePath: entry.data().media,
+              type: entry.data().mediaType || "unknown",
+            },
+            { filePath: entry.data().audio, type: "audio" },
+            { filePath: entry.data().baul, type: "unknown" },
+          ];
+
+          for (const attr of attributes) {
+            if (attr.filePath && typeof attr.filePath === "string") {
+              const filePath = attr.filePath.split("/o/")[1]?.split("?")[0];
+              if (filePath) {
+                const fileRef = ref(storage, decodeURIComponent(filePath));
+                const metadata = await getMetadata(fileRef);
+                const fileSizeMB = metadata.size / 1024 / 1024;
+
+                usageByType[attr.type] += fileSizeMB;
+              }
+            }
+          }
+        }
+
+        userStorageData.push({
+          userName,
+          totalSize: Object.values(usageByType)
+            .reduce((a, b) => a + b, 0)
+            .toFixed(2),
+          usageByType: {
+            image: usageByType.image.toFixed(2),
+            video: usageByType.video.toFixed(2),
+            audio: usageByType.audio.toFixed(2),
+            unknown: usageByType.unknown.toFixed(2),
+          },
+        });
+      }
+
+      setFilteredData([
+        {
+          data: userStorageData,
+          xAxis: "Usuarios",
+          yAxis: "Consumo de Almacenamiento",
+        },
+      ]);
+    } catch (error) {
+      console.error("Error procesando el consumo de almacenamiento:", error);
+    }
+  };
 
   const clearFiltersAndCharts = () => {
     setXAxisFilter(null);
@@ -44,27 +124,40 @@ const AnalysisPage = () => {
 
   // Fetch data from Firebase
   useEffect(() => {
-    const fetchData = async () => {
-      const entriesSnapshot = await getDocs(collection(db, "entradas"));
-      const sessionsSnapshot = await getDocs(collection(db, "sessions"));
-      const usersSnapshot = await getDocs(collection(db, "users"));
+    let isMounted = true; // Flag para verificar si el componente está montado
 
-      setData({
-        entries: entriesSnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        })),
-        sessions: sessionsSnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        })),
-        users: usersSnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        })),
-      });
+    const fetchData = async () => {
+      try {
+        const entriesSnapshot = await getDocs(collection(db, "entradas"));
+        const sessionsSnapshot = await getDocs(collection(db, "sessions"));
+        const usersSnapshot = await getDocs(collection(db, "users"));
+
+        if (isMounted) {
+          setData({
+            entries: entriesSnapshot.docs.map((doc) => ({
+              id: doc.id,
+              ...doc.data(),
+            })),
+            sessions: sessionsSnapshot.docs.map((doc) => ({
+              id: doc.id,
+              ...doc.data(),
+            })),
+            users: usersSnapshot.docs.map((doc) => ({
+              id: doc.id,
+              ...doc.data(),
+            })),
+          });
+        }
+      } catch (error) {
+        console.error("Error cargando datos:", error);
+      }
     };
+
     fetchData();
+
+    return () => {
+      isMounted = false; // Marca como desmontado al salir del componente
+    };
   }, []);
 
   // Process filters
@@ -391,6 +484,77 @@ const AnalysisPage = () => {
         return <p key={index}>No hay datos para este conjunto de filtros.</p>;
       }
 
+      // Verificar si el gráfico es de almacenamiento
+      if (
+        dataset.xAxis === "Usuarios" &&
+        dataset.yAxis === "Consumo de Almacenamiento"
+      ) {
+        const chartData = {
+          labels: dataset.data.map((user) => user.userName),
+          datasets: [
+            {
+              label: "Imágenes (MB)",
+              data: dataset.data.map((user) =>
+                parseFloat(user.usageByType.image)
+              ),
+              backgroundColor: "rgba(255, 99, 132, 0.6)",
+            },
+            {
+              label: "Videos (MB)",
+              data: dataset.data.map((user) =>
+                parseFloat(user.usageByType.video)
+              ),
+              backgroundColor: "rgba(54, 162, 235, 0.6)",
+            },
+            {
+              label: "Audios (MB)",
+              data: dataset.data.map((user) =>
+                parseFloat(user.usageByType.audio)
+              ),
+              backgroundColor: "rgba(75, 192, 192, 0.6)",
+            },
+            {
+              label: "Otros (MB)",
+              data: dataset.data.map((user) =>
+                parseFloat(user.usageByType.unknown)
+              ),
+              backgroundColor: "rgba(201, 203, 207, 0.6)",
+            },
+          ],
+        };
+
+        return (
+          <div key={index}>
+            <Bar data={chartData} />
+            <table className="pb-storage-table">
+              <thead>
+                <tr>
+                  <th>Usuario</th>
+                  <th>Imágenes (MB)</th>
+                  <th>Videos (MB)</th>
+                  <th>Audios (MB)</th>
+                  <th>Otros (MB)</th>
+                  <th>Total (MB)</th>
+                </tr>
+              </thead>
+              <tbody>
+                {dataset.data.map((user, idx) => (
+                  <tr key={idx}>
+                    <td>{user.userName}</td>
+                    <td>{user.usageByType.image}</td>
+                    <td>{user.usageByType.video}</td>
+                    <td>{user.usageByType.audio}</td>
+                    <td>{user.usageByType.unknown}</td>
+                    <td>{user.totalSize}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        );
+      }
+
+      // Renderización de gráficos generales
       const chartData = {
         labels: dataset.data.map((item) => item.x),
         datasets: [
@@ -494,6 +658,20 @@ const AnalysisPage = () => {
             <button className="pb-filter-button pb-dia">Día</button>
             <button className="pb-filter-button pb-mes">Mes</button>
             <button className="pb-filter-button pb-ano">Año</button>
+          </div>
+          <div className="pb-section">
+            <h3>Premium y otros</h3>
+            <button
+              onClick={processStorageConsumption}
+              className="pb-filter-button pb-storage"
+            >
+              Consumo de Almacenamiento
+            </button>
+
+            <button className="pb-filter-button pb-mes">
+              Mensajes Programadas
+            </button>
+            <button className="pb-filter-button pb-ano">Collages</button>
           </div>
         </div>
 
