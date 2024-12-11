@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Navigation, Pagination, Autoplay } from 'swiper/modules';
+import { Navigation, Pagination } from 'swiper/modules';
 import { getEntries } from '../../firebase';
 import EntryCard from './entryMapper/entryCard';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
-import 'swiper/css/autoplay';
 
 const Carousel = ({ currentUser, onEntrySelect, selectedEntries }) => {
     const [entries, setEntries] = useState([]);
+    const [activeIndex, setActiveIndex] = useState(0); // Índice de la tarjeta activa
 
     useEffect(() => {
         const fetchEntries = async () => {
@@ -23,37 +23,39 @@ const Carousel = ({ currentUser, onEntrySelect, selectedEntries }) => {
         fetchEntries();
     }, [currentUser]);
 
-    const handleEntryClick = (entry) => {
-        if (selectedEntries.includes(entry.id)) {
-            onEntrySelect(entry, false);
-        } else {
-            onEntrySelect(entry, true);
-        }
-    };
-
-    console.log(entries);
-    console.log(currentUser);
     return (
         <div className="carousel-container">
             <Swiper
                 className="my-swiper"
-                modules={[Navigation, Pagination, Autoplay]}
-                spaceBetween={1}
-                slidesPerView={3}
-                loop={true}
+                modules={[Navigation, Pagination]}
+                spaceBetween={10}
+                slidesPerView={5}
+                loop={true} // Habilita el bucle infinito
+                centeredSlides={true} // Siempre centra la tarjeta activa
+                onSlideChange={(swiper) => setActiveIndex(swiper.realIndex)} // Actualiza el índice activo
                 navigation
                 pagination={{ clickable: true }}
-                autoplay={{
-                    delay: 3000, // tiempo en milisegundos antes de cambiar de slide
-                    disableOnInteraction: false // sigue rotando incluso si el usuario interactúa
+                breakpoints={{
+                    1024: {
+                        slidesPerView: 5,
+                    },
+                    768: {
+                        slidesPerView: 3,
+                    },
+                    480: {
+                        slidesPerView: 2,
+                    },
+                    0: {
+                        slidesPerView: 1,
+                    },
                 }}
             >
-                {entries.map((entry) => (
+                {entries.map((entry, index) => (
                     <SwiperSlide key={entry.id}>
                         <EntryCard
                             entry={entry}
-                            onClick={() => handleEntryClick(entry)}
-                            isSelected={selectedEntries.includes(entry.id)}
+                            onClick={() => onEntrySelect(entry)}
+                            isSelected={selectedEntries.some(e => e.id === entry.id)}
                         />
                     </SwiperSlide>
                 ))}
