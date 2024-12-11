@@ -25,10 +25,12 @@ const firebaseConfig = {
 
 // Inicializa Firebase
 const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-const storage = getStorage(app);
+
 const firestore = getFirestore(app);
+export const auth = getAuth(app); // Exporta auth
+export const db = getFirestore(app); // Exporta db
+export const storage = getStorage(app); // Exporta storage
+
 
 // **Funciones Existentes**
 
@@ -440,7 +442,6 @@ export const getCollageById = async (collageId) => {
   }
 };
 
-
 // Actualizar posición de una entrada en el collage
 export const updateEntryPositionInCollage = async (collageId, entryId, newPosition) => {
   console.log(`// DEBUG [updateEntryPositionInCollage]: Iniciando actualización de posición. collageId=${collageId}, entryId=${entryId}, newPosition=`, newPosition);
@@ -468,6 +469,7 @@ export const updateEntryPositionInCollage = async (collageId, entryId, newPositi
       transaction.update(collageRef, { entries: updatedEntries });
     });
     console.log("// DEBUG [updateEntryPositionInCollage]: Posición actualizada exitosamente.");
+
   } catch (error) {
     console.error("// DEBUG [updateEntryPositionInCollage]: Error actualizando posición de la entrada:", error);
     throw error;
@@ -493,7 +495,6 @@ export const updateCollageTitleProperties = async (collageId, properties) => {
     throw error;
   }
 };
-
 
 // Remover una entrada del collage
 export const removeEntryFromCollage = async (collageId, entryId) => {
@@ -595,10 +596,10 @@ export const deleteCollage = async (collageId) => {
   }
 };
 
-
 // Actualizar propiedades de una entrada en el collage
 export const updateEntryProperties = async (collageId, entryId, properties) => {
   console.log(`// DEBUG [updateEntryProperties]: Iniciando actualización de propiedades de entrada. collageId=${collageId}, entryId=${entryId}, properties=`, properties);
+
   try {
     const collageRef = doc(db, "collages", collageId);
     const collageDoc = await getDoc(collageRef);
@@ -712,6 +713,9 @@ export const getTestigos = async (userId) => {
     const q = query(testigosCollection, where("userId", "==", userId));
     const snapshot = await getDocs(q);
 
+    console.log("Consulta realizada para el userId:", userId);
+    console.log("Cantidad de testigos obtenidos:", snapshot.size);
+
     return snapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
@@ -720,9 +724,7 @@ export const getTestigos = async (userId) => {
     console.error("Error al obtener testigos:", error);
     throw error;
   }
-
 };
-
 
 // **Nueva Función para Obtener un Usuario por ID**
 export const getUserById = async (userId) => {
@@ -819,15 +821,22 @@ export const getDespedidasForUser = async (userId) => {
 export const getDespedidasAssignedToUser = async (email) => {
   try {
     const despedidasRef = collection(db, "despedidas");
-    const q = query(despedidasRef, where("beneficiarioEmails", "array-contains", email));
+    const q = query(
+      despedidasRef,
+      where("beneficiarioEmails", "array-contains", email)
+    );
     const querySnapshot = await getDocs(q);
-    const despedidas = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    const despedidas = querySnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
     return despedidas;
   } catch (error) {
     console.error("Error al obtener despedidas asignadas:", error);
     throw error;
   }
 };
+
 /**
  * Obtener beneficiarios de un usuario
  * @param {string} userId - UID del usuario
@@ -860,7 +869,10 @@ export const getUserByEmail = async (email) => {
       console.log("No se encontró ningún usuario con el email proporcionado.");
       return null;
     }
-    const userData = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+    const userData = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
     return userData;
   } catch (error) {
     console.error("Error al obtener usuario por email:", error);
@@ -873,19 +885,19 @@ export const getUserByEmail = async (email) => {
  * @param {string} userId - UID del usuario
  * @returns {Object|null} - Datos del usuario o null si no existe
  */
-export const getUserByIdFromFirestore = async (userId) => {
+// Función para obtener datos del usuario por UID
+export const getUserByIdFromFirestore = async (uid) => {
   try {
-    const usersCollection = collection(db, "users");
-    const q = query(usersCollection, where("__name__", "==", userId));
-    const snapshot = await getDocs(q);
-    if (snapshot.empty) {
-      console.log("No se encontró ningún usuario con el userId proporcionado.");
+    const userDocRef = doc(db, "users", uid);
+    const userDoc = await getDoc(userDocRef);
+    if (userDoc.exists()) {
+      return userDoc.data();
+    } else {
+      console.log("No existe el documento del usuario.");
       return null;
     }
-    const userData = snapshot.docs[0].data();
-    return userData;
   } catch (error) {
-    console.error("Error al obtener usuario por userId:", error);
+    console.error("Error al obtener el documento del usuario:", error);
     throw error;
   }
 };
@@ -924,7 +936,12 @@ export const getUsersByIds = async (userIds) => {
 
 export const getReflexionesForUser = async (userId, entradaId) => {
   try {
-    const reflexionesCollection = collection(db, "entradas", entradaId, "reflexiones");
+    const reflexionesCollection = collection(
+      db,
+      "entradas",
+      entradaId,
+      "reflexiones"
+    );
     const snapshot = await getDocs(reflexionesCollection);
     const reflexiones = snapshot.docs.map((doc) => ({
       id: doc.id,
@@ -945,6 +962,3 @@ export const getReflexionesForUser = async (userId, entradaId) => {
     throw error;
   }
 };
-
-// Exportar auth, db y storage para su uso en otros componentes
-export { auth, db, storage }

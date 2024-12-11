@@ -1,106 +1,121 @@
-@import url('https://fonts.googleapis.com/css?family=Tangerine');
-
-/* Configuración general del TopBar */
-.topbar {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr; /* Distribuye en tres columnas */
-  align-items: center;
-  background-color: #eeecec00;
-  backdrop-filter: blur(5px);
-  width: 100%;
+.topbar-container {
   position: fixed;
-  z-index: 5;
-  padding: 10px;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background-color: #1c293a;
+  color: #fff;
+  z-index: 10;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr; 
+  align-items: center;
+  padding: 10px 25px; 
+  box-sizing: border-box;
+  height: 70px; 
+  margin-bottom: 15px;
 }
 
-/* Columna de usuario */
 .topbar-user {
-  color: #1f1c17;
-  font-size: 50px;
-  font-family: 'Tangerine', serif;
-  margin-left: 20px;
-  justify-self: start;
-  text-shadow: 1px 1px 3px #bebebe, -1px 3px #a7a7a7;
-
-}
-
-/* Columna de título */
-.topbar-title {
-  font-family: 'Tangerine', serif;
-  font-size: 58px;
-  margin: 0;
-  color: #000000;
-  text-align: center;
-  justify-self: center; /* Centra el título en la columna */
-  text-shadow: 1px 1px 3px #bebebe, -1px 3px #a7a7a7;
-
-}
-
-/* Columna de botón (Logout) */
-.Btn {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  width: 60px;
-  height: 50px;
-  border: none;
-  border-radius: 40%;
-  cursor: pointer;
-  position: relative;
+  text-align: left;
+  font-size: 16px;
   overflow: hidden;
-  transition-duration: .3s;
-  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.199);
-  background-color: rgb(255, 65, 65);
-  justify-self: end;
-  margin-right: 50px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: palevioletred;
 }
 
-/* Plus sign */
-.sign {
-  width: 100px;
-  transition-duration: .3s;
+.topbar-nav {
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  grid-column: 2;
 }
 
-.sign svg {
-  width: 17px;
+.topbar-link {
+  text-decoration: none;
+  color: #fff;
+  text-align: center;
+  padding: 10px ; 
+  font-size: 16px; 
+  background-color: #1c293a;
+  border-radius: 5px;
+  transition: background-color 0.3s, transform 0.2s;
+  white-space: nowrap;
 }
 
-.sign svg path {
-  fill: white;
+.topbar-link:hover {
+  background-color: #3d4a58; 
+  transform: scale(1.05);
 }
 
-/* Text */
-.text {
-  right: 0;
-  width: 0;
-  opacity: 0;
+.button-secondary {
+  background-color: #6e6e6e;
   color: white;
-  font-size: 1.2em;
-  font-weight: 600;
-  transition-duration: .3s;
+  padding: 8px 12px;
+  font-size: 14px; 
+  cursor: pointer;
+  border-radius: 5px;
+  transition: background-color 0.3s, transform 0.2s;
+  text-align: center;
+  grid-column: 3; 
+  justify-self: end; 
 }
 
-/* Hover effect on button width */
-.Btn:hover {
-  width: 125px;
-  border-radius: 40px;
+.button-secondary:hover {
+  background-color: #d32f2f;
+  transform: scale(1.05); 
 }
 
-/* Hover effect button's text */
-.Btn:hover .sign {
-  width: 30%;
+@media (max-width: 1024px) {
+  .topbar-container {
+    grid-template-columns: 1fr auto 1fr; 
+  }
+
+  .topbar-nav {
+    gap: 15px; 
+  }
+
+  .topbar-link {
+    font-size: 14px; 
+    padding: 8px 15px;
+  }
+
+  .button-secondary {
+    font-size: 12px;
+    padding: 6px 10px;
+  }
 }
 
-.Btn:hover .text {
-  opacity: 1;
-  width: 70%;
-  padding-right: 10px;
-}
+@media (max-width: 768px) {
+  .topbar-container {
+    grid-template-columns: 1fr;
+    padding: 15px;
+    height: auto; 
+  }
 
-/* Button click effect */
-.Btn:active {
-  transform: translate(2px, 2px);
+  .topbar-user {
+    text-align: center;
+    margin-bottom: 10px;
+  }
+
+  .topbar-nav {
+    flex-direction: column; 
+    justify-content: center;
+    gap: 10px; 
+    margin-bottom: 10px;
+  }
+
+  .topbar-link {
+    font-size: 14px;
+    flex: 1 1 100%; 
+    text-align: center;
+  }
+
+  .button-secondary {
+    width: auto; 
+    font-size: 12px;
+    padding: 6px 10px;
+    margin: 0 auto;
+  }
 }

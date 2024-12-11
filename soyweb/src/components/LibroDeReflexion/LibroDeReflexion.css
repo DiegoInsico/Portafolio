@@ -2,274 +2,306 @@
 
 /* Contenedor con scroll */
 .lr-scroll-container {
-    scroll-snap-type: y mandatory;
-    overflow-y: scroll;
-    height: 100vh;
-    scroll-behavior: smooth;
-    background-color: #121212; /* Fondo muy oscuro */
-    font-family: "Georgia", serif;
+  scroll-snap-type: y mandatory;
+  overflow-y: scroll;
+  height: 100vh;
+  scroll-behavior: smooth;
+  background-color: #121212; /* Fondo muy oscuro */
+  font-family: "Georgia", serif;
+}
+
+/* Secciones generales */
+.lr-section {
+  scroll-snap-align: start;
+  min-height: 100vh; /* Cada sección ocupa al menos la altura del viewport */
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* Centra verticalmente */
+  align-items: center; /* Centra horizontalmente */
+  position: relative;
+  padding: 20px;
+  box-sizing: border-box;
+  color: #e0e0e0; /* Texto principal en gris claro */
+}
+
+/* Sección para el PDF */
+.lr-section-pdf {
+  
+  scroll-snap-align: start;
+  width: 100%;
+  min-height: 100vh; /* Ocupa al menos la altura de la ventana */
+  margin: 0;
+  padding: 0;
+  display: flex; /* Usar Flexbox */
+  justify-content: center; /* Centrar horizontalmente */
+  align-items: center; /* Centrar verticalmente */
+  background-color: #1e1e1e; /* Fondo oscuro para distinguir la sección */
+  flex-direction: column;
+}
+
+/* Contenedor del PDF */
+.lr-pdf-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+/* Estilo del iframe del PDF */
+.lr-pdf-viewer {
+  width: 100%;
+  height: 80vh;
+  border: none;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+}
+
+/* Botón para Descargar PDF */
+.lr-pdf-button {
+  margin-top: 20px;
+  padding: 10px 20px;
+  background-color: #6a0dad;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+}
+
+.lr-pdf-button:hover,
+.lr-pdf-button:focus {
+  background-color: #9e6fd8;
+  transform: scale(1.05);
+}
+
+/* Responsividad para el PDF */
+@media (max-width: 768px) {
+  .lr-pdf-container {
+    width: 95%;
+    height: 70vh;
   }
-  
-  /* Secciones generales */
-  .lr-section {
-    scroll-snap-align: start;
-    min-height: 100vh; /* Cada sección ocupa al menos la altura del viewport */
-    display: flex;
-    flex-direction: column;
-    justify-content: center; /* Centra verticalmente */
-    align-items: center; /* Centra horizontalmente */
-    position: relative;
-    padding: 20px;
-    box-sizing: border-box;
-    color: #e0e0e0; /* Texto principal en gris claro */
-  }
-  
-  /* Botón Flotante para Descargar PDF */
-  .lr-pdf-button-float {
-    position: fixed;
-    left: 20px; /* Ajusta la distancia desde el borde izquierdo */
-    top: 50%;
-    transform: translateY(-50%);
-    background-color: #bb86fc; /* Lavanda */
-    color: #1a1a1a; /* Texto oscuro para contraste */
-    border: none;
-    padding: 12px 20px;
-    border-radius: 50px; /* Bordes redondeados para un aspecto moderno */
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3); /* Sombra para destacar */
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    transition: background-color 0.3s ease, transform 0.3s ease;
-    z-index: 1000; /* Asegura que el botón esté por encima de otros elementos */
-    text-decoration: none; /* Quitar subrayado en enlaces */
-  }
-  
-  .lr-pdf-button-float:hover,
-  .lr-pdf-button-float:focus {
-    background-color: #9e6fd8; /* Lavanda más oscuro al pasar el cursor */
-    transform: translateY(-50%) scale(1.05); /* Ligeramente agrandado al hover */
-  }
-  
-  .lr-pdf-button-float .pdf-icon {
-    margin-right: 8px;
-    font-size: 1.2rem;
-  }
-  
-  /* Responsividad para el Botón Flotante */
-  @media (max-width: 768px) {
-    .lr-pdf-button-float {
-      left: 10px; /* Reducir la distancia desde el borde izquierdo */
-      padding: 10px 16px; /* Reducir el tamaño del botón */
-    }
-  
-    .lr-pdf-button-float .pdf-icon {
-      margin-right: 6px;
-      font-size: 1rem;
-    }
-  }
-  
-  /* Hero Section */
-  .lr-hero-section {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: flex-end;
-    background-image: url("../../assets/images/libro.webp"); /* Ajusta la ruta si es necesario */
-    background-size: cover;
-    background-position: center;
-    min-height: 80vh;
-    margin-left: 15%;
-    margin-right: 15%;
-    border-radius: 90px;
-    padding: 0 5%;
-    width: 60%;
-    position: relative;
-    margin-top: 10vh;
-    margin-bottom: 10vh;
-    overflow: hidden;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.7); /* Sombra más oscura */
-    transition: transform 0.5s ease;
-  }
-  
-  .lr-hero-section:hover {
-    transform: scale(1.02);
-  }
-  
-  /* Capa de opacidad */
-  .lr-hero-section::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(18, 18, 18, 0.6); /* Superposición oscura con opacidad */
-    z-index: 1;
-  }
-  
-  /* Contenido Hero */
-  .lr-hero-section-left {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    z-index: 2;
-    position: relative;
-    margin-bottom: 150px;
-  }
-  
-  .lr-hero-section-left h1 {
-    font-size: 5rem;
-    color: #bb86fc; /* Morado claro */
-    font-weight: bold;
-    margin: 20px 0;
-    font-family: 'Georgia', serif;
-  }
-  
-  .lr-hero-section-right {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    max-width: 40%;
-    z-index: 2;
-    position: relative;
-    color: #e0e0e0; /* Texto secundario en gris claro */
-    margin-bottom: 160px;
-  }
-  
-  .lr-hero-section-right p {
-    font-size: 1.8rem;
-    line-height: 1.6;
-    text-align: right;
-    margin: 20px 0;
-    font-family: 'Georgia', serif;
-  }
-  
-  /* Títulos de Categoría */
-  .lr-categoria-title {
-    font-size: 2.5rem;
-    color: #bb86fc; /* Morado claro */
-    margin-bottom: 20px;
-    text-align: center;
-    border-bottom: 2px solid #bb86fc; /* Borde morado */
-    padding-bottom: 10px;
-    width: 80%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  .lr-icon {
-    margin-right: 10px;
-    color: #bb86fc; /* Iconos morados */
-  }
-  
-  /* Lista de Reflexiones por Categoría */
-  .lr-reflexiones-list {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    width: 80%;
-  }
-  
-  .lr-reflexion-item {
-    background-color: #1e1e1e; /* Fondo de reflexión oscuro */
-    padding: 20px;
-    border-left: 5px solid #bb86fc; /* Borde morado */
-    border-radius: 5px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5); /* Sombra oscura */
-    transition: background-color 0.3s ease;
-  }
-  
-  .lr-reflexion-item:hover {
-    background-color: #2c2c2c; /* Fondo ligeramente más claro al pasar el cursor */
-  }
-  
-  /* Nickname */
-  .lr-reflexion-nickname {
-    font-size: 1.1rem;
-    font-weight: bold;
-    color: #bb86fc; /* Lavanda para destacar */
-    margin-bottom: 5px;
-    text-align: left;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7); /* Sombra ligera para resaltar */
-    font-family: 'Georgia', serif;
-  }
-  
-  /* Header con fecha */
-  .lr-reflexion-header {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 10px;
-  }
-  
-  .lr-fecha {
+
+  .lr-pdf-button {
+    padding: 10px 16px;
     font-size: 0.9rem;
-    color: #b0b0b0; /* Texto de fecha en gris medio */
   }
-  
-  /* Texto de la Reflexión */
+}
+
+@media (max-width: 480px) {
+  .lr-pdf-container {
+    width: 100%;
+    height: 60vh;
+  }
+
+  .lr-pdf-button {
+    padding: 8px 14px;
+    font-size: 0.8rem;
+  }
+}
+
+/* Hero Section */
+.lr-hero-section {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-end;
+  background-image: url("../../assets/images/libro.webp"); /* Ajusta la ruta si es necesario */
+  background-size: cover;
+  background-position: center;
+  min-height: 80vh;
+  margin-left: 15%;
+  margin-right: 15%;
+  border-radius: 90px;
+  padding: 0 5%;
+  width: 60%;
+  position: relative;
+  margin-top: 10vh;
+  margin-bottom: 10vh;
+  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.7); /* Sombra más oscura */
+  transition: transform 0.5s ease;
+}
+
+.lr-hero-section:hover {
+  transform: scale(1.02);
+}
+
+/* Capa de opacidad */
+.lr-hero-section::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(18, 18, 18, 0.6); /* Superposición oscura con opacidad */
+  z-index: 1;
+}
+
+/* Contenido Hero */
+.lr-hero-section-left {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  z-index: 2;
+  position: relative;
+  margin-bottom: 150px;
+}
+
+.lr-hero-section-left h1 {
+  font-size: 5rem;
+  color: #bb86fc; /* Morado claro */
+  font-weight: bold;
+  margin: 20px 0;
+  font-family: "Georgia", serif;
+}
+
+.lr-hero-section-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  max-width: 40%;
+  z-index: 2;
+  position: relative;
+  color: #e0e0e0; /* Texto secundario en gris claro */
+  margin-bottom: 160px;
+}
+
+.lr-hero-section-right p {
+  font-size: 1.8rem;
+  line-height: 1.6;
+  text-align: right;
+  margin: 20px 0;
+  font-family: "Georgia", serif;
+}
+
+/* Títulos de Categoría */
+.lr-categoria-title {
+  font-size: 2.5rem;
+  color: #bb86fc; /* Morado claro */
+  margin-bottom: 20px;
+  text-align: center;
+  border-bottom: 2px solid #bb86fc; /* Borde morado */
+  padding-bottom: 10px;
+  width: 80%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lr-icon {
+  margin-right: 10px;
+  color: #bb86fc; /* Iconos morados */
+}
+
+/* Lista de Reflexiones por Categoría */
+.lr-reflexiones-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 80%;
+}
+
+.lr-reflexion-item {
+  background-color: #1e1e1e; /* Fondo de reflexión oscuro */
+  padding: 20px;
+  border-left: 5px solid #bb86fc; /* Borde morado */
+  border-radius: 5px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5); /* Sombra oscura */
+  transition: background-color 0.3s ease;
+}
+
+.lr-reflexion-item:hover {
+  background-color: #2c2c2c; /* Fondo ligeramente más claro al pasar el cursor */
+}
+
+/* Nickname */
+.lr-reflexion-nickname {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #bb86fc; /* Lavanda para destacar */
+  margin-bottom: 5px;
+  text-align: left;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7); /* Sombra ligera para resaltar */
+  font-family: "Georgia", serif;
+}
+
+/* Header con fecha */
+.lr-reflexion-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.lr-fecha {
+  font-size: 0.9rem;
+  color: #b0b0b0; /* Texto de fecha en gris medio */
+}
+
+/* Texto de la Reflexión */
+.lr-reflexion-texto {
+  font-size: 1.2rem;
+  color: #e0e0e0; /* Texto de reflexión en gris claro */
+  font-style: italic;
+  line-height: 1.6;
+  font-family: "Georgia", serif;
+}
+
+/* Mensajes de Estado */
+.lr-loading,
+.lr-error,
+.lr-no-reflexiones {
+  font-size: 1.5rem;
+  color: #b0b0b0; /* Texto de mensajes en gris medio */
+  text-align: center;
+  margin-top: 40px;
+}
+
+/* Responsividad General */
+@media (max-width: 992px) {
+  .lr-section {
+    padding: 30px 15px;
+  }
+
+  .lr-categoria-title {
+    font-size: 2rem;
+    width: 100%;
+  }
+
+  .lr-reflexiones-list {
+    width: 100%;
+  }
+
   .lr-reflexion-texto {
-    font-size: 1.2rem;
-    color: #e0e0e0; /* Texto de reflexión en gris claro */
-    font-style: italic;
-    line-height: 1.6;
-    font-family: "Georgia", serif;
+    font-size: 1rem;
   }
-  
-  /* Mensajes de Estado */
-  .lr-loading,
-  .lr-error,
-  .lr-no-reflexiones {
-    font-size: 1.5rem;
-    color: #b0b0b0; /* Texto de mensajes en gris medio */
-    text-align: center;
-    margin-top: 40px;
+
+  .lr-reflexion-nickname {
+    font-size: 1rem;
   }
-  
-  /* Responsividad General */
-  @media (max-width: 992px) {
-    .lr-section {
-      padding: 30px 15px;
-    }
-  
-    .lr-categoria-title {
-      font-size: 2rem;
-      width: 100%;
-    }
-  
-    .lr-reflexiones-list {
-      width: 100%;
-    }
-  
-    .lr-reflexion-texto {
-      font-size: 1rem;
-    }
-  
-    .lr-reflexion-nickname {
-      font-size: 1rem;
-    }
+}
+
+@media (max-width: 600px) {
+  .lr-hero-section-left h1 {
+    font-size: 3rem;
   }
-  
-  @media (max-width: 600px) {
-    .lr-hero-section-left h1 {
-      font-size: 3rem;
-    }
-  
-    .lr-hero-section-right p {
-      font-size: 1rem;
-    }
-  
-    .lr-reflexion-item {
-      padding: 15px;
-    }
-  
-    .lr-reflexion-texto {
-      font-size: 0.9rem;
-    }
-  
-    .lr-reflexion-nickname {
-      font-size: 0.9rem;
-    }
+
+  .lr-hero-section-right p {
+    font-size: 1rem;
   }
-  
+
+  .lr-reflexion-item {
+    padding: 15px;
+  }
+
+  .lr-reflexion-texto {
+    font-size: 0.9rem;
+  }
+
+  .lr-reflexion-nickname {
+    font-size: 0.9rem;
+  }
+}

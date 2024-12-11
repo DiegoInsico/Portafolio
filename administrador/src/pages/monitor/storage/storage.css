@@ -1,92 +1,91 @@
-.storage-container {
-  max-width: 1200px;
-  max-height: 80vh; /* Limita la altura para permitir desplazamiento cuando sea necesario */
-  margin: 0 auto;
+/* .graphics-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); 
+  gap: 20px;
   padding: 20px;
-  overflow-y: auto; /* Permite el desplazamiento vertical */
-  font-family: Arial, sans-serif;
-  background-color: #1e1e2f; /* Fondo oscuro */
-  color: #f0e6d2; /* Texto dorado claro */
-  scrollbar-width: thin; /* Solo para navegadores compatibles */
-  scrollbar-color: #1e1e2f #2c2c3a; /* Color del thumb y del fondo de la barra en navegadores compatibles */
 }
 
-/* Estilos para ocultar la barra de desplazamiento en Chrome, Edge y Safari */
-.storage-container::-webkit-scrollbar {
-  width: 0;
-  height: 0;
-}
-
-/* Si deseas mostrar la barra solo al hacer scroll, puedes agregar un hover */
-.storage-container:hover::-webkit-scrollbar {
-  width: 8px;
-}
-
-.storage-container:hover::-webkit-scrollbar-thumb {
-  background-color: #555; /* Color del thumb cuando el scroll está activo */
-  border-radius: 10px;
-}
-
-/* h2 {
+.chart-item {
+  background-color: #f9f9f9;
+  border: 1px solid #ddd; 
+  border-radius: 8px; 
+  padding: 20px; 
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   text-align: center;
-  color: #f0e6d2; 
-  margin-bottom: 20px;
-} */
-
-.chart-container {
-  width: 100%;
-  height: auto;
-  background-color: #2c2c3a; /* Fondo oscuro del gráfico */
-  padding: 20px;
-  border-radius: 10px;
+  max-width: 100%;
 }
 
-.chart-container canvas {
-  width: 100% !important;
-  height: auto !important;
+
+.chart-item canvas {
+  max-width: 100%; 
+  height: auto; 
 }
 
-.filter-buttons {
-  margin-bottom: 20px;
+.ticket-graphics-container {
   display: flex;
-  gap: 10px;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+.ticket-title {
+  margin-bottom: 20px;
+  text-align: center;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.ticket-charts-container {
+  display: flex;
+  gap: 20px;
   justify-content: center;
+  margin-bottom: 40px;
 }
 
-.filter-button {
-  padding: 10px 15px;
-  background-color: #f0ad4e;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s;
+.ticket-chart-item {
+  width: 120px;
+  text-align: center;
 }
 
-.filter-button.active {
-  background-color: #ec971f;
+.ticket-chart-label {
+  margin-top: 10px;
+  font-size: 16px;
 }
 
-.filter-button:hover {
-  background-color: #d58512;
+.ticket-table-container {
+  width: 100%;
+  max-width: 800px;
+  overflow-x: auto;
 }
 
-.file-info-table {
-  margin-top: 20px;
-  color: #f0e6d2;
-}
-
-.file-info-table table {
+.ticket-tickets-table {
   width: 100%;
   border-collapse: collapse;
+  margin-top: 20px;
+  text-align: left;
 }
 
-.file-info-table td, .file-info-table th {
+.ticket-tickets-table th,
+.ticket-tickets-table td {
+  border: 1px solid #ddd;
   padding: 10px;
-  border-bottom: 1px solid #444;
 }
 
-.file-info-table h3 {
-  color: #f0a500;
-  margin-bottom: 10px;
+.ticket-tickets-table th {
+  background-color: #f4f4f4;
 }
+
+.ticket-details-button {
+  padding: 5px 10px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.ticket-details-button:hover {
+  background-color: #45a049;
+}
+ */

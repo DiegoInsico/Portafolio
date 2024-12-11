@@ -1,0 +1,48 @@
+.export-container {
+  width: 100%;
+  height: 100%; /* Ocupa todo el contenedor disponible */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* Espacia el contenido verticalmente */
+  align-items: center;
+  padding: 20px;
+  background-color: #212121; /* Fondo oscuro */
+  color: #ffffff; /* Texto blanco */
+  text-align: center;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+  box-sizing: border-box; /* Considera padding dentro del tamaño total */
+}
+
+.export-title {
+  font-size: 24px;
+  color: #bb86fc; /* Tono púrpura */
+  margin-bottom: 20px; /* Espacio inferior */
+}
+
+.export-actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  margin-top: auto; /* Empuja los botones al centro verticalmente */
+}
+
+.export-button {
+  padding: 10px 20px;
+  font-size: 16px;
+  color: #ffffff;
+  background-color: #6200ea; /* Morado */
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.export-button:hover {
+  background-color: #3700b3; /* Morado más oscuro */
+}
+
+.export-button:active {
+  transform: scale(0.98);
+}

@@ -16,6 +16,7 @@ import { CertificadoService } from './services/certificado/certificado.service';
 import * as admin from 'firebase-admin';
 import { AiService } from './ai/ai.service';
 import { TasksService } from './tasks/tasks.service';
+import { PdfModule } from './pdf/pdf.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { TasksService } from './tasks/tasks.service';
     EmailModule,
     FirestoreModule,
     PaymentModule,
+    PdfModule,
     // Nota: No debes incluir servicios directamente en `imports`
   ],
   controllers: [AppController],

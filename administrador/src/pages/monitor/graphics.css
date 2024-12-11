@@ -1,0 +1,80 @@
+.graphics-container {
+  display: grid;
+  grid-template-areas:
+    "top-left top-right"
+    "bottom-left bottom-right";
+  grid-template-columns: 1fr 1fr; /* Dos columnas iguales */
+  grid-template-rows: 1fr 1fr;   /* Dos filas iguales */
+  gap: 20px;
+  padding: 20px;
+  background-color: #292929;
+  box-sizing: border-box;
+  margin-top: 70px; /* Posiciona debajo del TopBar */
+  height: calc(100vh - 70px); /* Usa todo el espacio disponible */
+}
+
+
+.top-left {
+  grid-area: top-left;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 15px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.top-right {
+  grid-area: top-right;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 15px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.bottom-left {
+  grid-area: bottom-left;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.bottom-right {
+  grid-area: bottom-right;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.bottom-left,
+.bottom-right{
+  overflow-y: auto;
+  background-color: rgb(48, 48, 48);
+}
+
+/* Ajustes responsivos */
+@media (max-width: 768px) {
+  .graphics-container {
+    grid-template-areas:
+      "top-left"
+      "top-right"
+      "bottom-left"
+      "bottom-right";
+    grid-template-columns: 1fr; /* Una columna en pantallas pequeñas */
+    grid-template-rows: auto;  /* Alturas dinámicas */
+  }
+}

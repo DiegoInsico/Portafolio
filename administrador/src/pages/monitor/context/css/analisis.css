@@ -1,0 +1,64 @@
+.analisis-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 20px;
+    box-sizing: border-box;
+  }
+  
+  .chart-section {
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    width: 100%;
+    max-width: 600px; /* Limita el tamaño horizontal */
+    margin: 0 auto; /* Centra los gráficos */
+  }
+  
+  .chart-section canvas {
+    max-height: 300px; /* Ajusta la altura de los gráficos */
+  }
+  
+  .table-section {
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    width: 100%;
+    max-width: 800px; /* Limita el tamaño de la tabla */
+    margin: 0 auto; /* Centra la tabla */
+  }
+  
+  .context-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9em; /* Reduce el tamaño de texto */
+  }
+  
+  .context-table th,
+  .context-table td {
+    border: 1px solid #ccc;
+    padding: 8px;
+    text-align: center; /* Centra el contenido */
+  }
+  
+  .context-table th {
+    background-color: #f0f0f0;
+    font-weight: bold;
+  }
+  
+  .emotion-summary-table {
+    width: 100%;
+    margin: 10px 0;
+    border-collapse: collapse;
+  }
+  
+  .emotion-summary-table th,
+  .emotion-summary-table td {
+    border: 1px solid #ddd;
+    padding: 5px;
+    text-align: center;
+    font-size: 0.85em; /* Reduce el tamaño de texto */
+  }
+  

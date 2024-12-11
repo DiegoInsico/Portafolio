@@ -1,0 +1,117 @@
+.pb-container {
+  display: flex;
+  flex-direction: row;
+  margin-top: 60px;
+  min-height: 100vh;
+  background-color: #121212;
+  color: #ffffff;
+}
+
+.pb-filters {
+  width: 250px;
+  padding: 20px;
+  background-color: #1f2a44;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.pb-section {
+  margin-bottom: 20px;
+}
+
+.pb-filter-button {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  background-color: #007bff;
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  text-align: center;
+}
+
+.pb-filter-button:hover {
+  background-color: #0056b3;
+}
+
+.pb-add-filters {
+  padding: 20px;
+  background-color: #1f2a44;
+}
+
+.pb-filters-container {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.pb-filter-slot {
+  width: 100px;
+  height: 50px;
+  background-color: #343a40;
+  color: #ffffff;
+  text-align: center;
+  line-height: 50px;
+  border: 1px dashed #ffffff;
+  border-radius: 4px;
+}
+
+.pb-highlight {
+  background-color: #495057;
+}
+
+.pb-graphs {
+  flex: 1;
+  padding: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+  background-color: #121212;
+}
+
+.pb-chart-container {
+  flex: 1 1 calc(45% - 20px); /* Ajusta el tamaño para que quepan dos gráficos por fila */
+  background-color: #1f2a44;
+  border-radius: 8px;
+  padding: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.pb-chart {
+  width: 100%;
+  height: 250px;
+}
+
+.pb-table-container {
+  width: 100%;
+  background-color: #1f2a44;
+  padding: 10px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  margin-top: 20px;
+}
+
+.pb-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #1f2a44;
+  color: #ffffff;
+}
+
+.pb-table th, .pb-table td {
+  padding: 10px;
+  text-align: center;
+  border: 1px solid #ffffff;
+}
+
+.pb-table th {
+  background-color: #007bff;
+}
+
+.pb-table td {
+  background-color: #343a40;
+}

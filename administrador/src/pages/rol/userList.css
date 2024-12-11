@@ -1,0 +1,133 @@
+/* Contenedor General */
+.user-list-container {
+  padding: 20px;
+  background-color: #ffffff; /* Fondo blanco */
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  font-family: Arial, sans-serif;
+}
+
+/* Título */
+.user-list-title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  color: #333333; /* Texto negro */
+  text-align: center;
+}
+
+/* Botones de Alternancia */
+.userlist-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.userlist-buttons button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  background-color: #28a745; /* Verde para botones activos */
+  color: #ffffff;
+  transition: background-color 0.3s ease;
+}
+
+.userlist-buttons button:hover {
+  background-color: #218838;
+}
+
+.userlist-buttons .active {
+  background-color: #218838;
+}
+
+/* Tabla de Usuarios */
+.userlist-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  background-color: #ffffff; /* Fondo blanco */
+  border: 1px solid #dddddd;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.userlist-table th,
+.userlist-table td {
+  text-align: left;
+  padding: 12px;
+  border-bottom: 1px solid #dddddd;
+}
+
+.userlist-table th {
+  background-color: #007bff; /* Azul para encabezados */
+  color: #ffffff; /* Texto blanco */
+  font-size: 16px;
+}
+
+.userlist-table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.userlist-table tr:hover {
+  background-color: #f1f1f1;
+}
+
+.userlist-table td {
+  font-size: 14px;
+  color: #333333; /* Texto negro */
+}
+
+/* Acciones de Usuario */
+.userlist-action {
+  padding: 5px 10px;
+  margin-right: 5px;
+  border-radius: 5px;
+  font-size: 12px;
+  cursor: pointer;
+  border: none;
+  color: #ffffff;
+}
+
+.userlist-action.edit {
+  background-color: #ffc107; /* Amarillo para editar */
+}
+
+.userlist-action.ban-active {
+  background-color: #dc3545; /* Rojo para desbanear */
+}
+
+.userlist-action.ban-inactive {
+  background-color: #28a745; /* Verde para banear */
+}
+
+.userlist-action.view {
+  background-color: #007bff; /* Azul para ver detalles */
+}
+
+.userlist-action:hover {
+  opacity: 0.9;
+}
+
+/* Lista de Trabajadores */
+.worker-list-ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.worker-list-item {
+  margin: 10px 0;
+  padding: 12px;
+  background: #ffffff; /* Fondo blanco */
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  font-size: 14px;
+  color: #333333; /* Texto negro */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
