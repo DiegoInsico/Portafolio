@@ -1,11 +1,8 @@
-// FloatingMenu.js
-
 import React from 'react';
 import './FloatingMenu.css';
-import { updateCollageTitleProperties } from '../firebase'; // Asegúrate de tener esta función
 
 const FloatingMenu = ({
-    collageId, // Añadido
+    collageId,
     position,
     onClose,
     fontSize,
@@ -15,44 +12,25 @@ const FloatingMenu = ({
     color,
     setColor
 }) => {
-    // Manejar clic fuera del menú para cerrarlo
     const handleClickOutside = (e) => {
         if (e.target.className === 'floating-menu-overlay') {
             onClose();
         }
     };
 
-    // Manejar cambios en el tamaño de fuente
     const handleFontSizeChange = (e) => {
         const newFontSize = parseInt(e.target.value, 10);
         setFontSize(newFontSize);
-        // Actualizar Firestore con el nuevo tamaño de fuente
-        updateCollageTitleProperties(collageId, { fontSize: newFontSize })
-            .catch(error => {
-                console.error("Error actualizando el tamaño de fuente:", error);
-            });
     };
 
-    // Manejar cambios en la familia de fuente
     const handleFontFamilyChange = (e) => {
         const newFontFamily = e.target.value;
         setFontFamily(newFontFamily);
-        // Actualizar Firestore con la nueva familia de fuente
-        updateCollageTitleProperties(collageId, { fontFamily: newFontFamily })
-            .catch(error => {
-                console.error("Error actualizando la familia de fuente:", error);
-            });
     };
 
-    // Manejar cambios en el color
     const handleColorChange = (e) => {
         const newColor = e.target.value;
         setColor(newColor);
-        // Actualizar Firestore con el nuevo color
-        updateCollageTitleProperties(collageId, { color: newColor })
-            .catch(error => {
-                console.error("Error actualizando el color:", error);
-            });
     };
 
     return (
@@ -87,7 +65,6 @@ const FloatingMenu = ({
                             <option value="Times New Roman">Times New Roman</option>
                             <option value="Courier New">Courier New</option>
                             <option value="Georgia">Georgia</option>
-                            {/* Añade más fuentes según tus necesidades */}
                         </select>
                     </div>
                     <div className="setting-item">

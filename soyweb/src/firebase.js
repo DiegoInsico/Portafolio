@@ -9,7 +9,7 @@ import {
 } from "firebase/firestore";
 
 import { v4 as uuidv4 } from 'uuid';
-import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
+import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject, getMetadata } from "firebase/storage";
 
 const DEFAULT_THUMBNAIL_URL = "https://via.placeholder.com/150";
 
@@ -285,240 +285,347 @@ export const getEntries = async (user) => {
   }
 }
 
-//Funciones de collage
-
+// Añadir entrada al collage
 export const addEntryToCollage = async (collageId, entryId, initialPosition = { x: 100, y: 100 }) => {
+  console.log(`// DEBUG [addEntryToCollage]: Iniciando función con collageId=${collageId}, entryId=${entryId}, initialPosition=`, initialPosition);
   try {
+    console.log("// DEBUG [addEntryToCollage]: Obteniendo referencia al documento del collage...");
     const collageRef = doc(db, "collages", collageId);
+
+    console.log("// DEBUG [addEntryToCollage]: Actualizando documento con nueva entrada...");
     await updateDoc(collageRef, {
       entries: arrayUnion({
         entryId,
         position: initialPosition,
-        size: { width: 300, height: 400 }, // Tamaño predeterminado
-        backgroundColor: '#ffffff' // Color de fondo predeterminado
+        size: { width: 300, height: 400 },
+        backgroundColor: '#ffffff'
       }),
     });
+    console.log(`// DEBUG [addEntryToCollage]: Entrada ${entryId} agregada exitosamente al collage ${collageId}.`);
   } catch (error) {
-    console.error("Error agregando la entrada al collage:", error);
+    console.error("// DEBUG [addEntryToCollage]: Error agregando la entrada al collage:", error);
     throw error;
   }
 };
 
+
+// Suscribirse a los collages de un usuario
 export const subscribeToCollages = (userId, onUpdate, onError) => {
+  console.log(`// DEBUG [subscribeToCollages]: Iniciando suscripción a collages del usuario userId=${userId}`);
   const db = getFirestore();
   const collagesRef = collection(db, 'collages');
   const q = query(collagesRef, where('userId', '==', userId));
 
+  console.log("// DEBUG [subscribeToCollages]: Configurando onSnapshot para monitorear cambios...");
   const unsubscribe = onSnapshot(
     q,
     (snapshot) => {
+      console.log(`// DEBUG [subscribeToCollages]: Snapshot recibido para userId=${userId}. Cantidad de documentos: ${snapshot.size}`);
       const collages = snapshot.docs.map((doc) => ({
         id: doc.id,
         name: doc.data().name,
-        thumbnail: doc.data().thumbnail || DEFAULT_THUMBNAIL_URL, // Asegúrate de definir `DEFAULT_THUMBNAIL_URL`
+        thumbnail: doc.data().thumbnail || DEFAULT_THUMBNAIL_URL,
         entries: doc.data().entries || [],
         createdAt: doc.data().createdAt,
         userId: doc.data().userId,
+        titleData: doc.data().titleData || {} // <-- Agregar este campo
       }));
+      console.log("// DEBUG [subscribeToCollages]: Collages actualizados:", collages);
       onUpdate(collages);
     },
     (error) => {
-      console.error('Error en la suscripción a collages:', error);
+      console.error('// DEBUG [subscribeToCollages]: Error en la suscripción a collages:', error);
       onError(error);
     }
   );
 
-  return unsubscribe; // Retorna la función para desuscribirse
+  return unsubscribe;
 };
 
-export const createCollageAlbum = async (collageName, selectedEntries, thumbnail, currentUser) => {
+
+// Crear un nuevo collage
+export const createCollageAlbum = async (collageName, selectedEntries, thumbnail, currentUser, titleData) => {
+  console.log(`// DEBUG [createCollageAlbum]: Iniciando creación de collage. Nombre=${collageName}, selectedEntries=`, selectedEntries, "titleData=", titleData);
   try {
     if (!currentUser || !currentUser.uid) {
+      console.error('// DEBUG [createCollageAlbum]: User ID no definido');
       throw new Error('User ID is undefined');
     }
 
-    // Subir thumbnail a Firebase Storage
-    const thumbnailRef = ref(storage, `thumbnails/${uuidv4()}-${thumbnail.name}`);
+    console.log('// DEBUG [createCollageAlbum]: Subiendo thumbnail a Firebase Storage...');
+    const uniqueThumbnailName = `thumbnails/${uuidv4()}-${thumbnail.name}`;
+    const thumbnailRef = ref(storage, uniqueThumbnailName);
     await uploadBytes(thumbnailRef, thumbnail);
-
-    // Obtener URL del thumbnail
     const thumbnailURL = await getDownloadURL(thumbnailRef);
+    console.log('// DEBUG [createCollageAlbum]: Thumbnail subida con URL:', thumbnailURL);
 
-    // Crear documento en Firestore con la URL del thumbnail
     const newCollageRef = doc(collection(db, 'collages'));
+    console.log('// DEBUG [createCollageAlbum]: Creando documento del collage en Firestore con ID:', newCollageRef.id);
     await setDoc(newCollageRef, {
       name: collageName,
       thumbnail: thumbnailURL,
-      thumbnailPath: `thumbnails/${uuidv4()}-${thumbnail.name}`, // Añadido para facilitar la eliminación
-      createdAt: serverTimestamp(), // Usar timestamp del servidor
+      thumbnailPath: uniqueThumbnailName,
+      createdAt: serverTimestamp(),
       userId: currentUser.uid,
-      entries: selectedEntries.map(entryId => ({
-        entryId,
-        position: { x: 100, y: 100 }, // Posiciones iniciales predeterminadas
-        size: { width: 300, height: 400 }, // Tamaños predeterminados
-        backgroundColor: '#ffffff' // Color de fondo predeterminado
-      })),
+      entries: selectedEntries,
+      titleData: titleData
     });
 
+    console.log(`// DEBUG [createCollageAlbum]: Collage creado exitosamente con ID ${newCollageRef.id}`);
     return newCollageRef.id;
   } catch (error) {
-    console.error('Error al crear el collage:', error);
+    console.error('// DEBUG [createCollageAlbum]: Error al crear el collage:', error);
     throw error;
   }
 };
 
+
+// Obtener collages por usuario
 export const getCollagesByUser = async (userId) => {
+  console.log(`// DEBUG [getCollagesByUser]: Iniciando fetch de collages para userId=${userId}`);
   try {
-    console.log(`Fetching collages for userId: ${userId}`); // Log del userId
     const collagesCollection = collection(db, "collages");
     const q = query(collagesCollection, where("userId", "==", userId));
+    console.log("// DEBUG [getCollagesByUser]: Ejecutando consulta en Firestore...");
     const snapshot = await getDocs(q);
 
-    console.log(`Number of collages fetched: ${snapshot.size}`); // Log de la cantidad de collages
+    console.log(`// DEBUG [getCollagesByUser]: Número de collages obtenidos: ${snapshot.size}`);
 
     const collages = snapshot.docs.map((doc) => {
       const data = doc.data();
       return {
         id: doc.id,
         name: data.name,
-        thumbnail: data.thumbnail || DEFAULT_THUMBNAIL_URL, // Valor predeterminado
+        thumbnail: data.thumbnail || DEFAULT_THUMBNAIL_URL,
         entries: data.entries || [],
       };
     });
 
-    console.log("Collages data:", collages); // Log de los datos de collages
-
+    console.log("// DEBUG [getCollagesByUser]: Datos de collages obtenidos:", collages);
     return collages;
   } catch (error) {
-    console.error("Error fetching collages:", error);
+    console.error("// DEBUG [getCollagesByUser]: Error al obtener collages:", error);
     throw error;
   }
 };
 
 
-// Función para obtener un collage específico
+// Obtener un collage específico por ID
 export const getCollageById = async (collageId) => {
+  console.log(`// DEBUG [getCollageById]: Obteniendo collage con ID=${collageId}`);
   try {
     const collageRef = doc(db, "collages", collageId);
     const collageDoc = await getDoc(collageRef);
 
     if (collageDoc.exists()) {
       const data = collageDoc.data();
-      return {
+      const collageData = {
         id: collageDoc.id,
         name: data.name,
         thumbnail: data.thumbnail || DEFAULT_THUMBNAIL_URL,
         entries: data.entries || [],
         createdAt: data.createdAt,
         userId: data.userId,
+        titleData: data.titleData // <- Agregar este campo
       };
+      console.log("// DEBUG [getCollageById]: Collage encontrado:", collageData);
+      return collageData;
     } else {
-      console.warn("Collage no encontrado");
+      console.warn("// DEBUG [getCollageById]: Collage no encontrado");
       return null;
     }
   } catch (error) {
-    console.error("Error fetching collage:", error);
+    console.error("// DEBUG [getCollageById]: Error fetching collage:", error);
     throw error;
   }
 };
 
+
+// Actualizar posición de una entrada en el collage
 export const updateEntryPositionInCollage = async (collageId, entryId, newPosition) => {
+  console.log(`// DEBUG [updateEntryPositionInCollage]: Iniciando actualización de posición. collageId=${collageId}, entryId=${entryId}, newPosition=`, newPosition);
   try {
     const collageRef = doc(db, "collages", collageId);
 
     await runTransaction(db, async (transaction) => {
+      console.log("// DEBUG [updateEntryPositionInCollage]: Iniciando transacción de Firestore...");
       const collageDoc = await transaction.get(collageRef);
       if (!collageDoc.exists()) {
+        console.error("// DEBUG [updateEntryPositionInCollage]: Collage no encontrado");
         throw new Error("Collage no encontrado");
       }
 
       const entries = collageDoc.data().entries || [];
       const updatedEntries = entries.map(entry => {
         if (entry.entryId === entryId) {
+          console.log(`// DEBUG [updateEntryPositionInCollage]: Actualizando posición de entryId=${entryId}`);
           return { ...entry, position: newPosition };
         }
         return entry;
       });
 
+      console.log("// DEBUG [updateEntryPositionInCollage]: Actualizando documento con nuevas posiciones...");
       transaction.update(collageRef, { entries: updatedEntries });
     });
+    console.log("// DEBUG [updateEntryPositionInCollage]: Posición actualizada exitosamente.");
   } catch (error) {
-    console.error("Error updating entry position:", error);
+    console.error("// DEBUG [updateEntryPositionInCollage]: Error actualizando posición de la entrada:", error);
     throw error;
   }
 };
 
+
+// Actualizar propiedades del título del collage
 export const updateCollageTitleProperties = async (collageId, properties) => {
+  console.log(`// DEBUG [updateCollageTitleProperties]: Actualizando propiedades del título para collageId=${collageId}, properties=`, properties);
   try {
     const collageRef = doc(db, "collages", collageId);
     const collageDoc = await getDoc(collageRef);
     if (!collageDoc.exists()) {
+      console.error("// DEBUG [updateCollageTitleProperties]: Collage no encontrado");
       throw new Error("Collage no encontrado");
     }
 
     await updateDoc(collageRef, { ...properties });
+    console.log("// DEBUG [updateCollageTitleProperties]: Propiedades del título actualizadas exitosamente.");
   } catch (error) {
-    console.error("Error actualizando propiedades del título:", error);
+    console.error("// DEBUG [updateCollageTitleProperties]: Error actualizando propiedades del título:", error);
     throw error;
   }
 };
 
+
+// Remover una entrada del collage
 export const removeEntryFromCollage = async (collageId, entryId) => {
+  console.log(`// DEBUG [removeEntryFromCollage]: Iniciando la remoción de entryId=${entryId} del collageId=${collageId}`);
+  const firestore = getFirestore();
   try {
-    const collageRef = doc(db, "collages", collageId);
-    await collageRef.update({
-      entries: firestore.FieldValue.arrayRemove(entryId)
-    });
+    const collageRef = doc(firestore, "collages", collageId);
+    const collageDoc = await getDoc(collageRef);
+
+    if (!collageDoc.exists()) {
+      console.error("// DEBUG [removeEntryFromCollage]: Collage no encontrado");
+      throw new Error("Collage no encontrado");
+    }
+
+    const existingEntries = collageDoc.data().entries || [];
+    const entryToRemove = existingEntries.find(entry => entry.entryId === entryId);
+
+    if (!entryToRemove) {
+      console.warn(`// DEBUG [removeEntryFromCollage]: La entrada entryId=${entryId} no existe en el collage`);
+      return;
+    }
+
+    const updatedEntries = existingEntries.filter(entry => entry.entryId !== entryId);
+    console.log(`// DEBUG [removeEntryFromCollage]: Removiendo entryId=${entryId}. Entradas antes: ${existingEntries.length}, después: ${updatedEntries.length}`);
+    await updateDoc(collageRef, { entries: updatedEntries });
+    console.log(`// DEBUG [removeEntryFromCollage]: Entrada entryId=${entryId} removida exitosamente del collageId=${collageId}`);
   } catch (error) {
-    console.error("Error removing entry from collage:", error);
+    console.error("// DEBUG [removeEntryFromCollage]: Error al remover la entrada del collage:", error);
     throw error;
   }
 };
 
-// Función para eliminar un collage
+
+// Eliminar un collage y sus recursos asociados
 export const deleteCollage = async (collageId) => {
+  console.log(`// DEBUG [deleteCollage]: Iniciando eliminación del collageId=${collageId}`);
   const storage = getStorage();
   const firestore = getFirestore();
-
-  // Referencia al archivo en Firebase Storage
-  const collageRef = ref(storage, `collages/${collageId}`);
-
-  // Referencia al documento de Firestore
-  const collageDocRef = doc(firestore, "collages", collageId); // Suponiendo que el documento se llama 'collages'
+  const collageDocRef = doc(firestore, 'collages', collageId);
 
   try {
-    // Eliminar el archivo de Firebase Storage
-    await deleteObject(collageRef);
-    console.log("Archivo de collage eliminado de Firebase Storage");
+    const docSnapshot = await getDoc(collageDocRef);
 
-    // Eliminar el documento de Firestore
-    await deleteDoc(collageDocRef);
-    console.log("Collage eliminado de Firestore");
+    if (docSnapshot.exists()) {
+      const collageData = docSnapshot.data();
+      console.log("// DEBUG [deleteCollage]: Collage encontrado, iniciando eliminación de recursos...");
+
+      // Eliminar miniatura del collage
+      if (collageData.thumbnailPath) {
+        const thumbnailRef = ref(storage, collageData.thumbnailPath);
+        console.log(`// DEBUG [deleteCollage]: Intentando eliminar miniatura en ${collageData.thumbnailPath}`);
+        try {
+          await getMetadata(thumbnailRef);
+          await deleteObject(thumbnailRef);
+          console.log(`// DEBUG [deleteCollage]: Miniatura del collage eliminada del Storage`);
+        } catch (error) {
+          if (error.code === 'storage/object-not-found') {
+            console.log(`// DEBUG [deleteCollage]: La miniatura ${collageData.thumbnailPath} no existe en el Storage.`);
+          } else {
+            console.error("// DEBUG [deleteCollage]: Error eliminando miniatura del collage:", error);
+            throw error;
+          }
+        }
+      }
+
+      // Eliminar miniaturas de las entradas
+      if (collageData.entries && Array.isArray(collageData.entries)) {
+        for (const entry of collageData.entries) {
+          if (entry.thumbnail) {
+            const entryThumbnailRef = ref(storage, entry.thumbnail);
+            console.log(`// DEBUG [deleteCollage]: Eliminando miniatura de entrada entryId=${entry.entryId}`);
+            try {
+              await getMetadata(entryThumbnailRef);
+              await deleteObject(entryThumbnailRef);
+              console.log(`// DEBUG [deleteCollage]: Miniatura de entrada ${entry.entryId} eliminada`);
+            } catch (error) {
+              if (error.code === 'storage/object-not-found') {
+                console.log(`// DEBUG [deleteCollage]: La miniatura de la entrada ${entry.entryId} ya no existe.`);
+              } else {
+                console.error(`// DEBUG [deleteCollage]: Error eliminando miniatura de entrada ${entry.entryId}:`, error);
+                throw error;
+              }
+            }
+          }
+        }
+      }
+
+      // Eliminar el documento del collage en Firestore
+      console.log("// DEBUG [deleteCollage]: Eliminando documento del collage en Firestore...");
+      await deleteDoc(collageDocRef);
+      console.log("// DEBUG [deleteCollage]: Collage eliminado exitosamente de Firestore");
+    } else {
+      console.log("// DEBUG [deleteCollage]: El collage no existe en Firestore");
+    }
 
   } catch (error) {
-    console.error("Error eliminando el collage:", error);
+    console.error("// DEBUG [deleteCollage]: Error eliminando el collage:", error);
+    throw error;
   }
 };
 
+
+// Actualizar propiedades de una entrada en el collage
 export const updateEntryProperties = async (collageId, entryId, properties) => {
+  console.log(`// DEBUG [updateEntryProperties]: Iniciando actualización de propiedades de entrada. collageId=${collageId}, entryId=${entryId}, properties=`, properties);
   try {
     const collageRef = doc(db, "collages", collageId);
     const collageDoc = await getDoc(collageRef);
     if (!collageDoc.exists()) {
+      console.error("// DEBUG [updateEntryProperties]: Collage no encontrado");
       throw new Error("Collage no encontrado");
     }
 
     const entries = collageDoc.data().entries || [];
+    let entryFound = false;
     const updatedEntries = entries.map(entry => {
       if (entry.entryId === entryId) {
+        entryFound = true;
+        console.log(`// DEBUG [updateEntryProperties]: Actualizando propiedades de entryId=${entryId}`);
         return { ...entry, ...properties };
       }
       return entry;
     });
 
+    if (!entryFound) {
+      console.warn(`// DEBUG [updateEntryProperties]: No se encontró la entrada con entryId=${entryId} en el collage.`);
+    }
+
     await updateDoc(collageRef, { entries: updatedEntries });
+    console.log(`// DEBUG [updateEntryProperties]: Propiedades actualizadas exitosamente para entryId=${entryId}`);
   } catch (error) {
-    console.error("Error updating entry properties:", error);
+    console.error("// DEBUG [updateEntryProperties]: Error actualizando propiedades de la entrada:", error);
     throw error;
   }
 };

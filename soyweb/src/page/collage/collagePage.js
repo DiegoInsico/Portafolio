@@ -1,23 +1,24 @@
-// CollagePage.js
-
 import React, { useState, useEffect } from 'react';
 import MiniNav from './miniNav';
 import CreateCollage from './createCollage';
-import ListCollages from './listCollage'; // Asegúrate de que la ruta es correcta
+import ListCollages from './listCollage';
 import './CollagePage.css';
-import { subscribeToCollages, deleteCollage, createCollageAlbum } from '../../firebase'; // Asegúrate de importar createCollageAlbum
-import { useAuth } from '../../page/auth/authContext'; // Importa el hook useAuth
+import { subscribeToCollages, deleteCollage } from '../../firebase';
+import { useAuth } from '../../page/auth/authContext';
 import { useNavigate } from 'react-router-dom';
+import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { db } from '../../firebase';
+import { v4 as uuidv4 } from 'uuid';
 
 const CollagePage = () => {
-  const { currentUser } = useAuth(); // Obtiene currentUser desde el contexto
+  const { currentUser } = useAuth();
   const [isCreatingCollage, setIsCreatingCollage] = useState(false);
   const [collages, setCollages] = useState([]);
   const [showCollagesList, setShowCollagesList] = useState(true);
-  const [selectedCollage, setSelectedCollage] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const navigate = useNavigate(); // Inicializa useNavigate
+  const [draftCollageId, setDraftCollageId] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!currentUser || !currentUser.uid) {
@@ -26,7 +27,6 @@ const CollagePage = () => {
       return;
     }
 
-    // Suscribirse a los cambios en tiempo real
     const unsubscribe = subscribeToCollages(
       currentUser.uid,
       (collagesData) => {
@@ -41,7 +41,6 @@ const CollagePage = () => {
       }
     );
 
-    // Limpiar la suscripción cuando el componente se desmonte o el usuario cambie
     return () => unsubscribe();
   }, [currentUser]);
 
@@ -50,31 +49,46 @@ const CollagePage = () => {
   };
 
   const handleSelectCollage = (collage) => {
-    console.log("Collage seleccionado:", collage); // Log del collage seleccionado
+    console.log("Collage seleccionado:", collage);
     navigate(`/collage/${collage.id}`);
   };
 
   const handleDeleteCollage = async (collageId) => {
     try {
-      await deleteCollage(collageId); // Llama a la función para eliminar en Storage y Firestore
-      // No es necesario actualizar el estado manualmente si usas un escuchador en tiempo real
+      await deleteCollage(collageId);
     } catch (error) {
       console.error("Error eliminando el collage:", error);
       setError(error);
     }
   };
 
-  // Modificación para devolver el collageId después de crear
-  const handleAddCollage = async (collageName, selectedEntries, thumbnail) => {
+  const startCreatingCollage = async () => {
+    if (!currentUser?.uid) {
+      alert('Debes estar autenticado para crear un collage.');
+      return;
+    }
+
     try {
-      const newCollageId = await createCollageAlbum(collageName, selectedEntries, thumbnail, currentUser);
-      console.log('Collage creado con ID:', newCollageId);
-      // La suscripción en tiempo real actualizará el estado `collages`
-      return newCollageId; // Devolver el ID para permitir la navegación
+      const defaultTitleData = {
+        position: { x: 50, y: 20 },
+        fontSize: 24,
+        fontFamily: 'Arial',
+        color: '#000000',
+        zIndex: 1
+      };
+      const draftRef = doc(db, 'collages', uuidv4());
+      await setDoc(draftRef, {
+        userId: currentUser.uid,
+        createdAt: serverTimestamp(),
+        entries: [],
+        titleData: defaultTitleData
+      });
+      console.log("Borrador de collage creado con ID:", draftRef.id);
+      setDraftCollageId(draftRef.id);
+      setIsCreatingCollage(true);
     } catch (error) {
-      console.error("Error agregando el collage:", error);
-      setError(error);
-      throw error; // Lanzar el error para que CreateCollage lo maneje
+      console.error('Error creando el borrador del collage', error);
+      alert('Hubo un error al crear el collage. Por favor, inténtalo de nuevo.');
     }
   };
 
@@ -90,17 +104,15 @@ const CollagePage = () => {
     <div className="collage-page">
       <MiniNav
         className="mini-nav"
-        isCreatingCollage={isCreatingCollage}
-        setIsCreatingCollage={setIsCreatingCollage}
         onToggleCollagesList={toggleCollagesList}
+        onStartCreatingCollage={startCreatingCollage}
       />
 
       <div className='render-content'>
-        {/* Renderizar CreateCollage o ListCollages según el estado */}
         {isCreatingCollage ? (
           <CreateCollage
-            onAddCollage={handleAddCollage}
             setIsCreatingCollage={setIsCreatingCollage}
+            collageId={draftCollageId}
           />
         ) : showCollagesList ? (
           <ListCollages
@@ -110,7 +122,6 @@ const CollagePage = () => {
           />
         ) : (
           <div className="placeholder">
-            {/* Puedes agregar contenido adicional aquí si no se está creando ni listando */}
             <p>Selecciona una opción del menú para empezar.</p>
           </div>
         )}

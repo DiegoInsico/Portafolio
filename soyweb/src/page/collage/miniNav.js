@@ -1,11 +1,13 @@
-// MiniNav.js
-
 import React from 'react';
 import './MiniNav.css';
 
-const MiniNav = ({ isCreatingCollage, setIsCreatingCollage, onToggleCollagesList }) => {
+const MiniNav = ({ onToggleCollagesList, onStartCreatingCollage }) => {
+
   const handleCreateCollage = () => {
-    setIsCreatingCollage(!isCreatingCollage); // Cambiar el estado de creación
+    // Llamamos a la función del padre para crear el borrador y activar el modo creación
+    if (onStartCreatingCollage) {
+      onStartCreatingCollage();
+    }
   };
 
   const handleListCollages = () => {
@@ -17,9 +19,9 @@ const MiniNav = ({ isCreatingCollage, setIsCreatingCollage, onToggleCollagesList
   return (
     <div className="mini-nav">
       <button onClick={handleCreateCollage}>
-        {isCreatingCollage ? 'Cancelar Crear Collage' : 'Crear Nuevo Collage'}
+        Crear Nuevo Collage
       </button>
-      <button onClick={handleListCollages}>Listar Collages</button> {/* Botón actualizado */}
+      <button onClick={handleListCollages}>Listar Collages</button>
     </div>
   );
 };

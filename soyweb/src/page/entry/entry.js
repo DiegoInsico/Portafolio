@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Navigation, Pagination } from 'swiper/modules';
+import { Navigation, Pagination, Autoplay } from 'swiper/modules';
 import { getEntries } from '../../firebase';
 import EntryCard from './entryMapper/entryCard';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
+import 'swiper/css/autoplay';
 
 const Carousel = ({ currentUser, onEntrySelect, selectedEntries }) => {
     const [entries, setEntries] = useState([]);
@@ -21,31 +22,30 @@ const Carousel = ({ currentUser, onEntrySelect, selectedEntries }) => {
         };
         fetchEntries();
     }, [currentUser]);
+
     const handleEntryClick = (entry) => {
-        // Si la entrada ya está seleccionada, la eliminamos
         if (selectedEntries.includes(entry.id)) {
-            onEntrySelect(entry, false); // Pasamos false para indicar deselección
+            onEntrySelect(entry, false);
         } else {
-            onEntrySelect(entry, true); // Pasamos true para indicar selección
+            onEntrySelect(entry, true);
         }
     };
 
-
+    console.log(entries);
+    console.log(currentUser);
     return (
         <div className="carousel-container">
             <Swiper
                 className="my-swiper"
-                modules={[Navigation, Pagination]}
-                spaceBetween={1} // Añadido un espacio entre las tarjetas
-                slidesPerView={5} // Ajustar la cantidad de tarjetas visibles
-                loop={true} // Habilita el bucle infinito
-                onSlideChange={(swiper) => console.log('Slide changed to index:', swiper.realIndex)} // Actualiza el índice activo
+                modules={[Navigation, Pagination, Autoplay]}
+                spaceBetween={1}
+                slidesPerView={3}
+                loop={true}
                 navigation
                 pagination={{ clickable: true }}
-                breakpoints={{
-                    1024: {
-                        slidesPerView: 5, // Para pantallas grandes
-                    }
+                autoplay={{
+                    delay: 3000, // tiempo en milisegundos antes de cambiar de slide
+                    disableOnInteraction: false // sigue rotando incluso si el usuario interactúa
                 }}
             >
                 {entries.map((entry) => (

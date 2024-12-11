@@ -1,29 +1,23 @@
-// DraggableEntry.js
-
 import React, { useState, useRef, useEffect } from 'react';
 import './DraggableEntry.css';
 import FloatingMenuEntry from '../../components/FloatinMenuEntry';
-import { updateEntryPositionInCollage, updateEntryProperties } from '../../firebase'; // Asegúrate de tener estas funciones
 
-const DraggableEntry = ({ entry, collageId, containerRef, bringToFront }) => {
-    // Proporcionar valores predeterminados si 'entry.size' es undefined
+const DraggableEntry = ({ entry, collageId, containerRef, bringToFront, disabled, onEntryPropertiesChange }) => {
     const [position, setPosition] = useState(entry.position || { x: 100, y: 100 });
-    const [cardWidth, setCardWidth] = useState(entry.size?.width || 300);
-    const [cardHeight, setCardHeight] = useState(entry.size?.height || 400);
-    const [backgroundColor, setBackgroundColor] = useState(entry.backgroundColor || '#ffffff');
-    const [zIndex, setZIndex] = useState(entry.zIndex || 1); // Inicializar con zIndex de Firestore si está disponible
+    const [cardWidth, setCardWidthState] = useState(entry.size?.width || 300);
+    const [cardHeight, setCardHeightState] = useState(entry.size?.height || 400);
+    const [backgroundColor, setBackgroundColorState] = useState(entry.backgroundColor || '#ffffff');
+    const [zIndex, setZIndex] = useState(entry.zIndex || 1);
 
     const [showMenu, setShowMenu] = useState(false);
     const entryRef = useRef(null);
-    const menuRef = useRef(null); // Referencia para el menú
-    const isDragging = useRef(false); // Ref para rastrear el estado de arrastre
+    const isDragging = useRef(false);
 
-    // Manejar el inicio del arrastre
     const handleDragStart = (e) => {
+        if (disabled) return;
         e.preventDefault();
         isDragging.current = true;
 
-        // Obtener el nuevo zIndex desde el componente padre
         const newZIndex = bringToFront();
         setZIndex(newZIndex);
 
@@ -41,24 +35,18 @@ const DraggableEntry = ({ entry, collageId, containerRef, bringToFront }) => {
             let newX = initialX + deltaX;
             let newY = initialY + deltaY;
 
-            // Obtener dimensiones del contenedor y de la entrada
             const containerRect = containerRef.current.getBoundingClientRect();
             const entryRect = entryRef.current.getBoundingClientRect();
 
-            // Calcular los límites
             const minX = 0;
             const minY = 0;
             const maxX = containerRect.width - entryRect.width;
             const maxY = containerRect.height - entryRect.height;
 
-            // Restringir la posición dentro de los límites
             newX = Math.max(minX, Math.min(newX, maxX));
             newY = Math.max(minY, Math.min(newY, maxY));
 
-            setPosition({
-                x: newX,
-                y: newY,
-            });
+            setPosition({ x: newX, y: newY });
         };
 
         const handleMouseUp = () => {
@@ -66,38 +54,34 @@ const DraggableEntry = ({ entry, collageId, containerRef, bringToFront }) => {
             document.removeEventListener('mousemove', handleMouseMove);
             document.removeEventListener('mouseup', handleMouseUp);
 
-            // Guardar la nueva posición y zIndex en Firestore solo si collageId está presente
-            if (collageId) {
-                updateEntryPositionInCollage(collageId, entry.entryId, { position, zIndex })
-                    .catch(error => {
-                        console.error("Error guardando la posición y zIndex:", error);
-                    });
-            }
+            // Notificar cambios al padre
+            onEntryPropertiesChange(entry.entryId, {
+                position: { x: position.x, y: position.y },
+                zIndex
+            });
         };
 
         document.addEventListener('mousemove', handleMouseMove);
         document.addEventListener('mouseup', handleMouseUp);
     };
 
-    // Alternar la visibilidad del menú
     const toggleMenu = (e) => {
-        e.stopPropagation(); // Evita que el evento de clic inicie el arrastre
+        if (disabled) return;
+        e.stopPropagation();
         setShowMenu(!showMenu);
     };
 
-    // Cerrar el menú si se hace clic fuera
-    const handleClickOutside = (e) => {
-        if (
-            entryRef.current &&
-            !entryRef.current.contains(e.target) &&
-            menuRef.current &&
-            !menuRef.current.contains(e.target)
-        ) {
-            setShowMenu(false);
-        }
-    };
-
     useEffect(() => {
+        const handleClickOutside = (e) => {
+            if (
+                entryRef.current &&
+                !entryRef.current.contains(e.target) &&
+                !e.target.closest('.floating-menu-entry')
+            ) {
+                setShowMenu(false);
+            }
+        };
+
         if (showMenu) {
             document.addEventListener('mousedown', handleClickOutside);
         } else {
@@ -108,6 +92,21 @@ const DraggableEntry = ({ entry, collageId, containerRef, bringToFront }) => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
     }, [showMenu]);
+
+    const setCardWidth = (newWidth) => {
+        setCardWidthState(newWidth);
+        onEntryPropertiesChange(entry.entryId, { size: { width: newWidth, height: cardHeight } });
+    };
+
+    const setCardHeight = (newHeight) => {
+        setCardHeightState(newHeight);
+        onEntryPropertiesChange(entry.entryId, { size: { width: cardWidth, height: newHeight } });
+    };
+
+    const setBackgroundColor = (newColor) => {
+        setBackgroundColorState(newColor);
+        onEntryPropertiesChange(entry.entryId, { backgroundColor: newColor });
+    };
 
     return (
         <>
@@ -121,7 +120,8 @@ const DraggableEntry = ({ entry, collageId, containerRef, bringToFront }) => {
                     width: `${cardWidth}px`,
                     height: `${cardHeight}px`,
                     backgroundColor: backgroundColor,
-                    position: 'absolute', 
+                    position: 'absolute',
+                    cursor: disabled ? 'default' : 'move'
                 }}
                 onMouseDown={handleDragStart}
                 onClick={toggleMenu}
@@ -164,37 +164,18 @@ const DraggableEntry = ({ entry, collageId, containerRef, bringToFront }) => {
                     )}
                 </div>
             </div>
-            {showMenu && (
+            {!disabled && showMenu && (
                 <FloatingMenuEntry
-                    ref={menuRef} // Pasamos la referencia al menú
-                    collageId={collageId} // Pasar collageId
-                    entryId={entry.entryId} // Pasar entryId
-
+                    className="floating-menu-entry"
+                    collageId={collageId}
+                    entryId={entry.entryId}
                     onClose={() => setShowMenu(false)}
                     cardWidth={cardWidth}
-                    setCardWidth={(newWidth) => {
-                        setCardWidth(newWidth);
-                        // Actualizar Firestore con el nuevo ancho
-                        updateEntryProperties(collageId, entry.entryId, { size: { width: newWidth, height: cardHeight } }).catch(error => {
-                            console.error("Error actualizando el ancho:", error);
-                        });
-                    }}
+                    setCardWidth={setCardWidth}
                     cardHeight={cardHeight}
-                    setCardHeight={(newHeight) => {
-                        setCardHeight(newHeight);
-                        // Actualizar Firestore con el nuevo alto
-                        updateEntryProperties(collageId, entry.entryId, { size: { width: cardWidth, height: newHeight } }).catch(error => {
-                            console.error("Error actualizando el alto:", error);
-                        });
-                    }}
+                    setCardHeight={setCardHeight}
                     backgroundColor={backgroundColor}
-                    setBackgroundColor={(newColor) => {
-                        setBackgroundColor(newColor);
-                        // Actualizar Firestore con el nuevo color de fondo
-                        updateEntryProperties(collageId, entry.entryId, { backgroundColor: newColor }).catch(error => {
-                            console.error("Error actualizando el color de fondo:", error);
-                        });
-                    }}
+                    setBackgroundColor={setBackgroundColor}
                 />
             )}
         </>

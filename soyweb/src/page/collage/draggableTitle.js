@@ -1,27 +1,23 @@
-// DraggableTitle.js
-
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import './DraggableTitle.css';
 import FloatingMenu from '../../components/FloatingMenu';
-import { updateCollageTitleProperties } from '../../firebase'; // Asegúrate de tener esta función
 
-const DraggableTitle = ({ title, setTitle, containerRef, collageId = null, titleData = {}, bringToFront }) => {
+const DraggableTitle = ({ title, setTitle, containerRef, collageId, titleData = {}, bringToFront, disabled, onTitlePropertiesChange }) => {
     const [position, setPosition] = useState(titleData.position || { x: 50, y: 20 });
-    const [fontSize, setFontSize] = useState(titleData.fontSize || 24);
-    const [fontFamily, setFontFamily] = useState(titleData.fontFamily || 'Arial');
-    const [color, setColor] = useState(titleData.color || '#000000');
+    const [fontSize, setFontSizeState] = useState(titleData.fontSize || 24);
+    const [fontFamily, setFontFamilyState] = useState(titleData.fontFamily || 'Arial');
+    const [color, setColorState] = useState(titleData.color || '#000000');
     const [zIndex, setZIndex] = useState(titleData.zIndex || 1);
 
     const [showMenu, setShowMenu] = useState(false);
     const titleRef = useRef(null);
-    const isDragging = useRef(false); // Ref para rastrear el estado de arrastre
+    const isDragging = useRef(false);
 
-    // Manejar el inicio del arrastre
     const handleDragStart = (e) => {
+        if (disabled) return;
         e.preventDefault();
         isDragging.current = true;
 
-        // Actualizar el z-index al iniciar el arrastre
         const newZIndex = bringToFront();
         setZIndex(newZIndex);
 
@@ -39,24 +35,18 @@ const DraggableTitle = ({ title, setTitle, containerRef, collageId = null, title
             let newX = initialX + deltaX;
             let newY = initialY + deltaY;
 
-            // Obtener dimensiones del contenedor y del título
             const containerRect = containerRef.current.getBoundingClientRect();
             const titleRect = titleRef.current.getBoundingClientRect();
 
-            // Calcular los límites
             const minX = 0;
             const minY = 0;
             const maxX = containerRect.width - titleRect.width;
             const maxY = containerRect.height - titleRect.height;
 
-            // Restringir la posición dentro de los límites
             newX = Math.max(minX, Math.min(newX, maxX));
             newY = Math.max(minY, Math.min(newY, maxY));
 
-            setPosition({
-                x: newX,
-                y: newY,
-            });
+            setPosition({ x: newX, y: newY });
         };
 
         const handleMouseUp = () => {
@@ -64,32 +54,37 @@ const DraggableTitle = ({ title, setTitle, containerRef, collageId = null, title
             document.removeEventListener('mousemove', handleMouseMove);
             document.removeEventListener('mouseup', handleMouseUp);
 
-            // Guardar la nueva posición y zIndex en Firestore solo si collageId está presente
-            if (collageId) {
-                updateCollageTitleProperties(collageId, {
-                    titlePosition: position,
-                    titleZIndex: zIndex
-                })
-                    .catch(error => {
-                        console.error("Error guardando la posición del título:", error);
-                    });
-            }
+            // Notificar cambios al padre
+            onTitlePropertiesChange({
+                position: { x: position.x, y: position.y },
+                zIndex
+            });
         };
 
         document.addEventListener('mousemove', handleMouseMove);
         document.addEventListener('mouseup', handleMouseUp);
     };
 
-    // Alternar la visibilidad del menú
     const handleTitleClick = (e) => {
-        if (isDragging.current) return; // Evita que el clic abra el menú si se está arrastrando
-        e.stopPropagation(); // Evita que el clic inicie el arrastre
+        if (disabled) return;
+        if (isDragging.current) return;
+        e.stopPropagation();
         setShowMenu(true);
     };
 
-    // Cerrar el menú
-    const handleCloseMenu = () => {
-        setShowMenu(false);
+    const setFontSize = (newSize) => {
+        setFontSizeState(newSize);
+        onTitlePropertiesChange({ fontSize: newSize });
+    };
+
+    const setFontFamily = (newFamily) => {
+        setFontFamilyState(newFamily);
+        onTitlePropertiesChange({ fontFamily: newFamily });
+    };
+
+    const setColor = (newColor) => {
+        setColorState(newColor);
+        onTitlePropertiesChange({ color: newColor });
     };
 
     return (
@@ -97,49 +92,31 @@ const DraggableTitle = ({ title, setTitle, containerRef, collageId = null, title
             <div
                 ref={titleRef}
                 className="draggable-title"
-                style={{ left: position.x, top: position.y, zIndex: zIndex, position: 'absolute', cursor: 'move' }}
+                style={{
+                    left: position.x,
+                    top: position.y,
+                    zIndex: zIndex,
+                    position: 'absolute',
+                    cursor: disabled ? 'default' : 'move'
+                }}
                 onMouseDown={handleDragStart}
                 onClick={handleTitleClick}
             >
-                <h1 style={{ fontSize: `${fontSize}px`, fontFamily: fontFamily, color: color }}>
+                <h1 style={{ fontSize: `${fontSize}px`, fontFamily, color }}>
                     {title}
                 </h1>
             </div>
-            {showMenu && (
+            {!disabled && showMenu && (
                 <FloatingMenu
-                    collageId={collageId} // Pasar collageId para actualizar Firestore
+                    collageId={collageId}
                     position={{ x: position.x + 100, y: position.y }}
-                    onClose={handleCloseMenu}
+                    onClose={() => setShowMenu(false)}
                     fontSize={fontSize}
-                    setFontSize={(newSize) => {
-                        setFontSize(newSize);
-                        if (collageId) {
-                            updateCollageTitleProperties(collageId, { titleFontSize: newSize })
-                                .catch(error => {
-                                    console.error("Error actualizando el tamaño de fuente:", error);
-                                });
-                        }
-                    }}
+                    setFontSize={setFontSize}
                     fontFamily={fontFamily}
-                    setFontFamily={(newFamily) => {
-                        setFontFamily(newFamily);
-                        if (collageId) {
-                            updateCollageTitleProperties(collageId, { titleFontFamily: newFamily })
-                                .catch(error => {
-                                    console.error("Error actualizando la familia de fuente:", error);
-                                });
-                        }
-                    }}
+                    setFontFamily={setFontFamily}
                     color={color}
-                    setColor={(newColor) => {
-                        setColor(newColor);
-                        if (collageId) {
-                            updateCollageTitleProperties(collageId, { titleColor: newColor })
-                                .catch(error => {
-                                    console.error("Error actualizando el color:", error);
-                                });
-                        }
-                    }}
+                    setColor={setColor}
                 />
             )}
         </>

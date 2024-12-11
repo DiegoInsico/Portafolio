@@ -1,37 +1,49 @@
-// CreateCollage.js
-
+import { doc, updateDoc } from 'firebase/firestore';
+import { db, storage } from '../../firebase';
+import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 import React, { useState } from 'react';
 import Carousel from '../entry/entry';
 import { useAuth } from '../../page/auth/authContext';
-import Collage from './collage'; // Asegúrate de que la ruta sea correcta
+import Collage from './collageCreator';
+import EditableTitle from './editableTitle';
 import './CreateCollage.css';
 import { useNavigate } from 'react-router-dom';
-import EditableTitle from './editableTitle'; // Ya está creado
 
-const CreateCollage = ({ onAddCollage, setIsCreatingCollage }) => {
+const CreateCollage = ({ setIsCreatingCollage, collageId }) => {
     const { currentUser } = useAuth();
     const [collageName, setCollageName] = useState('');
     const [selectedEntries, setSelectedEntries] = useState([]);
-    const [thumbnail, setThumbnail] = useState(null); // Almacena el archivo de imagen
-    const [isPreview, setIsPreview] = useState(true); // Estado para controlar la vista previa
-    const navigate = useNavigate();
+    const [thumbnail, setThumbnail] = useState(null);
 
-    // Declaraciones de consola mejoradas para diagnóstico
-    console.log('Nombre del Collage:', collageName);
-    console.log('Entradas Seleccionadas:', selectedEntries);
+    // Estados locales para guardar el estado final del título y entradas
+    const [finalEntries, setFinalEntries] = useState([]);
+    const [finalTitleData, setFinalTitleData] = useState({
+        position: { x: 50, y: 20 },
+        fontSize: 24,
+        fontFamily: 'Arial',
+        color: '#000000',
+        zIndex: 1
+    });
+
+    const navigate = useNavigate();
 
     const handleEntrySelect = (entry, isSelected) => {
         if (isSelected) {
-            setSelectedEntries([...selectedEntries, entry.id]);
+            setSelectedEntries(prev => [...prev, {
+                entryId: entry.id,
+                position: { x: 100, y: 100 },
+                size: { width: 300, height: 400 },
+                backgroundColor: '#ffffff'
+            }]);
         } else {
-            setSelectedEntries(selectedEntries.filter(id => id !== entry.id));
+            setSelectedEntries(prev => prev.filter(e => e.entryId !== entry.id));
         }
     };
 
     const handleThumbnailChange = (e) => {
         if (e.target.files && e.target.files[0]) {
             const file = e.target.files[0];
-            setThumbnail(file); // Almacena el archivo directamente
+            setThumbnail(file);
         }
     };
 
@@ -39,14 +51,28 @@ const CreateCollage = ({ onAddCollage, setIsCreatingCollage }) => {
         setThumbnail(null);
     };
 
-    const handleCreateCollage = async () => {
-        console.log('Iniciando la creación del collage...');
-        console.log('Nombre del Collage:', collageName);
-        console.log('Entradas Seleccionadas:', selectedEntries);
-        console.log('Thumbnail:', thumbnail);
+    const updateCollageDoc = async (collageId, collageName, entries, thumbnail, titleData) => {
+        // Subimos la miniatura al Storage
+        const uniqueThumbnailName = `thumbnails/${collageId}-${thumbnail.name}`;
+        const thumbnailRef = ref(storage, uniqueThumbnailName);
+        await uploadBytes(thumbnailRef, thumbnail);
+        const thumbnailURL = await getDownloadURL(thumbnailRef);
 
+        // Actualizar el documento con nombre, thumbnail, entries y titleData finales
+        const collageRef = doc(db, 'collages', collageId);
+        await updateDoc(collageRef, {
+            name: collageName,
+            thumbnail: thumbnailURL,
+            thumbnailPath: uniqueThumbnailName,
+            entries: entries,
+            titleData: titleData
+        });
+
+        return collageId;
+    };
+
+    const handleCreateCollage = async () => {
         if (!currentUser) {
-            console.error('No hay un usuario autenticado');
             alert('Debes estar autenticado para crear un collage.');
             return;
         }
@@ -61,33 +87,21 @@ const CreateCollage = ({ onAddCollage, setIsCreatingCollage }) => {
             return;
         }
 
-        try {
-            // Llama a onAddCollage pasando los parámetros correctos
-            const newCollageId = await onAddCollage(collageName, selectedEntries, thumbnail);
-            console.log('Collage creado con ID:', newCollageId);
-            setIsCreatingCollage(false); // Cerrar el formulario de creación
+        if (!collageId) {
+            alert('No se ha podido crear el borrador del collage. Inténtalo de nuevo.');
+            return;
+        }
 
-            // Navegar a la página del nuevo collage
-            navigate(`/collage/${newCollageId}`);
+        try {
+            // finalEntries y finalTitleData ya contienen el diseño actualizado desde Collage
+            const updatedId = await updateCollageDoc(collageId, collageName, finalEntries, thumbnail, finalTitleData);
+            console.log('Collage finalizado con ID:', updatedId);
+            setIsCreatingCollage(false);
+            navigate(`/collage/${updatedId}`);
         } catch (error) {
             console.error('Error creando el collage', error);
             alert('Hubo un error al crear el collage. Por favor, inténtalo de nuevo.');
         }
-    };
-
-    const handleSaveCollage = () => {
-        // Implementa la lógica para guardar los cambios realizados en el collage
-        // Por ejemplo, actualizar propiedades en Firestore
-        alert('Cambios guardados exitosamente.');
-    };
-
-    // Definir titleData con valores predeterminados para la vista previa
-    const defaultTitleData = {
-        position: { x: 50, y: 20 },
-        fontSize: 24,
-        fontFamily: 'Arial',
-        color: '#000000',
-        zIndex: 1
     };
 
     return (
@@ -96,7 +110,7 @@ const CreateCollage = ({ onAddCollage, setIsCreatingCollage }) => {
                 <Carousel
                     currentUser={currentUser}
                     onEntrySelect={handleEntrySelect}
-                    selectedEntries={selectedEntries}
+                    selectedEntries={selectedEntries.map(e => e.entryId)}
                 />
             </div>
             <div className="create-collage">
@@ -127,29 +141,28 @@ const CreateCollage = ({ onAddCollage, setIsCreatingCollage }) => {
                             )}
                         </label>
                     </div>
-                    {/* Título Editable */}
                     <EditableTitle title={collageName} setTitle={setCollageName} />
                 </div>
 
                 <div className='collage-content'>
-                    {/* Vista Previa del Collage */}
-                    <Collage
-                        currentUser={currentUser}
-                        collageName={collageName} // Añadido
-                        setCollageName={setCollageName}
-                        selectedEntries={selectedEntries}
-                        collageId={null} // Pasar null para vista previa
-                        titleData={defaultTitleData} // Pasar titleData predeterminado en preview
-                        isPreview={isPreview} // Indica si es una vista previa
-                    />
+                    {collageId && (
+                        <Collage
+                            currentUser={currentUser}
+                            collageName={collageName}
+                            setCollageName={setCollageName}
+                            selectedEntries={selectedEntries}
+                            collageId={collageId}
+                            titleData={finalTitleData}
+                            onTitleDataChange={setFinalTitleData}
+                            onEntriesChange={setFinalEntries}
+                            isPreview={false}
+                            ownerId={currentUser ? currentUser.uid : null}
+                        />
+                    )}
                 </div>
             </div>
             <div className="button-container">
-                {isPreview ? (
-                    <button onClick={handleCreateCollage}>Crear Collage</button>
-                ) : (
-                    <button onClick={handleSaveCollage}>Guardar Cambios</button>
-                )}
+                <button onClick={handleCreateCollage}>Crear Pensadero</button>
             </div>
         </div>
     );

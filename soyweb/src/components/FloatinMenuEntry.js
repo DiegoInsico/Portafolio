@@ -1,14 +1,11 @@
-// FloatingMenuEntry.js
-
 import React, { useState, useEffect } from 'react';
 import Draggable from 'react-draggable';
 import './FloatingMenuEntry.css';
-import { updateEntryProperties } from '../firebase';
 
 const FloatingMenuEntry = React.forwardRef(({
     collageId,
     entryId,
-    position,        // Posición { x, y } de la tarjeta
+    position,
     onClose,
     cardWidth,
     setCardWidth,
@@ -18,18 +15,15 @@ const FloatingMenuEntry = React.forwardRef(({
     setBackgroundColor
 }, ref) => {
 
-    // Dimensiones fijas del menú (ajusta según tu CSS)
     const menuWidth = 300;
     const menuHeight = 310;
 
     const [currentPosition, setCurrentPosition] = useState({ x: 0, y: 0 });
 
-    // Cada vez que el componente se monta (al abrir el menú),
-    // calculamos la posición para colocar el menú sobre la tarjeta.
     useEffect(() => {
         if (position) {
             const centerX = position.x + (cardWidth / 2) - (menuWidth / 2);
-            const topY = position.y - menuHeight - 10; // 10px de margen encima de la tarjeta
+            const topY = position.y - menuHeight - 10;
             setCurrentPosition({ x: centerX, y: topY });
         }
     }, [position, cardWidth, cardHeight]);
@@ -38,38 +32,23 @@ const FloatingMenuEntry = React.forwardRef(({
         setCurrentPosition({ x: data.x, y: data.y });
     };
 
-    const handleWidthChange = async (e) => {
+    const handleWidthChange = (e) => {
         const newWidth = parseInt(e.target.value, 10);
         setCardWidth(newWidth);
-        try {
-            await updateEntryProperties(collageId, entryId, { size: { width: newWidth, height: cardHeight } });
-        } catch (error) {
-            console.error("Error actualizando el ancho:", error);
-        }
     };
 
-    const handleHeightChange = async (e) => {
+    const handleHeightChange = (e) => {
         const newHeight = parseInt(e.target.value, 10);
         setCardHeight(newHeight);
-        try {
-            await updateEntryProperties(collageId, entryId, { size: { width: cardWidth, height: newHeight } });
-        } catch (error) {
-            console.error("Error actualizando el alto:", error);
-        }
     };
 
-    const handleBackgroundColorChange = async (e) => {
+    const handleBackgroundColorChange = (e) => {
         const newColor = e.target.value;
         setBackgroundColor(newColor);
-        try {
-            await updateEntryProperties(collageId, entryId, { backgroundColor: newColor });
-        } catch (error) {
-            console.error("Error actualizando el color de fondo:", error);
-        }
     };
 
     return (
-        <div className="floating-menu-overlay" onClick={onClose}>
+        <div className="floating-menu-entry" onClick={onClose}>
             <Draggable
                 handle=".menu-header"
                 cancel="input, textarea, select, option, button"
