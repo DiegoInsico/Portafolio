@@ -1,0 +1,19 @@
+/* DraggableTitle.css */
+
+.draggable-title {
+    position: absolute;
+    cursor: grab;
+    user-select: none;
+    transition: all 0.3s ease;
+    padding: 5px;
+    /* Fondo semitransparente */
+    border-radius: 4px;
+    /* Bordes redondeados */
+}
+
+.draggable-title h1 {
+    margin: 0;
+    padding: 0;
+    cursor: pointer;
+    /* Cursor para indicar que es interactivo */
+}

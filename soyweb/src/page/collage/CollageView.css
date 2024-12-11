@@ -1,0 +1,34 @@
+/* CollageView.css */
+
+.collage-view-page {
+    padding: 20px;
+    position: relative;
+}
+
+.collage-view-page h2 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.collage-thumbnail {
+    display: block;
+    margin: 0 auto 20px;
+    max-width: 300px;
+    height: auto;
+}
+
+.collage-display {
+    position: relative;
+    width: 800px;
+    /* Ajusta según sea necesario */
+    height: 600px;
+    /* Ajusta según sea necesario */
+    border: 1px solid #ccc;
+    margin: 0 auto;
+    background-color: #f9f9f9;
+}
+
+.collage-entry {
+    position: absolute;
+    /* Puedes agregar más estilos si es necesario */
+}

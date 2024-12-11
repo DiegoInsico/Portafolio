@@ -1,0 +1,27 @@
+/* MiniNav.css */
+
+/* Estilos para la mini navegación */
+.mini-nav {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    width: 80%;
+    height: 60px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.mini-nav button {
+    background-color: #4B0082;
+    color: white;
+    border: none;
+    height: 50px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
+
+.mini-nav button:hover {
+    background-color: #9b59b6;
+}

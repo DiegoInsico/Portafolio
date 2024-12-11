@@ -1,0 +1,38 @@
+/* CollagePage.css */
+
+/* Contenedor principal de la página */
+.collage-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    height: 100vh;
+}
+.mini-nav{
+    height: 5vh;
+}
+
+.render-content{
+    height: 90vh;
+}
+
+.collage-container {
+    width: 100%;
+    max-width: 1200px;
+    margin-top: 20px;
+}
+
+/* Botones dentro de la página (Ejemplo: Crear Collage) */
+.btn-custom {
+    background-color: #bb86fc;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+.btn-custom:hover {
+    background-color: #9b59b6;
+}
