@@ -1,4 +1,4 @@
-/* .graphics-container {
+.graphics-container {
   display: grid;
   grid-template-columns: repeat(3, 1fr); 
   gap: 20px;
@@ -6,7 +6,7 @@
 }
 
 .chart-item {
-  background-color: #f9f9f9;
+  background-color: #1a1b5a;
   border: 1px solid #ddd; 
   border-radius: 8px; 
   padding: 20px; 
@@ -88,4 +88,4 @@
 .ticket-details-button:hover {
   background-color: #45a049;
 }
- */
+

@@ -1,4 +1,4 @@
-.graphics-container {
+.graph-container {
   display: grid;
   grid-template-areas:
     "top-left top-right"
@@ -7,7 +7,7 @@
   grid-template-rows: 1fr 1fr;   /* Dos filas iguales */
   gap: 20px;
   padding: 20px;
-  background-color: #292929;
+  background-color: #181931;
   box-sizing: border-box;
   margin-top: 70px; /* Posiciona debajo del TopBar */
   height: calc(100vh - 70px); /* Usa todo el espacio disponible */
@@ -63,7 +63,7 @@
 .bottom-left,
 .bottom-right{
   overflow-y: auto;
-  background-color: rgb(48, 48, 48);
+  background-color: #16162b;
 }
 
 /* Ajustes responsivos */

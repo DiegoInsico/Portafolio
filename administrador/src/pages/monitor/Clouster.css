@@ -7,11 +7,11 @@
     grid-template-columns: 1fr 2fr;
     /* Columna izquierda más pequeña */
     grid-template-rows: auto auto;
-    /* Filas dinámicas */
     gap: 15px;
     width: 100%;
     height: calc(100vh - 70px);
-    /* Excluye el TopBar */
+    background-color: #1a1b3a;
+
     padding: 20px;
     box-sizing: border-box;
     margin-top: 60px;
@@ -23,7 +23,7 @@
 /* Sección de Estadísticas (Gráfico y Descripción) */
 .clouster-stats {
     grid-area: stats;
-    background-color: #333;
+    background-color: #1a1b5a;
     /* padding: 20px; */
     border-radius: 10px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
@@ -75,7 +75,7 @@
 /* Logs de Auditoría */
 .clouster-logs {
     grid-area: logs;
-    background-color: #333;
+    background-color: #1a1b5a;
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
@@ -95,7 +95,8 @@
 }
 
 .clouster-logs-table th {
-    background-color: #444;
+    background-color: #16163a;
+
     color: #bb86fc;
     font-weight: bold;
 }
@@ -107,11 +108,15 @@
 /* Alertas Operativas */
 .clouster-alerts {
     grid-area: alerts;
-    background-color: #333;
+    background-color: #1a1b5a;
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
     overflow-y: auto;
+}
+
+.clouster-alert strong, p{
+    color: white;
 }
 
 /* Lista de Alertas */
@@ -122,7 +127,7 @@
 }
 
 .clouster-alert {
-    background-color: #444;
+    background-color: #16163a;
     padding: 15px;
     border-radius: 8px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
@@ -139,11 +144,22 @@
 /* Formulario para Crear Anuncios */
 .clouster-announcement {
     grid-area: announcement;
-    background-color: #333;
+    background-color: #1a1b5a;
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
 }
+
+.clouster-announcement input, label{
+    background-color: #1a1a3b;
+    border-color: wheat;
+}
+
+.clouster-announcement textarea{
+    background-color: #292b91;
+    border-color: wheat;
+}
+
 
 form {
     display: flex;

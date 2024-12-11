@@ -3,7 +3,7 @@
   top: 0;
   left: 0;
   width: 100%;
-  background-color: #1c293a;
+  background-color: #1a1b5a;
   color: #fff;
   z-index: 10;
   display: grid;
@@ -21,7 +21,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  color: palevioletred;
+  color: rgb(235, 230, 225);
 }
 
 .topbar-nav {
@@ -50,7 +50,7 @@
 }
 
 .button-secondary {
-  background-color: #6e6e6e;
+  background-color: #d4570f;
   color: white;
   padding: 8px 12px;
   font-size: 14px; 

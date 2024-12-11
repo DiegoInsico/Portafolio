@@ -5,8 +5,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 import Home from './page/home/home';
 import Prueba from './page/prueba';
-import CollagePage from './page/collage/collagePage';
-import CollageView from './page/collage/collageView';
+import AlbumPage from './page/album/pageAlbum';
 import DocumentManager from './page/organizes/pageOrganize';
 import LoginPage from './page/auth/login';
 import RegisterPage from './page/auth/register';
@@ -54,21 +53,11 @@ function App() {
             }
           />
           <Route
-            path="/collage"
+            path="/album"
             element={
               <ProtectedRoute>
                 <ProtectedLayout>
-                  <CollagePage />
-                </ProtectedLayout>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/collage/:id"
-            element={
-              <ProtectedRoute>
-                <ProtectedLayout>
-                  <CollageView />
+                  <AlbumPage />
                 </ProtectedLayout>
               </ProtectedRoute>
             }

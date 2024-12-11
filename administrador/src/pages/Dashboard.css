@@ -7,6 +7,8 @@
   grid-template-rows: 45% 55%; /* Fila automática */
   gap: 15px; 
   width: 100%;
+  background-color: #1b1b33;
+
   height: calc(100vh - 70px); /* Ajuste dinámico excluyendo el TopBar */
   padding: 10px; /* Espaciado interno */
   box-sizing: border-box;
@@ -20,7 +22,7 @@
 .map-section,
 .charts-section {
   border-radius: 8px;
-  background-color: #212121; /* Color oscuro */
+  background-color: #1a1b5a;
   overflow-y: auto; /* Solo overflow vertical */
   padding: 10px;
   box-sizing: border-box;

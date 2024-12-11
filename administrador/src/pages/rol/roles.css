@@ -1,21 +1,27 @@
 .rol-management-container {
-  max-width: 80%;
-  margin: 60px auto;
+  height: 100vh; /* Altura del viewport */
+  width: 100vw; /* Ancho del viewport */
+  margin: 0;
+  margin-top: 60px;
   padding: 30px;
-  background-color: #1c1c1c;
+  background-color: #1a1b5a;
   border-radius: 10px;
   color: white;
   box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.3);
   text-align: center;
+  overflow: hidden; /* Quita el scroll */
 }
 
+
+/* Título principal */
 .rol-management-title {
   font-size: 28px;
   font-weight: bold;
-  color: #bb86fc;
+  color: #bb86fc; /* Color púrpura claro */
   margin-bottom: 20px;
 }
 
+/* Botón de creación */
 .rol-management-actions {
   margin-bottom: 20px;
 }
@@ -34,14 +40,16 @@
   background-color: #388e3c;
 }
 
+/* Tabla de roles */
 .rol-management-table {
   margin-top: 30px;
 }
 
 .rol-management-table table {
-  width: 100%;
+  width: 90%;
+  margin: 0 auto; /* Centrado horizontal */
   border-collapse: collapse;
-  background-color: #2b2b2b;
+  background-color: #2b2b2b; /* Fondo de tabla */
   border-radius: 8px;
   overflow: hidden;
 }
@@ -55,16 +63,17 @@
 
 .rol-management-table th {
   background-color: #333;
-  color: #bb86fc;
+  color: #bb86fc; /* Color púrpura claro para encabezados */
 }
 
 .rol-management-table td {
   color: white;
 }
 
+/* Botones de acción */
 .edit-button {
-  background-color: #fdd835;
-  color: #212121;
+  background-color: #fdd835; /* Amarillo */
+  color: #212121; /* Texto oscuro */
   padding: 5px 10px;
   border-radius: 5px;
   cursor: pointer;
@@ -76,7 +85,7 @@
 }
 
 .delete-button {
-  background-color: #f44336;
+  background-color: #f44336; /* Rojo */
   color: white;
   padding: 5px 10px;
   border-radius: 5px;
@@ -89,7 +98,7 @@
 }
 
 .authenticate-button {
-  background-color: #2196f3;
+  background-color: #2196f3; /* Azul */
   color: white;
   padding: 5px 10px;
   border-radius: 5px;
@@ -101,17 +110,18 @@
   background-color: #1976d2;
 }
 
+/* Estados de autenticación */
 .authenticated {
-  color: #4caf50;
+  color: #4caf50; /* Verde */
   font-weight: bold;
 }
 
 .not-authenticated {
-  color: #f44336;
+  color: #f44336; /* Rojo */
   font-weight: bold;
 }
 
-/* Centrado del modal */
+/* Modal de formulario */
 .form-modal-overlay {
   position: fixed;
   top: 0;
@@ -125,7 +135,6 @@
   z-index: 9999;
 }
 
-/* Contenedor del formulario */
 .form-modal-container {
   width: 100%;
   max-width: 500px;
@@ -136,7 +145,6 @@
   position: relative;
 }
 
-/* Estilo del botón de cierre */
 .form-close-button {
   position: absolute;
   top: 10px;
@@ -153,7 +161,6 @@
   color: #f44336;
 }
 
-/* Inputs del formulario */
 .form-modal-container input,
 .form-modal-container select {
   width: 90%;
@@ -170,14 +177,13 @@
   color: #aaa;
 }
 
-/* Botones del formulario */
-.form-modal-container .form-buttons {
+.form-buttons {
   display: flex;
   justify-content: space-between;
   margin-top: 20px;
 }
 
-.form-modal-container .form-save-button {
+.form-save-button {
   background-color: #4caf50;
   color: white;
   padding: 10px;
@@ -188,11 +194,11 @@
   transition: background-color 0.3s ease;
 }
 
-.form-modal-container .form-save-button:hover {
+.form-save-button:hover {
   background-color: #388e3c;
 }
 
-.form-modal-container .form-cancel-button {
+.form-cancel-button {
   background-color: #f44336;
   color: white;
   padding: 10px;
@@ -203,11 +209,10 @@
   transition: background-color 0.3s ease;
 }
 
-.form-modal-container .form-cancel-button:hover {
+.form-cancel-button:hover {
   background-color: #d32f2f;
 }
 
-/* Títulos */
 .form-modal-container h2 {
   color: white;
   text-align: center;

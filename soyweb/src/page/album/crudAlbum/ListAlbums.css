@@ -1,0 +1,36 @@
+/* src/album/ListAlbums.css */
+
+.list-albums-container {
+    padding: 16px;
+    background-color: #ffffff;
+    /* Añadido fondo blanco */
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.list-albums-container h2 {
+    margin-bottom: 16px;
+    font-size: 18px;
+    color: #333;
+    text-align: center;
+}
+
+/* ...resto de estilos... */
+
+/* src/album/SelectedAlbum.css */
+
+.selected-albums-container {
+    padding: 16px;
+    background-color: #ffffff;
+    /* Añadido fondo blanco */
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.selected-albums-container h2 {
+    margin-bottom: 16px;
+    font-size: 20px;
+    color: #333;
+}
+
+/* ...resto de estilos... */

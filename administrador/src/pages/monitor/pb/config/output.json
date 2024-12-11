@@ -1,0 +1,945 @@
+{
+    "beneficiarios": {
+        "NdEakaj6PFjjlg0bVZNC": {
+            "profileImage": null,
+            "email": "parraastete.diego11@gmail.com",
+            "phone": "",
+            "userId": "tkZE7vC1rwVBmAcwrj2pdeRdbgl1",
+            "name": "Parra"
+        },
+        "RvGWbrR8bJkpn068RW05": {
+            "profileImage": "file:///data/user/0/host.exp.exponent/cache/ExperienceData/%2540anonymous%252Ffrontend-757d86fb-d0d4-4d41-96c4-b2780a31e8fc/ImagePicker/b0d089ed-665c-4d7c-a8ac-1ae160b0f918.jpeg",
+            "email": "parraastete.diego11@gmail.com",
+            "phone": "",
+            "userId": "xumQokHmFaYXFKlaXfEsaAYUiOp2",
+            "name": "Diego Parra"
+        },
+        "n9HbxrQPJxTnbeyBsp1N": {
+            "profileImage": "file:///data/user/0/host.exp.exponent/cache/ExperienceData/%2540anonymous%252Ffrontend-757d86fb-d0d4-4d41-96c4-b2780a31e8fc/ImagePicker/888ade81-daa0-4649-8510-5c47fde1aa0b.jpeg",
+            "email": "miguel123@gmail.com",
+            "phone": "",
+            "userId": "xumQokHmFaYXFKlaXfEsaAYUiOp2",
+            "name": "Miguel Jara"
+        }
+    },
+    "certificados": {
+        "ke6NBGQlrgTeEk3l3Vdw": {
+            "fileName": "DEF_500594079273_9975623.pdf",
+            "userId": "OMP4tKWkILfFWY4WYaH9vD4jEIC2",
+            "testigoId": "ID_REAL_DEL_TESTIGO",
+            "createdAt": "2024-11-15T17:49:51.523000+00:00",
+            "fileUrl": "https://firebasestorage.googleapis.com/v0/b/soul2024-abe2f.appspot.com/o/certificados%2FOMP4tKWkILfFWY4WYaH9vD4jEIC2%2F1731692990828_DEF_500594079273_9975623.pdf?alt=media&token=fc7e231f-b052-498c-a576-d0b007fdee7b",
+            "status": "pending",
+            "filePath": "certificados/OMP4tKWkILfFWY4WYaH9vD4jEIC2/1731692990828_DEF_500594079273_9975623.pdf"
+        }
+    },
+    "documentos": {
+        "8mWYdhpZKA4XEu2BFy8N": {
+            "title": "Contraseña banco estado",
+            "texto": "Esta es mi contraseña para la cuenta de banco estado: 12345678",
+            "createdAt": "2024-11-22T02:43:34.230000+00:00",
+            "userId": "OMP4tKWkILfFWY4WYaH9vD4jEIC2",
+            "testigo": "Javier Caceres"
+        },
+        "DiGgrz1tXH487zdCDcIN": {
+            "texto": "Documento 6\n",
+            "createdAt": "2024-11-22T01:56:02.963000+00:00",
+            "title": "Prueba 6",
+            "userId": "OMP4tKWkILfFWY4WYaH9vD4jEIC2",
+            "testigo": "Javier Caceres"
+        },
+        "Qa3jHnHsF7EkmfTsACV1": {
+            "title": "Clave Bancaria",
+            "texto": "Yo confio en ti, por lo tanto te doy mi clave bancaria:\n\n2809280928092809",
+            "createdAt": "2024-11-27T19:04:01.994000+00:00",
+            "userId": "xumQokHmFaYXFKlaXfEsaAYUiOp2",
+            "testigo": "Javier Caceres"
+        },
+        "uSmJiN8Rz1dR9vUwYAZt": {
+            "title": "Cuenta banco estado",
+            "texto": "rut 20.888.020-9\ncontraseña 1234",
+            "createdAt": "2024-11-27T02:24:58.221000+00:00",
+            "userId": "tkZE7vC1rwVBmAcwrj2pdeRdbgl1",
+            "testigo": "Diego parra"
+        },
+        "vElwS8garmBSEa4qRAv6": {
+            "title": "Correo electronico",
+            "texto": "correo: javiercg.5656@gmail.com\ncontraseña:123456",
+            "createdAt": "2024-11-27T01:03:17.577000+00:00",
+            "userId": "tkZE7vC1rwVBmAcwrj2pdeRdbgl1",
+            "testigo": "Diego parra"
+        }
+    },
+    "entradas": {
+        "2cixhvwTwblYTQenJH3R": {
+            "nivel": "2",
+            "id": "2cixhvwTwblYTQenJH3R",
+            "baul": false,
+            "categoria": "Idea",
+            "media": null,
+            "color": "#99D099",
+            "emociones": [],
+            "isProtected": true,
+            "cancion": {
+                "albumImage": "https://i.scdn.co/image/ab67616d0000b2735a816f583172d45eb07ab8dc",
+                "artist": "Cris Mj",
+                "id": "50tfayMP8ZnSiV1sPM48qD",
+                "name": "Ponte Bonita"
+            },
+            "fechaRecuerdo": null,
+            "userId": "xumQokHmFaYXFKlaXfEsaAYUiOp2",
+            "fechaCreacion": "2024-11-26T22:04:34.038000+00:00",
+            "nickname": "Cancion para prueba 2",
+            "texto": null,
+            "mediaType": null,
+            "audio": null
+        },
+        "5g8YOMSaxAFy9RJ9sdnl": {
+            "nivel": "2",
+            "id": "5g8YOMSaxAFy9RJ9sdnl",
+            "baul": false,
+            "categoria": "Tristeza",
+            "media": null,
+            "color": "#8AA1B2",
+            "emociones": [
+                "miedo",
+                "incertidumbre"
+            ],
+            "isProtected": true,
+            "cancion": null,
+            "fechaRecuerdo": null,
+            "userId": "tkZE7vC1rwVBmAcwrj2pdeRdbgl1",
+            "fechaCreacion": "2024-11-27T02:17:55.956000+00:00",
+            "nickname": "Dias previos",
+            "texto": "Tengo algo de miedo de como me puede ir, la verdad no me siento preparado ni se como lo podre afrontar",
+            "mediaType": null,
+            "audio": null
+        },
+        "7uKDBMXgxV6ChcfbeSby": {
+            "nivel": "1",
+            "baul": true,
+            "categoria": "Tristeza",
+            "media": null,
+            "color": "#FF33A6",
+            "emociones": [
+                "alegri­a",
+                "miedo",
+                "entusiasmo",
+                "tristeza",
+                "ira"
+            ],
+            "isProtected": true,
+            "cancion": null,
+            "fechaRecuerdo": null,
+            "userId": "TUOXMnm7elhzhzFCv4YoIcVOxKr2",
+            "fechaCreacion": "2024-11-20T01:36:05.934000+00:00",
+            "nickname": "Un pensamiento al azar",
+            "texto": "He reflexionado sobre la importancia del tiempo.",
+            "mediaType": null,
+            "audio": null
+        },
+        "FFCS31E6KBxAVQqDit9U": {
+            "nivel": "3",
+            "baul": false,
+            "categoria": "Tristeza",
+            "media": null,
+            "color": "#FF33A6",
+            "emociones": [
+                "entusiasmo",
+                "ira",
+                "tristeza"
+            ],
+            "isProtected": false,
+            "cancion": null,
+            "fechaRecuerdo": null,
+            "userId": "TUOXMnm7elhzhzFCv4YoIcVOxKr2",
+            "fechaCreacion": "2024-11-22T01:40:19.414000+00:00",
+            "nickname": "Mi papa",
+            "mediaType": null,
+            "texto": "Recuerdo el dia que me pelie fuerte con mi viejo, la verdad me senti bastante traicionad",
+            "audio": null
+        },
+        "GhDsyO7gQxQBxA1MlcEg": {
+            "nivel": "2",
+            "baul": false,
+            "categoria": "Reflexion",
+            "media": null,
+            "color": "#3357FF",
+            "emociones": [
+                "incertidumbre"
+            ],
+            "isProtected": true,
+            "cancion": null,
+            "fechaRecuerdo": null,
+            "userId": "TUOXMnm7elhzhzFCv4YoIcVOxKr2",
+            "fechaCreacion": "2024-11-21T02:36:36.388000+00:00",
+            "nickname": "pensamientos intrusivos",
+            "mediaType": null,
+            "texto": "Siempre miro las lineas del metro con la mirada perdida perdida, no es que piense en lanzarme pero, quedo en blanco...",
+            "audio": null
+        },
+        "I7FHCyHPjUMBUzEAt9yC": {
+            "nivel": "2",
+            "id": "I7FHCyHPjUMBUzEAt9yC",
+            "baul": false,
+            "categoria": "Miedo",
+            "media": null,
+            "color": "#E6C19A",
+            "emociones": [
+                "Inseguridad",
+                "duda"
+            ],
+            "isProtected": true,
+            "cancion": null,
+            "fechaRecuerdo": null,
+            "userId": "tkZE7vC1rwVBmAcwrj2pdeRdbgl1",
+            "fechaCreacion": "2024-11-27T04:10:53.527000+00:00",
+            "nickname": "Dudas",
+            "texto": "Aveces tengo muchas dudas de lo que hago, o si lo hago bien, la verdad siento que no tengo mucho conocimiento a comparacion a los demas, lo que me hace sentir inseguro",
+            "mediaType": null,
+            "audio": null
+        },
+        "IpkVxhxigUGptzIkQWK0": {
+            "nivel": "1",
+            "baul": false,
+            "categoria": "Consejo",
+            "media": null,
+            "color": "#3357FF",
+            "emociones": [
+                "ira",
+                "alegria",
+                "miedo"
+            ],
+            "isProtected": true,
+            "cancion": null,
+            "fechaRecuerdo": null,
+            "userId": "TUOXMnm7elhzhzFCv4YoIcVOxKr2",
+            "fechaCreacion": "2024-11-25T00:39:44.739000+00:00",
+            "nickname": "Un pensamiento al azar",
+            "mediaType": null,
+            "texto": "cada dia que pasa en este proceso de portafolio siento que estoy enloqueciendo, de verdad",
+            "audio": null
+        },
+        "LVB32EXXYT1HleBqGd8c": {
+            "nivel": "1",
+            "id": "LVB32EXXYT1HleBqGd8c",
+            "baul": false,
+            "categoria": "Tristeza",
+            "media": null,
+            "color": "#8AA1B2",
+            "emociones": [],
+            "isProtected": false,
+            "cancion": {
+                "albumImage": "https://i.scdn.co/image/ab67616d0000b2738a577010b0baa62c836e330b",
+                "artist": "Twenty One Pilots",
+                "id": "3qrTll9OQ9wcejTxPFY0qg",
+                "name": "The Line (from the series Arcane League of Legends)"
+            },
+            "fechaRecuerdo": null,
+            "userId": "tkZE7vC1rwVBmAcwrj2pdeRdbgl1",
+            "fechaCreacion": "2024-11-27T04:09:36.141000+00:00",
+            "nickname": "Esta cancion me genera muchos sentimientos",
+            "texto": null,
+            "mediaType": null,
+            "audio": null
+        },
+        "PFisXaN9Mfk9zKi75EEA": {
+            "nivel": "1",
+            "id": "PFisXaN9Mfk9zKi75EEA",
+            "baul": false,
+            "categoria": "Tristeza",
+            "media": "https://firebasestorage.googleapis.com/v0/b/soul2024-abe2f.appspot.com/o/media%2F67407926-c982-4a60-9919-73ae3ecedc15_ea3312be-1cab-4475-ac49-70e42f4fd0c2.jpeg?alt=media&token=44d5845d-d57e-404a-9ff6-ece322497aa9",
+            "color": "#8AA1B2",
+            "emociones": [
+                "amor"
+            ],
+            "isProtected": false,
+            "cancion": null,
+            "fechaRecuerdo": null,
+            "userId": "xumQokHmFaYXFKlaXfEsaAYUiOp2",
+            "fechaCreacion": "2024-12-11T01:45:41.955000+00:00",
+            "nickname": "recuerdos ",
+            "texto": "lo queria demasiado",
+            "mediaType": "image",
+            "audio": null
+        },
+        "UzYclTlYYgm34aTEH5u3": {
+            "nivel": "2",
+            "id": "UzYclTlYYgm34aTEH5u3",
+            "baul": false,
+            "categoria": "Consejo",
+            "media": "https://firebasestorage.googleapis.com/v0/b/soul2024-abe2f.appspot.com/o/media%2Fe80935b9-ca84-4a8d-bd4e-2e058b849a21_de325ea5-3dda-4696-9f5d-673b02b221ca.mp4?alt=media&token=9e04f0f6-e11a-4f10-8dcc-8007b7fa0e32",
+            "color": "#E6C4A4",
+            "emociones": [
+                "sin emociones detectadas."
+            ],
+            "isProtected": true,
+            "cancion": null,
+            "fechaRecuerdo": null,
+            "userId": "xumQokHmFaYXFKlaXfEsaAYUiOp2",
+            "fechaCreacion": "2024-11-26T22:02:36.107000+00:00",
+            "nickname": "Otra de prueba",
+            "texto": "Un video de prueba",
+            "mediaType": "video",
+            "audio": null
+        },
+        "aeEVrL7HkNbWVqWgiia9": {
+            "nivel": "1",
+            "id": "aeEVrL7HkNbWVqWgiia9",
+            "baul": false,
+            "categoria": "Tristeza",
+            "media": null,
+            "color": "#8AA1B2",
+            "emociones": [
+                "cansancio",
+                "incertidumbre"
+            ],
+            "isProtected": false,
+            "cancion": null,
+            "fechaRecuerdo": null,
+            "userId": "xumQokHmFaYXFKlaXfEsaAYUiOp2",
+            "fechaCreacion": "2024-11-26T20:13:27.855000+00:00",
+            "nickname": "Me titulare?",
+            "texto": "Yo Creo que si, pero la verdad es que no lo se.\n\nTener 2 trabajos y poco tiempo igual me ha tenido un poco lento. Digamos que estoy cansado.",
+            "mediaType": null,
+            "audio": null
+        },
+        "eEWlPjLsGD2NpJFsyfBo": {
+            "nivel": "1",
+            "baul": false,
+            "categoria": "Idea",
+            "media": null,
+            "color": "#FF5733",
+            "emociones": [
+                "ira"
+            ],
+            "isProtected": true,
+            "cancion": null,
+            "fechaRecuerdo": null,
+            "userId": "TUOXMnm7elhzhzFCv4YoIcVOxKr2",
+            "fechaCreacion": "2024-11-19T02:37:48.335000+00:00",
+            "nickname": "Una idea para mis proyectos",
+            "mediaType": null,
+            "texto": "Abrire un bar cuando este casi en la edad de jubilacion, para mi y mi familia y amigos",
+            "audio": null
+        },
+        "gdXL0Aketa9OB9HTa3Ik": {
+            "nivel": "2",
+            "id": "gdXL0Aketa9OB9HTa3Ik",
+            "baul": false,
+            "categoria": "Ira",
+            "media": null,
+            "color": "#E6A1A4",
+            "emociones": [],
+            "isProtected": true,
+            "cancion": {
+                "albumImage": "https://i.scdn.co/image/ab67616d0000b273519266cd05491a5b5bc22d1e",
+                "artist": "Bad Bunny",
+                "id": "4vCAzANUWDE24URV6wQ4ra",
+                "name": "Otra Noche en Miami"
+            },
+            "fechaRecuerdo": null,
+            "userId": "xumQokHmFaYXFKlaXfEsaAYUiOp2",
+            "fechaCreacion": "2024-11-26T22:04:55.606000+00:00",
+            "nickname": "Otra Noche en Miami",
+            "texto": null,
+            "mediaType": null,
+            "audio": null
+        },
+        "hUqIsaJ8xWxh9zgJ9476": {
+            "nivel": "1",
+            "baul": false,
+            "categoria": "Idea",
+            "media": null,
+            "color": "#FF33A6",
+            "emociones": [
+                "entusiasmo",
+                "miedo",
+                "tristeza"
+            ],
+            "isProtected": false,
+            "cancion": null,
+            "fechaRecuerdo": null,
+            "userId": "TUOXMnm7elhzhzFCv4YoIcVOxKr2",
+            "fechaCreacion": "2024-11-19T02:38:02.597000+00:00",
+            "nickname": "Terminando",
+            "mediaType": null,
+            "texto": "Estamos terminando el año, estoy muy nervioso de lo que pueda pasar",
+            "audio": null
+        },
+        "lMyOKPoTGKlYvUER4sTU": {
+            "nivel": "1",
+            "id": "lMyOKPoTGKlYvUER4sTU",
+            "baul": false,
+            "categoria": "Alegria",
+            "beneficiary": {
+                "profileImage": "file:///data/user/0/host.exp.exponent/cache/ExperienceData/%2540anonymous%252Ffrontend-757d86fb-d0d4-4d41-96c4-b2780a31e8fc/ImagePicker/888ade81-daa0-4649-8510-5c47fde1aa0b.jpeg",
+                "email": "miguel123@gmail.com",
+                "id": "n9HbxrQPJxTnbeyBsp1N",
+                "name": "Miguel Jara"
+            },
+            "media": "https://firebasestorage.googleapis.com/v0/b/soul2024-abe2f.appspot.com/o/media%2F60ae40d8-a9d3-44d8-8440-c3b4c8b2463a_fadfb2e9-e41e-459f-9f23-79f964501284.jpeg?alt=media&token=3e2c9a5f-7126-498f-8960-1756285144a3",
+            "color": "#E6CBA1",
+            "emociones": [],
+            "isProtected": false,
+            "cancion": null,
+            "fechaRecuerdo": null,
+            "userId": "xumQokHmFaYXFKlaXfEsaAYUiOp2",
+            "fechaCreacion": "2024-11-26T20:12:37.726000+00:00",
+            "nickname": "Algunas cosas han funcionado",
+            "texto": null,
+            "mediaType": "image",
+            "audio": "https://firebasestorage.googleapis.com/v0/b/soul2024-abe2f.appspot.com/o/audios%2F9128f412-4297-4298-b225-cabb5a553244_recording-edc295ae-bf94-48e5-b028-7f478b96bc4e.3gp?alt=media&token=c0f3cb94-2549-4e2f-9661-bf5d8c81329f"
+        },
+        "mez9Nzx6p9CQNxOsfHFE": {
+            "nivel": "1",
+            "id": "mez9Nzx6p9CQNxOsfHFE",
+            "baul": false,
+            "categoria": "Alegria",
+            "media": "https://firebasestorage.googleapis.com/v0/b/soul2024-abe2f.appspot.com/o/media%2F0d26bdb9-8a69-4fd7-9a05-b51a3d87c576_d3379f31-91d4-442c-8a67-498cc229ce7a.jpeg?alt=media&token=83377ede-0f11-4270-a871-768abaa79804",
+            "color": "#E6CBA1",
+            "emociones": [
+                "tristeza",
+                "amor",
+                "nostalgia"
+            ],
+            "isProtected": false,
+            "cancion": null,
+            "fechaRecuerdo": null,
+            "userId": "xumQokHmFaYXFKlaXfEsaAYUiOp2",
+            "fechaCreacion": "2024-11-27T00:32:10.613000+00:00",
+            "nickname": "Acordandome de mi burrito",
+            "texto": "Yo tuve un gatito que se llamaba burrito, era precioso, la luz de mis dias. Lamentablemente fallecio, pero pude disfrutar mi tiempo con el aunque fue cortito. Lo creme, para que su alma siempre este en nuestra casa acompanandonos a nosotros y a sus hermanos gatunos",
+            "mediaType": "image",
+            "audio": null
+        },
+        "pbRxi4qfWtwZ0ZuRI0G9": {
+            "nivel": "1",
+            "id": "pbRxi4qfWtwZ0ZuRI0G9",
+            "baul": false,
+            "categoria": "Alegria",
+            "beneficiary": {
+                "profileImage": "file:///data/user/0/host.exp.exponent/cache/ExperienceData/%2540anonymous%252Ffrontend-757d86fb-d0d4-4d41-96c4-b2780a31e8fc/ImagePicker/b0d089ed-665c-4d7c-a8ac-1ae160b0f918.jpeg",
+                "email": "parraastete.diego11@gmail.com",
+                "id": "RvGWbrR8bJkpn068RW05",
+                "name": "Diego Parra"
+            },
+            "media": null,
+            "color": "#E6CBA1",
+            "emociones": [],
+            "isProtected": false,
+            "cancion": null,
+            "fechaRecuerdo": null,
+            "userId": "xumQokHmFaYXFKlaXfEsaAYUiOp2",
+            "fechaCreacion": "2024-11-27T04:43:10.622000+00:00",
+            "nickname": "Solo Audio",
+            "texto": null,
+            "mediaType": null,
+            "audio": "https://firebasestorage.googleapis.com/v0/b/soul2024-abe2f.appspot.com/o/audios%2Fffdfe715-8ea7-4a80-a23b-1b86bc9ecf31_recording-fe34f556-3389-4677-b782-5da7a9c83dea.3gp?alt=media&token=4733ee11-ad5a-48b5-8886-99786ca83999"
+        },
+        "qRJjBBU0qnNztfKJfegp": {
+            "nivel": "1",
+            "id": "qRJjBBU0qnNztfKJfegp",
+            "baul": false,
+            "categoria": "Alegria",
+            "media": null,
+            "color": "#E6CBA1",
+            "emociones": [],
+            "isProtected": false,
+            "cancion": {
+                "albumImage": "https://i.scdn.co/image/ab67616d0000b2732aab4ea84f431ad7d92fecbb",
+                "artist": "Stromae",
+                "id": "4lriIG2vNqwDWzOj2I9rtj",
+                "name": "Ma Meilleure Ennemie (from the series Arcane League of Legends)"
+            },
+            "fechaRecuerdo": null,
+            "userId": "tkZE7vC1rwVBmAcwrj2pdeRdbgl1",
+            "fechaCreacion": "2024-11-27T04:08:43.692000+00:00",
+            "nickname": "Cancion del momento",
+            "texto": null,
+            "mediaType": null,
+            "audio": null
+        },
+        "ti7urgJArYZ5VnNlsmu6": {
+            "nivel": "2",
+            "baul": true,
+            "categoria": "Meta",
+            "media": null,
+            "color": "#33FF57",
+            "emociones": [
+                "ira"
+            ],
+            "isProtected": false,
+            "cancion": null,
+            "fechaRecuerdo": null,
+            "userId": "TUOXMnm7elhzhzFCv4YoIcVOxKr2",
+            "fechaCreacion": "2024-11-26T01:38:15.347000+00:00",
+            "nickname": "Proyectos",
+            "mediaType": null,
+            "texto": "Pienso mucho sobre mi futuro que me llega a dar mucha rabia, sobrepensar y no vivr el presente",
+            "audio": null
+        },
+        "vHD2Kqz9M5XOij3LMB1J": {
+            "nivel": "3",
+            "baul": true,
+            "categoria": "Consejo",
+            "media": null,
+            "color": "#3357FF",
+            "emociones": [
+                "tristeza"
+            ],
+            "isProtected": true,
+            "cancion": null,
+            "fechaRecuerdo": null,
+            "userId": "TUOXMnm7elhzhzFCv4YoIcVOxKr2",
+            "fechaCreacion": "2024-11-27T02:38:28.514000+00:00",
+            "nickname": "Para mis panas",
+            "mediaType": null,
+            "texto": "Los quiero caleta, si alguien ve esto y  me conoce, no pienses que te guarde rencor en algo, eso es de imbeciles, es mas, me daria mucha pena pensar que haya terminado en malas relaciones las amistades y amoríos ",
+            "audio": null
+        },
+        "vPdMnmJCVS6IDwu0rXhf": {
+            "nivel": "1",
+            "id": "vPdMnmJCVS6IDwu0rXhf",
+            "baul": false,
+            "categoria": "Consejo",
+            "beneficiary": {
+                "profileImage": "file:///data/user/0/host.exp.exponent/cache/ExperienceData/%2540anonymous%252Ffrontend-757d86fb-d0d4-4d41-96c4-b2780a31e8fc/ImagePicker/888ade81-daa0-4649-8510-5c47fde1aa0b.jpeg",
+                "email": "miguel123@gmail.com",
+                "id": "n9HbxrQPJxTnbeyBsp1N",
+                "name": "Miguel Jara"
+            },
+            "media": "https://firebasestorage.googleapis.com/v0/b/soul2024-abe2f.appspot.com/o/media%2Ff37a8909-607c-44a2-9a84-505cc80e2144_8a57cff1-1ba2-4ee2-8051-37e24974a0bb.jpeg?alt=media&token=7d9008bb-62d8-46a2-9c87-e423badc36f0",
+            "color": "#E6C4A4",
+            "emociones": [
+                "divertido",
+                "frustración"
+            ],
+            "isProtected": false,
+            "cancion": null,
+            "fechaRecuerdo": null,
+            "userId": "xumQokHmFaYXFKlaXfEsaAYUiOp2",
+            "fechaCreacion": "2024-11-26T20:15:08.730000+00:00",
+            "nickname": "Se mas paciente",
+            "texto": "A veces se que no tengo los niveles de paciencia adecuados jajaja",
+            "mediaType": "image",
+            "audio": null
+        },
+        "x3mrYX8pIwXgMkyv27zj": {
+            "nivel": "1",
+            "id": "x3mrYX8pIwXgMkyv27zj",
+            "baul": false,
+            "categoria": "Alegria",
+            "beneficiary": {
+                "profileImage": "file:///data/user/0/host.exp.exponent/cache/ExperienceData/%2540anonymous%252Ffrontend-757d86fb-d0d4-4d41-96c4-b2780a31e8fc/ImagePicker/b0d089ed-665c-4d7c-a8ac-1ae160b0f918.jpeg",
+                "email": "parraastete.diego11@gmail.com",
+                "id": "RvGWbrR8bJkpn068RW05",
+                "name": "Diego Parra"
+            },
+            "media": "https://firebasestorage.googleapis.com/v0/b/soul2024-abe2f.appspot.com/o/media%2F6fa3469f-3c58-4e8e-8e10-49b81bc7644a_5411c34e-09bd-4c48-930d-d3a86d2fb2d8.jpeg?alt=media&token=b3d18c85-b817-4ed2-8b29-d2bf7c588446",
+            "color": "#E6CBA1",
+            "emociones": [
+                "Nostalgia",
+                "incomodidad"
+            ],
+            "isProtected": false,
+            "cancion": null,
+            "fechaRecuerdo": null,
+            "userId": "xumQokHmFaYXFKlaXfEsaAYUiOp2",
+            "fechaCreacion": "2024-11-26T20:16:27.025000+00:00",
+            "nickname": "Me acuerdo de mi primer beso",
+            "texto": "Iba como en 8vo basico, fue un piquito con una companera que ni me gustaba, pero ahi fue",
+            "mediaType": "image",
+            "audio": null
+        }
+    },
+    "mensajesProgramados": {
+        "3VzjJ51tGO3KnaM34arb": {
+            "fechaEnvio": "2024-11-28T21:37:45.596000+00:00",
+            "enviado": true,
+            "userId": "tkZE7vC1rwVBmAcwrj2pdeRdbgl1",
+            "mediaType": "video",
+            "email": "javiercg.5656@gmail.com",
+            "beneficiarioId": "RvGWbrR8bJkpn068RW05",
+            "media": "https://firebasestorage.googleapis.com/v0/b/soul2024-abe2f.appspot.com/o/videos%2F1732829865714.mp4?alt=media&token=40cac5ef-d770-420d-96ea-cc2c326f3e9f"
+        },
+        "EffqZeQGA8PXI5hROGAN": {
+            "fechaEnvio": "2024-11-27T17:07:52.554000+00:00",
+            "enviado": true,
+            "userId": "xumQokHmFaYXFKlaXfEsaAYUiOp2",
+            "mediaType": "video",
+            "email": "parraastete.diego11@gmail.com",
+            "beneficiarioId": "RvGWbrR8bJkpn068RW05",
+            "media": "https://firebasestorage.googleapis.com/v0/b/soul2024-abe2f.appspot.com/o/videos%2F1732727272568.mp4?alt=media&token=fdaa5a17-def4-4830-9c2d-bdafbe32da4a"
+        },
+        "GcOTptdMXlkxeQpLJNnO": {
+            "fechaEnvio": "2024-11-28T21:41:46.886000+00:00",
+            "enviado": true,
+            "userId": "tkZE7vC1rwVBmAcwrj2pdeRdbgl1",
+            "mediaType": "video",
+            "email": "javiercg.5656@gmail.com",
+            "beneficiarioId": "NdEakaj6PFjjlg0bVZNC",
+            "media": "https://firebasestorage.googleapis.com/v0/b/soul2024-abe2f.appspot.com/o/videos%2F1732830107016.mp4?alt=media&token=2630747c-93f9-4ebe-afb3-cffe0f1c2e5e"
+        }
+    },
+    "notifications": {},
+    "pdfs": {
+        "OMP4tKWkILfFWY4WYaH9vD4jEIC2": {
+            "createdAt": "2024-11-26T17:46:20.834000+00:00",
+            "url": "https://firebasestorage.googleapis.com/v0/b/soul2024-abe2f.appspot.com/o/pdfs%2FOMP4tKWkILfFWY4WYaH9vD4jEIC2%2Fdocumento.pdf?alt=media&token=ef9c5c1c-e9af-4e56-9fdd-1cabf72e73e5"
+        },
+        "tkZE7vC1rwVBmAcwrj2pdeRdbgl1": {
+            "createdAt": "2024-11-27T01:08:51.098000+00:00",
+            "url": "https://firebasestorage.googleapis.com/v0/b/soul2024-abe2f.appspot.com/o/pdfs%2FtkZE7vC1rwVBmAcwrj2pdeRdbgl1%2Fdocumento.pdf?alt=media&token=3ec5de6b-b91a-4041-be9b-999cdb1fc5c0"
+        }
+    },
+    "sessions": {
+        "23k2hyeriYCkJvnAzV9O": {
+            "userId": "OMP4tKWkILfFWY4WYaH9vD4jEIC2",
+            "timestamp": "2024-11-10 05:56:27.000000+00:00"
+        },
+        "2dxnCvtmlXdFjKBZGCFa": {
+            "userId": "mrF9VRaEYLa1kEZrvOwuTtsUDc42",
+            "timestamp": "2024-10-27T22:20:47.663000+00:00"
+        },
+        "3OeDRp6F9MVybOiS4V6Fo1gQ8vG3_1731366449116": {
+            "userId": "3OeDRp6F9MVybOiS4V6Fo1gQ8vG3",
+            "timestamp": "2024-11-11T23:07:30.084000+00:00"
+        },
+        "48TyLeeSi9g4GA0mpdPZ": {
+            "userId": "mrF9VRaEYLa1kEZrvOwuTtsUDc42",
+            "timestamp": "2024-10-30T00:13:48.269000+00:00"
+        },
+        "4OqHYz2EwJP90qKsblAx": {
+            "userId": "OMP4tKWkILfFWY4WYaH9vD4jEIC2",
+            "timestamp": "2024-11-25 15:49:14.145408+00:00"
+        },
+        "7knsb2gXrsR9VhHgWOvhfSxQ6q42_1731367148043": {
+            "userId": "7knsb2gXrsR9VhHgWOvhfSxQ6q42",
+            "timestamp": "2024-11-11T23:19:08.703000+00:00"
+        },
+        "8KSFMqLdliB0PXOgX06f": {
+            "userId": "OMP4tKWkILfFWY4WYaH9vD4jEIC2",
+            "timestamp": "2024-10-20 23:39:52.000000+00:00"
+        },
+        "DtJpTNcRN5XpaFwWIpe7": {
+            "userId": "mrF9VRaEYLa1kEZrvOwuTtsUDc42",
+            "timestamp": "2024-10-27T21:22:30.251000+00:00"
+        },
+        "DzKWWB1N4zSuepBA6Vq2W99Y1rt2_1733884913676": {
+            "userId": "DzKWWB1N4zSuepBA6Vq2W99Y1rt2",
+            "timestamp": "2024-12-11T02:41:54.355000+00:00"
+        },
+        "Glim90DvMpY34sExMexq": {
+            "userId": "mrF9VRaEYLa1kEZrvOwuTtsUDc42",
+            "timestamp": "2024-10-27T22:15:48.902000+00:00"
+        },
+        "HWQPTDGoEhos7ovGFoAm": {
+            "userId": "OMP4tKWkILfFWY4WYaH9vD4jEIC2",
+            "timestamp": "2024-11-07 10:57:05.000000+00:00"
+        },
+        "NaiYC2IKJitdFnjM1SZg": {
+            "userId": "OMP4tKWkILfFWY4WYaH9vD4jEIC2",
+            "timestamp": "2024-11-25 15:49:14.145408+00:00"
+        },
+        "OMP4tKWkILfFWY4WYaH9vD4jEIC2_1730908237163": {
+            "userId": "OMP4tKWkILfFWY4WYaH9vD4jEIC2",
+            "timestamp": "2024-11-06T15:50:48.307000+00:00"
+        },
+        "OMP4tKWkILfFWY4WYaH9vD4jEIC2_1730915290382": {
+            "userId": "OMP4tKWkILfFWY4WYaH9vD4jEIC2",
+            "timestamp": "2024-11-06T17:48:18.249000+00:00"
+        },
+        "OMP4tKWkILfFWY4WYaH9vD4jEIC2_1730915393296": {
+            "userId": "OMP4tKWkILfFWY4WYaH9vD4jEIC2",
+            "timestamp": "2024-11-06T17:50:01.867000+00:00"
+        },
+        "OMP4tKWkILfFWY4WYaH9vD4jEIC2_1731350820530": {
+            "userId": "OMP4tKWkILfFWY4WYaH9vD4jEIC2",
+            "timestamp": "2024-11-11T18:47:00.524000+00:00"
+        },
+        "OMP4tKWkILfFWY4WYaH9vD4jEIC2_1731351902452": {
+            "userId": "OMP4tKWkILfFWY4WYaH9vD4jEIC2",
+            "timestamp": "2024-11-11T19:05:02.991000+00:00"
+        },
+        "OMP4tKWkILfFWY4WYaH9vD4jEIC2_1731355478734": {
+            "userId": "OMP4tKWkILfFWY4WYaH9vD4jEIC2",
+            "timestamp": "2024-11-11T20:04:39.852000+00:00"
+        },
+        "OMP4tKWkILfFWY4WYaH9vD4jEIC2_1731356824280": {
+            "userId": "OMP4tKWkILfFWY4WYaH9vD4jEIC2",
+            "timestamp": "2024-11-11T20:27:04.898000+00:00"
+        },
+        "OMP4tKWkILfFWY4WYaH9vD4jEIC2_1731356855631": {
+            "userId": "OMP4tKWkILfFWY4WYaH9vD4jEIC2",
+            "timestamp": "2024-11-11T20:27:36.310000+00:00"
+        },
+        "OMP4tKWkILfFWY4WYaH9vD4jEIC2_1731366043103": {
+            "userId": "OMP4tKWkILfFWY4WYaH9vD4jEIC2",
+            "timestamp": "2024-11-11T23:00:45.804000+00:00"
+        },
+        "OMP4tKWkILfFWY4WYaH9vD4jEIC2_1731437314613": {
+            "userId": "OMP4tKWkILfFWY4WYaH9vD4jEIC2",
+            "timestamp": "2024-11-12T18:48:47.825000+00:00"
+        },
+        "OMP4tKWkILfFWY4WYaH9vD4jEIC2_1731680838303": {
+            "userId": "OMP4tKWkILfFWY4WYaH9vD4jEIC2",
+            "timestamp": "2024-11-15T14:27:27.309000+00:00"
+        },
+        "OMP4tKWkILfFWY4WYaH9vD4jEIC2_1731694949780": {
+            "userId": "OMP4tKWkILfFWY4WYaH9vD4jEIC2",
+            "timestamp": "2024-11-15T18:22:38.582000+00:00"
+        },
+        "OMP4tKWkILfFWY4WYaH9vD4jEIC2_1732126498770": {
+            "userId": "OMP4tKWkILfFWY4WYaH9vD4jEIC2",
+            "timestamp": "2024-11-20T18:15:06.222000+00:00"
+        },
+        "OMP4tKWkILfFWY4WYaH9vD4jEIC2_1732205634472": {
+            "userId": "OMP4tKWkILfFWY4WYaH9vD4jEIC2",
+            "timestamp": "2024-11-21T16:13:55.168000+00:00"
+        },
+        "OMP4tKWkILfFWY4WYaH9vD4jEIC2_1732651139222": {
+            "userId": "OMP4tKWkILfFWY4WYaH9vD4jEIC2",
+            "timestamp": "2024-11-26T19:59:20.257000+00:00"
+        },
+        "OMP4tKWkILfFWY4WYaH9vD4jEIC2_1732651589481": {
+            "userId": "OMP4tKWkILfFWY4WYaH9vD4jEIC2",
+            "timestamp": "2024-11-26T20:06:50.487000+00:00"
+        },
+        "TUOXMnm7elhzhzFCv4YoIcVOxKr2_1733884807091": {
+            "userId": "TUOXMnm7elhzhzFCv4YoIcVOxKr2",
+            "timestamp": "2024-12-11T02:40:07.686000+00:00"
+        },
+        "TUOXMnm7elhzhzFCv4YoIcVOxKr2_1733884841081": {
+            "userId": "TUOXMnm7elhzhzFCv4YoIcVOxKr2",
+            "timestamp": "2024-12-11T02:40:41.765000+00:00"
+        },
+        "ZFODH5cHq82XAESFKhGa": {
+            "userId": "mrF9VRaEYLa1kEZrvOwuTtsUDc42",
+            "timestamp": "2024-10-27T20:42:12.224000+00:00"
+        },
+        "c7fPIAnnT946tirDoNkR": {
+            "userId": "mrF9VRaEYLa1kEZrvOwuTtsUDc42",
+            "timestamp": "2024-10-30T00:20:28.457000+00:00"
+        },
+        "dgdxnVug9XWD2Rd49Hzh": {
+            "userId": "mrF9VRaEYLa1kEZrvOwuTtsUDc42",
+            "timestamp": "2024-10-27T22:17:46.152000+00:00"
+        },
+        "mrF9VRaEYLa1kEZrvOwuTtsUDc42_1730504499065": {
+            "userId": "mrF9VRaEYLa1kEZrvOwuTtsUDc42",
+            "timestamp": "2024-11-01T23:41:43.215000+00:00"
+        },
+        "mrF9VRaEYLa1kEZrvOwuTtsUDc42_1730504964424": {
+            "userId": "mrF9VRaEYLa1kEZrvOwuTtsUDc42",
+            "timestamp": "2024-11-01T23:49:28.223000+00:00"
+        },
+        "mrF9VRaEYLa1kEZrvOwuTtsUDc42_1730855793997": {
+            "userId": "mrF9VRaEYLa1kEZrvOwuTtsUDc42",
+            "timestamp": "2024-11-06T01:16:34.826000+00:00"
+        },
+        "s2mfJjw3JQ4BNne3OExJ": {
+            "userId": "OMP4tKWkILfFWY4WYaH9vD4jEIC2",
+            "timestamp": "2024-11-25 15:49:14.145408+00:00"
+        },
+        "sessions": {
+            "userId": "1",
+            "timestamp": "1"
+        },
+        "tkZE7vC1rwVBmAcwrj2pdeRdbgl1_1732669040235": {
+            "userId": "tkZE7vC1rwVBmAcwrj2pdeRdbgl1",
+            "timestamp": "2024-11-27T00:57:25.750000+00:00"
+        },
+        "tkZE7vC1rwVBmAcwrj2pdeRdbgl1_1732829818955": {
+            "userId": "tkZE7vC1rwVBmAcwrj2pdeRdbgl1",
+            "timestamp": "2024-11-28T21:37:00.159000+00:00"
+        },
+        "wvP1ZhCotihL0uIive1Y": {
+            "userId": "mrF9VRaEYLa1kEZrvOwuTtsUDc42",
+            "timestamp": "2024-10-30T01:11:38.180000+00:00"
+        },
+        "xtGtXLnphhfqA5hQKkBxQcqcmlf2_1731883046547": {
+            "userId": "xtGtXLnphhfqA5hQKkBxQcqcmlf2",
+            "timestamp": "2024-11-17T22:37:28.323000+00:00"
+        },
+        "xumQokHmFaYXFKlaXfEsaAYUiOp2_1732651704800": {
+            "userId": "xumQokHmFaYXFKlaXfEsaAYUiOp2",
+            "timestamp": "2024-11-26T20:08:46.051000+00:00"
+        },
+        "xumQokHmFaYXFKlaXfEsaAYUiOp2_1732660165586": {
+            "userId": "xumQokHmFaYXFKlaXfEsaAYUiOp2",
+            "timestamp": "2024-11-26T22:29:27.409000+00:00"
+        },
+        "xumQokHmFaYXFKlaXfEsaAYUiOp2_1732733484029": {
+            "userId": "xumQokHmFaYXFKlaXfEsaAYUiOp2",
+            "timestamp": "2024-11-27T18:51:27.866000+00:00"
+        },
+        "xumQokHmFaYXFKlaXfEsaAYUiOp2_1732857590332": {
+            "userId": "xumQokHmFaYXFKlaXfEsaAYUiOp2",
+            "timestamp": "2024-11-29T05:20:01.882000+00:00"
+        },
+        "xumQokHmFaYXFKlaXfEsaAYUiOp2_1733877943588": {
+            "userId": "xumQokHmFaYXFKlaXfEsaAYUiOp2",
+            "timestamp": "2024-12-11T00:45:52.164000+00:00"
+        },
+        "xumQokHmFaYXFKlaXfEsaAYUiOp2_1733882113680": {
+            "userId": "xumQokHmFaYXFKlaXfEsaAYUiOp2",
+            "timestamp": "2024-12-11T01:55:14.694000+00:00"
+        }
+    },
+    "solicitudes": {},
+    "testigos": {
+        "LnLx3UvdeAIH3Tm9aClG": {
+            "imageUrl": null,
+            "email": "parraastete.diego11@gmail.com",
+            "userId": "tkZE7vC1rwVBmAcwrj2pdeRdbgl1",
+            "phone": "",
+            "name": "Diego parra"
+        },
+        "q92ArIXnyMw9wLhhy8mx": {
+            "imageUrl": "https://firebasestorage.googleapis.com/v0/b/soul2024-abe2f.appspot.com/o/testigos%2F1732657045655_Javier%20Caceres?alt=media&token=90dffe54-dcf2-467a-8468-2bfc465c0a74",
+            "email": "javi123@gmail.com",
+            "userId": "xumQokHmFaYXFKlaXfEsaAYUiOp2",
+            "phone": "",
+            "name": "Javier Caceres"
+        }
+    },
+    "tickets": {
+        "FFYPY9ZyeQMQnVcAlRLT": {
+            "assignedTo": "ES0J0IAHeGVqT2lNm6aptTJewjU2",
+            "description": "no puedo ingresar a mi cuenta desde hace 2 dias",
+            "subject": "inicio de sesion",
+            "userId": "TUOXMnm7elhzhzFCv4YoIcVOxKr2",
+            "respuesta": "Mira lo que tienes que hacer es borrar el cache de la aplicacion. como es una aplicacion en desarrollo puede que existan incongruencias dentro del sistema",
+            "estado": "respondido",
+            "createdAt": "2024-11-20T03:00:00.516000+00:00",
+            "status": "cerrado",
+            "updatedAt": "2024-12-10T23:58:32.691000+00:00"
+        },
+        "PhDWECXun7xjszRNGqqq": {
+            "assignedTo": "TUOXMnm7elhzhzFCv4YoIcVOxKr2",
+            "description": "hola sabes que tengo unas dudas sobre la version premium",
+            "subject": "premium",
+            "userId": "TUOXMnm7elhzhzFCv4YoIcVOxKr2",
+            "createdAt": "2024-12-01T22:38:25.097000+00:00",
+            "status": "abierto",
+            "updatedAt": "2024-12-03T00:06:04.314000+00:00"
+        },
+        "ZSERNuqez5tVMdRUfzsk": {
+            "assignedTo": "TUOXMnm7elhzhzFCv4YoIcVOxKr2",
+            "description": "solo queria saber para que sirve este ticket",
+            "subject": "Que es este apartado?",
+            "userId": "HatUAxcIFUY1JrGomy7hZvhBrsf1",
+            "createdAt": "2024-11-29T15:40:38.202000+00:00",
+            "status": "abierto",
+            "updatedAt": "2024-12-03T01:35:28.388000+00:00"
+        },
+        "vulHYY10yKUaDpjxH3xX": {
+            "assignedTo": "TUOXMnm7elhzhzFCv4YoIcVOxKr2",
+            "subject": "problemas con cuenta",
+            "userId": "HatUAxcIFUY1JrGomy7hZvhBrsf1",
+            "createdAt": "2024-11-30T21:45:53.137000+00:00",
+            "descripcion": "hola tengo problemas con mi cuenta. me dice que no puedo entrar a la funcion premium",
+            "status": "en progreso",
+            "updatedAt": "2024-12-01T22:16:13.415000+00:00"
+        },
+        "wxWJwv12NSdu0nfIQPR6": {
+            "assignedTo": "2pG0QflwxtgCVjcXatZS5rENA0F3",
+            "description": "Necesito ayuda",
+            "subject": "Soporte Ayuda",
+            "userId": "xumQokHmFaYXFKlaXfEsaAYUiOp2",
+            "createdAt": "2024-11-27T19:11:57.321000+00:00",
+            "status": "en progreso",
+            "updatedAt": "2024-12-01T20:45:27.389000+00:00"
+        }
+    },
+    "users": {
+        "DzKWWB1N4zSuepBA6Vq2W99Y1rt2": {
+            "createdAt": "2024-12-11T02:41:39.123000+00:00",
+            "pais": "Chile",
+            "displayName": "felipe",
+            "birthDate": "2002-03-23T03:40:00+00:00",
+            "isPremium": false,
+            "email": "felipe@gmail.com"
+        },
+        "HatUAxcIFUY1JrGomy7hZvhBrsf1": {
+            "pais": "Chile",
+            "displayName": "John Doe",
+            "birthDate": "1992-09-19T01:47:23.016000+00:00",
+            "ciudad": "Santiago",
+            "createdAt": "2024-11-04T18:28:21.670000+00:00",
+            "email": "johndoe@gmail.com",
+            "comuna": "La Pintana"
+        },
+        "TUOXMnm7elhzhzFCv4YoIcVOxKr2": {
+            "pais": "Chile",
+            "displayName": "Felipe",
+            "level3Password": "qwe123",
+            "bio": "",
+            "countryCode": "+56",
+            "ciudad": "Santiago",
+            "isBanned": false,
+            "phoneNumber": "966535554",
+            "isPremium": true,
+            "birthDate": "1997-07-13T01:35:12.215000+00:00",
+            "createdAt": "2024-11-19T02:39:55.334000+00:00",
+            "isAdmin": true,
+            "email": "philip.1207.97@gmail.com",
+            "comuna": "El Bosque",
+            "level2Password": "qweqwe"
+        },
+        "Vlwnd32aR4Y0pvLKQ6B6l5mWxDO2": {
+            "pais": "Chile",
+            "displayName": "Matias Valenzuela",
+            "birthDate": "2003-06-25T14:46:51.597000+00:00",
+            "ciudad": "Viña del mar",
+            "createdAt": "2024-11-26T22:44:43.412000+00:00",
+            "email": "matias.valenzuela@gmail.com",
+            "comuna": "Reñaca"
+        },
+        "b59F5HDAXdyhwOaiuJoM": {
+            "password": "qwe123",
+            "pais": "Chile",
+            "phoneNumber": "123123123",
+            "displayName": "tester",
+            "birthDate": "2000-02-29T16:02:03.931000+00:00",
+            "countryCode": "+56",
+            "role": "user",
+            "ciudad": "Santiago",
+            "isAdmin": false,
+            "email": "tester@gmail.com",
+            "comuna": "San Bernardo",
+            "createdAt": "2024-11-30T20:31:43.928000+00:00",
+            "isBanned": false
+        },
+        "tkZE7vC1rwVBmAcwrj2pdeRdbgl1": {
+            "pais": "Chile",
+            "displayName": "Javier Caceres",
+            "birthDate": "2002-02-08T00:55:00+00:00",
+            "isPremium": true,
+            "isDeceased": true,
+            "createdAt": "2024-11-27T00:56:33.923000+00:00",
+            "level2Password": "123456",
+            "email": "javiercg.5656@gmail.com",
+            "isBanned": false
+        },
+        "xumQokHmFaYXFKlaXfEsaAYUiOp2": {
+            "pais": "Chile",
+            "displayName": "Diego",
+            "level3Password": "Diego123",
+            "bio": "",
+            "countryCode": "+56",
+            "ciudad": "Santiago",
+            "phoneNumber": "959770647",
+            "photoURL": "https://firebasestorage.googleapis.com/v0/b/soul2024-abe2f.appspot.com/o/profile_pics%2FxumQokHmFaYXFKlaXfEsaAYUiOp2?alt=media&token=5b519e8f-8799-44b1-a95e-1114c9452ff8",
+            "birthDate": "2001-12-11T20:07:00+00:00",
+            "isPremium": true,
+            "isDeceased": true,
+            "createdAt": "2024-11-26T20:08:10.842000+00:00",
+            "isAdmin": true,
+            "email": "parraastete.diego11@gmail.com",
+            "comuna": "Providencia",
+            "level2Password": "Diego123"
+        }
+    }
+}
