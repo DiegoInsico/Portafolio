@@ -1,7 +1,7 @@
 /* Contenedor principal */
 .context-container {
   width: 100%;
-  background-color: #212121; /* Fondo oscuro elegante */
+  background-color: #191a5a;
   color: #ffffff; /* Texto blanco */
   padding: 5px;
   box-sizing: border-box;
@@ -24,7 +24,7 @@
   font-size: 24px;
   font-weight: bold;
   margin-bottom: 20px;
-  color: #bb86fc;
+  color: #ffffff;
 
 }
 
@@ -56,7 +56,7 @@
 .context-list-item {
   margin: 10px 0;
   background-color: #2b2b2b; /* Fondo oscuro */
-  color: #bb86fc;
+  color: #ffffff;
   text-align: center;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
@@ -85,7 +85,7 @@
   font-size: 16px;
   font-weight: bold;
   margin-bottom: 8px;
-  color: #bb86fc;
+  color: #ffffff;
 }
 
 /* Input de fechas */
@@ -118,5 +118,7 @@
 /* Ajuste para evitar desbordamiento */
 .context-chart canvas {
   max-width: 100%; /* Limitar ancho del canvas */
+  background-color: #1c1d42;
+
   height: auto; /* Mantener proporción */
 }

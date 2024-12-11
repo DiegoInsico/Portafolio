@@ -4,6 +4,8 @@
   color: #ffffff; /* Texto blanco */
   padding: 5px;
   box-sizing: border-box;
+  background-color: #1a1b5a;
+
   border-radius: 10px;
   margin: 0 auto; /* Centrado horizontal */
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
@@ -14,7 +16,7 @@
   font-size: 24px;
   font-weight: bold;
   margin-bottom: 20px;
-  color: #bb86fc; /* Color destacado */
+  color: #ffffff; /* Color destacado */
   text-align: center;
 }
 
@@ -30,7 +32,7 @@
   font-size: 16px;
   font-weight: bold;
   margin-bottom: 8px;
-  color: #bb86fc;
+  color: #fafafa;
 }
 
 .date-picker-input {
@@ -47,7 +49,7 @@
 .chart-container {
   width: 100%;
   margin: 0 auto;
-  background-color: #2b2b2b; /* Fondo ligeramente más claro */
+  background-color: #17183a;
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
   overflow: hidden; /* Asegurar que no haya desbordamiento */
@@ -57,6 +59,8 @@
 .chart-container canvas {
   max-width: 100%; /* Limitar ancho del canvas */
   height: auto; /* Mantener proporción */
+  background-color: #1a1b5a;
+
 }
 
 .loading-message {
