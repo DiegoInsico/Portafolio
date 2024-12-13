@@ -131,7 +131,7 @@ const RootNavigator = () => {
             <Stack.Screen
               name="ProgramarMensaje"
               component={ProgramarMensaje}
-              options={{ title: "Programar un Mensaje" }}
+              options={{ title: "Un fragmento para ti" }}
             />
             <Stack.Screen
               name="Suscripcion"
@@ -156,7 +156,7 @@ const RootNavigator = () => {
             <Stack.Screen
               name="DetalleTicket"
               component={DetalleTicketScreen}
-              options={{ title: "Detalle del Ticket" }}
+              options={{ title: "Detalle de Ticket" }}
             />
             <Stack.Screen
               name="SubirCertificado"
@@ -166,12 +166,12 @@ const RootNavigator = () => {
             <Stack.Screen
               name="ListEntry"
               component={ListEntry}
-              options={{ title: "Listado de Instancias" }}
+              options={{ title: "Listado de Instantes" }}
             />
             <Stack.Screen
               name="Entry"
               component={EntryScreen}
-              options={{ title: "Instancias" }}
+              options={{ title: "Instantes" }}
             />
             <Stack.Screen
               name="EntryDetailScreen"
@@ -186,7 +186,7 @@ const RootNavigator = () => {
             <Stack.Screen
               name="MiDespedida"
               component={MiDespedidaScreen}
-              options={{ title: "Mi Despedida" }}
+              options={{ title: "Hasta Pronto" }}
             />
           </>
         ) : (

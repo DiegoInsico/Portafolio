@@ -88,6 +88,7 @@ const DetalleEntrada = ({ entrada, onClose, currentUser }) => {
               src={cancion.albumImage || defaultPlaceholder}
               alt={cancion.name || "Sin nombre"}
               className="detalle-album-image"
+              loading="lazy"
             />
           </>
         )}
@@ -107,7 +108,7 @@ const DetalleEntrada = ({ entrada, onClose, currentUser }) => {
           <>
             {mediaType === "video" ? (
               <div className="detalle-video">
-                <video controls width="100%">
+                <video controls width="100%" loading="lazy">
                   <source src={media} type="video/mp4" />
                   Tu navegador no soporta el elemento de video.
                 </video>
@@ -117,6 +118,7 @@ const DetalleEntrada = ({ entrada, onClose, currentUser }) => {
                 src={media || defaultPlaceholder}
                 alt={entrada.nickname || "Sin nombre"}
                 className="detalle-imagen-grande"
+                loading="lazy"
               />
             )}
           </>
@@ -145,6 +147,7 @@ const DetalleEntrada = ({ entrada, onClose, currentUser }) => {
             src={defaultPlaceholder}
             alt="Placeholder"
             className="detalle-imagen-grande"
+            loading="lazy"
           />
         )}
       </>
@@ -156,7 +159,7 @@ const DetalleEntrada = ({ entrada, onClose, currentUser }) => {
 
   return (
     <>
-      <div className="modal-overlay" onClick={handleClose}></div>
+      <div className="modal-overlay" onClick={handleClose} aria-hidden="true"></div>
       <div
         className={`detalle-entrada ${closing ? "fade-out" : "fade-in"}`}
         onClick={(e) => e.stopPropagation()}
@@ -225,7 +228,8 @@ const DetalleEntrada = ({ entrada, onClose, currentUser }) => {
               {/* Overlay para imágenes, videos y canciones */}
               {(entrada.media || (entrada.cancion && entrada.cancion.audioUrl)) && (
                 <div className="imagen-overlay">
-                  <i className="fas fa-search-plus"></i>
+                  <i className="fas fa-search-plus" aria-hidden="true"></i>
+                  <span className="sr-only">Ampliar</span>
                 </div>
               )}
             </div>
@@ -240,14 +244,14 @@ const DetalleEntrada = ({ entrada, onClose, currentUser }) => {
                   // Mostrar la única reflexión directamente
                   <div className="reflexion-item unico">
                     <div className="reflexion-full">
-                      <i className="fas fa-quote-left"></i>
+                      <i className="fas fa-quote-left" aria-hidden="true"></i>
                       <p>{reflexiones[0]}</p>
                       <button
                         className="reflexion-close"
                         onClick={() => setSelectedReflection(null)}
                         aria-label="Cerrar Reflexión"
                       >
-                        <i className="fas fa-times"></i> Cerrar
+                        <i className="fas fa-times" aria-hidden="true"></i> Cerrar
                       </button>
                     </div>
                   </div>
@@ -263,7 +267,7 @@ const DetalleEntrada = ({ entrada, onClose, currentUser }) => {
                           onClick={() => handleReflectionClick(index)}
                           aria-expanded={selectedReflection === index}
                         >
-                          <i className="fas fa-quote-left"></i>
+                          <i className="fas fa-quote-left" aria-hidden="true"></i>
                           {reflexion.length > 50
                             ? `${reflexion.slice(0, 50)}...`
                             : reflexion}
@@ -276,7 +280,7 @@ const DetalleEntrada = ({ entrada, onClose, currentUser }) => {
                               onClick={() => setSelectedReflection(null)}
                               aria-label="Cerrar Reflexión"
                             >
-                              <i className="fas fa-times"></i> Cerrar
+                              <i className="fas fa-times" aria-hidden="true"></i> Cerrar
                             </button>
                           </div>
                         )}
@@ -296,23 +300,23 @@ const DetalleEntrada = ({ entrada, onClose, currentUser }) => {
             {shouldShowDetails && (
               <div className="detalle-detalles">
                 <h3>
-                  <i className="fas fa-info-circle"></i> Detalles
+                  <i className="fas fa-info-circle" aria-hidden="true"></i> Detalles
                 </h3>
                 <p>
                   <strong>
-                    <i className="fas fa-tags"></i> Categoría:
+                    <i className="fas fa-tags" aria-hidden="true"></i> Categoría:
                   </strong>{" "}
                   {entrada.categoria || "N/A"}
                 </p>
                 <p>
                   <strong>
-                    <i className="fas fa-lock"></i> Protegido:
+                    <i className="fas fa-lock" aria-hidden="true"></i> Protegido:
                   </strong>{" "}
                   {entrada.isProtected ? "Sí" : "No"}
                 </p>
                 <p>
                   <strong>
-                    <i className="fas fa-calendar-day"></i> Fecha de Recuerdo:
+                    <i className="fas fa-calendar-day" aria-hidden="true"></i> Fecha de Recuerdo:
                   </strong>{" "}
                   {entrada.fechaRecuerdo
                     ? new Date(entrada.fechaRecuerdo).toLocaleDateString()
@@ -325,7 +329,7 @@ const DetalleEntrada = ({ entrada, onClose, currentUser }) => {
             {emocionesList.length > 0 && (
               <div className="detalle-emociones">
                 <h3>
-                  <i className="fas fa-palette"></i> Emociones
+                  <i className="fas fa-palette" aria-hidden="true"></i> Emociones
                 </h3>
                 <EmotionsMap emociones={emocionesList} />
               </div>
@@ -336,15 +340,13 @@ const DetalleEntrada = ({ entrada, onClose, currentUser }) => {
 
       {/* Lightbox para Imagen o Video Ampliado */}
       {isImageEnlarged && (entrada.media || (entrada.cancion && entrada.cancion.audioUrl)) && (
-        <div className="lightbox-overlay" onClick={handleImageClose}>
+        <div className="lightbox-overlay" onClick={handleImageClose} role="dialog" aria-modal="true">
           <div
             className="lightbox-content"
             onClick={(e) => e.stopPropagation()}
-            role="dialog"
-            aria-modal="true"
           >
             {entrada.mediaType === "video" ? (
-              <video controls width="100%">
+              <video controls width="100%" loading="lazy">
                 <source src={entrada.media} type="video/mp4" />
                 Tu navegador no soporta el elemento de video.
               </video>
@@ -357,6 +359,7 @@ const DetalleEntrada = ({ entrada, onClose, currentUser }) => {
                     : defaultPlaceholder)
                 }
                 alt="Memoria Ampliada"
+                loading="lazy"
               />
             )}
             <button
