@@ -10,9 +10,9 @@ import ExportPagesi from "./export";
 const GraphicsContext = () => {
     return (
       <div className="graph-container">
-        <div className="top-left">
+        {/* <div className="top-left">
           <ExportPagesi/>
-        </div>
+        </div> */}
         <div className="top-right">
           <RelationCharts/>
         </div>

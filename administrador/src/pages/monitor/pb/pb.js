@@ -862,12 +862,12 @@ const AnalysisPage = () => {
             Limpiar Gráficos
           </button>
 
-          <div className="pb-section">
+          {/* <div className="pb-section">
             <h3>Tiempo</h3>
             <button className="pb-filter-button pb-dia">Día</button>
             <button className="pb-filter-button pb-mes">Mes</button>
             <button className="pb-filter-button pb-ano">Año</button>
-          </div>
+          </div> */}
           <div className="pb-section">
             <h3>Premium y otros</h3>
             <button

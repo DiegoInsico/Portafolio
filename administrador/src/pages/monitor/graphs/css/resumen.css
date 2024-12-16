@@ -1,9 +1,10 @@
 .dataser-container {
     width: 100%;
     max-width: 600px;
-    background-color: #1a1b5a;
-    color: #ffffff; 
+    background-color: #EAD9C3;
+    color: #000000; 
     padding: 10px; 
+    text-align: center;
     box-sizing: border-box;
     border-radius: 10px;
     margin: 0 auto;

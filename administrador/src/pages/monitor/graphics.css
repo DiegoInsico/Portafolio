@@ -1,7 +1,7 @@
 .graph-container {
   display: grid;
   grid-template-areas:
-    "top-left top-right"
+    "bottom-left top-right"
     "bottom-left bottom-right";
   grid-template-columns: 1fr 1fr; /* Dos columnas iguales */
   grid-template-rows: 1fr 1fr;   /* Dos filas iguales */
@@ -10,7 +10,7 @@
   background-color: #EAD9C3;
   box-sizing: border-box;
   margin-top: 70px; /* Posiciona debajo del TopBar */
-  height: calc(100vh - 70px); /* Usa todo el espacio disponible */
+  height: 100vh; /* Usa todo el espacio disponible */
 }
 
 
@@ -61,9 +61,9 @@
 }
 
 .bottom-left,
-.bottom-right{
-  overflow-y: auto;
-  background-color: #16162b;
+.bottom-right,
+.top-right{
+  background-color: #D4A373;
 }
 
 /* Ajustes responsivos */

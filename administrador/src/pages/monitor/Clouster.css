@@ -20,6 +20,7 @@
     /* Evita desbordes */
 }
 
+
 /* Sección de Estadísticas (Gráfico y Descripción) */
 .clouster-stats {
     grid-area: stats;

@@ -82,7 +82,7 @@
 }
 
 .context-table tr:nth-child(even) {
-  background-color: #242424;
+  background-color: #EAD9C3;
 }
 
 /* Títulos */
@@ -148,8 +148,8 @@
   font-size: 14px;
   border-radius: 5px;
   border: 1px solid #444;
-  background-color: #5f5e5e;
-  color: #ffffff;
+  background-color: #e2a351;
+  color: #000000;
   width: 100%;
   max-width: 200px; /* Limitar el ancho máximo */
   text-align: center;
@@ -162,10 +162,10 @@
 }
 
 .context-container::-webkit-scrollbar-thumb {
-  background-color: #444; /* Oscuro */
+  background-color: #c5760f; /* Oscuro */
   border-radius: 8px;
 }
 
 .context-container::-webkit-scrollbar-track {
-  background-color: #1e1e1e; /* Fondo oscuro */
+  background-color: #e7a260; /* Fondo oscuro */
 }

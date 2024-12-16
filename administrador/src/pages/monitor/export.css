@@ -6,8 +6,8 @@
   justify-content: space-between; /* Espacia el contenido verticalmente */
   align-items: center;
   padding: 20px;
-  background-color: #1a1b5a;
-  color: #ffffff; /* Texto blanco */
+  background-color: #D4A373;
+  color: #000000; /* Texto blanco */
   text-align: center;
   border-radius: 10px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
@@ -16,7 +16,7 @@
 
 .export-title {
   font-size: 24px;
-  color: #bb86fc; /* Tono púrpura */
+  color: #000000; /* Tono púrpura */
   margin-bottom: 20px; /* Espacio inferior */
 }
 
@@ -31,8 +31,8 @@
 .export-button {
   padding: 10px 20px;
   font-size: 16px;
-  color: #ffffff;
-  background-color: #6200ea; /* Morado */
+  color: #000000;
+  background-color: #004aea; /* Morado */
   border: none;
   border-radius: 5px;
   cursor: pointer;

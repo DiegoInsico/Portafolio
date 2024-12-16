@@ -18,7 +18,7 @@ const UserContext = () => {
   // Fechas iniciales (últimos 7 días por defecto)
   const [startDate, setStartDate] = useState(() => {
     const date = new Date();
-    date.setDate(date.getDate() - 7); // Últimos 7 días por defecto
+    date.setDate(date.getDate() - 30); // Últimos 7 días por defecto
     return date;
   });
   const [endDate, setEndDate] = useState(new Date()); // Fecha de hoy por defecto

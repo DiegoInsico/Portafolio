@@ -8,7 +8,6 @@
   gap: 15px; 
   width: 100%;
   background-color: #EAD9C3;
-
   height: 100vh; /* Ajuste dinámico excluyendo el TopBar */
   padding: 10px; /* Espaciado interno */
   box-sizing: border-box;
@@ -24,7 +23,7 @@
   border-radius: 8px;
   height: 90%;
   background-color: #D4A373;
-  overflow-y: auto; /* Solo overflow vertical */
+  overflow-y: auto;
   padding: 10px;
   box-sizing: border-box;
   display: flex;

@@ -12,6 +12,8 @@
 .pb-filters {
   width: 25%; /* Área de filtros compacta pero con espacio suficiente */
   padding: 20px;
+  height: 80%;
+  margin-top: 10px;
   background-color: #D4A373; /* Azul oscuro más claro para los filtros */
   border-radius: 10px;
   box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5); /* Sutil sombra */
@@ -51,12 +53,16 @@
 .pb-add-filters {
   width: 40%; /* Mantiene espacio claro para gráficos */
   padding: 20px;
+  margin-top: 10px;
+  height: 80%;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  background-color: #D4A373; /* Azul oscuro más claro para los filtros */
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5); /* Sutil sombra */
+
+  background-color: #D4A373;
   border-radius: 10px;
-  overflow-y: auto; /* Scroll interno si es necesario */
+  overflow-y: auto; 
 }
 
 /* Slots de filtros (Eje X y Eje Y) */
@@ -114,6 +120,7 @@
   background-color: #D4A373; /* Fondo negro */
   color: white;
   display: flex;
+  height: 80%;
   justify-content: center;
   align-items: center;
   border-radius: 10px;
