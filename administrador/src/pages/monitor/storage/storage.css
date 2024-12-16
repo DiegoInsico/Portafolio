@@ -2,15 +2,16 @@
   display: grid;
   grid-template-columns: repeat(3, 1fr); 
   gap: 20px;
+  background-color: #EAD9C3;
   padding: 20px;
 }
 
 .chart-item {
-  background-color: #1a1b5a;
+  background-color: #D4A373;
   border: 1px solid #ddd; 
   border-radius: 8px; 
   padding: 20px; 
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
   text-align: center;
   max-width: 100%;
 }

@@ -312,13 +312,13 @@ const EntradasChart = () => {
       {mediaTypeChartData && (
         <Bar data={mediaTypeChartData} options={{ responsive: true }} />
       )}
-
+{/* 
       <h2>Entradas con/sin Media</h2>
       {mediaChartData && (
         <Pie data={mediaChartData} options={{ responsive: true }} />
-      )}
+      )} */}
 
-      <h2>Entradas con/sin Canciones</h2>
+      {/* <h2>Entradas con/sin Canciones</h2>
       {songChartData && (
         <Pie data={songChartData} options={{ responsive: true }} />
       )}
@@ -326,7 +326,7 @@ const EntradasChart = () => {
       <h2>Entradas con/sin Audio</h2>
       {audioChartData && (
         <Pie data={audioChartData} options={{ responsive: true }} />
-      )}
+      )} */}
 
       <h2>Distribución de Colores</h2>
       {colorChartData && (

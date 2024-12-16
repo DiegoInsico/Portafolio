@@ -40,12 +40,9 @@ const Dashboard = () => {
         <Music />
       </div>
       {/* visualizamos el mapa desde otra page */}
-      <div className="map-section">
-        {/* <h1>Mapa de Usuarios</h1> */}
+      {/* <div className="map-section">
           <UserHeatmap />
-        {/* <div style={{ height: "100%", width: "100%" }}>
-        </div> */}
-      </div>
+      </div> */}
 
       {/* niveles de seguridad de los users */}
       <div className="charts-section">

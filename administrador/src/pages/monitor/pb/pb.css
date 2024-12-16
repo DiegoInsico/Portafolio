@@ -4,7 +4,7 @@
   height: 100vh;
   gap: 10px;
   margin-top: 50px;
-  background-color: #1a1b5a; /* Fondo general azul oscuro */
+  background-color: #EAD9C3; /* Fondo general azul oscuro */
   color: white;
 }
 
@@ -12,7 +12,7 @@
 .pb-filters {
   width: 25%; /* Área de filtros compacta pero con espacio suficiente */
   padding: 20px;
-  background-color: #2b2b4b; /* Azul oscuro más claro para los filtros */
+  background-color: #D4A373; /* Azul oscuro más claro para los filtros */
   border-radius: 10px;
   box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5); /* Sutil sombra */
   overflow-y: auto; /* Scroll interno si los filtros exceden el espacio */
@@ -21,7 +21,7 @@
 /* Títulos de secciones */
 .pb-section h3 {
   font-size: 18px;
-  color: #bb86fc; /* Color púrpura claro */
+  color: #000000; /* Color púrpura claro */
   margin-bottom: 15px;
   text-align: left;
 }
@@ -54,7 +54,7 @@
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  background-color: #2b2b4b; /* Azul oscuro más claro para los filtros */
+  background-color: #D4A373; /* Azul oscuro más claro para los filtros */
   border-radius: 10px;
   overflow-y: auto; /* Scroll interno si es necesario */
 }
@@ -73,7 +73,7 @@
   border-radius: 8px;
   text-align: center;
   color: #bb86fc;
-  background-color: #2b2b4b; /* Azul oscuro */
+  background-color: #f5c08b; /* Azul oscuro */
   font-size: 14px;
   cursor: pointer;
   transition: background-color 0.3s ease;
@@ -111,7 +111,7 @@
 /* Área de gráficos */
 .pb-graphs {
   flex-grow: 1;
-  background-color: #121212; /* Fondo negro */
+  background-color: #D4A373; /* Fondo negro */
   color: white;
   display: flex;
   justify-content: center;
@@ -197,7 +197,7 @@
   margin: 20px auto;
   max-width: 90%; /* Limitar el ancho */
   overflow-x: auto; /* Habilitar scroll horizontal si es necesario */
-  background-color: #1a1b5a; /* Fondo oscuro */
+  background-color: #D4A373; /* Fondo oscuro */
   padding: 15px;
   border-radius: 10px;
   box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.3);

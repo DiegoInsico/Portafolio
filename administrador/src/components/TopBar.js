@@ -60,6 +60,9 @@ const TopBar = ({ currentUser, userRole, handleLogout }) => {
             <NavLink to="/monitor/graphics" className="topbar-link">
               Gráficos Tipificados
             </NavLink>
+            <NavLink to="/monitor/pb/pb" className="topbar-link">
+              Analisis de usuarios
+            </NavLink>
             <NavLink to="/monitor/storage/storageUsage" className="topbar-link">
               Gráficos Masivos
             </NavLink>

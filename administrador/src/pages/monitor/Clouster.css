@@ -10,7 +10,7 @@
     gap: 15px;
     width: 100%;
     height: calc(100vh - 70px);
-    background-color: #1a1b3a;
+    background-color: #EAD9C3;
 
     padding: 20px;
     box-sizing: border-box;
@@ -23,7 +23,7 @@
 /* Sección de Estadísticas (Gráfico y Descripción) */
 .clouster-stats {
     grid-area: stats;
-    background-color: #1a1b5a;
+    background-color: #D4A373;
     /* padding: 20px; */
     border-radius: 10px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
@@ -33,7 +33,7 @@
     font-size: 20px;
     font-weight: bold;
     margin-top: 0;
-    color: #bb86fc;
+    color: #000000;
     text-align: center;
 }
 
@@ -64,18 +64,18 @@
     flex-direction: column;
     justify-content: flex-start;
     align-items: flex-start;
-    color: #e0e0e0;
+    color: #000000;
     font-size: 14px;
 }
 
 .clouster-summary p {
-    color: white;
+    color: rgb(0, 0, 0);
 }
 
 /* Logs de Auditoría */
 .clouster-logs {
     grid-area: logs;
-    background-color: #1a1b5a;
+    background-color: #D4A373;
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
@@ -95,20 +95,20 @@
 }
 
 .clouster-logs-table th {
-    background-color: #16163a;
+    background-color: #b87532;
 
-    color: #bb86fc;
+    color: #000000;
     font-weight: bold;
 }
 
 .clouster-logs-table td {
-    color: #e0e0e0;
+    color: #000000;
 }
 
 /* Alertas Operativas */
 .clouster-alerts {
     grid-area: alerts;
-    background-color: #1a1b5a;
+    background-color: #D4A373;
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
@@ -116,7 +116,7 @@
 }
 
 .clouster-alert strong, p{
-    color: white;
+    color: rgb(0, 0, 0);
 }
 
 /* Lista de Alertas */
@@ -127,7 +127,7 @@
 }
 
 .clouster-alert {
-    background-color: #16163a;
+    background-color: #c47c34;
     padding: 15px;
     border-radius: 8px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
@@ -136,7 +136,7 @@
 }
 
 .alert-timestamp {
-    color: #bb86fc;
+    color: #424242;
     font-size: 12px;
     margin-top: 5px;
 }
@@ -144,19 +144,18 @@
 /* Formulario para Crear Anuncios */
 .clouster-announcement {
     grid-area: announcement;
-    background-color: #1a1b5a;
+    background-color: #D4A373;
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
 }
 
 .clouster-announcement input, label{
-    background-color: #1a1a3b;
     border-color: wheat;
 }
 
 .clouster-announcement textarea{
-    background-color: #292b91;
+    background-color: #be8042;
     border-color: wheat;
 }
 
@@ -169,7 +168,7 @@ form {
 
 form label {
     font-size: 14px;
-    color: #bb86fc;
+    color: #050505;
 }
 
 form textarea,

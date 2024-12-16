@@ -7,7 +7,7 @@
   grid-template-rows: 1fr 1fr;   /* Dos filas iguales */
   gap: 20px;
   padding: 20px;
-  background-color: #181931;
+  background-color: #EAD9C3;
   box-sizing: border-box;
   margin-top: 70px; /* Posiciona debajo del TopBar */
   height: calc(100vh - 70px); /* Usa todo el espacio disponible */

@@ -2,14 +2,14 @@
   display: grid;
   grid-template-areas:
     "tickets info music"
-    "map map charts";
-  grid-template-columns: 1fr 1fr 1fr; /* Columnas iguales */
-  grid-template-rows: 45% 55%; /* Fila automática */
+    "tickets charts charts";
+  grid-template-columns: 1.5fr 1fr 1fr; /* Columnas iguales */
+  grid-template-rows: 40% 55%; /* Fila automática */
   gap: 15px; 
   width: 100%;
-  background-color: #1b1b33;
+  background-color: #EAD9C3;
 
-  height: calc(100vh - 70px); /* Ajuste dinámico excluyendo el TopBar */
+  height: 100vh; /* Ajuste dinámico excluyendo el TopBar */
   padding: 10px; /* Espaciado interno */
   box-sizing: border-box;
   margin-top: 60PX;
@@ -22,7 +22,8 @@
 .map-section,
 .charts-section {
   border-radius: 8px;
-  background-color: #1a1b5a;
+  height: 90%;
+  background-color: #D4A373;
   overflow-y: auto; /* Solo overflow vertical */
   padding: 10px;
   box-sizing: border-box;
@@ -36,6 +37,7 @@
 /* Definición de las áreas del grid */
 .tickets-section {
   grid-area: tickets;
+  height: 95%;
 }
 
 .info-section {
