@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { useAuth } from "../auth/authContext";
-import "./LineaDeTiempo.css"; // Asegúrate de importar el nuevo nombre del CSS con las clases lt-
+import "./LineaDeTiempo.css";
 import { ClipLoader } from "react-spinners";
 import PasswordOverlay from "../../components/PasswordOverlay";
 import { getEntradas, getUserById } from "../../firebase";
@@ -49,37 +49,38 @@ const LineaDeTiempo = () => {
   const [entries, setEntries] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Configuración de Swiper
-  const swiperParams = {
-    modules: [Navigation, Pagination, Autoplay, A11y],
-    spaceBetween: 50, // Aumenta el espacio entre slides
-    slidesPerView: 3,
-    navigation: true,
-    pagination: { clickable: true },
-    autoplay: { delay: 3000, disableOnInteraction: false },
-    loop: true,
-    breakpoints: {
-      320: { slidesPerView: 1 },
-      480: { slidesPerView: 1 },
-      640: { slidesPerView: 1 },
-      768: { slidesPerView: 2 },
-      1024: { slidesPerView: 3 },
-      1440: { slidesPerView: 3 },
+// Configuración de Swiper
+const swiperParams = {
+  modules: [Navigation, Pagination, Autoplay, A11y],
+  spaceBetween: 50, // Aumenta el espacio entre slides
+  slidesPerView: 3,
+  navigation: true,
+  pagination: { clickable: true },
+  autoplay: { delay: 3000, disableOnInteraction: false },
+  loop: true,
+  breakpoints: {
+    320: { slidesPerView: 1 },
+    480: { slidesPerView: 1 },
+    640: { slidesPerView: 1 },
+    768: { slidesPerView: 2 },
+    1024: { slidesPerView: 3 },
+    1440: { slidesPerView: 3 },
+  },
+  on: {
+    slideChange: () => {
+      // Seleccionamos todos los slides
+      const slides = document.querySelectorAll('.timeline-item');
+      slides.forEach((slide, index) => {
+        // Eliminamos la clase "active" de todos los slides
+        slide.classList.remove('active');
+      });
+      // Agregamos la clase "active" al slide central
+      const activeSlide = swiper.current.swiper.slides[swiper.current.swiper.activeIndex]; // Corregir esta línea
+      activeSlide.classList.add('active');
     },
-    on: {
-      slideChange: () => {
-        // Seleccionamos todos los slides
-        const slides = document.querySelectorAll('.lt-timeline-item');
-        slides.forEach((slide) => {
-          // Eliminamos la clase "active" de todos los slides
-          slide.classList.remove('active');
-        });
-        // Agregamos la clase "active" al slide central
-        const activeSlide = swiper.current.swiper.slides[swiper.current.swiper.activeIndex];
-        activeSlide.classList.add('active');
-      },
-    },
-  };
+  },
+};
+
 
   const [userPasswords, setUserPasswords] = useState({
     level2Password: "",
@@ -170,21 +171,21 @@ const LineaDeTiempo = () => {
 
   const renderEntradaContent = (entrada) => {
     const { mediaType, media, cancion, texto, audio } = entrada;
-
+  
     // Prioridad de renderizado:
     // 1. Canción
     // 2. Media (Imagen/Video)
     // 3. Texto
     // 4. Audio
     // 5. Placeholder
-
+  
     if (cancion) {
       // Mostrar la imagen del álbum de la canción
       return (
         <img
           src={cancion.albumImage || PLACEHOLDERS.musica}
           alt={cancion.name || "Sin nombre"}
-          className="lt-item-image"
+          className="item-image"
           loading="lazy"
         />
       );
@@ -195,7 +196,7 @@ const LineaDeTiempo = () => {
           <img
             src={PLACEHOLDERS.video}
             alt="Video"
-            className="lt-item-image"
+            className="item-image"
             loading="lazy"
           />
         );
@@ -205,47 +206,52 @@ const LineaDeTiempo = () => {
           <img
             src={media || PLACEHOLDERS.default}
             alt={entrada.nickname || "Sin nombre"}
-            className="lt-item-image"
+            className="item-image"
             loading="lazy"
           />
         );
       }
     } else if (texto) {
       return (
-        <div className="lt-entrada-texto">
+        <div className="entrada-texto">
           <p>{texto}</p>
         </div>
       );
     } else if (audio) {
       return (
-        <div className="lt-entrada-audio">
-          <audio controls>
-            <source src={audio} type="audio/mpeg" />
-            Tu navegador no soporta el elemento de audio.
-          </audio>
-        </div>
+        <img
+          src={PLACEHOLDERS.audio}
+          alt="Audio"
+          className="item-image"
+          loading="lazy"
+        />
       );
     } else {
       // Mostrar placeholder si no hay contenido disponible
       return (
-        <div className="lt-entrada-default">
-          <p>Sin contenido disponible</p>
-        </div>
+        <img
+          src={PLACEHOLDERS.default}
+          alt="Sin contenido"
+          className="item-image"
+          loading="lazy"
+        />
       );
     }
   };
+  
+  
 
   return (
-    <div className="lt-scroll-container">
+    <div className="scroll-container">
       {/* Hero Section */}
-      <section className="lt-timeline-section">
-        <div className="lt-page-one">
-          <div className="lt-titulo-left">
-            <h1>El</h1>
+      <section className="timeline-section">
+        <div className="page-one">
+          <div className="titulo-left">
+            <h1>El </h1>
             <h1>carrusel</h1>
             <h1>de tu Vida</h1>
           </div>
-          <div className="lt-titulo-right">
+          <div className="titulo-right">
             <p>
               Este es el lugar donde puedes guardar todas tus pertenencias:
               correos electrónicos, cuentas bancarias, seguros de vida y todo lo
@@ -256,10 +262,10 @@ const LineaDeTiempo = () => {
       </section>
 
       {/* Timeline Section con Selector de Nivel Integrado */}
-      <section className="lt-timeline-section">
-        <div className="lt-timeline-container">
+      <section className="timeline-section">
+        <div className="timeline-container">
           {/* Selector de Nivel Integrado */}
-          <div className="lt-level-selector-container">
+          <div className="level-selector-container">
             <label htmlFor="level-select">Selecciona Nivel:</label>
             <select
               id="level-select"
@@ -276,24 +282,24 @@ const LineaDeTiempo = () => {
 
           {/* Carrusel (Timeline) */}
           {loading ? (
-            <div className="lt-loader">
-              <ClipLoader size={50} color="#e67e22" />
+            <div className="loader">
+              <ClipLoader size={50} color="#4A90E2" />
             </div>
           ) : entries.length === 0 ? (
             <p>No tienes entradas para mostrar.</p>
           ) : (
-            <Swiper {...swiperParams} ref={swiper} className="lt-swiper-container">
+            <Swiper {...swiperParams}>
               {entries.map((entrada) => (
                 <SwiperSlide key={entrada.id}>
                   <div
-                    className="lt-timeline-item"
+                    className="timeline-item"
                     onClick={() => handleItemClick(entrada)}
                   >
-                    <div className="lt-image-container">
+                    <div className="image-container">
                       {/* Renderizar contenido según el tipo */}
                       {renderEntradaContent(entrada)}
                       {/* Overlay con el apodo */}
-                      <div className="lt-nickname-overlay">
+                      <div className="nickname-overlay">
                         <h3>{entrada.nickname || "Sin nombre"}</h3>
                       </div>
                     </div>

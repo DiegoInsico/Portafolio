@@ -1,3 +1,5 @@
+// EntryCard.js
+
 import React from 'react';
 import './EntryCard.css';
 
