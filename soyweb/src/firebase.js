@@ -1,4 +1,5 @@
 // src/firebase.js
+
 import { initializeApp } from "firebase/app";
 import {
   getAuth, signInWithEmailAndPassword, onAuthStateChanged, createUserWithEmailAndPassword, signOut as firebaseSignOut,
@@ -6,9 +7,12 @@ import {
 import {
   getFirestore, collection, getDocs, query, where, Timestamp, addDoc, doc, updateDoc, onSnapshot, deleteDoc, getDoc, setDoc, arrayUnion, serverTimestamp, runTransaction
 } from "firebase/firestore";
+
 import { v4 as uuidv4 } from 'uuid';
 import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject, getMetadata } from "firebase/storage";
+
 const DEFAULT_THUMBNAIL_URL = "https://via.placeholder.com/150";
+
 // Configuración de Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyBRI4q2P-BbqG43sJkApiF-ifVLQZlsxnU",
@@ -18,17 +22,23 @@ const firebaseConfig = {
   messagingSenderId: "507152982336",
   appId: "1:507152982336:web:4504d3d9195e090bc25aa5",
 };
+
 // Inicializa Firebase
 const app = initializeApp(firebaseConfig);
+
 const firestore = getFirestore(app);
 export const auth = getAuth(app); // Exporta auth
 export const db = getFirestore(app); // Exporta db
 export const storage = getStorage(app); // Exporta storage
+
+
 // **Funciones Existentes**
+
 export const getBeneficiarios = async () => {
   try {
     const beneficiariosCollection = collection(db, "beneficiarios");
     const snapshot = await getDocs(beneficiariosCollection);
+
     return snapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
@@ -38,6 +48,7 @@ export const getBeneficiarios = async () => {
     throw error;
   }
 };
+
 export const getMensajesForUser = async (email) => {
   try {
     const mensajesRef = collection(db, "mensajesProgramados");
@@ -54,27 +65,33 @@ export const getMensajesForUser = async (email) => {
     throw error;
   }
 };
+
 // Función para obtener las entradas de un usuario específico
 export const getEntradas = async (userId) => {
   try {
     const entradasCollection = collection(db, "entradas");
     const q = query(entradasCollection, where("userId", "==", userId));
     const snapshot = await getDocs(q);
+
     return snapshot.docs.map((doc) => {
       const data = doc.data();
+
       // Convertir fechas a objetos Date
       data.fechaCreacion = data.fechaCreacion
         ? data.fechaCreacion.toDate
           ? data.fechaCreacion.toDate()
           : new Date(data.fechaCreacion)
         : null;
+
       data.fechaRecuerdo = data.fechaRecuerdo
         ? data.fechaRecuerdo.toDate
           ? data.fechaRecuerdo.toDate()
           : new Date(data.fechaRecuerdo)
         : null;
+
       // Asegurar que 'nivel' es una cadena
       data.nivel = data.nivel ? data.nivel.toString() : "1";
+
       // Definir valores predeterminados para los campos
       return {
         id: doc.id,
@@ -100,6 +117,7 @@ export const getEntradas = async (userId) => {
     throw error;
   }
 };
+
 // Función para obtener una entrada específica por ID
 export const getEntradaById = async (entryId) => {
   try {
@@ -116,6 +134,7 @@ export const getEntradaById = async (entryId) => {
     throw error;
   }
 };
+
 // Función para obtener múltiples entradas por IDs
 export const getEntradasByIds = async (entryIds) => {
   try {
@@ -153,6 +172,7 @@ export const getUsers = async () => {
   try {
     const usersCollection = collection(db, "users");
     const snapshot = await getDocs(usersCollection);
+
     return snapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
@@ -166,6 +186,7 @@ export const getMensajesProgramados = async () => {
   try {
     const mensajesCollection = collection(db, "mensajesProgramados");
     const snapshot = await getDocs(mensajesCollection);
+
     return snapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
@@ -218,14 +239,18 @@ export const signOutUser = async () => {
     throw error;
   }
 };
+
 // Funciones relacionadas con entradas
+
 export const getEntries = async (user) => {
   try {
     const entradasCollection = collection(db, 'entradas');
     const q = query(entradasCollection, where("userId", "==", user.uid)); // Usa user.uid en lugar de user
     const snapshot = await getDocs(q);
+
     return snapshot.docs.map(doc => {
       const data = doc.data();
+
       // Formateo de fecha para fechaCreacion y fechaRecuerdo
       if (data.fechaCreacion && data.fechaCreacion.toDate) {
         const fecha = data.fechaCreacion.toDate();
@@ -235,6 +260,7 @@ export const getEntries = async (user) => {
         const fechaRecuerdo = data.fechaRecuerdo.toDate();
         data.fechaRecuerdo = `${fechaRecuerdo.getDate()}/${fechaRecuerdo.getMonth() + 1}/${fechaRecuerdo.getFullYear()}`;
       }
+
       // Definir valores predeterminados para los campos
       return {
         id: doc.id,
@@ -260,12 +286,14 @@ export const getEntries = async (user) => {
     throw error;
   }
 }
+
 // Añadir entrada al collage
 export const addEntryToCollage = async (collageId, entryId, initialPosition = { x: 100, y: 100 }) => {
   console.log(`// DEBUG [addEntryToCollage]: Iniciando función con collageId=${collageId}, entryId=${entryId}, initialPosition=`, initialPosition);
   try {
     console.log("// DEBUG [addEntryToCollage]: Obteniendo referencia al documento del collage...");
     const collageRef = doc(db, "collages", collageId);
+
     console.log("// DEBUG [addEntryToCollage]: Actualizando documento con nueva entrada...");
     await updateDoc(collageRef, {
       entries: arrayUnion({
@@ -281,12 +309,15 @@ export const addEntryToCollage = async (collageId, entryId, initialPosition = { 
     throw error;
   }
 };
+
+
 // Suscribirse a los collages de un usuario
 export const subscribeToCollages = (userId, onUpdate, onError) => {
   console.log(`// DEBUG [subscribeToCollages]: Iniciando suscripción a collages del usuario userId=${userId}`);
   const db = getFirestore();
   const collagesRef = collection(db, 'collages');
   const q = query(collagesRef, where('userId', '==', userId));
+
   console.log("// DEBUG [subscribeToCollages]: Configurando onSnapshot para monitorear cambios...");
   const unsubscribe = onSnapshot(
     q,
@@ -309,8 +340,11 @@ export const subscribeToCollages = (userId, onUpdate, onError) => {
       onError(error);
     }
   );
+
   return unsubscribe;
 };
+
+
 // Crear un nuevo collage
 export const createCollageAlbum = async (collageName, selectedEntries, thumbnail, currentUser, titleData) => {
   console.log(`// DEBUG [createCollageAlbum]: Iniciando creación de collage. Nombre=${collageName}, selectedEntries=`, selectedEntries, "titleData=", titleData);
@@ -319,12 +353,14 @@ export const createCollageAlbum = async (collageName, selectedEntries, thumbnail
       console.error('// DEBUG [createCollageAlbum]: User ID no definido');
       throw new Error('User ID is undefined');
     }
+
     console.log('// DEBUG [createCollageAlbum]: Subiendo thumbnail a Firebase Storage...');
     const uniqueThumbnailName = `thumbnails/${uuidv4()}-${thumbnail.name}`;
     const thumbnailRef = ref(storage, uniqueThumbnailName);
     await uploadBytes(thumbnailRef, thumbnail);
     const thumbnailURL = await getDownloadURL(thumbnailRef);
     console.log('// DEBUG [createCollageAlbum]: Thumbnail subida con URL:', thumbnailURL);
+
     const newCollageRef = doc(collection(db, 'collages'));
     console.log('// DEBUG [createCollageAlbum]: Creando documento del collage en Firestore con ID:', newCollageRef.id);
     await setDoc(newCollageRef, {
@@ -336,6 +372,7 @@ export const createCollageAlbum = async (collageName, selectedEntries, thumbnail
       entries: selectedEntries,
       titleData: titleData
     });
+
     console.log(`// DEBUG [createCollageAlbum]: Collage creado exitosamente con ID ${newCollageRef.id}`);
     return newCollageRef.id;
   } catch (error) {
@@ -343,6 +380,8 @@ export const createCollageAlbum = async (collageName, selectedEntries, thumbnail
     throw error;
   }
 };
+
+
 // Obtener collages por usuario
 export const getCollagesByUser = async (userId) => {
   console.log(`// DEBUG [getCollagesByUser]: Iniciando fetch de collages para userId=${userId}`);
@@ -351,7 +390,9 @@ export const getCollagesByUser = async (userId) => {
     const q = query(collagesCollection, where("userId", "==", userId));
     console.log("// DEBUG [getCollagesByUser]: Ejecutando consulta en Firestore...");
     const snapshot = await getDocs(q);
+
     console.log(`// DEBUG [getCollagesByUser]: Número de collages obtenidos: ${snapshot.size}`);
+
     const collages = snapshot.docs.map((doc) => {
       const data = doc.data();
       return {
@@ -361,6 +402,7 @@ export const getCollagesByUser = async (userId) => {
         entries: data.entries || [],
       };
     });
+
     console.log("// DEBUG [getCollagesByUser]: Datos de collages obtenidos:", collages);
     return collages;
   } catch (error) {
@@ -368,12 +410,15 @@ export const getCollagesByUser = async (userId) => {
     throw error;
   }
 };
+
+
 // Obtener un collage específico por ID
 export const getCollageById = async (collageId) => {
   console.log(`// DEBUG [getCollageById]: Obteniendo collage con ID=${collageId}`);
   try {
     const collageRef = doc(db, "collages", collageId);
     const collageDoc = await getDoc(collageRef);
+
     if (collageDoc.exists()) {
       const data = collageDoc.data();
       const collageData = {
@@ -396,11 +441,13 @@ export const getCollageById = async (collageId) => {
     throw error;
   }
 };
+
 // Actualizar posición de una entrada en el collage
 export const updateEntryPositionInCollage = async (collageId, entryId, newPosition) => {
   console.log(`// DEBUG [updateEntryPositionInCollage]: Iniciando actualización de posición. collageId=${collageId}, entryId=${entryId}, newPosition=`, newPosition);
   try {
     const collageRef = doc(db, "collages", collageId);
+
     await runTransaction(db, async (transaction) => {
       console.log("// DEBUG [updateEntryPositionInCollage]: Iniciando transacción de Firestore...");
       const collageDoc = await transaction.get(collageRef);
@@ -408,6 +455,7 @@ export const updateEntryPositionInCollage = async (collageId, entryId, newPositi
         console.error("// DEBUG [updateEntryPositionInCollage]: Collage no encontrado");
         throw new Error("Collage no encontrado");
       }
+
       const entries = collageDoc.data().entries || [];
       const updatedEntries = entries.map(entry => {
         if (entry.entryId === entryId) {
@@ -416,15 +464,19 @@ export const updateEntryPositionInCollage = async (collageId, entryId, newPositi
         }
         return entry;
       });
+
       console.log("// DEBUG [updateEntryPositionInCollage]: Actualizando documento con nuevas posiciones...");
       transaction.update(collageRef, { entries: updatedEntries });
     });
     console.log("// DEBUG [updateEntryPositionInCollage]: Posición actualizada exitosamente.");
+
   } catch (error) {
     console.error("// DEBUG [updateEntryPositionInCollage]: Error actualizando posición de la entrada:", error);
     throw error;
   }
 };
+
+
 // Actualizar propiedades del título del collage
 export const updateCollageTitleProperties = async (collageId, properties) => {
   console.log(`// DEBUG [updateCollageTitleProperties]: Actualizando propiedades del título para collageId=${collageId}, properties=`, properties);
@@ -435,6 +487,7 @@ export const updateCollageTitleProperties = async (collageId, properties) => {
       console.error("// DEBUG [updateCollageTitleProperties]: Collage no encontrado");
       throw new Error("Collage no encontrado");
     }
+
     await updateDoc(collageRef, { ...properties });
     console.log("// DEBUG [updateCollageTitleProperties]: Propiedades del título actualizadas exitosamente.");
   } catch (error) {
@@ -442,6 +495,7 @@ export const updateCollageTitleProperties = async (collageId, properties) => {
     throw error;
   }
 };
+
 // Remover una entrada del collage
 export const removeEntryFromCollage = async (collageId, entryId) => {
   console.log(`// DEBUG [removeEntryFromCollage]: Iniciando la remoción de entryId=${entryId} del collageId=${collageId}`);
@@ -449,16 +503,20 @@ export const removeEntryFromCollage = async (collageId, entryId) => {
   try {
     const collageRef = doc(firestore, "collages", collageId);
     const collageDoc = await getDoc(collageRef);
+
     if (!collageDoc.exists()) {
       console.error("// DEBUG [removeEntryFromCollage]: Collage no encontrado");
       throw new Error("Collage no encontrado");
     }
+
     const existingEntries = collageDoc.data().entries || [];
     const entryToRemove = existingEntries.find(entry => entry.entryId === entryId);
+
     if (!entryToRemove) {
       console.warn(`// DEBUG [removeEntryFromCollage]: La entrada entryId=${entryId} no existe en el collage`);
       return;
     }
+
     const updatedEntries = existingEntries.filter(entry => entry.entryId !== entryId);
     console.log(`// DEBUG [removeEntryFromCollage]: Removiendo entryId=${entryId}. Entradas antes: ${existingEntries.length}, después: ${updatedEntries.length}`);
     await updateDoc(collageRef, { entries: updatedEntries });
@@ -468,17 +526,22 @@ export const removeEntryFromCollage = async (collageId, entryId) => {
     throw error;
   }
 };
+
+
 // Eliminar un collage y sus recursos asociados
 export const deleteCollage = async (collageId) => {
   console.log(`// DEBUG [deleteCollage]: Iniciando eliminación del collageId=${collageId}`);
   const storage = getStorage();
   const firestore = getFirestore();
   const collageDocRef = doc(firestore, 'collages', collageId);
+
   try {
     const docSnapshot = await getDoc(collageDocRef);
+
     if (docSnapshot.exists()) {
       const collageData = docSnapshot.data();
       console.log("// DEBUG [deleteCollage]: Collage encontrado, iniciando eliminación de recursos...");
+
       // Eliminar miniatura del collage
       if (collageData.thumbnailPath) {
         const thumbnailRef = ref(storage, collageData.thumbnailPath);
@@ -496,6 +559,7 @@ export const deleteCollage = async (collageId) => {
           }
         }
       }
+
       // Eliminar miniaturas de las entradas
       if (collageData.entries && Array.isArray(collageData.entries)) {
         for (const entry of collageData.entries) {
@@ -517,6 +581,7 @@ export const deleteCollage = async (collageId) => {
           }
         }
       }
+
       // Eliminar el documento del collage en Firestore
       console.log("// DEBUG [deleteCollage]: Eliminando documento del collage en Firestore...");
       await deleteDoc(collageDocRef);
@@ -524,14 +589,17 @@ export const deleteCollage = async (collageId) => {
     } else {
       console.log("// DEBUG [deleteCollage]: El collage no existe en Firestore");
     }
+
   } catch (error) {
     console.error("// DEBUG [deleteCollage]: Error eliminando el collage:", error);
     throw error;
   }
 };
+
 // Actualizar propiedades de una entrada en el collage
 export const updateEntryProperties = async (collageId, entryId, properties) => {
   console.log(`// DEBUG [updateEntryProperties]: Iniciando actualización de propiedades de entrada. collageId=${collageId}, entryId=${entryId}, properties=`, properties);
+
   try {
     const collageRef = doc(db, "collages", collageId);
     const collageDoc = await getDoc(collageRef);
@@ -539,6 +607,7 @@ export const updateEntryProperties = async (collageId, entryId, properties) => {
       console.error("// DEBUG [updateEntryProperties]: Collage no encontrado");
       throw new Error("Collage no encontrado");
     }
+
     const entries = collageDoc.data().entries || [];
     let entryFound = false;
     const updatedEntries = entries.map(entry => {
@@ -549,9 +618,11 @@ export const updateEntryProperties = async (collageId, entryId, properties) => {
       }
       return entry;
     });
+
     if (!entryFound) {
       console.warn(`// DEBUG [updateEntryProperties]: No se encontró la entrada con entryId=${entryId} en el collage.`);
     }
+
     await updateDoc(collageRef, { entries: updatedEntries });
     console.log(`// DEBUG [updateEntryProperties]: Propiedades actualizadas exitosamente para entryId=${entryId}`);
   } catch (error) {
@@ -559,6 +630,7 @@ export const updateEntryProperties = async (collageId, entryId, properties) => {
     throw error;
   }
 };
+
 // Funciones para documentos
 export const addDocument = async (userId, { title, texto, testigo }) => {
   try {
@@ -578,6 +650,7 @@ export const addDocument = async (userId, { title, texto, testigo }) => {
     throw error;
   }
 };
+
 export const editDocument = async (documentId, updatedData) => {
   try {
     const docRef = doc(db, "documentos", documentId);
@@ -588,6 +661,7 @@ export const editDocument = async (documentId, updatedData) => {
     throw error;
   }
 };
+
 export const deleteDocument = async (documentId) => {
   try {
     const docRef = doc(db, "documentos", documentId);
@@ -598,6 +672,7 @@ export const deleteDocument = async (documentId) => {
     throw error;
   }
 };
+
 // Función para obtener los documentos de un usuario específico
 export const getDocuments = async (userId) => {
   try {
@@ -613,13 +688,17 @@ export const getDocuments = async (userId) => {
     throw error;
   }
 };
+
 export const getTestigos = async (userId) => {
+
   try {
     const testigosCollection = collection(db, "testigos");
     const q = query(testigosCollection, where("userId", "==", userId));
     const snapshot = await getDocs(q);
+
     console.log("Consulta realizada para el userId:", userId);
     console.log("Cantidad de testigos obtenidos:", snapshot.size);
+
     return snapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
@@ -628,12 +707,15 @@ export const getTestigos = async (userId) => {
     console.error("Error al obtener testigos:", error);
     throw error;
   }
+
   try {
     const testigosCollection = collection(db, "testigos");
     const q = query(testigosCollection, where("userId", "==", userId));
     const snapshot = await getDocs(q);
+
     console.log("Consulta realizada para el userId:", userId);
     console.log("Cantidad de testigos obtenidos:", snapshot.size);
+
     return snapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
@@ -643,6 +725,7 @@ export const getTestigos = async (userId) => {
     throw error;
   }
 };
+
 // **Nueva Función para Obtener un Usuario por ID**
 export const getUserById = async (userId) => {
   try {
@@ -659,6 +742,7 @@ export const getUserById = async (userId) => {
     throw error;
   }
 };
+
 // **Subir PDF directamente a Firebase Storage**
 export const uploadPdfToStorage = async (userId, pdfBlob) => {
   try {
@@ -674,6 +758,7 @@ export const uploadPdfToStorage = async (userId, pdfBlob) => {
     throw error;
   }
 };
+
 // **Guardar la URL en Firestore**
 export const savePdfUrlInFirestore = async (userId, pdfUrl) => {
   try {
@@ -689,6 +774,7 @@ export const savePdfUrlInFirestore = async (userId, pdfUrl) => {
     throw error;
   }
 };
+
 // **Añadir Reflexión a una Entrada**
 export const addReflexion = async (userId, entradaId, texto) => {
   try {
@@ -710,6 +796,7 @@ export const addReflexion = async (userId, entradaId, texto) => {
     throw error;
   }
 };
+
 export const getDespedidasForUser = async (userId) => {
   try {
     const despedidasCollection = collection(db, "despedidas");
@@ -725,6 +812,7 @@ export const getDespedidasForUser = async (userId) => {
     throw error;
   }
 };
+
 /**
  * Obtener despedidas asignadas al usuario a través de beneficiarios
  * @param {string} email - Email del usuario
@@ -748,6 +836,7 @@ export const getDespedidasAssignedToUser = async (email) => {
     throw error;
   }
 };
+
 /**
  * Obtener beneficiarios de un usuario
  * @param {string} userId - UID del usuario
@@ -765,6 +854,7 @@ export const getBeneficiariosForUser = async (userId) => {
     throw error;
   }
 };
+
 /**
  * Obtener un usuario por su email
  * @param {string} email - Email del usuario
@@ -789,6 +879,7 @@ export const getUserByEmail = async (email) => {
     throw error;
   }
 };
+
 /**
  * Obtener un usuario por su userId
  * @param {string} userId - UID del usuario
@@ -810,7 +901,9 @@ export const getUserByIdFromFirestore = async (uid) => {
     throw error;
   }
 };
+
 // firebase.js
+
 /**
  * Obtener usuarios por una lista de UIDs
  * @param {Array} userIds - Array de UIDs de usuarios
@@ -824,6 +917,7 @@ export const getUsersByIds = async (userIds) => {
       const batch = userIds.splice(0, 10);
       batches.push(batch);
     }
+
     const users = [];
     for (const batch of batches) {
       const usersCollection = collection(db, "users");
@@ -839,6 +933,7 @@ export const getUsersByIds = async (userIds) => {
     throw error;
   }
 };
+
 export const getReflexionesForUser = async (userId, entradaId) => {
   try {
     const reflexionesCollection = collection(
@@ -852,6 +947,7 @@ export const getReflexionesForUser = async (userId, entradaId) => {
       id: doc.id,
       ...doc.data(),
     }));
+
     // Asegurar que los campos necesarios existen y convertir Timestamp a Date
     const reflexionesFormateadas = reflexiones.map((reflexion) => ({
       texto: reflexion.texto || "",
@@ -859,6 +955,7 @@ export const getReflexionesForUser = async (userId, entradaId) => {
       fecha: reflexion.fecha ? reflexion.fecha.toDate() : new Date(), // Convertir a Date
       userId: reflexion.userId || "",
     }));
+
     return reflexionesFormateadas;
   } catch (error) {
     console.error("Error al obtener reflexiones:", error);
