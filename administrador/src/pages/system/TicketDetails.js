@@ -17,6 +17,7 @@ import {
 import { ToastContainer, toast } from "react-toastify";
 import "./TicketDetails.css";
 import { auth } from "../../firebase";
+import Access from "./access";
 
 const TicketDetails = ({ ticket, onClose }) => {
   console.log("Datos recibidos en TicketDetails:", ticket);
@@ -28,13 +29,18 @@ const TicketDetails = ({ ticket, onClose }) => {
   const priority = ticket.priority || "No Definida";
   const createdAt = ticket.createdAt || "Fecha desconocida";
   const currentUser = auth.currentUser;
-
+  const [openAccessModal, setOpenAccessModal] = useState(false);
 
   // Obtener mensajes en tiempo real
   useEffect(() => {
     const unsubscribe = getTicketMessages(ticket.id, setMessages);
     return () => unsubscribe();
   }, [ticket.id]);
+
+  const handleUpdateAccess = (updatedStatus) => {
+    console.log("Nuevo estado de accesos:", updatedStatus);
+    // Guardar en Firestore aquí si es necesario
+  };
 
   // Manejar envío de mensaje
   const handleSendMessage = async () => {
@@ -132,6 +138,17 @@ const TicketDetails = ({ ticket, onClose }) => {
         <Button onClick={onClose} className="close-button" variant="contained">
           Cerrar
         </Button>
+
+        {/* Botón de Configurar Accesos */}
+        <Button
+          onClick={() => setOpenAccessModal(true)}
+          className="access-button"
+          variant="contained"
+          color="primary"
+        >
+          Configurar Accesos
+        </Button>
+
         <Typography variant="h5" className="modal-title">
           Detalles del Ticket
         </Typography>
@@ -165,11 +182,16 @@ const TicketDetails = ({ ticket, onClose }) => {
             <strong>Asignado a:</strong> {ticket.assignedTo || "Sin asignar"}
           </Typography>
           <Typography>
-            <strong>Creado:</strong> {ticket.createdAt || "Fecha desconocida"}
+            <strong>Creado:</strong>{" "}
+            {ticket.createdAt
+              ? new Date(ticket.createdAt.seconds * 1000).toLocaleString()
+              : "Fecha desconocida"}
           </Typography>
           <Typography>
             <strong>Última actualización:</strong>{" "}
-            {ticket.updatedAt || "Sin fecha"}
+            {ticket.updatedAt
+              ? new Date(ticket.updatedAt.seconds * 1000).toLocaleString()
+              : "Sin fecha"}
           </Typography>
         </div>
 
@@ -209,7 +231,13 @@ const TicketDetails = ({ ticket, onClose }) => {
           </button>
         </div>
       )}
-
+      {/* Modal de Configurar Accesos */}
+      {/* Modal Access */}
+      <Access
+        open={openAccessModal}
+        onClose={() => setOpenAccessModal(false)}
+        userId={ticket.userId} // Pasar el ID del usuario
+      />
       <ToastContainer />
     </div>
   );

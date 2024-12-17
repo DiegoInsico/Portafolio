@@ -17,9 +17,9 @@ const TopBar = ({ currentUser, userRole, handleLogout }) => {
             <NavLink to="/monitor/graphics" className="topbar-link">
               Gráficos Tipificados
             </NavLink>
-            <NavLink to="/monitor/storage/storageUsage" className="topbar-link">
+            {/* <NavLink to="/monitor/storage/storageUsage" className="topbar-link">
               Gráficos Masivos
-            </NavLink>
+            </NavLink> */}
             <NavLink to="/monitor/pb/pb" className="topbar-link">
               Gráficos PB
             </NavLink>
@@ -29,12 +29,12 @@ const TopBar = ({ currentUser, userRole, handleLogout }) => {
             <NavLink to="/system/inbox" className="topbar-link">
               Consultas y Soporte
             </NavLink>
-            <NavLink to="/monitor/clouster" className="topbar-link">
+            {/* <NavLink to="/monitor/clouster" className="topbar-link">
               Logs
-            </NavLink>
-            <NavLink to="/rol/RolManagment" className="topbar-link">
+            </NavLink> */}
+            {/* <NavLink to="/rol/RolManagment" className="topbar-link">
               Administración de Usuarios
-            </NavLink>
+            </NavLink> */}
             {/* <NavLink to="/test/test" className="topbar-link">
               Test
             </NavLink> */}
