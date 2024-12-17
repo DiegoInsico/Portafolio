@@ -1,0 +1,31 @@
+/* src/album/AlbumPage.css */
+
+/* AlbumPage Layout */
+.album-page-layout {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background-color: #f7f7f7;
+}
+
+/* Contenido de la opción seleccionada */
+.option-content {
+    background-color: #fff;
+    padding: 20px;
+    border-bottom: 1px solid #ddd;
+}
+
+/* Entries Carousel */
+.entries-carousel {
+    padding: 20px;
+    border-bottom: 1px solid #ddd;
+    z-index: 10;
+}
+
+/* Album Card */
+.album-card {
+    flex-grow: 1;
+    padding: 20px;
+    background-color: #ffffff;
+    overflow: hidden;
+}

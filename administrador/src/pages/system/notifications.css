@@ -25,7 +25,7 @@
   
   .form-group label {
     font-weight: bold;
-    color: #ffa726;
+    color: #ffffff;
     margin-bottom: 5px;
   }
   
@@ -34,7 +34,6 @@
   .form-group textarea {
     background-color: #282a36;
     color: #ffffff;
-    border: 1px solid #ffa726;
     border-radius: 5px;
     padding: 8px;
     font-size: 14px;

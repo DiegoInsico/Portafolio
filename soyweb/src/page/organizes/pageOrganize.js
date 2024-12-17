@@ -14,7 +14,7 @@ import AddDocument from "./crudDocument/addDocument";
 import EditDocument from "./crudDocument/editDocument";
 import ConfirmDeleteModal from "./crudDocument/deleteDocument"; // Importa el nuevo modal
 import { jsPDF } from "jspdf";
-import "./PageOrganize.css";
+import "./PageOrganize.css"; // Cambiar la importación al nuevo nombre de CSS
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../firebase";
 
@@ -81,13 +81,11 @@ const DocumentManager = () => {
         setShowDeleteModal(true);
     };
 
-    // Función para agregar un documento
     const handleAddDocument = (newDocument) => {
         setDocuments([...documents, newDocument]);
         setIsAdding(false);
     };
 
-    // Función para actualizar un documento
     const handleUpdateDocument = (updatedDoc) => {
         setDocuments((prevDocs) =>
             prevDocs.map((doc) => (doc.id === updatedDoc.id ? updatedDoc : doc))
@@ -96,18 +94,14 @@ const DocumentManager = () => {
         setIsEditing(false);
     };
 
-    // **Función para manejar la eliminación de un documento**
     const handleDeleteDocument = async () => {
         if (!documentToDelete) return;
 
         try {
-            // Llama a la función deleteDocument para eliminar del Firestore
             await deleteDocument(documentToDelete.id);
 
-            // Actualiza el estado local para eliminar el documento de la lista
             setDocuments(documents.filter((doc) => doc.id !== documentToDelete.id));
 
-            // Si el documento eliminado está seleccionado, resetea la selección
             if (selectedDocument && selectedDocument.id === documentToDelete.id) {
                 setSelectedDocument(null);
             }
@@ -117,12 +111,11 @@ const DocumentManager = () => {
             console.error("Error al eliminar el documento:", error);
             alert("Hubo un error al eliminar el documento. Por favor, intenta nuevamente.");
         } finally {
-            setShowDeleteModal(false); // Cierra el modal
-            setDocumentToDelete(null);  // Resetea el documento a eliminar
+            setShowDeleteModal(false);
+            setDocumentToDelete(null);
         }
     };
 
-    // Función para seleccionar un documento
     const handleSelectDocument = (doc) => {
         setSelectedDocument(doc);
         setIsAdding(false);
@@ -242,15 +235,14 @@ const DocumentManager = () => {
     if (loading) return <p>Cargando documentos...</p>;
 
     return (
-        <div className="main-container">
+        <div className="dm-main-container">
             {/* Hero Section */}
-
-            <section className="hero-section">
-                <div className="hero-left">
+            <section className="dm-hero-section">
+                <div className="dm-hero-left">
                     <h1>Ordena </h1>
                     <h1>Tu Vida</h1>
                 </div>
-                <div className="hero-right">
+                <div className="dm-hero-right">
                     <p>
                         Este es el lugar donde puedes guardar todas tus pertenencias: correos
                         electrónicos, cuentas bancarias, seguros de vida y todo lo que consideres
@@ -260,31 +252,31 @@ const DocumentManager = () => {
             </section>
 
             {/* Content Section con efecto Parallax y estilo documento */}
-            <div className="content-section">
-                <div className="sidebar">
-                    <button className="add-button" onClick={handleShowAdd}>
+            <div className="dm-content-section">
+                <div className="dm-sidebar">
+                    <button className="dm-add-button" onClick={handleShowAdd}>
                         + Agregar Documento
                     </button>
-                    <div className="listContainer">
+                    <div className="dm-listContainer">
                         {documents.length === 0 ? (
-                            <p className="no-documents">No tienes documentos aún. ¡Agrega uno!</p>
+                            <p className="dm-no-documents">No tienes documentos aún. ¡Agrega uno!</p>
                         ) : (
                             <ListDocument
                                 documents={documents}
-                                onDelete={confirmDeleteDocument} // Usa confirmDeleteDocument en lugar de handleDeleteDocument
+                                onDelete={confirmDeleteDocument}
                                 onSelect={handleSelectDocument}
                                 selectedDocumentId={selectedDocument ? selectedDocument.id : null}
                             />
                         )}
                     </div>
-                    <div className="pdf-button-container">
-                        <button className="generate-pdf-button" onClick={handleShowModal}>
+                    <div className="dm-pdf-button-container">
+                        <button className="dm-generate-pdf-button" onClick={handleShowModal}>
                             Guardar Documentos como PDF
                         </button>
                     </div>
                 </div>
-                <div className="main-content">
-                    <div className="parallax-container">
+                <div className="dm-main-content">
+                    <div className="dm-parallax-container">
                         {isAdding && (
                             <AddDocument onAdd={handleAddDocument} />
                         )}
@@ -297,14 +289,14 @@ const DocumentManager = () => {
                             />
                         )}
                         {!isAdding && !isEditing && selectedDocument && (
-                            <div className="document-details">
+                            <div className="dm-document-details">
                                 <h2>{selectedDocument.title}</h2>
                                 <p dangerouslySetInnerHTML={{ __html: selectedDocument.texto.replace(/\n/g, '<br>') }}></p>
                                 <p>
                                     <strong>Testigo:</strong> {selectedDocument.testigo}
                                 </p>
                                 <button
-                                    className="edit-button"
+                                    className="dm-edit-button"
                                     onClick={handleEditDocument}
                                 >
                                     Editar Documento
@@ -312,7 +304,7 @@ const DocumentManager = () => {
                             </div>
                         )}
                         {!isAdding && !isEditing && !selectedDocument && (
-                            <div className="welcome-message">
+                            <div className="dm-welcome-message">
                                 <h3>Selecciona un documento para ver los detalles o agrega uno nuevo.</h3>
                             </div>
                         )}
@@ -320,10 +312,9 @@ const DocumentManager = () => {
                 </div>
             </div>
 
-            {/* Modal para confirmar generación de PDF */}
             {showModal && (
-                <div className="modal-confirm">
-                    <div className="modal-content-confirm">
+                <div className="dm-modal-confirm">
+                    <div className="dm-modal-content-confirm">
                         <h2>Confirmar Subida de PDF</h2>
                         <p>
                             Por favor, sube tu firma actual con tu nombre. Es necesario para autorizar el documento legal.
@@ -332,15 +323,15 @@ const DocumentManager = () => {
                             type="file"
                             accept="image/*"
                             onChange={handleImageUpload}
-                            className="signature-upload"
+                            className="dm-signature-upload"
                         />
                         {signatureImage && (
-                            <div className="signature-preview">
+                            <div className="dm-signature-preview">
                                 <p>Vista previa de la firma:</p>
                                 <img src={signatureImage} alt="Firma" />
                             </div>
                         )}
-                        <div className="modal-actions-confirm">
+                        <div className="dm-modal-actions-confirm">
                             <button
                                 onClick={handleConfirmDownload}
                                 disabled={!signatureImage || uploading}
@@ -351,20 +342,18 @@ const DocumentManager = () => {
                                 Cancelar
                             </button>
                         </div>
-                        {uploadError && <p className="error-message">{uploadError}</p>}
+                        {uploadError && <p className="dm-error-message">{uploadError}</p>}
                     </div>
                 </div>
             )}
 
-            {/* Mostrar PDF existente */}
             {pdfUrl && (
-                <div className="existing-pdf">
+                <div className="dm-existing-pdf">
                     <h3>Tu PDF Actual:</h3>
                     <iframe src={pdfUrl} title="PDF del Usuario" width="100%" height="600px"></iframe>
                 </div>
             )}
 
-            {/* Modal para Confirmar Eliminación */}
             {showDeleteModal && documentToDelete && (
                 <ConfirmDeleteModal
                     document={documentToDelete}

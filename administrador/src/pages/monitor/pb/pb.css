@@ -1,117 +1,251 @@
+/* Contenedor general */
 .pb-container {
   display: flex;
-  flex-direction: row;
-  margin-top: 60px;
-  min-height: 100vh;
-  background-color: #121212;
-  color: #ffffff;
+  height: 100vh;
+  gap: 10px;
+  margin-top: 50px;
+  background-color: #EAD9C3; /* Fondo general azul oscuro */
+  color: white;
 }
 
+/* Contenedor de filtros */
 .pb-filters {
-  width: 250px;
+  width: 25%; /* Área de filtros compacta pero con espacio suficiente */
   padding: 20px;
-  background-color: #1f2a44;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+  height: 80%;
+  margin-top: 10px;
+  background-color: #D4A373; /* Azul oscuro más claro para los filtros */
+  border-radius: 10px;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5); /* Sutil sombra */
+  overflow-y: auto; /* Scroll interno si los filtros exceden el espacio */
 }
 
-.pb-section {
-  margin-bottom: 20px;
+/* Títulos de secciones */
+.pb-section h3 {
+  font-size: 18px;
+  color: #000000; /* Color púrpura claro */
+  margin-bottom: 15px;
+  text-align: left;
 }
 
+/* Botones de filtro */
 .pb-filter-button {
   display: block;
   width: 100%;
-  padding: 10px;
   margin-bottom: 10px;
-  background-color: #007bff;
-  color: #ffffff;
+  padding: 10px 15px;
+  font-size: 14px;
+  text-align: left;
   border: none;
-  border-radius: 4px;
+  border-radius: 8px;
+  background-color: #4caf50; /* Verde */
+  color: white;
   cursor: pointer;
-  text-align: center;
+  transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
 .pb-filter-button:hover {
-  background-color: #0056b3;
+  background-color: #556699; /* Azul más claro al pasar el mouse */
+  transform: translateY(-2px); /* Efecto de elevación */
 }
 
+/* Espacio para insertar filtros */
 .pb-add-filters {
+  width: 40%; /* Mantiene espacio claro para gráficos */
   padding: 20px;
-  background-color: #1f2a44;
+  margin-top: 10px;
+  height: 80%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5); /* Sutil sombra */
+
+  background-color: #D4A373;
+  border-radius: 10px;
+  overflow-y: auto; 
 }
 
+/* Slots de filtros (Eje X y Eje Y) */
 .pb-filters-container {
   display: flex;
-  justify-content: space-between;
+  gap: 15px;
   margin-bottom: 20px;
 }
 
 .pb-filter-slot {
-  width: 100px;
-  height: 50px;
-  background-color: #343a40;
-  color: #ffffff;
+  flex: 1;
+  padding: 15px;
+  border: 2px dashed #bb86fc;
+  border-radius: 8px;
   text-align: center;
-  line-height: 50px;
-  border: 1px dashed #ffffff;
-  border-radius: 4px;
+  color: #bb86fc;
+  background-color: #f5c08b; /* Azul oscuro */
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
-.pb-highlight {
-  background-color: #495057;
+.pb-filter-slot.pb-highlight {
+  background-color: #556699; /* Cambia de color cuando un filtro está sobre él */
+}
+
+/* Botones de acción en la sección de agregar filtros */
+.pb-add-filters button {
+  margin-right: 10px;
+  padding: 10px 20px;
+  font-size: 14px;
+  border: none;
+  border-radius: 5px;
+  background-color: #4caf50; /* Verde */
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.pb-add-filters button:hover {
+  background-color: #388e3c;
+}
+
+.pb-clear-button {
+  background-color: #f44336; /* Rojo */
+}
+
+.pb-clear-button:hover {
+  background-color: #d32f2f;
+}
+
+/* Área de gráficos */
+.pb-graphs {
+  flex-grow: 1;
+  background-color: #D4A373; /* Fondo negro */
+  color: white;
+  display: flex;
+  height: 80%;
+  justify-content: center;
+  align-items: center;
+  border-radius: 10px;
+  padding: 20px;
+  margin-left: 20px; /* Espaciado entre filtros y gráficos */
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5); /* Sombra para definición */
+  min-width: 70%; /* Asegura un tamaño mínimo para gráficos */
+}
+
+.scheduled-messages-list {
+  margin-top: 20px;
+  padding: 10px;
+  background-color: #2b2b4b;
+  border-radius: 8px;
+  color: white;
+}
+
+.scheduled-messages-list h4 {
+  margin-bottom: 10px;
+}
+
+.scheduled-messages-list ul {
+  list-style: none;
+  padding: 0;
+}
+
+.scheduled-messages-list li {
+  margin-bottom: 10px;
+  padding: 10px;
+  border: 1px solid #444;
+  border-radius: 5px;
+  background-color: #334466;
+}
+
+.collage-users-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  background-color: #2b2b4b; /* Fondo oscuro */
+  color: white;
+}
+
+.collage-users-table th,
+.collage-users-table td {
+  border: 1px solid #444;
+  padding: 10px;
+  text-align: center;
+}
+
+.collage-users-table th {
+  background-color: #333;
+  color: #bb86fc; /* Color púrpura claro */
+}
+
+.collage-users-table td {
+  background-color: #2b2b4b;
+}
+
+.pb-collages {
+  background-color: #4caf50; /* Verde */
+  color: white;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.pb-collages:hover {
+  background-color: #388e3c; /* Verde más oscuro */
+}
+
+.pb-collages:active {
+  transform: scale(0.98);
 }
 
 .pb-graphs {
-  flex: 1;
-  padding: 20px;
   display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-  justify-content: center;
-  background-color: #121212;
+  flex-direction: column; /* Alinea elementos en columna (gráfico arriba, tabla abajo) */
+  align-items: center; /* Centra la tabla y el gráfico horizontalmente */
+  margin: 20px auto;
+  max-width: 90%; /* Limitar el ancho */
+  overflow-x: auto; /* Habilitar scroll horizontal si es necesario */
+  background-color: #D4A373; /* Fondo oscuro */
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.3);
 }
 
-.pb-chart-container {
-  flex: 1 1 calc(45% - 20px); /* Ajusta el tamaño para que quepan dos gráficos por fila */
-  background-color: #1f2a44;
-  border-radius: 8px;
-  padding: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+.pb-graphs canvas {
+  max-width: 100%; /* Ajustar ancho del canvas al contenedor */
+  height: auto;
+  margin-bottom: 20px; /* Espacio entre el gráfico y la tabla */
 }
 
-.pb-chart {
+.collage-users-table {
   width: 100%;
-  height: 250px;
-}
-
-.pb-table-container {
-  width: 100%;
-  background-color: #1f2a44;
-  padding: 10px;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  margin-top: 20px;
-}
-
-.pb-table {
-  width: 100%;
+  max-width: 600px; /* Mantén la tabla compacta */
+  margin: 0 auto;
   border-collapse: collapse;
-  background-color: #1f2a44;
-  color: #ffffff;
+  background-color: #2b2b4b; /* Fondo oscuro */
+  color: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.3);
 }
 
-.pb-table th, .pb-table td {
-  padding: 10px;
+.collage-users-table th,
+.collage-users-table td {
+  border: 1px solid #444;
+  padding: 12px;
   text-align: center;
-  border: 1px solid #ffffff;
 }
 
-.pb-table th {
-  background-color: #007bff;
+.collage-users-table th {
+  background-color: #333; /* Encabezado */
+  color: #bb86fc; /* Púrpura claro */
+  font-weight: bold;
 }
 
-.pb-table td {
-  background-color: #343a40;
+.collage-users-table td {
+  background-color: #2b2b4b; /* Fondo oscuro para filas */
 }
+
+.collage-users-table tr:nth-child(even) td {
+  background-color: #3a3a5a; /* Alternar filas */
+}
+

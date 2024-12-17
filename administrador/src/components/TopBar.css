@@ -3,7 +3,7 @@
   top: 0;
   left: 0;
   width: 100%;
-  background-color: #1c293a;
+  background-color: #D4A373 ;
   color: #fff;
   z-index: 10;
   display: grid;
@@ -21,7 +21,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  color: palevioletred;
+  color: rgb(26, 26, 26);
 }
 
 .topbar-nav {
@@ -34,23 +34,25 @@
 
 .topbar-link {
   text-decoration: none;
-  color: #fff;
+  color: #222222;
   text-align: center;
   padding: 10px ; 
-  font-size: 16px; 
-  background-color: #1c293a;
+  font-size: 16px;
+  font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif; 
+  background-color: #D4A373;
   border-radius: 5px;
   transition: background-color 0.3s, transform 0.2s;
   white-space: nowrap;
 }
 
 .topbar-link:hover {
-  background-color: #3d4a58; 
+  background-color: #a86420; 
+  color: wheat;
   transform: scale(1.05);
 }
 
 .button-secondary {
-  background-color: #6e6e6e;
+  background-color: #d4570f;
   color: white;
   padding: 8px 12px;
   font-size: 14px; 

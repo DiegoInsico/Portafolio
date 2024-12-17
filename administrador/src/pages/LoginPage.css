@@ -4,7 +4,7 @@
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background-color: #f4f4f4;
+  background-color: #1b1b33;
   margin: 0;
   padding: 0;
 }
@@ -16,7 +16,7 @@
   width: 100%;
   max-width: 1400px;
   height: 90%;
-  background-color: #fff;
+  background-color: #19195a;
   border-radius: 10px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
   overflow: hidden;
@@ -24,26 +24,36 @@
 
 
 /* Sección del formulario */
-.login-box {
+.login-box{
   flex: 1;
   padding: 3rem;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  background-color: #ffffff;
+  background-color: #2b2bb6;
 }
 
+.login-box label{
+  background-color: #2b2bb6;
+  margin: 0;
+}
+
+
 .login-title {
-  font-size: 2.5rem;
+  font-size: 5.5rem;
   font-weight: bold;
+  margin: 0;
+  text-align: center;
   margin-bottom: 1rem;
-  color: #333;
+  color: #ffffff;
 }
 
 .login-subtitle {
   font-size: 1.2rem;
   margin-bottom: 2rem;
-  color: #555;
+  color: #ffffff;
+  text-align: center;
+  margin: 0;
 }
 
 .login-input {

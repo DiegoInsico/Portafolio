@@ -1,9 +1,10 @@
 /* Contenedor principal */
 .context-container {
   width: 100%;
-  background-color: #212121; /* Fondo oscuro elegante */
+  height: 100%;
+  background-color: #EAD9C3;
   color: #ffffff; /* Texto blanco */
-  padding: 5px;
+  padding: 20px;
   box-sizing: border-box;
   border-radius: 10px;
   margin: 0 auto; /* Centrado horizontal */
@@ -13,9 +14,75 @@
 
 /* Contenido */
 .context-content {
-  text-align: center; /* Centrar todo el texto y contenido */
-  max-width: 100%; /* Usar todo el ancho disponible */
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 100%;
   margin: 0 auto;
+}
+
+/* Visualización de gráfico y tabla */
+.context-visualization {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+/* Gráfico */
+.context-chart {
+  flex: 2;
+  width: 100%;
+  border-radius: 10px;
+  overflow: hidden; /* Asegurar que no haya desbordamiento */
+}
+
+.context-chart canvas {
+  max-width: 100%; /* Limitar ancho del canvas */
+  height: auto; /* Mantener proporción */
+  background-color: #D4A373;
+  border-radius: 20px;
+}
+
+/* Tabla */
+.context-table {
+  flex: 1;
+  width: 100%;
+  background-color: #D4A373;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  padding: 10px;
+  overflow-x: auto; /* Permitir scroll horizontal */
+}
+
+.context-table h2 {
+  font-size: 20px;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 15px;
+  color: #050505;
+}
+
+.context-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.context-table th,
+.context-table td {
+  border: 1px solid #444;
+  text-align: left;
+  color: #000000;
+}
+
+.context-table th {
+  background-color: #333;
+  font-weight: bold;
+}
+
+.context-table tr:nth-child(even) {
+  background-color: #EAD9C3;
 }
 
 /* Títulos */
@@ -24,18 +91,7 @@
   font-size: 24px;
   font-weight: bold;
   margin-bottom: 20px;
-  color: #bb86fc;
-
-}
-
-/* Gráfico */
-.context-chart {
-  width: 100%; /* Usar el 100% del ancho del contenedor */
-  margin: 0 auto; /* Centrar */
-  background-color: #2b2b2b; /* Fondo ligeramente más claro */
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-  overflow: hidden; /* Asegurar que no haya desbordamiento */
+  color: #ffffff;
 }
 
 /* Mensaje de carga */
@@ -47,7 +103,6 @@
 /* Listas */
 .context-list {
   list-style: none;
-  padding: 0;
   margin: 20px auto;
   text-align: left; /* Alinear el texto de los elementos de la lista */
   max-width: 80%; /* Limitar el ancho de las listas */
@@ -56,7 +111,7 @@
 .context-list-item {
   margin: 10px 0;
   background-color: #2b2b2b; /* Fondo oscuro */
-  color: #bb86fc;
+  color: #ffffff;
   text-align: center;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
@@ -85,7 +140,7 @@
   font-size: 16px;
   font-weight: bold;
   margin-bottom: 8px;
-  color: #bb86fc;
+  color: #ffffff;
 }
 
 /* Input de fechas */
@@ -93,8 +148,8 @@
   font-size: 14px;
   border-radius: 5px;
   border: 1px solid #444;
-  background-color: #5f5e5e;
-  color: #ffffff;
+  background-color: #e2a351;
+  color: #000000;
   width: 100%;
   max-width: 200px; /* Limitar el ancho máximo */
   text-align: center;
@@ -107,16 +162,10 @@
 }
 
 .context-container::-webkit-scrollbar-thumb {
-  background-color: #444; /* Oscuro */
+  background-color: #c5760f; /* Oscuro */
   border-radius: 8px;
 }
 
 .context-container::-webkit-scrollbar-track {
-  background-color: #1e1e1e; /* Fondo oscuro */
-}
-
-/* Ajuste para evitar desbordamiento */
-.context-chart canvas {
-  max-width: 100%; /* Limitar ancho del canvas */
-  height: auto; /* Mantener proporción */
+  background-color: #e7a260; /* Fondo oscuro */
 }

@@ -1,3 +1,5 @@
+// Beneficiarios.js
+
 import React, { useState, useEffect } from "react";
 import {
   View,
@@ -11,7 +13,7 @@ import {
   ImageBackground,
   ActivityIndicator,
 } from "react-native";
-import { db } from "../../utils/firebase";
+import { db, storage } from "../../utils/firebase"; // Asegúrate de exportar storage desde firebase.js
 import {
   collection,
   addDoc,
@@ -25,6 +27,8 @@ import {
 import { getAuth } from "firebase/auth";
 import * as ImagePicker from "expo-image-picker";
 import { MaterialIcons } from "@expo/vector-icons";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage"; // Importar funciones de storage
+import * as ImageManipulator from "expo-image-manipulator"; // Opcional para manipulación de imágenes
 
 const Beneficiarios = () => {
   const auth = getAuth();
@@ -39,6 +43,7 @@ const Beneficiarios = () => {
   const [editingId, setEditingId] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
+  const [uploading, setUploading] = useState(false); // Nuevo estado para manejar la carga
 
   useEffect(() => {
     const fetchBeneficiarios = async () => {
@@ -64,11 +69,60 @@ const Beneficiarios = () => {
     fetchBeneficiarios();
   }, [userId]);
 
+  // Función para optimizar la imagen antes de subirla (opcional)
+  const optimizeImage = async (uri) => {
+    const manipResult = await ImageManipulator.manipulateAsync(
+      uri,
+      [{ resize: { width: 800 } }], // Ajusta el tamaño según sea necesario
+      { compress: 0.7, format: ImageManipulator.SaveFormat.JPEG }
+    );
+    return manipResult.uri;
+  };
+
   const pickImage = async () => {
+    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (permissionResult.granted === false) {
+      Alert.alert(
+        "Permiso Denegado",
+        "Necesitamos permiso para acceder a tu galería de imágenes."
+      );
+      return;
+    }
+
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      quality: 0.7, // Reducir calidad para optimizar la carga
     });
-    if (!result.canceled) setProfileImage(result.assets[0].uri);
+
+    if (!result.canceled) {
+      const optimizedUri = await optimizeImage(result.assets[0].uri);
+      setProfileImage(optimizedUri);
+    }
+  };
+
+  // Función para subir la imagen a Firebase Storage y obtener la URL
+  const uploadImageAsync = async (uri) => {
+    if (!uri) return null;
+
+    try {
+      setUploading(true);
+      const response = await fetch(uri);
+      const blob = await response.blob();
+
+      const filename = `${userId}_${Date.now()}`; // Nombre único para la imagen
+      const storageRef = ref(storage, `beneficiarios/${filename}`);
+
+      await uploadBytes(storageRef, blob);
+      const downloadURL = await getDownloadURL(storageRef);
+      setUploading(false);
+      return downloadURL;
+    } catch (error) {
+      console.error("Error al subir la imagen: ", error);
+      setUploading(false);
+      Alert.alert("Error", "No se pudo subir la imagen.");
+      return null;
+    }
   };
 
   const handleAddOrUpdateBeneficiary = async () => {
@@ -81,9 +135,16 @@ const Beneficiarios = () => {
       return;
     }
 
-    const newBeneficiary = { name, email, phone, profileImage, userId };
-
     try {
+      let imageURL = profileImage;
+
+      // Si hay una imagen seleccionada y es una URI local, subirla
+      if (profileImage && profileImage.startsWith("file://")) {
+        imageURL = await uploadImageAsync(profileImage);
+      }
+
+      const newBeneficiary = { name, email, phone, profileImage: imageURL, userId };
+
       if (editingId) {
         const beneficiaryRef = doc(db, "beneficiarios", editingId);
         await updateDoc(beneficiaryRef, newBeneficiary);
@@ -124,6 +185,14 @@ const Beneficiarios = () => {
     }
   };
 
+  const handleEditBeneficiary = (beneficiary) => {
+    setName(beneficiary.name);
+    setEmail(beneficiary.email);
+    setPhone(beneficiary.phone || "");
+    setProfileImage(beneficiary.profileImage || null);
+    setEditingId(beneficiary.id);
+  };
+
   const filteredBeneficiarios = beneficiarios.filter((ben) =>
     ben.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -145,6 +214,7 @@ const Beneficiarios = () => {
           placeholder="Buscar por nombre"
           value={searchQuery}
           onChangeText={setSearchQuery}
+          placeholderTextColor="#666666"
         />
 
         <View style={styles.form}>
@@ -153,12 +223,15 @@ const Beneficiarios = () => {
             value={name}
             onChangeText={setName}
             placeholder="Nombre"
+            placeholderTextColor="#666666"
           />
           <TextInput
             style={styles.input}
             value={email}
             onChangeText={setEmail}
             placeholder="Correo Electrónico"
+            keyboardType="email-address"
+            placeholderTextColor="#666666"
           />
           <TextInput
             style={styles.input}
@@ -166,26 +239,38 @@ const Beneficiarios = () => {
             onChangeText={setPhone}
             placeholder="Teléfono (opcional)"
             keyboardType="phone-pad"
+            placeholderTextColor="#666666"
           />
           <TouchableOpacity onPress={pickImage} style={styles.imagePicker}>
             <MaterialIcons name="photo-camera" size={24} color="#FFFFFF" />
             <Text style={styles.imagePickerText}>Seleccionar Imagen</Text>
           </TouchableOpacity>
           {profileImage && (
-            <Image source={{ uri: profileImage }} style={styles.profileImage} />
+            <Image
+              source={{ uri: profileImage }}
+              style={styles.profileImage}
+              resizeMode="cover"
+            />
           )}
           <TouchableOpacity
             style={styles.addButton}
             onPress={handleAddOrUpdateBeneficiary}
+            disabled={uploading} // Desactivar botón mientras se sube
           >
-            <MaterialIcons
-              name={editingId ? "edit" : "add"}
-              size={24}
-              color="#FFFFFF"
-            />
-            <Text style={styles.buttonText}>
-              {editingId ? "Actualizar" : "Añadir"}
-            </Text>
+            {uploading ? (
+              <ActivityIndicator size="small" color="#FFFFFF" />
+            ) : (
+              <>
+                <MaterialIcons
+                  name={editingId ? "edit" : "add"}
+                  size={24}
+                  color="#FFFFFF"
+                />
+                <Text style={styles.buttonText}>
+                  {editingId ? "Actualizar" : "Añadir"}
+                </Text>
+              </>
+            )}
           </TouchableOpacity>
         </View>
 
@@ -196,19 +281,27 @@ const Beneficiarios = () => {
                 uri: beneficiary.profileImage || "https://via.placeholder.com/80",
               }}
               style={styles.cardImage}
+              resizeMode="cover"
             />
             <View style={styles.cardText}>
               <Text style={styles.cardName}>{beneficiary.name}</Text>
               <Text style={styles.cardEmail}>{beneficiary.email}</Text>
+              {beneficiary.phone ? (
+                <Text style={styles.cardPhone}>{beneficiary.phone}</Text>
+              ) : null}
             </View>
             <View style={styles.cardActions}>
               <TouchableOpacity
                 onPress={() => handleEditBeneficiary(beneficiary)}
+                style={styles.cardIcon}
+                accessibilityLabel="Editar Beneficiario"
               >
-                <MaterialIcons name="edit" size={24} color="#FFFFFF" />
+                <MaterialIcons name="edit" size={24} color="#555555" />
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => handleDeleteBeneficiary(beneficiary.id)}
+                style={styles.cardIcon}
+                accessibilityLabel="Eliminar Beneficiario"
               >
                 <MaterialIcons name="delete" size={24} color="#FF5555" />
               </TouchableOpacity>
@@ -235,7 +328,7 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: "bold",
     textAlign: "center",
-    color: "#333333", // Gris oscuro
+    color: "#FFFFFF", // Cambiar a blanco para mejor contraste
     marginBottom: 20,
   },
   input: {
@@ -244,14 +337,14 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 12,
     marginBottom: 15,
-    backgroundColor: "#FFFFFF", // Blanco puro
+    backgroundColor: "rgba(255, 255, 255, 0.8)", // Fondo semi-transparente para mejor legibilidad
     color: "#333333", // Gris oscuro para texto
   },
   form: {
     marginBottom: 30,
   },
   imagePicker: {
-    backgroundColor: "#EFEFEF", // Fondo gris claro
+    backgroundColor: "#555555", // Fondo más oscuro
     borderRadius: 10,
     padding: 15,
     alignItems: "center",
@@ -260,7 +353,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   imagePickerText: {
-    color: "#333333", // Gris oscuro
+    color: "#FFFFFF", // Blanco para texto
     marginLeft: 10,
     fontWeight: "bold",
   },
@@ -274,7 +367,7 @@ const styles = StyleSheet.create({
     borderColor: "#CCCCCC", // Borde gris claro
   },
   addButton: {
-    backgroundColor: "#555555", // Negro suave
+    backgroundColor: "#333333", // Fondo más oscuro
     padding: 15,
     borderRadius: 12,
     flexDirection: "row",
@@ -288,7 +381,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   card: {
-    backgroundColor: "#FFFFFF", // Blanco puro
+    backgroundColor: "rgba(255, 255, 255, 0.9)", // Fondo semi-transparente
     borderRadius: 12,
     padding: 15,
     marginBottom: 15,
@@ -320,6 +413,10 @@ const styles = StyleSheet.create({
     color: "#666666", // Gris medio
     fontSize: 14,
   },
+  cardPhone: {
+    color: "#666666",
+    fontSize: 14,
+  },
   cardActions: {
     flexDirection: "row",
     alignItems: "center",
@@ -333,6 +430,5 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
 });
-
 
 export default Beneficiarios;

@@ -103,7 +103,7 @@ const SideBarMenu = ({
             onPress={() => handleNavigation("ListEntry")}
           >
             <FontAwesome name="tasks" size={24} color="#000" />
-            <Text style={styles.menuText}>Entradas</Text>
+            <Text style={styles.menuText}>Instantes</Text>
           </TouchableOpacity>
 
           {/* Nueva opción de "Mi Despedida" */}
@@ -112,7 +112,7 @@ const SideBarMenu = ({
             onPress={() => handleNavigation("MiDespedida")}
           >
             <FontAwesome name="video-camera" size={24} color="#000" />
-            <Text style={styles.menuText}>Mi Despedida</Text>
+            <Text style={styles.menuText}>Hasta Pronto</Text>
           </TouchableOpacity>
 
           {/* Línea divisoria */}
@@ -147,7 +147,7 @@ const SideBarMenu = ({
             onPress={() => handleNavigation("ProgramarMensaje")}
           >
             <FontAwesome name="clock-o" size={24} color="#000" />
-            <Text style={styles.menuText}>Programar Mensaje</Text>
+            <Text style={styles.menuText}>Un fragmento de ti</Text>
           </TouchableOpacity>
 
           {/* Línea divisoria */}

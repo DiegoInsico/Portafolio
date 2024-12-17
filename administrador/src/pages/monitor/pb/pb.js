@@ -18,6 +18,209 @@ const AnalysisPage = () => {
   const [xAxisFilter, setXAxisFilter] = useState(null);
   const [yAxisFilter, setYAxisFilter] = useState(null);
   const [filteredData, setFilteredData] = useState([]);
+  const [scheduledMessagesChartData, setScheduledMessagesChartData] =
+    useState(null);
+  const [showScheduledMessagesChart, setShowScheduledMessagesChart] =
+    useState(false);
+  const [collageUsers, setCollageUsers] = useState([]);
+  const [usersWithoutCollage, setUsersWithoutCollage] = useState([]);
+  const [collageChartData, setCollageChartData] = useState(null);
+  const [showCollageChart, setShowCollageChart] = useState(false);
+
+  const processCollages = async () => {
+    await processCollageUsers(); // Genera la tabla
+    await processCollageChartData(); // Genera el gráfico
+  };
+
+  const processCollageChartData = async () => {
+    try {
+      const collagesSnapshot = await getDocs(collection(db, "collages"));
+
+      const userFunctionUsage = {}; // Objeto para contar el uso por función y usuario
+
+      collagesSnapshot.docs.forEach((doc) => {
+        const collage = doc.data();
+        const userId = collage.userId;
+
+        if (!userFunctionUsage[userId]) {
+          userFunctionUsage[userId] = {
+            categoria: 0,
+            isProtected: 0,
+            mediaType: 0,
+            nivel: 0,
+          };
+        }
+
+        // Recorremos las entradas del collage
+        collage.entries.forEach((entry) => {
+          if (entry.categoria) userFunctionUsage[userId].categoria += 1;
+          if (entry.isProtected) userFunctionUsage[userId].isProtected += 1;
+          if (entry.mediaType) userFunctionUsage[userId].mediaType += 1;
+          if (entry.nivel) userFunctionUsage[userId].nivel += 1;
+        });
+      });
+
+      // Convertir datos para el gráfico
+      const labels = Object.keys(userFunctionUsage).map(
+        (userId, index) => `Usuario ${index + 1}`
+      );
+      const dataset = {
+        labels,
+        datasets: [
+          {
+            label: "Categoría",
+            data: Object.values(userFunctionUsage).map((u) => u.categoria),
+            backgroundColor: "rgba(54, 162, 235, 0.6)", // Azul
+          },
+          {
+            label: "Protegido",
+            data: Object.values(userFunctionUsage).map((u) => u.isProtected),
+            backgroundColor: "rgba(255, 99, 132, 0.6)", // Rojo
+          },
+          {
+            label: "Tipo de Media",
+            data: Object.values(userFunctionUsage).map((u) => u.mediaType),
+            backgroundColor: "rgba(75, 192, 192, 0.6)", // Verde
+          },
+          {
+            label: "Nivel",
+            data: Object.values(userFunctionUsage).map((u) => u.nivel),
+            backgroundColor: "rgba(201, 203, 207, 0.6)", // Gris
+          },
+        ],
+      };
+
+      setCollageChartData(dataset);
+      setShowCollageChart(true);
+    } catch (error) {
+      console.error(
+        "Error al procesar datos para el gráfico de collages:",
+        error
+      );
+    }
+  };
+
+  const renderCollageChart = () => {
+    if (!showCollageChart || !collageChartData) {
+      return null; // No mostrar el gráfico si no hay datos o no está activo
+    }
+
+    return <Bar data={collageChartData} options={{ stacked: true }} />;
+  };
+
+  // Procesar datos para collages
+  const processCollageUsers = async () => {
+    try {
+      const collagesSnapshot = await getDocs(collection(db, "collages"));
+      const allUsersSnapshot = await getDocs(collection(db, "users"));
+
+      // Obtener usuarios que tienen collages
+      const usersWithCollage = new Set();
+      collagesSnapshot.docs.forEach((doc) => {
+        const userId = doc.data().userId;
+        usersWithCollage.add(userId);
+      });
+
+      // Clasificar usuarios
+      const allUsers = allUsersSnapshot.docs.map((doc) => doc.id);
+      const usersWithCollages = Array.from(usersWithCollage);
+      const usersWithoutCollages = allUsers.filter(
+        (userId) => !usersWithCollage.has(userId)
+      );
+
+      setCollageUsers(
+        usersWithCollages.map((userId, index) => `Usuario ${index + 1}`)
+      );
+      setUsersWithoutCollage(
+        usersWithoutCollages.map(
+          (userId, index) => `Usuario ${index + 1 + usersWithCollages.length}`
+        )
+      );
+    } catch (error) {
+      console.error("Error al procesar los datos de collages:", error);
+    }
+  };
+
+  const renderCollageUsersTable = () => {
+    if (!collageUsers.length && !usersWithoutCollage.length) {
+      return <p>No hay datos de usuarios disponibles.</p>;
+    }
+
+    return (
+      <table className="collage-users-table">
+        <thead>
+          <tr>
+            <th>Usuario</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          {collageUsers.map((user, index) => (
+            <tr key={`with-collage-${index}`}>
+              <td>{user}</td>
+              <td>Tiene Collage</td>
+            </tr>
+          ))}
+          {usersWithoutCollage.map((user, index) => (
+            <tr key={`without-collage-${index}`}>
+              <td>{user}</td>
+              <td>No Tiene Collage</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    );
+  };
+
+  const fetchScheduledMessagesChartData = async () => {
+    try {
+      const messagesSnapshot = await getDocs(
+        collection(db, "mensajesProgramados")
+      );
+      const messages = messagesSnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
+      // Contar documentos por usuario
+      const userDocumentCount = {};
+      messages.forEach((message) => {
+        const userId = message.userId;
+        userDocumentCount[userId] = (userDocumentCount[userId] || 0) + 1;
+      });
+
+      // Crear datos del gráfico
+      const chartData = {
+        labels: Object.keys(userDocumentCount).map(
+          (userId, index) => `Usuario ${index + 1}`
+        ),
+        datasets: [
+          {
+            label: "Cantidad de Documentos",
+            data: Object.values(userDocumentCount),
+            backgroundColor: "rgba(54, 162, 235, 0.6)",
+            borderColor: "rgba(54, 162, 235, 1)",
+            borderWidth: 1,
+          },
+        ],
+      };
+
+      setScheduledMessagesChartData(chartData);
+      setShowScheduledMessagesChart(true); // Mostrar el gráfico
+    } catch (error) {
+      console.error(
+        "Error al obtener los datos de mensajes programados:",
+        error
+      );
+    }
+  };
+  const renderScheduledMessagesChart = () => {
+    if (!showScheduledMessagesChart || !scheduledMessagesChartData) {
+      return null; // No renderizar si no está activo
+    }
+
+    return <Bar data={scheduledMessagesChartData} />;
+  };
 
   const processStorageConsumption = async () => {
     try {
@@ -96,6 +299,12 @@ const AnalysisPage = () => {
     setXAxisFilter(null);
     setYAxisFilter(null);
     setFilteredData([]);
+    setScheduledMessagesChartData(null); // Limpia los datos del gráfico de mensajes programados
+    setShowScheduledMessagesChart(false); // Oculta el gráfico de mensajes programados
+    setCollageUsers([]); // Limpia la tabla de usuarios con collages
+    setUsersWithoutCollage([]); // Limpia la tabla de usuarios sin collages
+    setCollageChartData(null); // Limpia los datos del gráfico de collages
+    setShowCollageChart(false); // Oculta el gráfico de collages
   };
 
   const calculateAge = (birthDate) => {
@@ -653,12 +862,12 @@ const AnalysisPage = () => {
             Limpiar Gráficos
           </button>
 
-          <div className="pb-section">
+          {/* <div className="pb-section">
             <h3>Tiempo</h3>
             <button className="pb-filter-button pb-dia">Día</button>
             <button className="pb-filter-button pb-mes">Mes</button>
             <button className="pb-filter-button pb-ano">Año</button>
-          </div>
+          </div> */}
           <div className="pb-section">
             <h3>Premium y otros</h3>
             <button
@@ -668,14 +877,27 @@ const AnalysisPage = () => {
               Consumo de Almacenamiento
             </button>
 
-            <button className="pb-filter-button pb-mes">
-              Mensajes Programadas
+            <button
+              onClick={fetchScheduledMessagesChartData}
+              className="pb-filter-button pb-mes"
+            >
+              Mensajes Programados
             </button>
-            <button className="pb-filter-button pb-ano">Collages</button>
+
+            <button
+              onClick={processCollages}
+              className="pb-filter-button pb-collages"
+            >
+              Usuarios con Collages
+            </button>
           </div>
         </div>
 
-        <div className="pb-graphs">{renderChart()}</div>
+        <div className="pb-graphs">
+          {renderChart()}
+          {renderScheduledMessagesChart()} {renderCollageUsersTable()}{" "}
+          {renderCollageChart()} {/* Gráfico de collages */}
+        </div>
       </div>
     </DndProvider>
   );

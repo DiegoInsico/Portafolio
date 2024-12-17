@@ -1,9 +1,11 @@
 .security-level-container {
   width: 100%;
   background-color: #212121; /* Fondo oscuro elegante */
-  color: #ffffff; /* Texto blanco */
+  color: #000000; /* Texto blanco */
   padding: 5px;
   box-sizing: border-box;
+  background-color: #EAD9C3;
+
   border-radius: 10px;
   margin: 0 auto; /* Centrado horizontal */
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
@@ -14,7 +16,7 @@
   font-size: 24px;
   font-weight: bold;
   margin-bottom: 20px;
-  color: #bb86fc; /* Color destacado */
+  color: #000000; /* Color destacado */
   text-align: center;
 }
 
@@ -30,15 +32,15 @@
   font-size: 16px;
   font-weight: bold;
   margin-bottom: 8px;
-  color: #bb86fc;
+  color: #000000;
 }
 
 .date-picker-input {
   font-size: 12px;
   border-radius: 5px;
   border: 1px solid #444;
-  background-color: #5f5e5e;
-  color: #ffffff;
+  background-color: #ee9f39;
+  color: #0c0c0c;
   padding: 5px;
   max-width: 200px; /* Limitar el ancho máximo */
   text-align: center;
@@ -47,7 +49,7 @@
 .chart-container {
   width: 100%;
   margin: 0 auto;
-  background-color: #2b2b2b; /* Fondo ligeramente más claro */
+  background-color: #EAD9C3;
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
   overflow: hidden; /* Asegurar que no haya desbordamiento */
@@ -57,11 +59,13 @@
 .chart-container canvas {
   max-width: 100%; /* Limitar ancho del canvas */
   height: auto; /* Mantener proporción */
+  background-color: #EAD9C3;
+
 }
 
 .loading-message {
   font-size: 18px;
-  color: #cccccc;
+  color: #000000;
   text-align: center;
 }
 
@@ -69,7 +73,7 @@
   font-size: 20px;
   font-weight: bold;
   margin: 20px 0;
-  color: #ffffff;
+  color: #000000;
   text-align: center;
 }
 
@@ -77,7 +81,7 @@
   width: 100%;
   border-collapse: collapse;
   margin: 0 auto; /* Centrar la tabla */
-  background-color: #2b2b2b; /* Fondo gris oscuro */
+  background-color: #EAD9C3; /* Fondo gris oscuro */
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
@@ -87,16 +91,16 @@
   text-align: center;
   padding: 10px;
   border: 1px solid #444; /* Bordes sutiles */
-  color: #ffffff; /* Texto blanco */
+  color: #000000; /* Texto blanco */
 }
 
 .entries-table th {
-  background-color: #444; /* Fondo más oscuro para los encabezados */
+  background-color: #d1903c; /* Fondo más oscuro para los encabezados */
   font-weight: bold;
 }
 
 .entries-table tr:nth-child(even) {
-  background-color: #3a3a3a; /* Fondo alternativo */
+  background-color: #e4a34f; /* Fondo alternativo */
 }
 
 .entries-table tr:hover {
@@ -110,12 +114,12 @@
 }
 
 .security-level-container::-webkit-scrollbar-thumb {
-  background-color: #444; /* Oscuro */
+  background-color: #c76a1f; /* Oscuro */
   border-radius: 8px;
 }
 
 .security-level-container::-webkit-scrollbar-track {
-  background-color: #1e1e1e; /* Fondo oscuro */
+  background-color: #ebbf6f; /* Fondo oscuro */
 }
 
 /* Responsividad */

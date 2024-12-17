@@ -45,7 +45,7 @@ const Graphics = () => {
         <h2>entradas</h2>
         <MensajesProgramadosChart />
       </div>
-      <div className="chart-item">
+      {/* <div className="chart-item">
         <h2>Sesiones</h2>
         <SesionesChart />
       </div>
@@ -64,7 +64,7 @@ const Graphics = () => {
       <div className="chart-item">
         <h2>info</h2>
         <Info />
-      </div>
+      </div> */}
     </div>
   );
 };

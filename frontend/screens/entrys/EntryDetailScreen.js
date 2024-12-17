@@ -20,13 +20,18 @@ import {
   ActivityIndicator,
   Menu,
   List,
+  Card,
+  Snackbar,
 } from "react-native-paper";
 import { useRoute, useNavigation } from "@react-navigation/native";
 import { Picker } from "@react-native-picker/picker";
 import { updateDoc, doc, getDoc, collection, addDoc } from "firebase/firestore";
-import { db } from "../../utils/firebase"; // Asegúrate de que la ruta es correcta
-import { Video } from "expo-av"; // Importa Video desde expo-av
-import AudioPlayer from "../../components/audioPlayer"; // Importación corregida
+import { db } from "../../utils/firebase";
+import { Video } from "expo-av";
+import AudioPlayer from "../../components/audioPlayer";
+import BeneficiarySection from "./BeneficiarySection";
+import ReflectionsSection from "./ReflectionsSection";
+import { MaterialIcons } from "@expo/vector-icons"; // Importar iconos adicionales
 
 // Definir las categorías disponibles con sus iconos
 const categorias = [
@@ -37,21 +42,17 @@ const categorias = [
     value: "aprendizaje",
     icon: "book-open-page-variant",
   },
-  { label: "Reflexión", value: "reflexion", icon: "thought-bubble" }, // Nueva categoría
+  { label: "Reflexión", value: "reflexion", icon: "thought-bubble" },
   { label: "Otro", value: "otro", icon: "dots-horizontal" },
 ];
 
 // Función para determinar el color del texto basado en el color de fondo
 const getContrastingTextColor = (bgColor) => {
-  // Extraer los componentes RGB del color
   const color = bgColor.charAt(0) === "#" ? bgColor.substring(1, 7) : bgColor;
   const r = parseInt(color.substring(0, 2), 16);
   const g = parseInt(color.substring(2, 4), 16);
   const b = parseInt(color.substring(4, 6), 16);
-
-  // Calcular la luminancia
   const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-
   return luminance > 0.5 ? "#000000" : "#FFFFFF";
 };
 
@@ -82,11 +83,21 @@ const EntryDetailScreen = () => {
   const [isAddReflexionModalVisible, setIsAddReflexionModalVisible] =
     useState(false);
   const [nuevaReflexion, setNuevaReflexion] = useState("");
-  const [selectedCategoria, setSelectedCategoria] = useState(""); // Nuevo estado para la categoría
-  const [categoriaError, setCategoriaError] = useState(""); // Estado para manejar errores de categoría
+  const [selectedCategoria, setSelectedCategoria] = useState("");
+  const [categoriaError, setCategoriaError] = useState("");
 
   // Estados para el menú de categorías
   const [menuVisible, setMenuVisible] = useState(false);
+
+  // Estados para Snackbar
+  const [snackbarVisible, setSnackbarVisible] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+
+  // Función para mostrar Snackbar
+  const showSnackbar = (message) => {
+    setSnackbarMessage(message);
+    setSnackbarVisible(true);
+  };
 
   // Función para abrir el menú
   const openMenu = () => setMenuVisible(true);
@@ -106,7 +117,7 @@ const EntryDetailScreen = () => {
     );
   }
 
-  // Formateo de fechas (si aplica)
+  // Formateo de fechas
   const creationDateTime = item.fechaCreacion
     ? new Date(item.fechaCreacion.seconds * 1000)
     : null;
@@ -128,8 +139,8 @@ const EntryDetailScreen = () => {
     : "Hora no disponible";
 
   // Obtener color de la categoría desde la base de datos
-  const categoryColor = item.color || "#1E90FF"; // Color por defecto si no está definido
-  const textColor = getContrastingTextColor(categoryColor); // Para textos sobre fondo oscuro
+  const categoryColor = item.color || "#1E90FF"; // Color por defecto
+  const textColor = getContrastingTextColor(categoryColor); // Texto contrastante
 
   // Obtener el icono de la categoría seleccionada
   const selectedCategoriaIcon =
@@ -190,7 +201,7 @@ const EntryDetailScreen = () => {
         },
       });
 
-      Alert.alert("Éxito", "Beneficiario asignado correctamente.");
+      showSnackbar("Beneficiario asignado correctamente.");
       setBeneficiary(beneficiaryData);
       setAddBeneficiary(false);
       setSelectedBeneficiary("");
@@ -214,7 +225,7 @@ const EntryDetailScreen = () => {
             try {
               const entryRef = doc(db, "entradas", item.id);
               await updateDoc(entryRef, { beneficiary: null });
-              Alert.alert("Éxito", "Beneficiario eliminado correctamente.");
+              showSnackbar("Beneficiario eliminado correctamente.");
               setBeneficiary(null);
             } catch (error) {
               console.error("Error al eliminar beneficiario:", error);
@@ -231,13 +242,11 @@ const EntryDetailScreen = () => {
 
   // Agregar reflexión
   const handleAgregarReflexion = async () => {
-    // Validar que la categoría esté seleccionada
     if (!selectedCategoria) {
       setCategoriaError("Por favor, selecciona una categoría.");
       return;
     }
 
-    // Validar que la reflexión no esté vacía
     if (!nuevaReflexion.trim()) {
       Alert.alert("Error", "La reflexión no puede estar vacía.");
       return;
@@ -247,12 +256,12 @@ const EntryDetailScreen = () => {
       const reflexionesRef = collection(db, "entradas", item.id, "reflexiones");
       await addDoc(reflexionesRef, {
         texto: nuevaReflexion.trim(),
-        categoria: selectedCategoria, // Agregar la categoría
+        categoria: selectedCategoria,
         fecha: new Date(),
       });
-      Alert.alert("Éxito", "Reflexión agregada correctamente.");
+      showSnackbar("Reflexión agregada correctamente.");
       setNuevaReflexion("");
-      setSelectedCategoria(""); // Resetear la categoría seleccionada
+      setSelectedCategoria("");
       setIsAddReflexionModalVisible(false);
     } catch (error) {
       console.error("Error al agregar reflexión:", error);
@@ -260,71 +269,79 @@ const EntryDetailScreen = () => {
     }
   };
 
-  // Función para renderizar el contenido principal (texto, audio, etc.)
+  // Función para renderizar el contenido principal
   const renderEntryContent = () => {
     const isSpotifyEntry = item.cancion && item.cancion.albumImage;
 
     return (
       <View>
         {isSpotifyEntry && (
-          <View style={styles.spotifyContainer}>
+          <Card style={styles.spotifyCard}>
             {!spotifyImageError ? (
-              <Image
-                source={{ uri: item.cancion.albumImage }}
-                style={styles.spotifyImage}
-                onError={() => setSpotifyImageError(true)}
-              />
+              <>
+                <Image
+                  source={{ uri: item.cancion.albumImage }}
+                  style={styles.spotifyImage}
+                  resizeMode="contain" // Cambiar a 'contain'
+                  onError={() => setSpotifyImageError(true)}
+                />
+                <View style={styles.spotifyOverlay}>
+                  <Text style={styles.spotifySongName}>{item.cancion.name}</Text>
+                  <Text style={styles.spotifyAuthors}>{item.cancion.artist}</Text>
+                </View>
+              </>
             ) : (
-              // Placeholder personalizado en caso de error
               <View style={[styles.spotifyImage, styles.imagePlaceholder]}>
                 <Text style={styles.placeholderText}>Imagen no disponible</Text>
               </View>
             )}
-            <View style={styles.spotifyOverlay}>
-              <Text style={styles.spotifySongName}>{item.cancion.name}</Text>
-              <Text style={styles.spotifyAuthors}>{item.cancion.artist}</Text>
-            </View>
-          </View>
+          </Card>
         )}
 
         {item.mediaType === "image" && item.media && (
-          <View>
+          <Card style={styles.mediaCard}>
             {!entryImageError ? (
               <Image
                 source={{ uri: item.media }}
                 style={styles.entryImage}
+                resizeMode="contain" // Cambiar a 'contain'
                 onError={() => setEntryImageError(true)}
               />
             ) : (
-              // Placeholder personalizado en caso de error
               <View style={[styles.entryImage, styles.imagePlaceholder]}>
                 <Text style={styles.placeholderText}>Imagen no disponible</Text>
               </View>
             )}
-          </View>
+          </Card>
         )}
 
         {item.mediaType === "video" && item.media && (
-          <Video
-            source={{ uri: item.media }}
-            rate={1.0}
-            volume={1.0}
-            isMuted={false}
-            resizeMode="cover"
-            shouldPlay={false}
-            useNativeControls
-            style={styles.video}
-          />
+          <Card style={styles.mediaCard}>
+            <Video
+              source={{ uri: item.media }}
+              rate={1.0}
+              volume={1.0}
+              isMuted={false}
+              resizeMode="contain" // Cambiar a 'contain'
+              shouldPlay={false}
+              useNativeControls
+              style={styles.video}
+            />
+          </Card>
         )}
 
-        {item.audio && <AudioPlayer audioUri={item.audio} />}
+        {item.audio && (
+          <Card style={styles.audioCard}>
+            <AudioPlayer audioUri={item.audio} />
+          </Card>
+        )}
 
         {item.texto && (
-          <View style={[styles.textBackground, styles.contentContainer]}>
-            <Text style={[styles.mediaText, { color: "#fff" }]}>
-              {item.texto}
-            </Text>
-          </View>
+          <Card style={styles.textCard}>
+            <Card.Content>
+              <Text style={styles.mediaText}>{item.texto}</Text>
+            </Card.Content>
+          </Card>
         )}
       </View>
     );
@@ -334,109 +351,32 @@ const EntryDetailScreen = () => {
     <ScrollView
       contentContainerStyle={[
         styles.scrollContainer,
-        { backgroundColor: categoryColor }, // Establecer backgroundColor a categoryColor
+        { backgroundColor: categoryColor },
       ]}
     >
       <View style={styles.mainContainer}>
-        {/* Contenedor con fondo oscuro y bordes redondeados */}
-        <View style={[styles.contentWrapper, { backgroundColor: "#1E1E1E" }]}>
-          {/* Título de la entrada */}
+        <View style={styles.contentWrapper}>
           <Text style={styles.title}>
-            {item.nickname || "Título de la Entrada"}{" "}
-            {/* "Ice Caves" si es el nickname */}
+            {item.nickname || "Título de la Entrada"}
           </Text>
 
-          {/* Descripción o contenido */}
           {renderEntryContent()}
 
-          {/* Beneficiarios */}
-          <View style={styles.beneficiariesContainer}>
-            <View style={styles.beneficiaryHeader}>
-              <Text style={styles.sectionTitle}>Beneficiario</Text>
-              <View style={styles.beneficiaryButtons}>
-                {beneficiary ? (
-                  <>
-                    <Button
-                      mode="text"
-                      onPress={() => setAddBeneficiary(true)}
-                      style={styles.button}
-                      icon="pencil"
-                      labelStyle={{ color: "#fff" }}
-                    >
-                      Cambiar
-                    </Button>
-                    <Button
-                      mode="text"
-                      onPress={handleRemoveBeneficiary}
-                      style={styles.button}
-                      icon="trash-can"
-                      color="#E74C3C"
-                    >
-                      Eliminar
-                    </Button>
-                  </>
-                ) : (
-                  <Button
-                    mode="text"
-                    onPress={() => setAddBeneficiary(true)}
-                    style={styles.button}
-                    icon="plus"
-                    labelStyle={{ color: "#fff" }}
-                  >
-                    Añadir
-                  </Button>
-                )}
-              </View>
-            </View>
-            {beneficiary ? (
-              <View style={styles.beneficiaryInfo}>
-                {beneficiary.profileImage ? (
-                  <Avatar.Image
-                    size={50}
-                    source={{ uri: beneficiary.profileImage }}
-                    onError={() => {
-                      Alert.alert(
-                        "Error",
-                        "No se pudo cargar la imagen del beneficiario."
-                      );
-                    }}
-                  />
-                ) : (
-                  <Avatar.Icon size={50} icon="account" />
-                )}
-                <Text style={styles.beneficiaryName}>{beneficiary.name}</Text>
-              </View>
-            ) : (
-              <View style={styles.beneficiaryInfo}>
-                <Avatar.Icon size={50} icon="account" />
-                <Text style={styles.beneficiaryName}>Sin beneficiario</Text>
-              </View>
-            )}
-          </View>
+          {/* Sección de Beneficiarios */}
+          <BeneficiarySection
+            beneficiary={beneficiary}
+            onChange={() => setAddBeneficiary(true)}
+            onRemove={handleRemoveBeneficiary}
+            onAdd={() => setAddBeneficiary(true)}
+          />
 
-          {/* Botones para Reflexiones */}
-          <Text style={styles.sectionTitle}>Reflexiones</Text>
-          <View style={styles.reflectionsButtonContainer}>
-            <Button
-              mode="contained"
-              onPress={() => setIsAddReflexionModalVisible(true)}
-              style={styles.addReflectionButton}
-              icon="plus"
-            >
-              Agregar Reflexión
-            </Button>
-            <Button
-              mode="outlined"
-              onPress={() =>
-                navigation.navigate("ReflexionListScreen", { entryId: item.id })
-              }
-              style={styles.viewReflectionsButton}
-              icon="eye"
-              labelStyle={{ color: "#fff" }}
-            >
-              Ver Reflexiones
-            </Button>
-          </View>
+          {/* Sección de Reflexiones */}
+          <ReflectionsSection
+            onAdd={() => setIsAddReflexionModalVisible(true)}
+            onView={() =>
+              navigation.navigate("ReflexionListScreen", { entryId: item.id })
+            }
+          />
         </View>
       </View>
 
@@ -474,7 +414,7 @@ const EntryDetailScreen = () => {
           visible={isAddReflexionModalVisible}
           onDismiss={() => {
             setIsAddReflexionModalVisible(false);
-            setCategoriaError(""); // Limpiar errores al cerrar el modal
+            setCategoriaError("");
           }}
           style={styles.dialogContainer}
         >
@@ -543,6 +483,16 @@ const EntryDetailScreen = () => {
         </Dialog>
       </Portal>
 
+      {/* Snackbar para feedback */}
+      <Snackbar
+        visible={snackbarVisible}
+        onDismiss={() => setSnackbarVisible(false)}
+        duration={3000}
+        style={styles.snackbar}
+      >
+        {snackbarMessage}
+      </Snackbar>
+
       {/* Mostrar cargando si está cargando */}
       {isLoading && (
         <ActivityIndicator
@@ -556,22 +506,23 @@ const EntryDetailScreen = () => {
   );
 };
 
-// Definición de estilos corregida y mejorada
+// Definición de estilos mejorada
 const styles = StyleSheet.create({
   scrollContainer: {
     flexGrow: 1,
     padding: 10,
-    backgroundColor: "#1E1E1E", // Fondo oscuro
   },
   mainContainer: {
+    flex: 1,
+    justifyContent: "center", // Centrar verticalmente
     alignItems: "center",
     paddingVertical: 10,
     width: "100%",
-    paddingTop: 70,
+    paddingTop: 0, // Remover paddingTop para centrar correctamente
   },
   contentWrapper: {
-    width: "100%",
-    backgroundColor: "#2C2C2C", // Fondo oscuro
+    width: "90%", // Ajustar ancho para centrado
+    backgroundColor: "#1E1E1E",
     borderRadius: 20,
     padding: 20,
     shadowColor: "#000",
@@ -586,96 +537,63 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     textAlign: "center",
     color: "#FFFFFF",
+    paddingHorizontal: 10,
   },
-  textBackground: {
-    backgroundColor: "#444444", // Fondo más oscuro
-    padding: 15,
-    borderRadius: 10,
+  spotifyCard: {
     marginBottom: 20,
+    borderRadius: 10,
+    overflow: "hidden",
   },
-  contentContainer: {
+  spotifyImage: {
+    height: 200,
     width: "100%",
+  },
+  spotifyOverlay: {
+    position: "absolute",
+    bottom: 0,
+    width: "100%",
+    backgroundColor: "rgba(0, 0, 0, 0.6)",
+    padding: 10,
+  },
+  spotifySongName: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#FFFFFF",
+  },
+  spotifyAuthors: {
+    fontSize: 14,
+    color: "#FFFFFF",
+    marginTop: 2,
+  },
+  mediaCard: {
+    marginBottom: 15,
+    borderRadius: 10,
+    overflow: "hidden",
+  },
+  entryImage: {
+    width: "100%",
+    height: 200,
+  },
+  video: {
+    width: "100%",
+    height: 200,
+  },
+  audioCard: {
+    marginBottom: 20,
+    borderRadius: 10,
+    padding: 15,
+    backgroundColor: "#2C2C2C",
+  },
+  textCard: {
+    backgroundColor: "#444444",
+    borderRadius: 10,
+    padding: 15,
+    marginBottom: 20,
   },
   mediaText: {
     fontSize: 16,
     color: "#FFFFFF",
     textAlign: "center",
-  },
-  entryImage: {
-    width: "100%",
-    height: 200,
-    borderRadius: 10,
-    resizeMode: "cover",
-    marginBottom: 15,
-  },
-  video: {
-    width: "100%",
-    height: 200,
-    borderRadius: 10,
-    marginBottom: 15,
-  },
-  audioContainer: {
-    width: "100%",
-    marginBottom: 20,
-    alignItems: "center",
-  },
-  beneficiariesContainer: {
-    width: "100%",
-    marginBottom: 20,
-  },
-  beneficiaryHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 10,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: "#FFFFFF",
-    marginBottom: 10,
-  },
-  beneficiaryButtons: {
-    flexDirection: "row",
-    justifyContent: "center",
-    marginTop: 10,
-  },
-  button: {
-    marginHorizontal: 5,
-    borderRadius: 20,
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-    backgroundColor: "#444",
-  },
-  beneficiaryInfo: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  beneficiaryName: {
-    marginLeft: 10,
-    fontSize: 16,
-    color: "#FFFFFF",
-  },
-  reflectionsButtonContainer: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    width: "100%",
-    marginTop: 20,
-  },
-  addReflectionButton: {
-    backgroundColor: "#444",
-    borderRadius: 20,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    width: "45%",
-  },
-  viewReflectionsButton: {
-    borderColor: "#FFFFFF",
-    borderWidth: 1,
-    borderRadius: 20,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    width: "45%",
   },
   dialogContainer: {
     backgroundColor: "#FFFFFF",
@@ -713,52 +631,20 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginBottom: 10,
   },
-  spotifyContainer: {
-    width: "100%",
-    height: 300,
-    marginBottom: 20,
-    position: "relative",
-  },
-  spotifyImage: {
-    width: "100%",
-    height: "100%",
-    borderRadius: 10,
-    resizeMode: "cover",
-  },
   imagePlaceholder: {
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#444",
-    borderRadius: 10,
   },
   placeholderText: {
     color: "#FFFFFF",
     fontSize: 16,
   },
-  spotifyOverlay: {
-    position: "absolute",
-    bottom: 0,
-    width: "100%",
-    backgroundColor: "rgba(0, 0, 0, 0.6)", // Fondo translúcido
-    padding: 10,
-    borderBottomLeftRadius: 10,
-    borderBottomRightRadius: 10,
-  },
-  spotifySongName: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#FFFFFF",
-  },
-  spotifyAuthors: {
-    fontSize: 14,
-    color: "#FFFFFF",
-    marginTop: 2,
-  },
   loadingIndicator: {
     position: "absolute",
     top: "50%",
     left: "50%",
-    marginLeft: -25, // Para centrar el ActivityIndicator
+    marginLeft: -25,
     marginTop: -25,
   },
   fullWidthTextInput: {
@@ -769,6 +655,9 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+  },
+  snackbar: {
+    backgroundColor: "#333333",
   },
 });
 
