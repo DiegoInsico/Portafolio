@@ -1,0 +1,414 @@
+/* src/components/LineaDeTiempoStyles.css */
+
+/* ============================ */
+/* GENERAL STYLES */
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  background: #000; /* Fondo de respaldo */
+  overflow: hidden; /* Evitamos scroll en body; el scroll se hará en .lt-scroll-container */
+  font-family: Arial, sans-serif;
+}
+
+/* ============================ */
+/* SCROLL CONTAINER */
+.lt-scroll-container {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow-y: scroll;
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+  flex-direction: column;
+  align-items: center;
+  
+  /* Fondo con imagen fija */
+  background: url('../../assets/images/mensajefondo.webp') no-repeat center center fixed;
+  background-size: cover;
+}
+
+/* Capa de blur sobre el fondo */
+.lt-scroll-container::before {
+  content: "";
+  position: fixed; 
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.3);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* Asegurar el contenido por encima del blur */
+.lt-scroll-container > * {
+  position: relative;
+  z-index: 2;
+}
+
+/* ============================ */
+/* HERO SECTION */
+.lt-page-one {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-end;
+  background-image: url('../../../public/lineavida.webp');
+  background-size: cover;
+  background-position: center;
+  min-height: 80vh;
+  margin-left: 15%;
+  margin-right: 15%;
+  border-radius: 90px;
+  padding: 0 5%;
+  width: 60%;
+  position: relative;
+  margin-top: 10vh;
+  margin-bottom: 10vh;
+  overflow: hidden;
+  animation: lt-fadeInHero 0.8s ease-in-out;
+}
+
+@keyframes lt-fadeInHero {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.lt-page-one::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.3);
+  z-index: 1;
+}
+
+.lt-titulo-left {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; 
+  margin-bottom: 150px;
+  position: relative;
+  z-index: 2;
+}
+
+.lt-titulo-left h1 {
+  font-size: 6rem;
+  color: #ffffff; 
+  font-weight: bold;
+  margin: 20px 0;
+  font-family: 'Georgia', serif;
+  position: relative;
+  transition: color 0.3s ease;
+}
+
+.lt-titulo-left h1::after {
+  content: "";
+  position: absolute;
+  bottom: -10px;
+  left: 0;
+  width: 40%;
+  height: 3px;
+  background-color: #ffffff;
+  opacity: 0.7;
+  transition: width 0.3s ease;
+}
+
+.lt-titulo-left h1:hover::after {
+  width: 60%;
+}
+
+.lt-titulo-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end; 
+  margin-bottom: 100px;
+  max-width: 40%;
+  position: relative;
+  color: #ffffff; 
+  z-index: 2;
+}
+
+.lt-titulo-right p {
+  font-size: 1.6rem;
+  line-height: 1.6;
+  text-align: right; 
+  margin: 10px 0;
+  font-family: 'Georgia', serif;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  transition: background 0.3s ease, transform 0.3s ease;
+}
+
+.lt-titulo-right p:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-3px);
+}
+
+/* ============================ */
+/* TIMELINE SECTION */
+.lt-timeline-section {
+  height: 100vh;
+  flex: 0 0 80%; 
+  scroll-snap-align: center; 
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  animation: lt-fadeInSection 0.8s ease-in-out;
+  position: relative;
+}
+
+@keyframes lt-fadeInSection {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.lt-timeline-container {
+  margin: 20px auto;
+  width: 100%; 
+  max-width: none;
+}
+
+/* SWIPER */
+.lt-swiper-container {
+  width: 100%;
+  padding: 20px 0;
+  position: relative;
+  z-index: 2;
+}
+
+/* Clases de Swiper nativas no las cambiamos, para evitar problemas con la librería:
+   .swiper-slide se queda igual, 
+   pero podemos aplicar estilos a padres con clases lt- para evitar conflictos. */
+
+.lt-timeline-item {
+  width: 100%; 
+  height: 500px; 
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  border-radius: 10px;
+  background-color: #1e1e1e;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+}
+
+.lt-timeline-item:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+}
+
+.lt-image-container {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+  border-radius: 10px;
+  transition: transform 0.3s ease;
+}
+
+.lt-image-container:hover {
+  transform: scale(1.02);
+}
+
+.lt-item-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain; 
+  border-radius: 10px;
+  background-color: #000; 
+  transition: transform 0.3s ease;
+}
+
+.lt-item-image:hover {
+  transform: scale(1.05);
+}
+
+.lt-nickname-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+  color: white;
+  padding: 20px;
+  font-size: 1.2rem;
+  text-align: center;
+  border-radius: 0 0 10px 10px;
+  border-top: 1px solid rgba(255,255,255,0.2);
+  box-shadow: inset 0 -2px 4px rgba(0,0,0,0.3);
+}
+
+/* SELECCIONADOR DE NIVEL */
+.lt-level-selector-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  margin: 20px 0;
+  color: #ffffff;
+}
+
+.lt-level-selector-container label {
+  font-size: 1.2rem;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+}
+
+.lt-level-selector-container select {
+  padding: 8px 12px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+  background-color: #ffffff;
+  color: #333;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.lt-level-selector-container select:hover {
+  background-color: #f0f0f0;
+  transform: translateY(-2px);
+}
+
+/* LOADER */
+.lt-loader {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+/* RESPONSIVE */
+@media (max-width: 1024px) {
+  .lt-swiper-container {
+    padding: 15px 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .lt-swiper-container {
+    padding: 10px 0;
+  }
+
+  .lt-timeline-item {
+    height: 450px; 
+  }
+
+  .lt-timeline-item .lt-image-container {
+    max-width: 300px;
+  }
+}
+
+@media (max-width: 480px) {
+  .lt-swiper-container {
+    padding: 5px 0;
+  }
+
+  .lt-timeline-item {
+    height: 400px; 
+  }
+
+  .lt-timeline-item .lt-image-container {
+    max-width: 250px;
+  }
+
+  .lt-nickname-overlay {
+    font-size: 1rem;
+  }
+}
+
+/* ESTILOS PARA DIFERENTES TIPOS DE CONTENIDO */
+.lt-entrada-texto {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  box-sizing: border-box;
+  background: linear-gradient(135deg, rgba(30,30,30,0.9), rgba(50,50,50,0.7));
+  border-radius: 10px;
+  box-shadow: inset 0 2px 6px rgba(0,0,0,0.4);
+}
+
+.lt-entrada-texto p {
+  color: #ffffff;
+  font-size: 1.2rem;
+  text-align: center;
+  line-height: 1.4;
+}
+
+.lt-entrada-audio,
+.lt-entrada-musica,
+.lt-entrada-video,
+.lt-entrada-default {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.lt-entrada-audio audio,
+.lt-entrada-musica audio {
+  width: 90%;
+}
+
+.lt-entrada-musica img,
+.lt-entrada-video video {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  border-radius: 10px;
+  background-color: #000;
+}
+
+.lt-entrada-musica p {
+  color: #ffffff;
+  font-size: 1rem;
+  text-align: center;
+  margin-top: 5px;
+}
+
+.lt-entrada-default p {
+  color: #ffffff;
+  font-size: 1.2rem;
+  text-align: center;
+  font-style: italic;
+  opacity: 0.9;
+}
+
+.lt-timeline-item.active {
+  transform: scale(1.1);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+  z-index: 2;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.lt-timeline-item {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}

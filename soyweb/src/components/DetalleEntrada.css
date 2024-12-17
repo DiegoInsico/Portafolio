@@ -1,0 +1,727 @@
+/* src/components/DetalleEntrada.css */
+
+/* ============================ */
+/* VARIABLES CSS */
+:root {
+  --color-principal: #6c5ce7; /* Azul violeta suave */
+  --color-secundario: #2d3436; /* Gris oscuro */
+  --color-fondo: #f8f9fa; /* Blanco roto */
+  --color-overlay: rgba(0, 0, 0, 0.6); /* Negro semi-transparente */
+  --color-hover: #a29bfe; /* Azul violeta más claro para hover */
+  --color-activo: #00b894; /* Verde agua para estado activo */
+  --color-cerrar: #d63031; /* Rojo suave para botones de cierre */
+  --color-cerrar-hover: #e17055; /* Rojo más claro para hover */
+  --color-texto: #2d3436; /* Gris oscuro para texto */
+  --color-subtexto: #636e72; /* Gris medio para subtexto */
+  --fuente-principal: 'Roboto', sans-serif; /* Fuente moderna */
+  --fuente-secundaria: 'Open Sans', sans-serif; /* Fuente complementaria */
+}
+
+/* ============================ */
+/* MODAL OVERLAY */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  z-index: 1000;
+  backdrop-filter: blur(5px); /* Añade un efecto de desenfoque */
+}
+
+/* ============================ */
+/* DETALLE ENTRADA MODAL */
+.detalle-entrada {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #f8f9fa;
+  color: #2d3436;
+  font-family: 'Roboto', sans-serif;
+  padding: 40px;
+  border-radius: 16px;
+  width: 95%; /* Aumentado de 90% a 95% */
+  max-width: 1600px; /* Aumentado de 1400px a 1600px */
+  max-height: 86vh; /* Incrementado para mayor altura */
+  overflow-y: auto; /* Permite scroll si el contenido excede la altura */
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  z-index: 1001;
+  animation: fadeIn 0.4s ease-out;
+  transition: transform 0.4s ease, opacity 0.4s ease;
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -55%);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
+}
+
+.fade-out {
+  animation: fadeOut 0.4s forwards;
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
+  to {
+    opacity: 0;
+    transform: translate(-50%, -55%);
+  }
+}
+
+/* ============================ */
+/* HEADER DEL MODAL */
+.detalle-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center; /* Centrado vertical */
+  padding-bottom: 20px;
+  position: relative;
+}
+
+.header-left {
+  display: flex;
+  flex-direction: column;
+}
+
+.header-left h2 {
+  margin: 0;
+  font-size: 2rem;
+  color: #2d3436;
+  font-family: 'Open Sans', sans-serif;
+}
+
+.header-details {
+  display: flex;
+  gap: 15px;
+  font-size: 1rem;
+  color: #636e72;
+}
+
+/* ============================ */
+/* DIVIDER */
+.detalle-divider {
+  height: 1px;
+  background-color: #b2bec3;
+  margin: 20px 0;
+}
+
+/* ============================ */
+/* MAIN CONTENT */
+.detalle-main {
+  display: flex;
+  gap: 30px;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+/* ============================ */
+/* SECCIÓN COLUMNAS */
+.detalle-columna {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ============================ */
+/* COLUNMA IZQUIERDA */
+.izquierda {
+  flex: 1; /* Ocupa 1 parte */
+}
+
+/* Imagen, Video, Cancion, Texto o Audio */
+.detalle-imagen {
+  width: 100%;
+  max-width: 800px; /* Ancho máximo de 800px */
+  overflow: hidden;
+  border-radius: 12px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+  position: relative;
+  transition: transform 0.3s ease;
+  margin: 0 auto; /* Centrar la imagen */
+  height: auto; /* Ajustar altura automáticamente */
+  max-height: 600px; /* Limitar la altura máxima */
+}
+
+.detalle-imagen:hover {
+  transform: scale(1.02);
+}
+
+/* Imagen Grande */
+.detalle-imagen-grande {
+  width: 100%;
+  height: 100%;
+  object-fit: contain; /* Asegura que la imagen se ajuste dentro del contenedor sin distorsión */
+  transition: opacity 0.3s ease;
+}
+
+/* Imagen del Álbum para Cancion */
+.detalle-album-image {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  border-radius: 12px;
+  margin-top: 10px; /* Espaciado adicional */
+}
+
+/* Información de Cancion */
+.detalle-cancion-info {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  color: #ffffff;
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 5px 10px;
+  border-radius: 5px;
+  text-align: left;
+  max-width: 90%; /* Asegura que no se salga del contenedor */
+}
+
+.detalle-cancion-info h3 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.detalle-cancion-info p {
+  margin: 2px 0 0 0;
+  font-size: 1rem;
+}
+
+/* Texto en Imagen */
+.detalle-texto-imagen {
+  width: 100%;
+  max-width: 800px; /* Ancho máximo */
+  padding: 20px;
+  box-sizing: border-box;
+  background-color: rgba(30, 30, 30, 0.8); /* Fondo semi-transparente */
+  border-radius: 12px;
+  overflow-y: auto; /* Permite scroll si el texto es muy largo */
+  margin: 0 auto; /* Centrar el contenedor */
+  max-height: 600px; /* Ajusta la altura según tus necesidades */
+}
+
+.detalle-texto-imagen p {
+  color: #ffffff;
+  font-size: 1.2rem;
+  text-align: center;
+  margin: 0;
+}
+
+/* Audio en Imagen */
+.detalle-audio-imagen {
+  width: 100%;
+  max-width: 800px; /* Ancho máximo */
+  height: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 12px;
+  background-color: rgba(30, 30, 30, 0.8); /* Fondo semi-transparente */
+  margin: 0 auto; /* Centrar el contenedor */
+  padding: 20px;
+}
+
+.detalle-audio-imagen audio {
+  width: 90%;
+}
+
+/* Texto Adicional Bajo Imagen/Video/Cancion */
+.detalle-texto-adicional {
+  width: 100%;
+  max-width: 800px; /* Ancho máximo */
+  max-height: 150px; /* Ajusta según sea necesario */
+  overflow-y: auto; /* Permite scroll si el texto es muy largo */
+  margin-top: 10px;
+  padding: 10px;
+  background-color: rgba(245, 245, 245, 0.9);
+  border-radius: 8px;
+  margin: 0 auto; /* Centrar el contenedor */
+}
+
+.detalle-texto-adicional p {
+  color: #2d3436;
+  font-size: 1rem;
+  margin: 0;
+}
+
+/* Audio Adicional Bajo Imagen/Video/Cancion */
+.detalle-audio-adicional {
+  width: 100%;
+  max-width: 800px; /* Ancho máximo */
+  margin-top: 10px;
+  margin: 0 auto; /* Centrar el contenedor */
+}
+
+.detalle-audio-adicional audio {
+  width: 100%;
+}
+
+/* Overlay solo para imágenes, videos y cancion */
+.imagen-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #f8f9fa;
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 12px;
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.detalle-imagen:hover .imagen-overlay {
+  opacity: 1;
+}
+
+.imagen-overlay i {
+  font-size: 1.5rem;
+}
+
+/* ============================ */
+/* COLUNMA CENTRAL */
+.central {
+  flex: 1; /* Ocupa 1 parte */
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Reflexiones */
+.detalle-reflexiones {
+  background-color: #ffffff;
+  color: #2d3436;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  font-family: 'Roboto', sans-serif;
+  
+  /* Nuevas propiedades añadidas */
+  flex: 1; /* Permite que esta sección ocupe el espacio disponible */
+  overflow-y: auto; /* Habilita el desplazamiento vertical */
+  
+  /* Limitar la altura máxima para evitar que ocupe demasiado espacio */
+  max-height: 550px; /* Ajusta este valor según tus necesidades */
+}
+
+.detalle-reflexiones::-webkit-scrollbar {
+  width: 8px;
+}
+
+.detalle-reflexiones::-webkit-scrollbar-thumb {
+  background-color: #6c5ce7;
+  border-radius: 4px;
+}
+
+.detalle-reflexiones::-webkit-scrollbar-thumb:hover {
+  background-color: #a29bfe;
+}
+
+.detalle-reflexiones h3 {
+  font-size: 1.6rem;
+  color: #2d3436;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.detalle-reflexiones-lista {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.reflexion-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.reflexion-button {
+  background-color: #6c5ce7;
+  color: #f8f9fa;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 6px;
+  text-align: left;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.reflexion-button:hover {
+  background-color: #a29bfe;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.reflexion-button.active {
+  background-color:#00b894;
+}
+
+.reflexion-full {
+  padding: 15px;
+  background-color: #f4f4f4;
+  border-radius: 6px;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-top: 5px;
+  animation: fadeInReflexion 0.3s ease-out;
+}
+
+@keyframes fadeInReflexion {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.reflexion-full p {
+  margin: 0 0 10px 0;
+  font-size: 0.95rem;
+  color: #2d3436;
+}
+
+.reflexion-close {
+  background: none;
+  border: none;
+  color: #d63031;
+  font-size: 0.9rem;
+  cursor: pointer;
+  align-self: flex-end;
+  transition: color 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.reflexion-close:hover {
+  color: #e17055;
+}
+
+/* Reflexión única */
+.reflexion-item.unico {
+  padding: 10px 0;
+}
+
+.reflexion-item.unico .reflexion-full {
+  padding: 15px;
+  background-color: #f4f4f4;
+  border-radius: 6px;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.reflexion-item.unico .reflexion-full i {
+  color: #2d3436;
+  margin-right: 5px;
+}
+
+/* ============================ */
+/* COLUNMA DERECHA */
+.derecha {
+  flex: 1; /* Ocupa 1 parte */
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Detalles */
+.detalle-detalles {
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  font-family: 'Roboto', sans-serif;
+}
+
+.detalle-detalles h3 {
+  font-size: 1.6rem;
+  color: #2d3436;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.detalle-detalles p {
+  margin: 8px 0;
+  font-size: 1rem;
+  color: #2d3436;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.detalle-detalles strong {
+  color: #2d3436;
+  font-weight: 600;
+}
+
+/* Emociones */
+.detalle-emociones {
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  font-family: 'Roboto', sans-serif;
+}
+
+.detalle-emociones h3 {
+  font-size: 1.6rem;
+  color: #2d3436;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+/* ============================ */
+/* LIGHTBOX OVERLAY */
+.lightbox-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8);
+  z-index: 1100;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  animation: fadeInLightbox 0.3s ease-out;
+}
+
+@keyframes fadeInLightbox {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.lightbox-content {
+  position: relative;
+  width: 90%;
+  max-width: 1000px; /* Aumentado de 800px a 1000px para una imagen aún más grande */
+  max-height: 90%;
+  animation: scaleIn 0.3s ease-out;
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.lightbox-content img,
+.lightbox-content video {
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+  object-fit: contain;
+}
+
+.lightbox-close-button {
+  position: absolute;
+  top: -20px;
+  right: -20px;
+  background-color: #f8f9fa;
+  border: none;
+  border-radius: 50%;
+  padding: 10px 12px;
+  cursor: pointer;
+  font-size: 1.5rem;
+  color: #d63031;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.lightbox-close-button:hover {
+  background-color: #d63031;
+  color: #f8f9fa;
+}
+
+/* ============================ */
+/* RESPONSIVIDAD */
+@media (max-width: 1600px) {
+  .detalle-entrada {
+    max-width: 90%;
+  }
+}
+
+@media (max-width: 1024px) {
+  .detalle-main {
+    flex-direction: column;
+    gap: 25px;
+  }
+
+  .detalle-columna {
+    width: 100%;
+  }
+
+  .detalle-imagen {
+    max-width: 100%;
+    max-height: 500px; /* Ajustar la altura para pantallas más pequeñas */
+  }
+
+  .detalle-reflexiones,
+  .detalle-detalles,
+  .detalle-emociones {
+    padding: 15px;
+  }
+
+  .detalle-texto-adicional {
+    max-height: 200px; /* Ajusta según sea necesario */
+  }
+}
+
+@media (max-width: 768px) {
+  .detalle-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .detalle-header h2 {
+    text-align: left;
+    width: 100%;
+    margin-bottom: 10px;
+  }
+
+  .detalle-main {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .detalle-imagen {
+    max-width: 100%;
+    max-height: 400px; /* Ajustar la altura para dispositivos móviles */
+  }
+
+  .detalle-detalles,
+  .detalle-emociones {
+    padding: 15px;
+  }
+
+  .lightbox-content {
+    max-width: 95%;
+    max-height: 95%;
+  }
+
+  .lightbox-close-button {
+    top: -15px;
+    right: -15px;
+  }
+}
+
+/* ============================ */
+/* ESTILOS PARA DIFERENTES TIPOS DE CONTENIDO */
+
+/* Detalle Música */
+.detalle-musica {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.detalle-musica img {
+  width: 100%;
+  max-width: 400px;
+  border-radius: 10px;
+  margin-bottom: 15px;
+}
+
+.detalle-musica p {
+  font-size: 1rem;
+  color: #2d3436;
+}
+
+.detalle-musica audio {
+  width: 100%;
+  max-width: 400px;
+  margin-top: 10px;
+}
+
+/* Detalle Video */
+.detalle-video video {
+  width: 100%;
+  border-radius: 10px;
+}
+
+/* Detalle Audio */
+.detalle-audio audio {
+  width: 100%;
+}
+
+/* Detalle Texto */
+.detalle-texto p {
+  font-size: 1.2rem;
+  color: #2d3436;
+}
+
+/* Detalle Texto en Imagen */
+.detalle-texto-imagen p {
+  font-size: 1.2rem;
+  color: #ffffff;
+  text-align: center;
+  max-height: 100%;
+  overflow-y: auto; /* Permite scroll si el texto es muy largo */
+}
+
+/* Texto Adicional Bajo Imagen/Video/Cancion */
+.detalle-texto-adicional {
+  width: 100%;
+  max-width: 800px; /* Ancho máximo */
+  max-height: 150px; /* Ajusta según sea necesario */
+  overflow-y: auto; /* Permite scroll si el texto es muy largo */
+  margin-top: 10px;
+  padding: 10px;
+  background-color: rgba(245, 245, 245, 0.9);
+  border-radius: 8px;
+  margin: 0 auto; /* Centrar el contenedor */
+}
+
+.detalle-texto-adicional p {
+  color: #2d3436;
+  font-size: 1rem;
+  margin: 0;
+}
+
+/* Audio Adicional Bajo Imagen/Video/Cancion */
+.detalle-audio-adicional {
+  width: 100%;
+  max-width: 800px; /* Ancho máximo */
+  margin-top: 10px;
+  margin: 0 auto; /* Centrar el contenedor */
+}
+
+.detalle-audio-adicional audio {
+  width: 100%;
+}
+
+/* ============================ */
+/* Reflexiones y Otros Estilos Existentes */

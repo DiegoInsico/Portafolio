@@ -1,0 +1,42 @@
+.content-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    min-height: 100vh;
+    max-width: 1850px;
+}
+
+/* Collage.css o CollageView.css */
+
+.collage-viewer-container {
+    display: flex;
+    width: 100%;
+    height: calc(100vh - 200px);
+    /* Ajustar según la altura deseada */
+    position: relative;
+}
+
+.collage-creation-container {
+    flex: 1;
+    position: relative;
+}
+
+
+/* Panel lateral */
+.entry-info-panel {
+    width: 400px;
+    background: #fff;
+    border-left: 1px solid #ccc;
+    padding: 20px;
+    box-sizing: border-box;
+    overflow-y: auto;
+}
+
+.entry-info-panel h2 {
+    margin-top: 0;
+}
+
+.entry-info-panel p {
+    margin: 10px 0;
+}

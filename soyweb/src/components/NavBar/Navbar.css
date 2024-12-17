@@ -1,0 +1,266 @@
+/* src/components/Navbar.css */
+
+/* ============================ */
+/* VARIABLES CSS */
+:root {
+    /* Paleta de colores oscura mejorada */
+    --color-principal: #1f1f1f; /* Gris muy oscuro para fondo general */
+    --color-secundario: #ffffff; /* Blanco para texto principal */
+    --color-fondo: #1a1a1a; /* Negro más suave para la navbar */
+    --color-overlay: rgba(0, 0, 0, 0.7); /* Negro semi-transparente */
+    --color-hover: #333333; /* Gris medio para hover */
+    --color-activo: #bb86fc; /* Lavanda para elementos activos */
+    --color-cerrar: #cf6679; /* Rojo suave para botones de cierre */
+    --color-cerrar-hover: #d75c78; /* Rojo más claro para hover */
+    --color-texto: #ffffff; /* Blanco para texto */
+    --color-subtexto: #bbbbbb; /* Gris claro para subtexto */
+    --fuente-principal: 'Roboto', sans-serif; /* Fuente moderna */
+    --fuente-secundaria: 'Open Sans', sans-serif; /* Fuente complementaria */
+    --navbar-height: 60px; /* Altura de la navbar */
+    --transition-duration: 0.3s; /* Duración de las transiciones */
+}
+
+/* ============================ */
+/* NAVBAR */
+.navbar {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    background-color: var(--color-fondo); /* Fondo oscuro */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.7); /* Sombra oscura */
+    z-index: 1001;
+    transition: top var(--transition-duration) ease-in-out, background-color var(--transition-duration) ease-in-out;
+}
+
+/* Navbar oculto */
+.navbar--hidden {
+    top: -100px; /* Oculta la navbar moviéndola hacia arriba */
+}
+
+/* Contenedor principal de la navbar */
+.navbar-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: var(--navbar-height);
+    max-width: 1500px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* Marca / Logo */
+.navbar-brand {
+    text-decoration: none;
+    color: var(--color-secundario);
+    font-size: 1.8rem;
+    font-weight: bold;
+    font-family: var(--fuente-secundaria);
+    display: flex;
+    align-items: center;
+}
+
+.navbar-brand .brand-logo {
+    margin-left: 8px; /* Espacio entre el icono y el texto */
+    font-size: 1.8rem;
+    color: var(--color-activo); /* Color lavanda para destacar */
+}
+
+/* Enlaces de la navbar */
+.navbar-links {
+    list-style: none;
+    display: flex;
+    gap: 20px;
+}
+
+.navbar-links li {
+    position: relative;
+}
+
+.navbar-links a {
+    text-decoration: none;
+    color: var(--color-texto);
+    font-size: 1rem;
+    font-family: var(--fuente-principal);
+    padding: 8px 12px;
+    border-radius: 4px;
+    transition: background-color var(--transition-duration), color var(--transition-duration);
+    display: flex;
+    align-items: center;
+}
+
+.navbar-links a:hover,
+.navbar-links a:focus {
+    background-color: var(--color-hover);
+    color: var(--color-secundario);
+}
+
+/* Iconos dentro de los enlaces */
+.navbar-links a .icon {
+    margin-right: 8px;
+    font-size: 1.2rem;
+    vertical-align: middle;
+    color: var(--color-activo); /* Color lavanda para los iconos */
+}
+
+/* Botón de Cerrar Sesión */
+.logout-button {
+    background-color: var(--color-cerrar);
+    color: var(--color-fondo);
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-family: var(--fuente-principal);
+    transition: background-color var(--transition-duration), transform var(--transition-duration);
+}
+
+.logout-button:hover,
+.logout-button:focus {
+    background-color: var(--color-cerrar-hover);
+    transform: translateY(-2px);
+}
+
+/* Menú Hamburguesa */
+.menu-toggle {
+    display: none; /* Oculto por defecto, se mostrará en pantallas pequeñas */
+    cursor: pointer;
+    margin-left: 20px;
+}
+
+.hamburger-icon {
+    color: var(--color-texto);
+    font-size: 1.5rem;
+    transition: color var(--transition-duration);
+}
+
+.menu-toggle:hover .hamburger-icon,
+.menu-toggle:focus .hamburger-icon {
+    color: var(--color-activo);
+}
+
+/* Dropdown para "Hasta Pronto" */
+.navbar-dropdown {
+    position: relative;
+}
+
+.dropdown-toggle {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    color: var(--color-texto);
+    font-size: 1rem;
+    font-family: var(--fuente-principal);
+    padding: 8px 12px;
+    border-radius: 4px;
+    transition: background-color var(--transition-duration), color var(--transition-duration);
+}
+
+.dropdown-toggle:hover,
+.dropdown-toggle:focus {
+    background-color: var(--color-hover);
+    color: var(--color-secundario);
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: var(--color-fondo);
+    list-style: none;
+    padding: 10px 0;
+    margin: 0;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
+    min-width: 180px;
+    z-index: 1002;
+}
+
+.dropdown-menu li {
+    width: 100%;
+}
+
+.dropdown-menu a {
+    display: block;
+    padding: 8px 20px;
+    color: var(--color-texto);
+    text-decoration: none;
+    transition: background-color var(--transition-duration), color var(--transition-duration);
+}
+
+.dropdown-menu a:hover,
+.dropdown-menu a:focus {
+    background-color: var(--color-hover);
+    color: var(--color-secundario);
+}
+
+/* ============================ */
+/* RESPONSIVIDAD */
+
+/* Menú para pantallas pequeñas */
+@media (max-width: 768px) {
+    .navbar-container {
+        flex-wrap: wrap;
+        height: auto;
+    }
+
+    /* Ocultar los enlaces y mostrar el botón de menú */
+    .navbar-links {
+        flex-direction: column;
+        width: 100%;
+        display: none; /* Ocultos por defecto */
+        background-color: var(--color-fondo);
+        border-top: 1px solid #333;
+        transition: max-height var(--transition-duration) ease-in-out;
+        overflow: hidden;
+        max-height: 0;
+    }
+
+    .navbar-links.active {
+        display: flex; /* Mostrar cuando está activo */
+        max-height: 500px; /* Valor suficientemente alto para mostrar todos los enlaces */
+    }
+
+    /* Mostrar el botón de menú */
+    .menu-toggle {
+        display: block; /* Mostrar en pantallas pequeñas */
+    }
+
+    /* Ajustar los enlaces para que ocupen todo el ancho */
+    .navbar-links li {
+        width: 100%;
+    }
+
+    .navbar-links a {
+        width: 100%;
+        padding: 12px 20px;
+    }
+
+    /* Dropdown en pantallas pequeñas */
+    .navbar-dropdown .dropdown-menu {
+        position: static;
+        box-shadow: none;
+        border: none;
+    }
+
+    /* Ajustar el dropdown */
+    .navbar-dropdown .dropdown-menu a {
+        padding-left: 40px; /* Indentación para sub-opciones */
+    }
+
+    /* Alinear el botón de cerrar sesión */
+    .navbar-actions {
+        width: 100%;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        margin-top: 10px;
+    }
+}
+
+/* Ocultar el botón de menú en pantallas grandes */
+@media (min-width: 769px) {
+    .menu-toggle {
+        display: none;
+    }
+}
