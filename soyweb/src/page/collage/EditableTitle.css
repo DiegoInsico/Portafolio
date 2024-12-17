@@ -2,14 +2,13 @@
 
 .editable-title {
     cursor: pointer;
-    margin-bottom: 20px;
     /* Espaciado inferior para separar del contenido */
 }
 
 .title-display {
     font-size: 2em;
     font-weight: bold;
-    color: #333;
+    color: #fffefe;
     transition: color 0.3s ease;
 }
 

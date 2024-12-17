@@ -14,7 +14,8 @@ const Collage = ({
     isPreview,
     ownerId,
     onTitleDataChange,
-    onEntriesChange
+    onEntriesChange,
+    isSaving
 }) => {
     const [entriesInCollage, setEntriesInCollage] = useState([]);
     const [localTitleData, setLocalTitleData] = useState(titleData);
@@ -23,7 +24,9 @@ const Collage = ({
 
     // Notificar cambios en las entradas
     useEffect(() => {
+
         onEntriesChange(entriesInCollage);
+        console.log("DEBUG [Collage]: entriesInCollage actualizadas", entriesInCollage);
     }, [entriesInCollage, onEntriesChange]);
 
     // Notificar cambios en el título
@@ -96,7 +99,7 @@ const Collage = ({
                     collageId={collageId}
                     titleData={localTitleData}
                     bringToFront={bringToFront}
-                    disabled={isPreview}
+                    disabled={isPreview || isSaving}
                     onTitlePropertiesChange={updateTitleProperties}
                 />
 
@@ -107,7 +110,7 @@ const Collage = ({
                         collageId={collageId}
                         containerRef={workspaceRef}
                         bringToFront={bringToFront}
-                        disabled={isPreview}
+                        disabled={isPreview || isSaving}
                         onEntryPropertiesChange={updateEntryProperties}
                     />
                 ))}

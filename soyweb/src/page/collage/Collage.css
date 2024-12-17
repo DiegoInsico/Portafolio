@@ -1,14 +1,43 @@
-/* Collage.css */
+.render-content {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    width: 100%;
+    /* O el ancho que requieras */
+}
 
 .collage-workspace {
     position: relative;
-    width: 1600px;
-    margin-left: 10px;
+    width: 1400px;
+    height: 700px;
     margin-right: 10px;
-    height: 80vh;
     border: 2px solid #ccc;
     border-radius: 50px;
-    margin: 20px auto;
     background-color: #bdd2df;
     overflow: hidden;
+    /* Podrías ajustar márgenes a tu gusto */
+}
+
+/* Luego para tu nuevo componente que va a la derecha, podrías crear un contenedor adicional */
+.extra-component {
+    /* Ocupa el espacio restante */
+    margin-left: 20px;
+    /* Separación entre el collage y el nuevo componente */
+    /* Añadir aquí los estilos para tu nuevo componente */
+}
+
+.collage-creation-container {
+    margin-left: 30px;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+.collage-viewer-container {
+    margin-left: 30px;
+    display: flex;
+    width: 100%;
+    height: calc(100vh - 200px);
+    /* Ajustar según la altura deseada */
+    position: relative;
 }

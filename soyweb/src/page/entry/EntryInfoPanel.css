@@ -1,0 +1,227 @@
+.entry-info-panel {
+    position: relative;
+    height: 700px;
+    width: 100%;
+    background: #ffffff;
+    border-left: 1px solid #ccc;
+    border-radius: 30px;
+    box-sizing: border-box;
+    overflow-y: auto;
+    font-family: Arial, sans-serif;
+    overflow: hidden;
+}
+
+/* Contenido principal de la info */
+.info-content {
+    padding: 20px;
+    transition: opacity 0.3s ease;
+}
+
+
+.info-content.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.info-header {
+    display: flex;
+    justify-content: space-between;
+    /* Espacio entre el texto y el botón */
+    align-items: center;
+    /* Alinear verticalmente */
+    border-bottom: 1px solid #ccc;
+    /* Línea gris bajo el contenedor */
+    padding: 10px 0;
+    /* Espaciado vertical interno */
+}
+
+h2 {
+    margin: 0;
+    /* Eliminar márgenes predeterminados */
+    font-size: 1.5rem;
+    /* Ajustar tamaño de fuente */
+    line-height: 1.2;
+    /* Ajustar altura de línea del texto */
+}
+
+.ver-reflexiones-button {
+    background-color: #5A0FC8;
+    /* Color del botón */
+    color: #fff;
+    /* Texto blanco */
+    border: none;
+    /* Sin bordes */
+    border-radius: 10px;
+    /* Bordes redondeados */
+    padding: 8px 16px;
+    /* Espaciado interno del botón */
+    font-size: 1rem;
+    /* Tamaño de la fuente */
+    cursor: pointer;
+    /* Cursor de mano al pasar sobre el botón */
+    display: flex;
+    /* Flexbox interno */
+    align-items: center;
+    /* Centrar el texto verticalmente dentro del botón */
+    justify-content: center;
+    /* Centrar el texto horizontalmente dentro del botón */
+    height: 100%;
+    /* Asegura que se ajuste al contenido */
+}
+
+.ver-reflexiones-button:hover {
+    background-color: #450AA0;
+    /* Cambio de color al pasar el ratón */
+}
+
+
+.entry-info-panel h2 {
+    margin-top: 0;
+    font-size: 1.8em;
+    margin-bottom: 20px;
+    color: #333;
+    border-bottom: 2px solid #ccc;
+    padding-bottom: 10px;
+}
+
+.info-section {
+    margin-bottom: 20px;
+}
+
+.info-section h3 {
+    margin-top: 0;
+    font-size: 1.4em;
+    margin-bottom: 10px;
+    color: #444;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 5px;
+}
+
+.entry-info-panel p {
+    margin: 10px 0;
+    line-height: 1.4;
+    color: #555;
+}
+
+.entry-info-panel strong {
+    color: #000;
+}
+
+.panel-img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 5px;
+    margin-top: 10px;
+}
+
+.panel-media {
+    width: 100%;
+    border-radius: 5px;
+    background: #000;
+}
+
+/* Emociones */
+.emociones-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+.emotion-item {
+    width: 20px;
+    height: 20px;
+    background: #eee;
+    border-radius: 50%;
+    font-size: 10px;
+    color: #333;
+    border: 1px solid #ccc;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+
+/* Panel para Reflexiones que se superpone */
+.reflexiones-panel {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    background: #fafafa;
+    border-left: 1px solid #ccc;
+    padding: 20px;
+    box-sizing: border-box;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    z-index: 9999;
+    /* Para superponer sobre todo */
+}
+
+.reflexiones-panel.reflexiones-show {
+    transform: translateX(0);
+}
+
+.reflexiones-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+}
+
+.reflexiones-header h3 {
+    margin: 0;
+    font-size: 1.4em;
+    color: #333;
+}
+
+.close-reflexiones {
+    background: transparent;
+    border: none;
+    color: #333;
+    cursor: pointer;
+    font-size: 14px;
+    text-decoration: underline;
+}
+
+.reflexiones-lista {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.reflexion-item {
+    margin-bottom: 10px;
+    background: #fff;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    padding: 10px;
+}
+
+.reflexion-full p {
+    margin: 0;
+}
+
+/* Scrollbar opcional */
+.entry-info-panel {
+    scrollbar-width: thin;
+    scrollbar-color: #ccc #f0f0f0;
+}
+
+.entry-info-panel::-webkit-scrollbar {
+    width: 8px;
+}
+
+.entry-info-panel::-webkit-scrollbar-track {
+    background: #f0f0f0;
+}
+
+.entry-info-panel::-webkit-scrollbar-thumb {
+    background-color: #ccc;
+    border-radius: 4px;
+}

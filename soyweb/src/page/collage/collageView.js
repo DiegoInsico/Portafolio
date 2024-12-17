@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getCollageById } from '../../firebase';
-import CollageViewer from './CollageViewer'; // Importa el nuevo componente
+import CollageViewer from './CollageViewer';
 import { useAuth } from '../../page/auth/authContext';
 import './CollageView.css';
 
@@ -36,13 +36,14 @@ const CollageView = () => {
     console.log(collage.titleData)
 
     return (
-        <div>
+        <div className='content-container'>
             <h1>{collage.name}</h1>
             <CollageViewer
                 collageName={collage.name}
                 titleData={collage.titleData}
                 entries={collage.entries}
                 collageId={collage.id}
+                currentUser={currentUser}
             />
         </div>
     );

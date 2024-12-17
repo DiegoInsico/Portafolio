@@ -44,10 +44,6 @@ const CollagePage = () => {
     return () => unsubscribe();
   }, [currentUser]);
 
-  const toggleCollagesList = () => {
-    setShowCollagesList((prev) => !prev);
-  };
-
   const handleSelectCollage = (collage) => {
     console.log("Collage seleccionado:", collage);
     navigate(`/collage/${collage.id}`);
@@ -86,10 +82,16 @@ const CollagePage = () => {
       console.log("Borrador de collage creado con ID:", draftRef.id);
       setDraftCollageId(draftRef.id);
       setIsCreatingCollage(true);
+      setShowCollagesList(false);
     } catch (error) {
       console.error('Error creando el borrador del collage', error);
       alert('Hubo un error al crear el collage. Por favor, inténtalo de nuevo.');
     }
+  };
+
+  const handleShowList = () => {
+    setIsCreatingCollage(false);
+    setShowCollagesList(true);
   };
 
   if (loading) {
@@ -101,31 +103,45 @@ const CollagePage = () => {
   }
 
   return (
-    <div className="collage-page">
-      <MiniNav
-        className="mini-nav"
-        onToggleCollagesList={toggleCollagesList}
-        onStartCreatingCollage={startCreatingCollage}
-      />
-
-      <div className='render-content'>
-        {isCreatingCollage ? (
-          <CreateCollage
-            setIsCreatingCollage={setIsCreatingCollage}
-            collageId={draftCollageId}
-          />
-        ) : showCollagesList ? (
-          <ListCollages
-            collages={collages}
-            onSelectCollage={handleSelectCollage}
-            onDeleteCollage={handleDeleteCollage}
-          />
-        ) : (
-          <div className="placeholder">
-            <p>Selecciona una opción del menú para empezar.</p>
+    <div className="scroll-container">
+      <section className="timeline-section">
+        <div className="page-one-collage">
+          <div className="titulo-left">   
+            <h1>Pensadero</h1>
           </div>
-        )}
-      </div>
+          <div className="titulo-right">
+            <p>
+              Este es el lugar donde puedes revivir y visitar todas tus recuedos conectando tu historia con el pasado.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section className="collage-section">
+        <MiniNav
+          className="mini-nav"
+          onToggleCollagesList={handleShowList}
+          onStartCreatingCollage={startCreatingCollage}
+        />
+        <div className="render-content">
+          {isCreatingCollage ? (
+            <CreateCollage
+              setIsCreatingCollage={setIsCreatingCollage}
+              collageId={draftCollageId}
+            />
+          ) : showCollagesList ? (
+            <ListCollages
+              collages={collages}
+              onSelectCollage={handleSelectCollage}
+              onDeleteCollage={handleDeleteCollage}
+            />
+          ) : (
+            <div className="placeholder">
+              <p>Selecciona una opción del menú para empezar.</p>
+            </div>
+          )}
+        </div>
+      </section>
     </div>
   );
 };

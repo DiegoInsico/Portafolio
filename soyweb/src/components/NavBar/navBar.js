@@ -4,15 +4,15 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom'; // Para navegar entre rutas
 import { useNavigate } from 'react-router-dom'; // Para la funcionalidad de logout
 import { signOutUser } from '../../firebase';
-import { 
-    FaBook, 
-    FaPhotoVideo, 
-    FaTasks, 
-    FaClock, 
-    FaEnvelope, 
-    FaBars, 
-    FaTimes, 
-    FaHandsHelping 
+import {
+    FaBook,
+    FaPhotoVideo,
+    FaTasks,
+    FaClock,
+    FaEnvelope,
+    FaBars,
+    FaTimes,
+    FaHandsHelping
 } from 'react-icons/fa'; // Importa iconos adicionales
 import './Navbar.css';
 
@@ -72,9 +72,9 @@ const Navbar = () => {
     return (
         <nav className={`navbar ${showNavbar ? '' : 'navbar--hidden'}`}>
             <div className="navbar-container">
-                <Link 
-                    to="/" 
-                    className="navbar-brand" 
+                <Link
+                    to="/"
+                    className="navbar-brand"
                     onClick={() => { closeMenu(); closeDropdownHastaPronto(); }}
                 >
                     {/* Puedes reemplazar el texto "Soy" por un logo si lo deseas */}
@@ -82,35 +82,25 @@ const Navbar = () => {
                 </Link>
                 <ul className={`navbar-links ${menuActive ? 'active' : ''}`}>
                     <li>
-                        <Link to="/prueba" onClick={closeMenu}>
-                            <FaBook className="icon" /> Pruebas
-                        </Link>
-                    </li>
-                    <li>
-                        <Link to="/collage" onClick={closeMenu}>
-                            <FaPhotoVideo className="icon" /> Tu Álbum
-                        </Link>
-                    </li>
-                    <li>
                         <Link to="/organize" onClick={closeMenu}>
                             <FaTasks className="icon" /> Ordena tu Vida
                         </Link>
                     </li>
                     <li>
                         <Link to="/linea-tiempo" onClick={closeMenu}>
-                            <FaClock className="icon" /> Línea de Tiempo
+                            <FaClock className="icon" /> Carrusel de tu Vida
                         </Link>
                     </li>
                     <li>
                         <Link to="/mensajes" onClick={closeMenu}>
-                            <FaEnvelope className="icon" /> Tus Mensajes
+                            <FaEnvelope className="icon" /> Un Fragmento para Ti
                         </Link>
                     </li>
                     {/* Elemento de menú "Hasta Pronto" con sub-opciones */}
                     <li className="navbar-dropdown">
-                        <div 
-                            className="dropdown-toggle" 
-                            onClick={toggleDropdownHastaPronto} 
+                        <div
+                            className="dropdown-toggle"
+                            onClick={toggleDropdownHastaPronto}
                             tabIndex={0}
                             onKeyPress={(e) => { if (e.key === 'Enter') toggleDropdownHastaPronto(); }}
                             aria-haspopup="true"
@@ -121,16 +111,16 @@ const Navbar = () => {
                         {dropdownHastaProntoActive && (
                             <ul className="dropdown-menu">
                                 <li>
-                                    <Link 
-                                        to="/hasta-pronto/mis-despedidas" 
+                                    <Link
+                                        to="/hasta-pronto/mis-despedidas"
                                         onClick={() => { closeMenu(); closeDropdownHastaPronto(); }}
                                     >
                                         Mis Despedidas
                                     </Link>
                                 </li>
                                 <li>
-                                    <Link 
-                                        to="/hasta-pronto/despedidas-asignadas" 
+                                    <Link
+                                        to="/hasta-pronto/despedidas-asignadas"
                                         onClick={() => { closeMenu(); closeDropdownHastaPronto(); }}
                                     >
                                         Sus Despedidas
@@ -145,14 +135,20 @@ const Navbar = () => {
                             <FaBook className="icon" /> Libro de Reflexión
                         </Link>
                     </li>
+                    <li>
+                        <Link to="/collage" onClick={closeMenu}>
+                            <FaPhotoVideo className="icon" /> Pensadero
+                        </Link>
+                    </li>
                 </ul>
+
                 <div className="navbar-actions">
                     <button onClick={handleLogout} className="logout-button">Cerrar Sesión</button>
-                    <div 
-                        className="menu-toggle" 
-                        onClick={toggleMenu} 
-                        aria-label="Toggle Menu" 
-                        role="button" 
+                    <div
+                        className="menu-toggle"
+                        onClick={toggleMenu}
+                        aria-label="Toggle Menu"
+                        role="button"
                         tabIndex={0}
                         onKeyPress={(e) => { if (e.key === 'Enter') toggleMenu(); }}
                     >

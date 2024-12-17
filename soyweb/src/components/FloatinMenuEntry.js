@@ -72,7 +72,7 @@ const FloatingMenuEntry = React.forwardRef(({
                                 type="range"
                                 id="card-width"
                                 min="200"
-                                max="600"
+                                max="350"
                                 value={cardWidth}
                                 onChange={handleWidthChange}
                             />
@@ -84,7 +84,7 @@ const FloatingMenuEntry = React.forwardRef(({
                                 type="range"
                                 id="card-height"
                                 min="200"
-                                max="800"
+                                max="400"
                                 value={cardHeight}
                                 onChange={handleHeightChange}
                             />

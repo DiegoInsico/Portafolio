@@ -4,7 +4,6 @@ import './MiniNav.css';
 const MiniNav = ({ onToggleCollagesList, onStartCreatingCollage }) => {
 
   const handleCreateCollage = () => {
-    // Llamamos a la función del padre para crear el borrador y activar el modo creación
     if (onStartCreatingCollage) {
       onStartCreatingCollage();
     }
@@ -19,9 +18,9 @@ const MiniNav = ({ onToggleCollagesList, onStartCreatingCollage }) => {
   return (
     <div className="mini-nav">
       <button onClick={handleCreateCollage}>
-        Crear Nuevo Collage
+        Crear un Nuevo Pensadero
       </button>
-      <button onClick={handleListCollages}>Listar Collages</button>
+      <button onClick={handleListCollages}>Lista de Pensaderos</button>
     </div>
   );
 };

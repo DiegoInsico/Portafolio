@@ -1,28 +1,122 @@
-/* CollagePage.css */
+/* Habilitar scroll snap en el contenedor principal */
+.scroll-container {
+    scroll-snap-type: y mandatory;
+    overflow-y: scroll;
+    height: 100vh;
+    scroll-behavior: smooth;
+}
 
-/* Contenedor principal de la página */
-.collage-page {
+/* Cada sección se 'encaja' en el centro de la pantalla */
+.timeline-section,
+.collage-section {
+    scroll-snap-align: center;
+    height: 100vh;
+    /* Cada sección ocupa toda la pantalla */
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 20px;
-    height: 100vh;
-}
-.mini-nav{
-    height: 5vh;
+    justify-content: center;
 }
 
-.render-content{
-    height: 90vh;
-}
-
-.collage-container {
+.collage-page {
+    /* Ya no es necesario overflow visible aquí,
+       ya que scroll-contaier gestiona el scroll */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     width: 100%;
-    max-width: 1200px;
-    margin-top: 20px;
 }
 
-/* Botones dentro de la página (Ejemplo: Crear Collage) */
+/* HERO SECTION */
+.page-one-collage {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-end;
+    min-height: 80vh;
+    position: relative;
+    background-image: url('../../../public/PensaderoBG.webp');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    margin-left: 15%;
+    margin-right: 15%;
+    border-radius: 90px;
+    padding: 0 5%;
+    width: 60%;
+    overflow: hidden;
+    margin-top: 10vh;
+    margin-bottom: 10vh;
+}
+
+.page-one::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.3);
+    z-index: 1;
+}
+
+.titulo-left {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    z-index: 2;
+    margin-bottom: 150px;
+    position: relative;
+}
+
+.titulo-left h1 {
+    font-size: 6rem;
+    color: #ffffff;
+    font-weight: bold;
+    margin: 20px 0;
+    font-family: 'Georgia', serif;
+}
+
+.titulo-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    margin-bottom: 100px;
+    max-width: 40%;
+    z-index: 2;
+    position: relative;
+    color: #ffffff;
+}
+
+.titulo-right p {
+    font-size: 1.6rem;
+    line-height: 1.6;
+    text-align: right;
+    margin: 10px 0;
+    font-family: 'Georgia', serif;
+}
+
+/* Sección debajo del hero con contenido del collage */
+.collage-section {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow: hidden;
+}
+
+
+.render-content {
+    width: 100%;
+    height: calc(100vh - 5vh);
+    overflow-y: auto;
+    /* Aquí se hace scroll interno */
+    box-sizing: border-box;
+    padding: 20px;
+    /* Opcional */
+}
+
+/* Botones */
 .btn-custom {
     background-color: #bb86fc;
     color: white;

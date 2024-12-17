@@ -12,6 +12,10 @@ const DraggableTitle = ({ title, setTitle, containerRef, collageId, titleData = 
     const [showMenu, setShowMenu] = useState(false);
     const titleRef = useRef(null);
     const isDragging = useRef(false);
+    const initialMousePos = useRef({ x: 0, y: 0 }); // ADD
+    const movedDistance = useRef(0); // ADD
+
+    const finalPosRef = useRef(position);
 
     const handleDragStart = (e) => {
         if (disabled) return;
@@ -20,6 +24,9 @@ const DraggableTitle = ({ title, setTitle, containerRef, collageId, titleData = 
 
         const newZIndex = bringToFront();
         setZIndex(newZIndex);
+
+        initialMousePos.current = { x: e.clientX, y: e.clientY }; // ADD
+        movedDistance.current = 0; // ADD
 
         const initialMouseX = e.clientX;
         const initialMouseY = e.clientY;
@@ -46,7 +53,8 @@ const DraggableTitle = ({ title, setTitle, containerRef, collageId, titleData = 
             newX = Math.max(minX, Math.min(newX, maxX));
             newY = Math.max(minY, Math.min(newY, maxY));
 
-            setPosition({ x: newX, y: newY });
+            finalPosRef.current = { x: newX, y: newY }; // Guardar en la ref
+            setPosition(finalPosRef.current);
         };
 
         const handleMouseUp = () => {
@@ -69,8 +77,15 @@ const DraggableTitle = ({ title, setTitle, containerRef, collageId, titleData = 
         if (disabled) return;
         if (isDragging.current) return;
         e.stopPropagation();
+
+        const DRAG_THRESHOLD = 5; // ADD
+        if (movedDistance.current > DRAG_THRESHOLD) {
+            return; // Fue un drag significativo, no abrir menú
+        }
+
         setShowMenu(true);
     };
+
 
     const setFontSize = (newSize) => {
         setFontSizeState(newSize);

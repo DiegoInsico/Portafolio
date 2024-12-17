@@ -2,24 +2,40 @@ import React, { useState, useRef, useEffect } from 'react';
 import './DraggableEntry.css';
 import FloatingMenuEntry from '../../components/FloatinMenuEntry';
 
-const DraggableEntry = ({ entry, collageId, containerRef, bringToFront, disabled, onEntryPropertiesChange }) => {
+const DraggableEntry = ({ entry, collageId, containerRef, bringToFront, disabled, onEntryPropertiesChange, onClick }) => {
     const [position, setPosition] = useState(entry.position || { x: 100, y: 100 });
-    const [cardWidth, setCardWidthState] = useState(entry.size?.width || 300);
-    const [cardHeight, setCardHeightState] = useState(entry.size?.height || 400);
+    const [cardWidth, setCardWidthState] = useState(entry.size?.width || 200);
+    const [cardHeight, setCardHeightState] = useState(entry.size?.height || 300);
     const [backgroundColor, setBackgroundColorState] = useState(entry.backgroundColor || '#ffffff');
     const [zIndex, setZIndex] = useState(entry.zIndex || 1);
 
     const [showMenu, setShowMenu] = useState(false);
     const entryRef = useRef(null);
     const isDragging = useRef(false);
+    const initialMousePos = useRef({ x: 0, y: 0 });
+    const movedDistance = useRef(0);
+    const finalPosRef = useRef(position);
 
-    const handleDragStart = (e) => {
-        if (disabled) return;
+    const DRAG_THRESHOLD = 5; // Umbral para distinguir click de drag
+
+    const handleMouseDown = (e) => {
         e.preventDefault();
-        isDragging.current = true;
+        if (disabled) {
+            // Si está deshabilitado, no arrastramos, lo interpretamos como click simple
+            if (onClick) {
+                e.stopPropagation();
+                onClick();
+            }
+            return;
+        }
 
+        // Modo arrastrable
+        isDragging.current = true;
         const newZIndex = bringToFront();
         setZIndex(newZIndex);
+
+        initialMousePos.current = { x: e.clientX, y: e.clientY };
+        movedDistance.current = 0;
 
         const initialMouseX = e.clientX;
         const initialMouseY = e.clientY;
@@ -31,6 +47,8 @@ const DraggableEntry = ({ entry, collageId, containerRef, bringToFront, disabled
 
             const deltaX = moveEvent.clientX - initialMouseX;
             const deltaY = moveEvent.clientY - initialMouseY;
+
+            movedDistance.current = Math.max(movedDistance.current, Math.abs(deltaX), Math.abs(deltaY));
 
             let newX = initialX + deltaX;
             let newY = initialY + deltaY;
@@ -45,8 +63,8 @@ const DraggableEntry = ({ entry, collageId, containerRef, bringToFront, disabled
 
             newX = Math.max(minX, Math.min(newX, maxX));
             newY = Math.max(minY, Math.min(newY, maxY));
-
-            setPosition({ x: newX, y: newY });
+            finalPosRef.current = { x: newX, y: newY };
+            setPosition(finalPosRef.current);
         };
 
         const handleMouseUp = () => {
@@ -54,21 +72,22 @@ const DraggableEntry = ({ entry, collageId, containerRef, bringToFront, disabled
             document.removeEventListener('mousemove', handleMouseMove);
             document.removeEventListener('mouseup', handleMouseUp);
 
-            // Notificar cambios al padre
-            onEntryPropertiesChange(entry.entryId, {
-                position: { x: position.x, y: position.y },
-                zIndex
-            });
+            // Guardar posición final
+            if (onEntryPropertiesChange) {
+                onEntryPropertiesChange(entry.entryId, {
+                    position: { x: finalPosRef.current.x, y: finalPosRef.current.y },
+                    zIndex
+                });
+            }
+
+            // Si se movió menos del umbral, es un click (abrir/cerrar menú flotante)
+            if (movedDistance.current < DRAG_THRESHOLD) {
+                setShowMenu(prev => !prev);
+            }
         };
 
         document.addEventListener('mousemove', handleMouseMove);
         document.addEventListener('mouseup', handleMouseUp);
-    };
-
-    const toggleMenu = (e) => {
-        if (disabled) return;
-        e.stopPropagation();
-        setShowMenu(!showMenu);
     };
 
     useEffect(() => {
@@ -95,17 +114,23 @@ const DraggableEntry = ({ entry, collageId, containerRef, bringToFront, disabled
 
     const setCardWidth = (newWidth) => {
         setCardWidthState(newWidth);
-        onEntryPropertiesChange(entry.entryId, { size: { width: newWidth, height: cardHeight } });
+        if (onEntryPropertiesChange) {
+            onEntryPropertiesChange(entry.entryId, { size: { width: newWidth, height: cardHeight } });
+        }
     };
 
     const setCardHeight = (newHeight) => {
         setCardHeightState(newHeight);
-        onEntryPropertiesChange(entry.entryId, { size: { width: cardWidth, height: newHeight } });
+        if (onEntryPropertiesChange) {
+            onEntryPropertiesChange(entry.entryId, { size: { width: cardWidth, height: newHeight } });
+        }
     };
 
     const setBackgroundColor = (newColor) => {
         setBackgroundColorState(newColor);
-        onEntryPropertiesChange(entry.entryId, { backgroundColor: newColor });
+        if (onEntryPropertiesChange) {
+            onEntryPropertiesChange(entry.entryId, { backgroundColor: newColor });
+        }
     };
 
     return (
@@ -123,8 +148,7 @@ const DraggableEntry = ({ entry, collageId, containerRef, bringToFront, disabled
                     position: 'absolute',
                     cursor: disabled ? 'default' : 'move'
                 }}
-                onMouseDown={handleDragStart}
-                onClick={toggleMenu}
+                onMouseDown={handleMouseDown}
             >
                 <div className="entry-content">
                     {entry.cancion && (

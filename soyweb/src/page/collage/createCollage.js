@@ -1,5 +1,5 @@
 import { doc, updateDoc } from 'firebase/firestore';
-import { db, storage } from '../../firebase';
+import { db, storage, deleteCollage } from '../../firebase';
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 import React, { useState } from 'react';
 import Carousel from '../entry/entry';
@@ -14,6 +14,7 @@ const CreateCollage = ({ setIsCreatingCollage, collageId }) => {
     const [collageName, setCollageName] = useState('');
     const [selectedEntries, setSelectedEntries] = useState([]);
     const [thumbnail, setThumbnail] = useState(null);
+    const [isSaving, setIsSaving] = useState(false);
 
     // Estados locales para guardar el estado final del título y entradas
     const [finalEntries, setFinalEntries] = useState([]);
@@ -27,12 +28,31 @@ const CreateCollage = ({ setIsCreatingCollage, collageId }) => {
 
     const navigate = useNavigate();
 
+    const handleCancelCreation = async () => {
+        if (!collageId) {
+            // Si no hay collageId, simplemente volvemos a la lista
+            setIsCreatingCollage(false);
+            return;
+        }
+
+        const confirmDelete = window.confirm("¿Seguro que deseas cancelar la creación y eliminar el borrador?");
+        if (!confirmDelete) return;
+
+        try {
+            await deleteCollage(collageId);
+            setIsCreatingCollage(false);
+        } catch (error) {
+            console.error("Error al eliminar el borrador:", error);
+            alert("Hubo un error al cancelar la creación. Por favor, inténtalo de nuevo.");
+        }
+    };
+
     const handleEntrySelect = (entry, isSelected) => {
         if (isSelected) {
             setSelectedEntries(prev => [...prev, {
                 entryId: entry.id,
                 position: { x: 100, y: 100 },
-                size: { width: 300, height: 400 },
+                size: { width: 200, height: 300 },
                 backgroundColor: '#ffffff'
             }]);
         } else {
@@ -72,6 +92,7 @@ const CreateCollage = ({ setIsCreatingCollage, collageId }) => {
     };
 
     const handleCreateCollage = async () => {
+
         if (!currentUser) {
             alert('Debes estar autenticado para crear un collage.');
             return;
@@ -92,15 +113,23 @@ const CreateCollage = ({ setIsCreatingCollage, collageId }) => {
             return;
         }
 
+        console.log("DEBUG [CreateCollage]: finalEntries antes de guardar", finalEntries);
+        console.log("DEBUG [CreateCollage]: finalTitleData antes de guardar", finalTitleData);
         try {
+            setIsSaving(true);
             // finalEntries y finalTitleData ya contienen el diseño actualizado desde Collage
             const updatedId = await updateCollageDoc(collageId, collageName, finalEntries, thumbnail, finalTitleData);
+            console.log('DEBUG [CreateCollage]: Collage finalizado con ID:', updatedId);
             console.log('Collage finalizado con ID:', updatedId);
             setIsCreatingCollage(false);
             navigate(`/collage/${updatedId}`);
         } catch (error) {
             console.error('Error creando el collage', error);
+            setIsSaving(false);
             alert('Hubo un error al crear el collage. Por favor, inténtalo de nuevo.');
+        }
+        finally {
+            setIsSaving(false);
         }
     };
 
@@ -157,13 +186,20 @@ const CreateCollage = ({ setIsCreatingCollage, collageId }) => {
                             onEntriesChange={setFinalEntries}
                             isPreview={false}
                             ownerId={currentUser ? currentUser.uid : null}
+                            isSaving={isSaving}
                         />
                     )}
+                    <div className="button-container">
+                        <button onClick={handleCreateCollage} disabled={isSaving}>
+                            {isSaving ? "Guardando..." : "Crear Pensadero"}
+                        </button>
+                        <button onClick={handleCancelCreation} disabled={isSaving} style={{ marginLeft: '10px', backgroundColor: '#d9534f' }}>
+                            Cancelar
+                        </button>
+                    </div>
                 </div>
             </div>
-            <div className="button-container">
-                <button onClick={handleCreateCollage}>Crear Pensadero</button>
-            </div>
+
         </div>
     );
 };

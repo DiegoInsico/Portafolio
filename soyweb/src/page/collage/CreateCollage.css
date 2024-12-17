@@ -11,7 +11,6 @@
 
 /* Sección de creación de collage */
 .create-collage {
-    background-color: #f18080;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
@@ -20,7 +19,7 @@
     max-width: 1850px;
     box-sizing: border-box;
     border-radius: 40px;
-    padding: 40px;
+    padding: 10px;
 }
 
 /* Contenedor para el nombre del collage y la miniatura */
@@ -29,7 +28,7 @@
     align-items: center;
     width: 100%;
     position: relative;
-    padding: 20px;
+    padding: 10px;
     /* Aumentado padding para más espacio */
     box-sizing: border-box;
 }
@@ -38,6 +37,7 @@
 .thumbnail-wrapper {
     position: relative;
     margin-right: 20px;
+    margin-left: 100px;
 }
 
 .thumbnail-label {
@@ -49,8 +49,8 @@
 
 .thumbnail-container {
     position: relative;
-    width: 100px;
-    height: 100px;
+    width: 70px;
+    height: 70px;
     border-radius: 50%;
     overflow: hidden;
     border: 2px solid #ccc;
@@ -72,8 +72,8 @@
 
 /* Placeholder de la miniatura */
 .thumbnail-placeholder {
-    width: 100px;
-    height: 100px;
+    width: 70px;
+    height: 70px;
     border-radius: 50%;
     background-color: #ddd;
     display: flex;
@@ -91,37 +91,10 @@
     border-color: #228291;
 }
 
-/* Icono de eliminar */
-.remove-icon {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: rgba(0, 0, 0, 0.6);
-    color: white;
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 20px;
-    cursor: pointer;
-    opacity: 0;
-    transition: opacity 0.3s ease, transform 0.3s ease;
-}
-
-.thumbnail-container:hover .remove-icon {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1.2);
-    /* Aumenta ligeramente al aparecer */
-    z-index: 10;
-}
-
 /* Estilo del input del nombre del collage */
 .collage-name-input {
     flex: 1;
-    padding: 12px 20px;
+    padding: 10px 20px;
     /* Añadido padding horizontal */
     border: 1px solid #ccc;
     /* Color de borde fijo */
@@ -143,7 +116,7 @@
     justify-content: flex-start;
     max-width: 300px;
     width: 100%;
-    padding: 12px;
+    padding: 10px;
     margin: 10px 0;
     border: 1px solid #ccc;
     border-radius: 8px;
@@ -185,6 +158,9 @@
 
 /* Contenedor del carrusel */
 .carousel-container {
+    height: 250px;
+    margin-top: 10px;
+    margin-bottom: 10px;
     width: 100%;
     max-width: 1400px;
     padding: 20px 0;
@@ -232,6 +208,10 @@
 
 /* Estilo para el componente Collage */
 .create-collage .collage-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     width: 100%;
-    box-sizing: border-box;
+    min-height: 100vh;
+    max-width: 1850px;
 }
